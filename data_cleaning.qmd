@@ -118,7 +118,7 @@ table(merged$diagnosis, useNA = "ifany")
 
 ```{r}
 # Identifiera kolumner som är plasma-biomarkörer
-plasma_cols <- colnames(merged)[grepl("pT|Aβ|NfL|GFAP", colnames(merged))]
+plasma_cols <- colnames(merged)[grepl("pT|AB|NfL|GFAP", colnames(merged))]
 
 # Räkna antal rader med både diagnos, amyloid och minst en plasma-biomarkör
 n_complete <- merged %>%
