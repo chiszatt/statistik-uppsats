@@ -36,28 +36,17 @@ library(dplyr)
 ```{r}
 # load data sets: Charley
 
-# loading adni library
-library(ADNIMERGE2)
-
-# biomarker data set
-plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
-
-# PET scan data
-amyloid_data = UCBERKELEY_AMY_6MM
-
-# dx data
-diagnosis_data = DXSUM
-```
-
-```{r}
-# Antal rader i plasma-data
-cat("Plasma-data rader:", nrow(plasma_data), "\n")
-
-# Antal rader i amyloid-PET-data
-cat("Amyloid-PET-data rader:", nrow(amyloid_data), "\n")
-
-# Antal rader i diagnos-data
-cat("Diagnos-data rader:", nrow(diagnosis_data), "\n")
+# # loading adni library
+# library(ADNIMERGE2)
+# 
+# # biomarker data set
+# plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+# 
+# # PET scan data
+# amyloid_data = UCBERKELEY_AMY_6MM
+# 
+# # dx data
+# diagnosis_data = DXSUM
 ```
 
 ```{r}
@@ -67,73 +56,41 @@ cat("Diagnos-data unika RID:", length(unique(diagnosis_data$RID)), "\n")
 ```
 
 ```{r}
+# selecting the relevant variables -> why these ones???
+plasma_data = plasma_data %>% select(
+  "ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "pT217_F", "AB42_F",
+  "AB40_F", "AB42_AB40_F", "pT217_AB42_F", "NfL_Q", "GFAP_Q")
 
-# Filtrera baseline i varje dataset
-plasma_bl <- plasma_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
-amyloid_bl <- amyloid_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
-diagnosis_bl <- diagnosis_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
+diagnosis_data = diagnosis_data %>% select("ORIGPROT", "COLPROT", "RID", "VISCODE2",
+                                           "EXAMDATE", "DIAGNOSIS")
 
-# Merge datasets successivt (inner join för gemensamma rader)
-merged <- plasma_bl %>%
-  inner_join(amyloid_bl, by = c("RID", "VISCODE")) %>%
-  inner_join(diagnosis_bl, by = c("RID", "VISCODE"))
-
-# Skapa amyloid_status om SUVR finns
-if("COMPOSITE_REF_SUVR" %in% colnames(merged)){
-  merged <- merged %>%
-    mutate(amyloid_status = ifelse(COMPOSITE_REF_SUVR > 1.1, "A+", "A-"))
-} else if("SUMMARY_SUVR" %in% colnames(merged)){
-  merged <- merged %>%
-    mutate(amyloid_status = ifelse(SUMMARY_SUVR > 1.1, "A+", "A-"))
-} else {
-  warning("Ingen amyloid-SUVR-kolumn hittades för att skapa amyloid_status.")
-  merged$amyloid_status <- NA
-}
-
-# Skapa diagnosis
-if("DX" %in% colnames(merged)){
-  merged <- merged %>%
-    mutate(diagnosis = case_when(
-      DX == "CN" ~ "CN",
-      DX == "MCI" ~ "MCI",
-      DX == "AD" ~ "AD",
-      TRUE ~ NA_character_
-    ))
-} else if("DIAGNOSIS" %in% colnames(merged)){
-  merged <- merged %>%
-    mutate(diagnosis = case_when(
-      DIAGNOSIS == "CN" ~ "CN",
-      DIAGNOSIS == "MCI" ~ "MCI",
-      DIAGNOSIS == "AD" ~ "AD",
-      TRUE ~ NA_character_
-    ))
-} else {
-  warning("Ingen diagnos-kolumn hittades.")
-  merged$diagnosis <- NA
-}
-
-# Kontrollera resultat
-cat("Antal rader i merged dataset:", nrow(merged), "\n")
-cat("Antal unika deltagare:", length(unique(merged$RID)), "\n")
-table(merged$amyloid_status, useNA = "ifany")
-table(merged$diagnosis, useNA = "ifany")
-```
-
-```{r}
-# Identifiera kolumner som är plasma-biomarkörer
-plasma_cols <- colnames(merged)[grepl("pT|AB|NfL|GFAP", colnames(merged))]
-
-# Räkna antal rader med både diagnos, amyloid och minst en plasma-biomarkör
-n_complete <- merged %>%
-  filter(
-    !is.na(amyloid_status),
-    !is.na(diagnosis),
-    rowSums(!is.na(select(., all_of(plasma_cols)))) > 0
-  ) %>%
-  nrow()
-
-n_complete
+# merging the plasma data set and the diagnosis data set by RID (unique identifier)
+merged = plasma_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx"))
 
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
 grep("381_S_10###", merged$PTID)
+```
+
+```{r}
+test = merged %>%
+#   grouping by the unique identifier
+  group_by(RID) %>%
+#   extracting only rows with the most recent diagnosis exam date
+  slice_max(EXAMDATE_dx) %>%
+#   and the earlier plasma exam date (for baseline)
+  slice_min(EXAMDATE_plasma) %>%
+#   creating a new variable event, 1 = AD, 0 otherwise
+  mutate(event = case_when(
+    DIAGNOSIS == "Dementia" ~ 1,
+    TRUE ~ 0
+  ))
+
+# some patients have a first observation that is not "bl", it seems to be that this is the case even in the original plasma data set so might not be a coding problem but let's try and check this!
+```
+
+```{r}
+cat("Antal rader i merged dataset:", nrow(test), "\n")
+cat("Antal unika deltagare:", length(unique(test$RID)), "\n")
+table(test$event, useNA = "ifany")
 ```
