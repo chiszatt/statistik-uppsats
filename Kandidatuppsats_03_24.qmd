@@ -91,6 +91,28 @@ colSums(is.na(merged_data[, c("pT217_F", "time_years", "DIAGNOSIS")]))
 
 # 3. Longitudinal model
 
+-   Biomarker process
+
+-   Describes the trajectory of biomarkers at the individual level 
+
+**Linear mixed effects models?** What are these - why use them here?
+
+$$
+y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+$$
+m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2)
+$$
+
+$y_i(t):$ the observed longitudinal biomarker
+
+$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
+
+$\mathbf{X_i}^T(t)\beta:$ the fixed effects
+
+$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
+
 ```{r}
 # Longitudinal model
 library(nlme)
@@ -126,6 +148,26 @@ qqline(residuals, col = "red")
 
 # 4. Survival model
 
+-   Time-to-diagnosis process
+
+-   Parametric baseline hazard: **flexible parametrics, splines**
+
+-   OR leave undefined -\> Cox PH model
+
+Assuming a Cox PH survival sub-model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
+$$
+
+$\mathbf{v_i}:$ vector of time-independent co-variates
+
+$\phi:$ vector of log-hazard ratios
+
+$\alpha:$ the association parameter
+
+$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
+
 ```{r}
 library(survival)
 
@@ -140,6 +182,26 @@ summary(surv_model)
 ```
 
 # 5. Joint-model
+
+In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
+
+The association structure of the joint model:
+
+-   How is the longitudinal model linked to the survival model? 
+
+-   Does this association structure change for different biomarkers?
+
+-   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
+
+If we include the current rate of change alongside the current value in the proportional-hazard model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
+$$
+
+$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
+
+$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
 
 ```{r}
 library(JMbayes2)
