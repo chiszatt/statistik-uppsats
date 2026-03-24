@@ -36,17 +36,17 @@ library(dplyr)
 ```{r}
 # load data sets: Charley
 
-# # loading adni library
-# library(ADNIMERGE2)
-# 
-# # biomarker data set
-# plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
-# 
-# # PET scan data
-# amyloid_data = UCBERKELEY_AMY_6MM
-# 
-# # dx data
-# diagnosis_data = DXSUM
+# loading adni library
+library(ADNIMERGE2)
+
+# biomarker data set
+plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+
+# PET scan data
+amyloid_data = UCBERKELEY_AMY_6MM
+
+# dx data
+diagnosis_data = DXSUM
 ```
 
 ```{r}
@@ -96,5 +96,20 @@ length(test$RID)
 ```
 
 ```{r}
+# We want to check how many obs we have going from CN -> AD: if this is low we need to take in to account going from CN -> MCI, MCI -> AD, CN -> AD
+# data frame with the first and last diagnosis exam date 
+min_max_examdate_dx = rbind(merged %>% group_by(RID) %>%
+                              filter(EXAMDATE_dx == min(EXAMDATE_dx)),
+                            merged %>% group_by(RID) %>%
+                              filter(EXAMDATE_dx == max(EXAMDATE_dx))) %>%
+  arrange(RID) %>%
+  mutate(dx = case_when(
+    DIAGNOSIS == "Dementia" ~ 1,
+    TRUE ~ 0
+  ))
+```
 
+```{r}
+# count how many obs have change in diagnosis from CN to AD: not finished!
+min_max_examdate_dx %>% group_by(RID) %>% filter(min(EXAMDATE_dx))
 ```
