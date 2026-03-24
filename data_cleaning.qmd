@@ -7,7 +7,7 @@ editor: visual
 ## Data cleaning
 
 ```{r}
-lbrary(dplyr)
+library(dplyr)
 ```
 
 ```{r}
@@ -36,14 +36,17 @@ lbrary(dplyr)
 ```{r}
 # load data sets: Charley
 
+# loading adni library
+library(ADNIMERGE2)
+
 # biomarker data set
-# plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
-# 
+plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+
 # PET scan data
-# amyloid_data = UCBERKELEY_AMY_6MM
-# 
+amyloid_data = UCBERKELEY_AMY_6MM
+
 # dx data
-# diagnosis_data = DXSUM
+diagnosis_data = DXSUM
 ```
 
 ```{r}
@@ -66,9 +69,9 @@ cat("Diagnos-data unika RID:", length(unique(diagnosis_data$RID)), "\n")
 ```{r}
 
 # Filtrera baseline i varje dataset
-plasma_bl <- plasma_data %>% filter(VISCODE %in% c("bl", "4_bl"))
-amyloid_bl <- amyloid_data %>% filter(VISCODE %in% c("bl", "4_bl"))
-diagnosis_bl <- diagnosis_data %>% filter(VISCODE %in% c("bl", "4_bl"))
+plasma_bl <- plasma_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
+amyloid_bl <- amyloid_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
+diagnosis_bl <- diagnosis_data %>% filter(VISCODE %in% c("bl", "v03", "4_bl"))
 
 # Merge datasets successivt (inner join för gemensamma rader)
 merged <- plasma_bl %>%
@@ -130,4 +133,7 @@ n_complete <- merged %>%
   nrow()
 
 n_complete
+
+# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
+grep("381_S_10###", merged$PTID)
 ```
