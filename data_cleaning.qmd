@@ -90,7 +90,11 @@ test = merged %>%
 ```
 
 ```{r}
-cat("Antal rader i merged dataset:", nrow(test), "\n")
-cat("Antal unika deltagare:", length(unique(test$RID)), "\n")
-table(test$event, useNA = "ifany")
+# some duplicate RIDs, why is this?
+length(unique(test$RID))
+length(test$RID)
+```
+
+```{r}
+
 ```
