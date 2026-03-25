@@ -143,13 +143,13 @@ merged = merged %>% filter(as.character(EXAMDATE_dx) != "NA")
 ```
 
 ```{r}
-# 1) Filtrera personer med minst 2 mätningar
-merged_data <- merged_data %>%
-  group_by(RID) %>%
-  filter(n() > 1) %>%
-  ungroup()
+unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+```
 
-table(table(merged_data$RID))
+```{r}
+# 1) Filtrera personer med minst 2 mätningar
+keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
 
 # 2) Skapa baseline-datum
 merged_data <- merged_data %>%
