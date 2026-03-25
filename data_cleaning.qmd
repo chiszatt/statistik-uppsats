@@ -97,19 +97,32 @@ length(test$RID)
 
 ```{r}
 # We want to check how many obs we have going from CN -> AD: if this is low we need to take in to account going from CN -> MCI, MCI -> AD, CN -> AD
-# data frame with the first and last diagnosis exam date 
-min_max_examdate_dx = rbind(merged %>% group_by(RID) %>%
-                              filter(EXAMDATE_dx == min(EXAMDATE_dx)),
-                            merged %>% group_by(RID) %>%
-                              filter(EXAMDATE_dx == max(EXAMDATE_dx))) %>%
-  arrange(RID) %>%
-  mutate(dx = case_when(
+
+# creating a data frame with only the baseline diagnosis for each patient and creating an event variable which describes whether diagnosis changes from CN/MCI -> AD
+first_dx = merged %>% group_by(RID) %>%
+  filter(EXAMDATE_dx == min(EXAMDATE_dx)) %>%
+  mutate(event = case_when(
     DIAGNOSIS == "Dementia" ~ 1,
     TRUE ~ 0
   ))
-```
 
-```{r}
-# count how many obs have change in diagnosis from CN to AD: not finished!
-min_max_examdate_dx %>% group_by(RID) %>% filter(min(EXAMDATE_dx))
+# creating a data frame with only the last diagnosis for each patient and creating an event variable which describes whether diagnosis changes from CN/MCI -> AD
+last_dx = merged %>% group_by(RID) %>%
+  filter(EXAMDATE_dx == max(EXAMDATE_dx)) %>%
+    mutate(event = case_when(
+    DIAGNOSIS == "Dementia" ~ 1,
+    TRUE ~ 0
+  ))
+
+# merging the two data frames with the first and last and recoding diagnosis as 1 = AD, 0 otherwise in order to compare the first and last values
+first_last_dx = merge(
+#   merging the data set of first and last diagnoses by RID 
+  first_dx, last_dx,by = "RID", suffix = c("_first", "_last")) %>%
+#   arranging by ascending RID to check format
+  arrange(RID) %>%
+#   adding a variable to check whether the diagnosis changed from CN/MCI to AD
+  mutate(dx_change = event_first != event_last)
+
+# count how many obs have change in diagnosis from CN to AD
+table(first_last_dx$dx_change)
 ```
