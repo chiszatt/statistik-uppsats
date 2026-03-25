@@ -105,7 +105,7 @@ baseline_plasma <- merged_data %>%
   filter(VISCODE2.x == "bl") %>%       # baseline plasma
   group_by(RID) %>%
   arrange(EXAMDATE.x) %>%
-  slice(1) %>% # We choose the earliest baseline date (since there are sometimes more than 1)
+  slice(1) %>% # We choose the earliest baseline date 
   ungroup()
 ```
 
