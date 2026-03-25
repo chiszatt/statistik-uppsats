@@ -1,21 +1,43 @@
 ---
-format: pdf
+format:
+  pdf:
+    toc: false
+    colorlinks: false
+    number-sections: true
 editor: visual
 ---
 
-::: {.flushright data-latex="" style="fontsize: 20"}
-Kandidatuppsats
+\begin{flushright}
 
-Statistiska Institutionen
+\Huge \textbf{Kandidatuppsats}
 
-Nr 2026:x
+\vspace{\stretch{1}}
 
-\<Title in English\>
+\Large Statistiska Instiutionen
 
-\<Title in Swedish\>
+\vspace{\stretch{1}}
 
-Charlotte Emily Iszatt and Milou Rossi
-:::
+\Huge \textbf{Nr 2026:x}
+
+\vspace{\stretch{1}}
+
+\LARGE \textbf{Title in English}
+
+\large Title in Swedish
+
+\vspace{\stretch{1}}
+
+\huge Charlotte Emily Iszatt and Milou Rossi
+
+\vspace{\stretch{1}}
+
+\end{flushright}
+
+```{=latex}
+\tableofcontents
+
+\newpage
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, output = FALSE)
@@ -31,6 +53,10 @@ library(survival)
 ```
 
 ## 1. Vi plockar ut unika biomarkörer och diagnoser och slår ihop dem till ett dataset
+
+```{r}
+ADNIMERGE2::DM
+```
 
 ```{r}
 # load data sets: Charley
@@ -132,14 +158,14 @@ merged_data = plasma_data %>%
   mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
   
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
-grep("381_S_10###", merged$PTID)
+grep("381_S_10###", merged_data$PTID)
 
 # checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
-sum(as.numeric(is.na(merged$EXAMDATE_plasma)))
-sum(as.numeric(is.na(merged$EXAMDATE_dx)))
+sum(as.numeric(is.na(merged_data$EXAMDATE_plasma)))
+sum(as.numeric(is.na(merged_data$EXAMDATE_dx)))
 
 # removing the obs with no EXAMDATE_dx
-merged = merged %>% filter(as.character(EXAMDATE_dx) != "NA")
+merged = merged_data %>% filter(as.character(EXAMDATE_dx) != "NA")
 ```
 
 ```{r}
