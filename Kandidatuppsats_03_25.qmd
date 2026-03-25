@@ -1,0 +1,357 @@
+---
+title: "test"
+format: pdf
+editor: visual
+---
+
+```{r, warning=FALSE}
+# We load necessary packages 
+library(dplyr)     # for data manipulation
+```
+
+## 1. Merging the datasets
+
+```{r}
+# We load plasma data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
+plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
+
+# We load diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+# We merge the two datasets using patient ID
+merged_data <- merge(plasma_data, diagnosis_data, by = "RID")
+```
+
+# 2. Pre-processing
+
+## 2.1 We select only the variables needed for longitudinal + survival + joint model
+
+```{r}
+merged_data <- merged_data[, c(
+
+  # Patient ID
+  "RID",
+
+  # Visit indicators (used to detect baseline)
+  "VISCODE2.x",   # plasma visit code
+  "VISCODE2.y",   # diagnosis visit code
+
+  # Visit dates
+  "EXAMDATE.x",   # plasma visit date
+  "EXAMDATE.y",   # diagnosis visit date
+
+  # Longitudinal biomarker
+  "pT217_F",
+
+  # Diagnosis (used to define the event)
+  "DIAGNOSIS"
+
+  # Optional additional biomarkers (can be useful as covariates)
+  #"AB42_F",
+  #"AB40_F",
+  #"AB42_AB40_F",
+  #"NfL_Q",
+  #"GFAP_Q"
+)]
+```
+
+## 2.2 We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# We load the demographics dataset
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (EXAMDATE.x)
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE.x, "%Y")) - merged_data$PTDOBYY
+```
+
+## 2.3 We create time variable for longitudinal model
+
+We need this because the longitudinal model require a numeric measure of follow-up time to estimate how pT217_F changes over time.
+
+```{r, warning=FALSE}
+# Longitudinal time variable (from plasma visits)
+merged_data$time_months <- as.numeric(sub("m", "", merged_data$VISCODE2.x))
+merged_data$time_months[merged_data$VISCODE2.x == "bl"] <- 0
+
+# We check that time variables were created correctly
+table(merged_data$time_months)
+```
+
+## 2.4 We extract baseline visits (first plasma visit per patient)
+
+```{r}
+# First baseline plasma per person
+baseline_plasma <- merged_data %>%
+  filter(VISCODE2.x == "bl") %>%       # baseline plasma
+  group_by(RID) %>%
+  arrange(EXAMDATE.x) %>%
+  slice(1) %>% # We choose the earliest baseline date (since there are sometimes more than 1)
+  ungroup()
+```
+
+## 2.5 We keep only diagnosis visits after baseline
+
+So that we don't get negative time-to-event values
+
+Det fanns nämligen typ 300 observationer med diagnosdatum innan baseline plasmabesöken, om vi tar med de får vi t.ex. -300 i time-to-event
+
+```{r}
+# We keep only diagnosis visits after baseline 
+baseline_plus_diag <- merged_data %>%
+  filter(EXAMDATE.y >= baseline_plasma$EXAMDATE.x[match(RID, baseline_plasma$RID)])  # diagnosis after baseline
+```
+
+## 2.6 We create surv_data with an event variable (conversion to AD) and a time to event variable
+
+```{r}
+# We create surv_data: one row per person with event and time to event
+surv_data <- baseline_plus_diag %>%
+  group_by(RID) %>%
+  summarise(
+    baseline_date = min(EXAMDATE.x),
+    event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
+    time_to_event = ifelse(
+      event == 1,
+      min(EXAMDATE.y[DIAGNOSIS == "Dementia"] - baseline_date),  # time to first dementia (in days)
+      max(EXAMDATE.y - baseline_date)                             # censored time
+    ),
+    .groups = "drop"
+  )
+
+table(surv_data$event)
+```
+
+## 2.7 We include demographics, to use in a coxph model
+
+```{r}
+# We merge age_at_baseline and PTGENDER into surv_data
+surv_data <- surv_data %>%
+  left_join(
+    merged_data %>% select(RID, age_at_visit, PTGENDER) %>% 
+      group_by(RID) %>% 
+      slice(1) %>%  # keep first row per person (baseline)
+      ungroup(),
+    by = "RID"
+  ) %>%
+  rename(age_at_baseline = age_at_visit)
+```
+
+## We check the structure of surv_data
+
+```{r}
+head(surv_data)
+```
+
+## We check for negative event times or missing values in surv_data
+
+```{r}
+# We check for negative event times
+negative_times <- surv_data %>%
+  filter(time_to_event < 0)
+nrow(negative_times)
+
+# We check for NAs in event or time_to_event
+nas <- surv_data %>%
+  filter(is.na(event) | is.na(time_to_event))
+nrow(nas)
+
+# We check also for duplicates 
+any(duplicated(surv_data$RID))
+```
+
+## To check if the event and time_to_event is correct (comparing surv_data with merged_data)
+
+```{r}
+# We extract RID = 42 from surv_data
+surv_rid10 <- surv_data %>%
+  filter(RID == 42)
+
+surv_rid10  # shows baseline_date, event, time_to_event_days for RID 10
+
+# We extract all rows with RID 42 from merged_data
+merged_rid10 <- merged_data %>%
+  filter(RID == 42)
+
+merged_rid10  # shows all visits for RID 42, plasma and diagnosis
+```
+
+## We check missing values after pre-processing
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+## We remove all missing values
+
+```{r}
+merged_data <- merged_data %>%
+  filter(!is.na(pT217_F) &
+         !is.na(time_months) &
+         !is.na(age_at_visit) &
+         !is.na(PTGENDER) &
+         !is.na(EXAMDATE.y) &
+         !is.na(DIAGNOSIS))
+
+sapply(merged_data, function(x) sum(is.na(x)))
+```
+
+# 3. Longitudinal model
+
+## 3.1 We remove participants with only 1 measurement 
+
+```{r}
+# We check the number of measurements per subject
+table(table(merged_data$RID))  # counts of measurements per individual
+
+# We keep only RIDs with more than 1 measurement
+counts <- table(merged_data$RID)
+keep_rids <- names(counts[counts > 1])
+
+# Subset merged_data
+merged_data <- merged_data[merged_data$RID %in% keep_rids, ]
+```
+
+## 3.2 Fitted LME (linear mixed-effects) model
+
+```{r}
+library(nlme) 
+# We fit longitudinal 
+long_model <- lme(
+  pT217_F ~ time_months + age_at_visit + PTGENDER,
+  random = ~ time_months | RID,
+  data = merged_data
+)
+summary(long_model)
+
+# We confirm class
+class(long_model)  # should return "lme" "nlme"
+```
+
+## 3.2 Residuals
+
+```{r}
+# Residuals
+residuals <- resid(long_model)
+
+# Fitted values
+fitted_values <- fitted(long_model)
+
+# Plot of residuals vs fitted values 
+plot(fitted_values, residuals,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted values")
+abline(h = 0, col = "red", lty = 2)
+```
+
+## 3.3 QQ plot
+
+```{r}
+qqnorm(residuals)
+qqline(residuals, col = "red")
+```
+
+# 4. Survival model
+
+## 4.1 We create a survival object
+
+```{r}
+library(survival)  
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+## 4.2 Kaplan-Meier curve
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+## 4.3 Fitted Coxph model
+
+```{r}
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+# 5. Joint-model
+
+```{r}
+library(JMbayes2)
+joint_model_bayes <- jm(
+  long_model,
+  surv_model,
+  time_var = "time_months"
+)
+```
+
+# Andra sätt vi kan utveckla vår uppsats
+
+1\. Om vi vill lägga till kovariatet APOE4 = genetisk riskfaktor för AD (t.ex. antal alleler: 0,1,2). Kanske i variabeln "GENOTYPE" –\> lägga till de i cox-modellen (survival-modellen)
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe_data <- APOERES  
+```
+
+1\. Lägga till fler kovariater, t.ex. utbildning och etnicitet (variablerna PTEDUCAT och PTETHCAT/PTRACCAT)
+
+2\. Lägga till interaktioner i modellerna (t.ex. time_years \* AGE)
+
+3\. Residualdiagnostik för LME
+
+4\. Kolla antagandet om proportional hazards (att hazard ratio är konstant över tid)
+
+5\. Sensitivitetsanalyser, t.ex. ändra definitionen av event, såsom olika kriterier för AD-diagnos.
+
+**Användning av flera biomarkörer:**
+
+6\. Analysera flera biomarkörer separat - skapa enskilda modeller för varje biomarkör (t.ex. pT217, AB42, tau) för att se deras individuella effekter.
+
+7\. Modellera flera biomarkörer samtidigt - bygga en multivariat joint-modell där varje biomarkör är ett longitudinellt utfall i modellen.
+
+8\. Kombinera biomarkörer till ratio eller index - t.ex. AB42/AB40 eller pTau/AB42, och använda dessa som en enda variabel i modellen.
+
+9\. Reducera dimension med **PCA** - göra principal component analysis på flera biomarkörer och använda komponenter som utfall i joint-modellen.
+
+10\. Jämföra modeller med olika biomarkörssammansättningar - utvärdera skillnader i prediktion och signifikans för olika kombinationer av biomarkörer.
