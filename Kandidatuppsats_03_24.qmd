@@ -126,14 +126,20 @@ plasma_data = plasma_data %>%
 diagnosis_data = diagnosis_data %>%
   select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
 
-# merging the plasma data set and the diagnosis data set by RID (unique identifier)
+# merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
 merged_data = plasma_data %>%
-  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx"))
-```
+  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
+  mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
+  
+# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
+grep("381_S_10###", merged$PTID)
 
-```{r}
-# För att kolla hur många mätningar individer har
-table(table(merged_data$RID))
+# checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
+sum(as.numeric(is.na(merged$EXAMDATE_plasma)))
+sum(as.numeric(is.na(merged$EXAMDATE_dx)))
+
+# removing the obs with no EXAMDATE_dx
+merged = merged %>% filter(as.character(EXAMDATE_dx) != "NA")
 ```
 
 ```{r}
