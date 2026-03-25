@@ -101,6 +101,8 @@ merged_data <- plasma_data %>%
 
 # 2. Pre-processing
 
+ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
+
 Some bullet points to add to the final paper about things we thought about/did:
 
 -   Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)
