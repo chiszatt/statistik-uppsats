@@ -1,29 +1,95 @@
 ---
-title: "test"
 format: pdf
 editor: visual
 ---
 
+::: {.flushright data-latex="" style="fontsize: 20"}
+Kandidatuppsats
+
+Statistiska Institutionen
+
+Nr 2026:x
+
+\<Title in English\>
+
+\<Title in Swedish\>
+
+Charlotte Emily Iszatt and Milou Rossi
+:::
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, output = FALSE)
+```
+
+```{r}
+# loading libraries
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+```
+
 ## 1. Vi plockar ut unika biomarkörer och diagnoser och slår ihop dem till ett dataset
 
+```{r}
+# load data sets: Charley
+# loading adni library
+library(ADNIMERGE2)
+
+# biomarker data set
+plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+
+# PET scan data
+amyloid_data = UCBERKELEY_AMY_6MM
+
+# dx data
+diagnosis_data = DXSUM
+
+# APOE GENOTYPING
+apoe_data = APOERES
+
+# deprivation index
+deprivation = ADI
+
+# demographics
+demog1 = PTDEMOG
+demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
+
+demographics = demog1 %>%
+  inner_join(demog2, by = c("RID"))
+
+# # loading data sets: Milou
+# # Skapa en mapp för att packa upp
+# outdir <- "ADNIMERGE2_unpacked"
+# dir.create(outdir, showWarnings = FALSE)
+# 
+# # Packa upp tar.gz-filen
+# untar("ADNIMERGE2.tar.gz", exdir = outdir)
+# 
+# # Plasma-biomarkörer
+# load(file.path(outdir, "ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda"))
+# plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
+# 
+# # Amyloid-PET
+# load(file.path(outdir, "ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+# amyloid_data <- UCBERKELEY_AMY_6MM
+# 
+# # Diagnos
+# load(file.path(outdir, "ADNIMERGE2/data/DXSUM.rda"))
+# diagnosis_data <- DXSUM
+
+# # Demographics
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+
+# # Genotype data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe_data <- APOERES  
+```
+
 ```{r, warning=FALSE}
-# Ladda bibliotek
-library(dplyr)
-library(lme4)
-
-# Ladda plasma-data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
-plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
-
-# Ladda diagnos-data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-
-# Vi mergar de 2 dataseten
-library(dplyr)
-plasma_data$EXAMDATE <- as.Date(plasma_data$EXAMDATE)
-diagnosis_data$EXAMDATE <- as.Date(diagnosis_data$EXAMDATE)
-
+# MERGING DATA TEST
 merged_data <- plasma_data %>%
   inner_join(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
   mutate(time_diff = abs(EXAMDATE_plasma - EXAMDATE_dx)) %>%
@@ -35,21 +101,55 @@ merged_data <- plasma_data %>%
 
 # 2. Pre-processing
 
+ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
+
+Some bullet points to add to the final paper about things we thought about/did:
+
+-   Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)
+
+-   Selecting relevant variables from diagnosis and biomarker/amyloid data set
+
+-   What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)
+
+-   What variables do we need for survival sub-model? (Event, time followed?)
+
+-   Joint model: time-var: a character string indicating the time variable in the mixed-effects model
+
+-   How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?
+
 ```{r}
-# För att kolla hur många mätningar individer har
-table(table(merged_data$RID))
+# selecting the relevant variables -> why these ones???
+plasma_data = plasma_data %>%
+  select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "pT217_F",
+         "AB42_F", "AB40_F", "AB42_AB40_F", "pT217_AB42_F", "NfL_Q", "GFAP_Q")
+
+diagnosis_data = diagnosis_data %>%
+  select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
+
+# merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
+merged_data = plasma_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
+  mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
+  
+# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
+grep("381_S_10###", merged$PTID)
+
+# checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
+sum(as.numeric(is.na(merged$EXAMDATE_plasma)))
+sum(as.numeric(is.na(merged$EXAMDATE_dx)))
+
+# removing the obs with no EXAMDATE_dx
+merged = merged %>% filter(as.character(EXAMDATE_dx) != "NA")
 ```
 
 ```{r}
-library(dplyr)
+unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+```
 
+```{r}
 # 1) Filtrera personer med minst 2 mätningar
-merged_data <- merged_data %>%
-  group_by(RID) %>%
-  filter(n() > 1) %>%
-  ungroup()
-
-table(table(merged_data$RID))
+keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
 
 # 2) Skapa baseline-datum
 merged_data <- merged_data %>%
@@ -91,9 +191,34 @@ colSums(is.na(merged_data[, c("pT217_F", "time_years", "DIAGNOSIS")]))
 
 # 3. Longitudinal model
 
+-   Biomarker process
+
+-   Describes the trajectory of biomarkers at the individual level 
+
+**Linear mixed effects models?** What are these - why use them here?
+
+$$
+y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+$$
+m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2)
+$$
+
+$y_i(t):$ the observed longitudinal biomarker
+
+$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
+
+$\mathbf{X_i}^T(t)\beta:$ the fixed effects
+
+$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
+
+### Assumptions!!
+
+-   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+
 ```{r}
 # Longitudinal model
-library(nlme)
 
 long_model <- lme(
   pT217_F ~ time_years, 
@@ -126,14 +251,38 @@ qqline(residuals, col = "red")
 
 # 4. Survival model
 
+-   Time-to-diagnosis process
+
+-   Parametric baseline hazard: **flexible parametrics, splines??**
+
+-   OR leave undefined -\> Cox PH model
+
+Assuming a Cox PH survival sub-model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
+$$
+
+$\mathbf{v_i}:$ vector of time-independent co-variates
+
+$\phi:$ vector of log-hazard ratios
+
+$\alpha:$ the association parameter
+
+$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
+
+### Assumptions!!
+
+-   What do we assume about the censoring process?
+
+-   Proportionality
+
 ```{r}
-library(survival)
 
 # Cox survival-modell
 surv_model <- coxph(
   Surv(time_to_event, event) ~ 1,   # ~1 = ingen covariat just nu
-  data = surv_data
-)
+  data = surv_data)
 
 # Kontrollera modellen
 summary(surv_model)
@@ -141,37 +290,66 @@ summary(surv_model)
 
 # 5. Joint-model
 
+In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
+
+The association structure of the joint model:
+
+-   How is the longitudinal model linked to the survival model? 
+
+-   Does this association structure change for different biomarkers?
+
+-   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
+
+If we include the current rate of change alongside the current value in the proportional-hazard model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
+$$
+
+$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
+
+$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
+
+Joint-model options:
+
+-   Longitudinal sub-model: model of class lme()
+
+### Assumptions!!
+
+-   Full conditional independence
+
+    -   Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
+
+    -   This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
+
+-   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
+
+-   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+
 ```{r}
-library(JMbayes2)
-
-joint_model <- jm(
-  surv_model,
-  long_model,
-  time_var = "time_years"
-)
-
-summary(joint_model)
+# joint_model <- jm(
+#   surv_model,
+#   long_model,
+#   time_var = "time_years"
+# )
+# 
+# summary(joint_model)
 ```
 
 ```{r}
-library(JMbayes2)
 
-joint_model <- jm(
-  Surv_object = surv_model,      # Cox-survivalmodell
-  Mixed_objects = long_model,       # Longitudinell modell
-  time_var = "time_years"        # tid i longitudinal data
-)
-
-summary(joint_model)
+# joint_model <- jm(
+#   Surv_object = surv_model,      # Cox-survivalmodell
+#   Mixed_objects = long_model,       # Longitudinell modell
+#   time_var = "time_years"        # tid i longitudinal data
+# )
+# 
+# summary(joint_model)
 ```
 
 # Kovariater som kan vara till användning?
 
 ```{r, warning=FALSE}
-# Demographics
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-
 head(demographics[, c("RID", "PTDOBYY", "PTGENDER")])
 ```
 
@@ -190,11 +368,6 @@ Vi kan kolla på andra variabler också såsom utbildning och etnicitet (variabl
 # Andra sätt vi kan utveckla vår uppsats
 
 1\. Om vi vill lägga till kovariatet APOE4 = genetisk riskfaktor för AD (t.ex. antal alleler: 0,1,2). Kanske i variabeln "GENOTYPE" –\> lägga till de i cox-modellen (survival-modellen)
-
-```{r}
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe_data <- APOERES  
-```
 
 2\. Lägg till interaktioner i LME (t.ex. time_years \* AGE)
 
