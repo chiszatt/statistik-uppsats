@@ -1,37 +1,57 @@
 ---
 format:
   pdf:
+    include-before-body:
+      text: |
+        \begin{titlepage}
+        \raggedleft
+        \vspace*{2cm}
+        
+        {\Huge\bfseries Kandidatuppsats\par}
+        \vspace{1.5cm}
+        
+        {\Large Statistiska Instiutionen\par}
+        \vspace{3cm}
+        
+        {\Huge\bfseries Nr 2026:x\par}
+        \vspace{0.5cm}
+        
+        {\LARGE \bfseries Title in English\par}
+
+        {\large Title in Swedish\par}
+        \vspace{0.5cm}
+        
+        {\large \today\par}
+        \vspace{3cm}
+        
+        {\Huge Charlotte Emily Iszatt and Milou Rossi\par}
+        
+        \vfill
+        
+        \end{titlepage}
+        
+        \begin{titlepage}
+        \raggedleft
+        
+        {\normalsize Självständigt arbete 15 högskolepoäng inom Statistik III, VT2026\par}
+        {\normalsize Handledare: Hans Nyqvist\par}
+        \vspace{2cm}
+        
+        \raggedright
+        {\huge\bfseries Abstract\par}
+        \vspace{1cm}
+        
+        {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
+        \vspace{3cm}
+        
+        \vfill
+        
+        \end{titlepage}
     toc: false
     colorlinks: false
     number-sections: true
 editor: visual
 ---
-
-\begin{flushright}
-
-\Huge \textbf{Kandidatuppsats}
-
-\vspace{\stretch{1}}
-
-\Large Statistiska Instiutionen
-
-\vspace{\stretch{1}}
-
-\Huge \textbf{Nr 2026:x}
-
-\vspace{\stretch{1}}
-
-\LARGE \textbf{Title in English}
-
-\large Title in Swedish
-
-\vspace{\stretch{1}}
-
-\huge Charlotte Emily Iszatt and Milou Rossi
-
-\vspace{\stretch{1}}
-
-\end{flushright}
 
 ```{=latex}
 \tableofcontents
@@ -52,31 +72,25 @@ library(nlme) # decide which package will we use for lme
 library(survival)
 ```
 
-## 1. Vi plockar ut unika biomarkörer och diagnoser och slår ihop dem till ett dataset
-
-```{r}
-ADNIMERGE2::DM
-```
-
 ```{r}
 # load data sets: Charley
 # loading adni library
-#library(ADNIMERGE2)
+library(ADNIMERGE2)
 
 # biomarker data set
 plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
 # PET scan data
-#amyloid_data = UCBERKELEY_AMY_6MM
+amyloid_data = UCBERKELEY_AMY_6MM
 
 # dx data
 diagnosis_data = DXSUM
 
 # APOE GENOTYPING
-#apoe_data = APOERES
+apoe_data = APOERES
 
 # deprivation index
-#deprivation = ADI
+deprivation = ADI
 
 # demographics
 demog1 = PTDEMOG
@@ -84,6 +98,8 @@ demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
 
 demographics = demog1 %>%
   inner_join(demog2, by = c("RID"))
+
+
 
 # # loading data sets: Milou# 
 # # Plasma-biomarkörer
@@ -104,21 +120,156 @@ demographics = demog1 %>%
 
 # # Genotype data
 # load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe_data <- APOERES  
+# apoe_data <- APOERES 
 ```
 
-```{r, warning=FALSE}
-# MERGING DATA TEST
-merged_data <- plasma_data %>%
-  inner_join(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
-  mutate(time_diff = abs(EXAMDATE_plasma - EXAMDATE_dx)) %>%
-  group_by(RID, EXAMDATE_plasma) %>%
-  slice_min(time_diff, n = 1) %>%
-  ungroup() %>%
-  filter(time_diff <= 90)
-```
+# Introduction
 
-# 2. Pre-processing
+## Background
+
+General background information.
+
+Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.
+
+## Research Context
+
+Assessing the current landscape in terms of the scientific literature.
+
+What is known?
+
+What has been done?
+
+Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)
+
+## Research Aims
+
+What are our research questions?
+
+Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
+
+How will we accomplish this?
+
+# Method
+
+Introduce the methods we will use.
+
+Why did we choose this method to answer the research question?
+
+## Linear Mixed Effect Model
+
+**Theory about the model... (specifically why we should use it)**
+
+-   Biomarker process
+
+-   Describes the trajectory of biomarkers at the individual level 
+
+**Linear mixed effects models?** What are these - why use them here?
+
+$$
+y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+$$
+m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2)
+$$
+
+$y_i(t):$ the observed longitudinal biomarker
+
+$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
+
+$\mathbf{X_i}^T(t)\beta:$ the fixed effects
+
+$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
+
+### Assumptions!!
+
+-   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+
+## Proportional Hazard Model 
+
+**Theory about the model... (specifically why we should use it)**
+
+-   Time-to-diagnosis process
+
+-   Parametric baseline hazard: **flexible parametrics, splines??**
+
+-   OR leave undefined -\> Cox PH model
+
+Assuming a Cox PH survival sub-model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
+$$
+
+$\mathbf{v_i}:$ vector of time-independent co-variates
+
+$\phi:$ vector of log-hazard ratios
+
+$\alpha:$ the association parameter
+
+$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
+
+### Assumptions!!
+
+-   What do we assume about the censoring process?
+
+-   Proportionality
+
+## Joint Model
+
+**Theory about the model... (specifically why we should use it)**
+
+In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
+
+The association structure of the joint model:
+
+-   How is the longitudinal model linked to the survival model? 
+
+-   Does this association structure change for different biomarkers?
+
+-   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
+
+If we include the current rate of change alongside the current value in the proportional-hazard model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
+$$
+
+$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
+
+$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
+
+Joint-model options:
+
+-   Longitudinal sub-model: model of class lme()
+
+### Assumptions!!
+
+-   Full conditional independence
+
+    -   Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
+
+    -   This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
+
+-   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
+
+-   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+
+# Data
+
+## ADNI
+
+Introducing the study, it's aims and the type of information gathered.
+
+**IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
+
+Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.
+
+## Introducing variables... bio-markers/amyloid data...
+
+Information about the variables we will use and why, what they can show, how are they recorded,
+
+## Pre-processing
 
 ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
 
@@ -135,6 +286,59 @@ Some bullet points to add to the final paper about things we thought about/did:
 -   Joint model: time-var: a character string indicating the time variable in the mixed-effects model
 
 -   How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?
+
+# Results
+
+Present the results from our analyses.
+
+Do not interpret results here! That should be done in the discussion.
+
+## Joint Model
+
+Results from the joint model
+
+## Comparison of predictive accuracy...
+
+Results from comparison of models... not sure what we will do but you get the idea haha
+
+# Discussion
+
+## Main findings
+
+Interpret the results. What did we find?
+
+## Relate to the research question(s)/previous literature
+
+How do our results help to answer the research question?
+
+Anything unexpected/not in accordance with previous studies?
+
+## Further research
+
+Suggest what kinds of questions this analysis leaves us with?
+
+What more can be done/looked at?
+
+# Conclusions
+
+Summary
+
+# References
+
+<https://www.mybib.com/tools/harvard-referencing-generator>
+
+```{r, warning=FALSE}
+# MERGING DATA TEST
+# merged_data <- plasma_data %>%
+#   inner_join(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
+#   mutate(time_diff = abs(EXAMDATE_plasma - EXAMDATE_dx)) %>%
+#   group_by(RID, EXAMDATE_plasma) %>%
+#   slice_min(time_diff, n = 1) %>%
+#   ungroup() %>%
+#   filter(time_diff <= 90)
+```
+
+# 2. Pre-processing
 
 ```{r}
 # selecting the relevant variables -> why these ones???
@@ -210,32 +414,6 @@ colSums(is.na(merged_data[, c("pT217_F", "time_years", "DIAGNOSIS")]))
 
 # 3. Longitudinal model
 
--   Biomarker process
-
--   Describes the trajectory of biomarkers at the individual level 
-
-**Linear mixed effects models?** What are these - why use them here?
-
-$$
-y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2)
-$$
-
-$$
-m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2)
-$$
-
-$y_i(t):$ the observed longitudinal biomarker
-
-$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
-
-$\mathbf{X_i}^T(t)\beta:$ the fixed effects
-
-$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
-
-### Assumptions!!
-
--   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
-
 ```{r}
 # Longitudinal model
 
@@ -270,32 +448,6 @@ qqline(residuals, col = "red")
 
 # 4. Survival model
 
--   Time-to-diagnosis process
-
--   Parametric baseline hazard: **flexible parametrics, splines??**
-
--   OR leave undefined -\> Cox PH model
-
-Assuming a Cox PH survival sub-model:
-
-$$
-h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
-$$
-
-$\mathbf{v_i}:$ vector of time-independent co-variates
-
-$\phi:$ vector of log-hazard ratios
-
-$\alpha:$ the association parameter
-
-$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
-
-### Assumptions!!
-
--   What do we assume about the censoring process?
-
--   Proportionality
-
 ```{r}
 
 # Cox survival-modell
@@ -308,42 +460,6 @@ summary(surv_model)
 ```
 
 # 5. Joint-model
-
-In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
-
-The association structure of the joint model:
-
--   How is the longitudinal model linked to the survival model? 
-
--   Does this association structure change for different biomarkers?
-
--   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
-
-If we include the current rate of change alongside the current value in the proportional-hazard model:
-
-$$
-h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
-$$
-
-$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
-
-$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
-
-Joint-model options:
-
--   Longitudinal sub-model: model of class lme()
-
-### Assumptions!!
-
--   Full conditional independence
-
-    -   Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
-
-    -   This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
-
--   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
-
--   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
 ```{r}
 joint_model <- jm(
