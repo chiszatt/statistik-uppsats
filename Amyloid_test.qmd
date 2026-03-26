@@ -1,0 +1,61 @@
+---
+title: "Amyloid test"
+format: pdf
+editor: visual
+---
+
+# Amyloid version (instead of plasma biomarkers)
+
+## 1. We load our datasets
+
+```{r}
+# We load diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+amyloid_data <- UCBERKELEY_AMY_6MM
+```
+
+## 2. We select only the required variables and merge them
+
+```{r}
+# selecting the relevant variables 
+amyloid_data <- amyloid_data %>%
+  select(
+    "RID",        # Participant ID
+    "ORIGPROT",   # Original protocol
+    "VISCODE2",   # Visit code
+    "SCANDATE",   # Date of amyloid-PET
+    "PROCESSDATE",
+    "CENTILOIDS",  # Main longitudinal variable (continuous amyloid)
+    "AMYLOID_STATUS"
+  )
+
+diagnosis_data = diagnosis_data %>%
+  select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
+
+# We merge by RID 
+merged_data = amyloid_data %>%
+  merge(diagnosis_data, by = "RID")
+```
+
+## 3. We filter participants with at least 2 measurements
+
+```{r}
+keep = unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+length(unique(merged_data$RID))
+```
+
+## 4. Checking for missing values
+
+```{r}
+# We count missing values per column in merged_data
+# sapply(merged_data, function(x) sum(is.na(x)))
+```
+
+## 5. We extract baseline visits, and create an event and time-to-event variable
+
+## 6. We create a time variable (time from baseline)
