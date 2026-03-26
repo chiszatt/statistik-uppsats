@@ -185,7 +185,7 @@ $\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
 
 -   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
 
-## Proportional Hazard Model 
+## Proportional Hazard Model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -342,6 +342,8 @@ Summary
 
 # 2. Pre-processing
 
+## 2.1 We select only the required variables and merge them
+
 ```{r}
 # selecting the relevant variables -> why these ones???
 plasma_data = plasma_data %>%
@@ -357,8 +359,16 @@ merged_data = plasma_data %>%
   mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
   
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
-grep("381_S_10###", merged_data$PTID)
+# grep("381_S_10###", merged_data$PTID)
+```
 
+```{r}
+unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+```
+
+## 2.2 We check missing values 
+
+```{r}
 # checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
 sum(as.numeric(is.na(merged_data$EXAMDATE_plasma)))
 sum(as.numeric(is.na(merged_data$EXAMDATE_dx)))
@@ -367,25 +377,54 @@ sum(as.numeric(is.na(merged_data$EXAMDATE_dx)))
 merged = merged_data %>% filter(as.character(EXAMDATE_dx) != "NA")
 ```
 
+## 2.3 We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
 ```{r}
-unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (EXAMDATE.plasma)
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")) - merged_data$PTDOBYY
 ```
+
+## 2.4 We filter participants with at least 2 measurements
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
 keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
+```
 
-# 2) Skapa baseline-datum
+## 2.5 We extract baseline visits, and create an event and time-to-event variable
+
+```{r}
+# Skapar baseline-datum
 merged_data <- merged_data %>%
   group_by(RID) %>%
   mutate(baseline_date = min(EXAMDATE_plasma)) %>%
   ungroup()
 
-# 3) Skapa event + time_to_event (Dementia räknas som event)
+# Skapar event + time_to_event (Dementia räknas som event)
 surv_data <- merged_data %>%
   group_by(RID) %>%
   summarize(
+    # Baseline-variabler
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_plasma)],
+    PTGENDER = PTGENDER[which.min(EXAMDATE_plasma)],
+    
     # Event = 1 om individen någonsin fått "Dementia", annars 0 (censurerad)
     event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
     
@@ -400,10 +439,14 @@ surv_data <- merged_data %>%
   ) %>%
   ungroup()
 
-# 4) Lägg survival-data tillbaka i merged_data
+# Lägger survival-data tillbaka i merged_data
 merged_data <- merged_data %>%
   left_join(surv_data, by = "RID")
+```
 
+## 2.6 We create a time variable (time from baseline)
+
+```{r}
 # 5) Skapa time_years (tid från baseline)
 merged_data <- merged_data %>%
   mutate(time_years = as.numeric(EXAMDATE_plasma - baseline_date) / 365.25)
