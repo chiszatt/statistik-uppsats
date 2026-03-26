@@ -35,22 +35,22 @@ library(survival)
 ```{r}
 # load data sets: Charley
 # loading adni library
-library(ADNIMERGE2)
+#library(ADNIMERGE2)
 
 # biomarker data set
 plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
 # PET scan data
-amyloid_data = UCBERKELEY_AMY_6MM
+#amyloid_data = UCBERKELEY_AMY_6MM
 
 # dx data
 diagnosis_data = DXSUM
 
 # APOE GENOTYPING
-apoe_data = APOERES
+#apoe_data = APOERES
 
 # deprivation index
-deprivation = ADI
+#deprivation = ADI
 
 # demographics
 demog1 = PTDEMOG
@@ -59,14 +59,7 @@ demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
 demographics = demog1 %>%
   inner_join(demog2, by = c("RID"))
 
-# # loading data sets: Milou
-# # Skapa en mapp för att packa upp
-# outdir <- "ADNIMERGE2_unpacked"
-# dir.create(outdir, showWarnings = FALSE)
-# 
-# # Packa upp tar.gz-filen
-# untar("ADNIMERGE2.tar.gz", exdir = outdir)
-# 
+# # loading data sets: Milou# 
 # # Plasma-biomarkörer
 # load(file.path(outdir, "ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda"))
 # plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
@@ -327,13 +320,13 @@ Joint-model options:
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
 ```{r}
-# joint_model <- jm(
-#   surv_model,
-#   long_model,
-#   time_var = "time_years"
-# )
-# 
-# summary(joint_model)
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
 ```
 
 ```{r}
