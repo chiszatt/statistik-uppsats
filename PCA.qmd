@@ -1,0 +1,100 @@
+---
+title: "PCA"
+format: pdf
+editor: visual
+---
+
+# PCA (for plasma biomarkers)
+
+```{r}
+# We load necessary packages 
+library(dplyr) # To manipulate and transform data
+library(corrplot) # To visualize correlation matrix
+```
+
+## 1. Loading the dataset (plasma biomarkers) 
+
+```{r}
+# We load plasma data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
+plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
+```
+
+## 2. Extracting the plasma biomarkers 
+
+```{r}
+# selecting the relevant variables -> why these ones???
+biomarkers = plasma_data %>%
+  select(
+    "pT217_F", 
+    "AB42_F", 
+    "AB40_F", 
+    "AB42_AB40_F", 
+    "pT217_AB42_F", 
+    "NfL_Q", 
+    "GFAP_Q"
+    )
+```
+
+## 3. Checking for and removing missing values 
+
+```{r}
+# We count missing values per column in merged_data
+sapply(biomarkers, function(x) sum(is.na(x)))
+```
+
+```{r}
+biomarkers = biomarkers %>% filter(as.character(AB42_F) != "NA")
+biomarkers = biomarkers %>% filter(as.character(AB40_F) != "NA")
+biomarkers = biomarkers %>% filter(as.character(AB42_AB40_F) != "NA")
+biomarkers = biomarkers %>% filter(as.character(pT217_AB42_F) != "NA")
+```
+
+## 4. Korrelationer mellan plasma-biomarkörerna 
+
+```{r}
+# We compute correlation matrix 
+cor_matrix <- cor(biomarkers)  
+
+# Correlation plot 
+corrplot(cor_matrix,
+         method = "color",
+         type = "upper",
+         order = "hclust",
+         tl.cex = 0.6,
+         number.cex = 0.5,
+         addCoef.col = "black",
+         diag = FALSE
+         )
+```
+
+## 5. Scaling 
+
+```{r}
+biomarkers_scaled <- scale(biomarkers, center = TRUE, scale = TRUE )
+```
+
+## 6. Extracting PCAs
+
+```{r}
+pca <- prcomp(biomarkers_scaled) 
+names(pca)
+```
+
+## 7. Determining the dimensions
+
+```{r}
+summary(pca)
+```
+
+```{r}
+# We do a scree plot by plotting the variances 
+plot(pca$sdev^2, type='b', main = "Scree Plot")
+```
+
+## 8. Examining the weights
+
+```{r}
+pca_loadings <- pca$rotation[, 1:3] 
+pca_loadings
+```
