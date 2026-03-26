@@ -329,17 +329,6 @@ Summary
 
 <https://www.mybib.com/tools/harvard-referencing-generator>
 
-```{r, warning=FALSE}
-# MERGING DATA TEST
-# merged_data <- plasma_data %>%
-#   inner_join(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
-#   mutate(time_diff = abs(EXAMDATE_plasma - EXAMDATE_dx)) %>%
-#   group_by(RID, EXAMDATE_plasma) %>%
-#   slice_min(time_diff, n = 1) %>%
-#   ungroup() %>%
-#   filter(time_diff <= 90)
-```
-
 # 2. Pre-processing
 
 ## 2.1 We select only the required variables and merge them
@@ -366,7 +355,7 @@ merged_data = plasma_data %>%
 unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 ```
 
-## 2.2 We check missing values 
+## 2.2 We check missing values
 
 ```{r}
 # checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
@@ -406,6 +395,9 @@ merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")
 # 1) Filtrera personer med minst 2 mätningar
 keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 2 measurements 
+length(keep)
 ```
 
 ## 2.5 We extract baseline visits, and create an event and time-to-event variable
