@@ -265,6 +265,8 @@ Introducing the study, it's aims and the type of information gathered.
 
 Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.
 
+We checked whether there were any individuals with a PTID in the format "381_S_10###" as per the ADNI leadership guidelines, which state that due to serious data quality concerns, data from these observations should not be used in any analysis. (SOURCE?)
+
 ## Introducing variables... bio-markers/amyloid data...
 
 Information about the variables we will use and why, what they can show, how are they recorded,
