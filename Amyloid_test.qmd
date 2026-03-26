@@ -6,6 +6,21 @@ editor: visual
 
 # Amyloid version (instead of plasma biomarkers)
 
+## Problemet här = 
+
+-   Finns både SCANDATE och PROCESSDATE som tidsvariabler, jag vet inte vilken jag ska utgå ifrån (hittills har jag utgått ifrån PROCESSDATE)
+
+-   Jag behövde merge by både RID och VISCODE2 för att få diagnosis-variabeln att se korrekt ut (annars fick jag bara MCI, NC och NA, INTE Dementia)
+
+```{r}
+# loading libraries
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+```
+
 ## 1. We load our datasets
 
 ```{r}
@@ -13,6 +28,7 @@ editor: visual
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 diagnosis_data <- DXSUM
 
+# We load amyloid data 
 load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
 amyloid_data <- UCBERKELEY_AMY_6MM
 ```
@@ -36,8 +52,12 @@ diagnosis_data = diagnosis_data %>%
   select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
 
 # We merge by RID 
-merged_data = amyloid_data %>%
-  merge(diagnosis_data, by = "RID")
+# merged_data = amyloid_data %>%
+  #merge(diagnosis_data, by = "RID")
+
+# We merge by RID and VISCODE2
+merged_data <- amyloid_data %>%
+  merge(diagnosis_data, by = c("RID", "VISCODE2"))
 ```
 
 ## 3. We filter participants with at least 2 measurements
@@ -46,16 +66,119 @@ merged_data = amyloid_data %>%
 keep = unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
-length(unique(merged_data$RID))
+# We check number of individuals with at least 2 measurements 
+length(keep)
 ```
 
-## 4. Checking for missing values
+## 4. We extract baseline visits, and create an event and time-to-event variable
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(PROCESSDATE)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event)
+surv_data <- merged_data %>%
+  group_by(RID) %>%
+  summarize(
+    # Event = 1 om individen någonsin fått "Dementia", annars 0 (censurerad)
+    event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
+    
+    # Tid till första "Dementia", annars tid till sista observation
+    time_to_event = as.numeric(
+      ifelse(
+        any(DIAGNOSIS == "Dementia"),
+        min(PROCESSDATE[DIAGNOSIS == "Dementia"]) - min(PROCESSDATE),  # dagar till event
+        max(PROCESSDATE) - min(PROCESSDATE)                               # censurerad tid
+      )
+    ) / 365.25  # konvertera till år
+  ) %>%
+  ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## 5. We create a time variable (time from baseline)
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(PROCESSDATE - baseline_date) / 365.25)
+```
+
+## 6. We check for missing values 
 
 ```{r}
 # We count missing values per column in merged_data
-# sapply(merged_data, function(x) sum(is.na(x)))
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## 5. We extract baseline visits, and create an event and time-to-event variable
+## 7. We remove missing values 
 
-## 6. We create a time variable (time from baseline)
+```{r}
+merged_data <- merged_data %>%
+  filter(
+    !is.na(CENTILOIDS),
+    !is.na(AMYLOID_STATUS),
+    !is.na(EXAMDATE),
+    !is.na(DIAGNOSIS),
+    !is.na(event),
+    !is.na(time_to_event)
+  )
+
+# We check missing values again 
+sapply(merged_data, function(x) sum(is.na(x)))
+```
+
+# Longitudinal model
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  CENTILOIDS ~ time_years, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model 
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+
+# Cox survival-modell
+surv_model <- coxph(
+  surv_object ~ 1,   # ~1 = ingen covariat just nu
+  data = surv_data)
+
+# Kontrollera modellen
+summary(surv_model)
+```
+
+# Joint model 
+
+```{r}
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```
