@@ -17,17 +17,6 @@ library(dplyr)
 ```
 
 ```{r}
-#HEAD
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-
-# We load demographics data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-```
-
-```{r}
 # load data sets: Milou
 # 
 # # We load CSF data 
@@ -50,7 +39,6 @@ csf_data = UPENNBIOMK_MASTER
 
 # dx data
 diagnosis_data = DXSUM
-
 ```
 
 ## 1. We select only the required variables and merge them
@@ -289,4 +277,8 @@ Vårt dataset har helt enkelt tidpunkter med risk-set utan variation, vilket gö
 #   )
 # 
 # summary(joint_model)
+```
+
+```{r}
+
 ```
