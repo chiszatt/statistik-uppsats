@@ -344,7 +344,7 @@ merged_data = plasma_data %>%
   mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
 ```
 
-## Concerning 381_S_10###
+## Concerning 381_S_10
 
 ```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
@@ -444,7 +444,7 @@ merged_data <- merged_data %>%
 colSums(is.na(merged_data[, c("pT217_F", "time_years", "DIAGNOSIS")]))
 ```
 
-## 6. We check for missing values in both merged_data and long_data 
+## 6. We check for missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
