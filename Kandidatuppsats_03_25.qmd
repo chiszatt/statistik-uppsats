@@ -30,7 +30,7 @@ demographics <- PTDEMOG
 
 # 2. Pre-processing
 
-## 2.1 We select only the required variables and merge them 
+## 2.1 We select only the required variables and merge them
 
 ```{r}
 # We select the relevant variables 
@@ -81,7 +81,7 @@ n_individuals <- length(keep)
 n_individuals
 ```
 
-## 2.4 We extract baseline visits, and create an event and time-to-event variable 
+## 2.4 We extract baseline visits, and create an event and time-to-event variable
 
 ```{r, warning=FALSE}
 # Skapar baseline-datum
@@ -123,7 +123,7 @@ merged_data <- merged_data %>%
 head(surv_data)
 ```
 
-## 2.6 We create a time variable (time from baseline) 
+## 2.6 We create a time variable (time from baseline)
 
 We need this because the longitudinal model require a numeric measure of follow-up time to estimate how pT217_F changes over time.
 
@@ -133,7 +133,7 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(EXAMDATE_plasma - baseline_date) / 365.25)
 ```
 
-## We check for negative event times or duplicates in surv_data 
+## We check for negative event times or duplicates in surv_data
 
 ```{r}
 # We check for negative event times

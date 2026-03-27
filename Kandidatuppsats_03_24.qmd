@@ -387,6 +387,9 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 2 measurements 
 length(keep)
+
+# We check exact number of measurements per individual
+#table(merged_data$RID)
 ```
 
 ## 4. We extract baseline visits, and create an event and time-to-event variable
@@ -538,11 +541,17 @@ plot(
 ```{r}
 # Cox survival-model with covariates
 surv_model <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER,
+  surv_object ~ age_at_baseline + PTGENDER,
   data = surv_data
 )
 
 summary(surv_model)
+```
+
+## 4.5 Testing for the assumption of proportional hazards
+
+```{r}
+cox.zph(surv_model)
 ```
 
 # 5. Joint-model

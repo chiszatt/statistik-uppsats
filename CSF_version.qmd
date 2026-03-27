@@ -20,6 +20,10 @@ csf_data <- UPENNBIOMK_MASTER
 # We load diagnosis data
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 diagnosis_data <- DXSUM
+
+# We load demographics data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 ```
 
 ## 1. We select only the required variables and merge them
@@ -35,6 +39,29 @@ diagnosis_data = diagnosis_data %>%
 # merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
 merged_data = csf_data %>%
   merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx"))
+```
+
+## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (DRAWDTE)
+merged_data$age_at_visit <- as.numeric(format(merged_data$DRAWDTE, "%Y")) - merged_data$PTDOBYY
 ```
 
 ## 3. We filter participants with at least 2 measurements
@@ -64,6 +91,10 @@ merged_data <- merged_data %>%
 surv_data <- merged_data %>%
   group_by(RID) %>%
   summarize(
+    # Baseline-variabler
+    age_at_baseline = age_at_visit[which.min(DRAWDTE)],
+    PTGENDER = PTGENDER[which.min(DRAWDTE)],
+    
     # Event = 1 if participant ever had "Dementia", else 0 (censored)
     event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
     
@@ -94,7 +125,7 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(DRAWDTE - baseline_date) / 365.25)  # time in years since baseline
 ```
 
-## 6. We check for and remove missing values in both merged_data and long_data 
+## 6. We check for and remove missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
@@ -122,12 +153,13 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ```{r}
 library(nlme)
 
-# Linear mixed-effects model for TAU over time
+merged_data$time_c <- merged_data$time_years - mean(merged_data$time_years, na.rm = TRUE)
+
 long_model <- lme(
-  TAU ~ time_years,
-  random = ~ time_years | RID,        # random intercept + slope per participant
+  TAU ~ time_c + age_at_visit + PTGENDER.x,
+  random = ~ time_c | RID,   # random intercept + slope
   data = merged_data
-)
+  )
 
 # Summary of the model
 summary(long_model)
@@ -135,21 +167,66 @@ summary(long_model)
 
 # 4. Survival model
 
+## 4.1 We create a survival object
+
 ```{r}
 # We create a Surv object: time and event
 surv_object <- Surv(
   time = surv_data$time_to_event, 
   event = surv_data$event
 )
+```
 
-# Cox survival-model 
+## 4.2 Kaplan-Meier curve
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+## 4.3 Fitted Coxph model
+
+```{r}
+# Cox survival-model with covariates
 surv_model <- coxph(
-  surv_object ~ 1,
+  surv_object ~ age_at_baseline + PTGENDER,
   data = surv_data
 )
 
 summary(surv_model)
 ```
+
+## 4.4 Testing for the assumption of proportional hazards
+
+```{r}
+cox.zph(surv_model)
+```
+
+cox.zph() fungerar inte matematiskt när risk-setet vid någon eventtidpunkt saknar variation i covariater, eftersom den försöker lösa ett linjärt system med score-residualer som blir singulärt och därmed omöjligt att invertera.
+
+–\> Alternativ:
+
+```{r}
+library(survival)
+library(survminer)
+
+fit <- survfit(surv_object ~ PTGENDER, data = surv_data)
+ggsurvplot(fit, data = surv_data)
+```
+
+"Linjerna är nästan horisontella → PH-antagandet verkar rimligt för kön.
+
+Spike vid tid 0 → orsakar singularitet i cox.zph().
+
+Vårt dataset har helt enkelt tidpunkter med risk-set utan variation, vilket gör att cox.zph() inte kan lösa matrisen, men visuellt är PH-antagandet inte brutet."
 
 # 5. Joint-model
 
