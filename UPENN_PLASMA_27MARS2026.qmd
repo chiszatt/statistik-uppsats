@@ -1,0 +1,51 @@
+---
+title: "Untitled"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(readr)
+biomarkers <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
+```
+
+```{r}
+rid_vis_counts <- biomarkers %>%
+  select(RID, VISCODE) %>%        # plocka ut kolumner
+  distinct() %>%                  # ta bort dubbletter
+  group_by(RID) %>%               # gruppera per deltagare
+  summarise(n_measurements = n()) %>%  # räkna antal unika mätningar
+  arrange(desc(n_measurements))   # sortera efter flest mätpunkter
+
+# Visa resultatet
+print(rid_vis_counts)
+```
+
+```{r}
+# Räkna antal mätpunkter per individ
+individual_counts <- biomarkers %>%
+  group_by(RID) %>%             # gruppera per deltagare
+  summarise(n_measurements = n_distinct(VISCODE)) %>%  # räkna unika tidpunkter
+  ungroup() %>%
+  filter(n_measurements > 2)    # bara de med >2 mätningar
+
+# Antal individer med fler än 2 mätpunkter
+n_individuals_gt2 <- nrow(individual_counts)
+print(n_individuals_gt2)
+```
+
+```{r}
+library(dplyr)
+
+# Räkna antal mätpunkter per individ
+measurement_distribution <- biomarkers %>%
+  group_by(RID) %>%
+  summarise(n_measurements = n_distinct(VISCODE)) %>%
+  ungroup() %>%
+  group_by(n_measurements) %>%
+  summarise(n_individuals = n()) %>%
+  arrange(n_measurements)
+
+# Visa resultatet
+print(measurement_distribution)
+```
