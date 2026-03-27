@@ -17,17 +17,6 @@ library(dplyr)
 ```
 
 ```{r}
-#HEAD
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-
-# We load demographics data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-```
-
-```{r}
 # load data sets: Milou
 # 
 # # We load CSF data 
@@ -37,6 +26,10 @@ demographics <- PTDEMOG
 # # We load diagnosis data
 # load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 # diagnosis_data <- DXSUM
+# 
+# We load demographics data 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
 ```
 
 ```{r}
@@ -51,6 +44,8 @@ csf_data = UPENNBIOMK_MASTER
 # dx data
 diagnosis_data = DXSUM
 
+# demographics data 
+demographics = PTDEMOG
 ```
 
 ## 1. We select only the required variables and merge them
@@ -66,6 +61,19 @@ diagnosis_data = diagnosis_data %>%
 # merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
 merged_data = csf_data %>%
   merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx"))
+```
+
+##### Checking the number of individuals in the data set after removing all missing values
+
+```{r}
+# checking number of individuals in the data set
+length(unique(csf_data$RID))
+
+# removing all missing values
+csf_data_full = na.omit(csf_data)
+
+# checking number of individuals after na.omit()
+length(unique(csf_data_full$RID))
 ```
 
 ## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
@@ -289,4 +297,8 @@ Vårt dataset har helt enkelt tidpunkter med risk-set utan variation, vilket gö
 #   )
 # 
 # summary(joint_model)
+```
+
+```{r}
+
 ```

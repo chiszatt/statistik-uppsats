@@ -76,7 +76,7 @@ merged_data <- amyloid_data %>%
 ## 3. We filter participants with at least 2 measurements
 
 ```{r}
-unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+length(unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID))
 ```
 
 ```{r}
@@ -117,6 +117,21 @@ surv_data <- merged_data %>%
 # Lägger survival-data tillbaka i merged_data
 merged_data <- merged_data %>%
   left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+# checking how many individuals convert to AD (event == 1 and time to event > 0)  
+surv_data %>% filter(time_to_event != 0, event == 1)
+
+# checking which individuals had a baseline AD diagnosis
+baseline_AD = (surv_data %>% filter(time_to_event == 0, event == 1))$RID
+
+# removing individuals with baseline AD diagnosis from the merged data set and the survival data set
+merged_data = merged_data %>% filter(!(RID %in% baseline_AD))
+surv_data = surv_data %>% filter(!(RID %in% baseline_AD))
 
 # We check the number of events 
 table(surv_data$event)
