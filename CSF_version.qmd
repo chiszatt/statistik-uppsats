@@ -58,24 +58,39 @@ merged_data = csf_data %>%
 
 ## 3. We filter participants with at least 2 measurements
 
-```{r}
-# this does not get unique draw dates
-# we need to find a way to get one observation for unique draw date
-# do we want to take an average over all run dates?
+First, we group the CSF data set by RID and DRAWDTE, create an average over different RUNDATE for each individual, remove the unwanted columns (RUNDATE, ABETA, TAU, PTAU). Then we remove duplicate rows and are left with a data frame with unique DRAWDTE for each individual and an average measurement for each biomarker. We check how many unique RID are in the data frame: $n_{RID} = 159$ but we have $n_{obs} = 613$.
 
-csf_data %>% group_by(RID) %>% filter(n() > 2)
+```{r}
+# grouping by RID and then DRAWDTE in order to compute means for ABETA, TAU and PTAU measurements over the different RUNDATES for each unique DRAWDTE
+csf_data_reduced = csf_data %>%
+#   grouping by RID and DRAWDTE
+  group_by(RID, DRAWDTE) %>%
+#   computing means for ABETA, TAU, PTAU for different RUNDATEs for each DRAWDAT
+  mutate(
+  ABETA_MEAN = mean(ABETA),
+  TAU_MEAN = mean(TAU),
+  PTAU_MEAN = mean(PTAU)
+) %>%
+#   removing unwanted columns
+  select(!c(RUNDATE, ABETA, TAU, PTAU))
+
+# removing duplicate rows with !duplicated()
+csf_data_reduced = csf_data_reduced[!duplicated(csf_data_reduced), ]
+
+# code that checks which individuals have more than 2 measurements AFTER we have gotten unique draw dates
+csf_data_reduced = csf_data_reduced %>% group_by(RID) %>% filter(n() > 2)
+
+# checking how many individuals we have in the reduced data set with only individuals with more than three CSF biomarker measurements 
+length(unique(csf_data_reduced$RID))
 ```
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((csf_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+keep = unique(csf_data_reduced$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 2 measurements 
 length(keep)
-
-# # We check exact number of measurements per individual
-# table(merged_data$RID)
 ```
 
 ## 4. We extract baseline visits, and create an event and time-to-event variable
