@@ -62,6 +62,7 @@ merged_data = csf_data %>%
 # this does not get unique draw dates
 # we need to find a way to get one observation for unique draw date
 # do we want to take an average over all run dates?
+
 csf_data %>% group_by(RID) %>% filter(n() > 2)
 ```
 
@@ -73,8 +74,8 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 2 measurements 
 length(keep)
 
-# We check exact number of measurements per individual
-#table(merged_data$RID)
+# # We check exact number of measurements per individual
+# table(merged_data$RID)
 ```
 
 ## 4. We extract baseline visits, and create an event and time-to-event variable
