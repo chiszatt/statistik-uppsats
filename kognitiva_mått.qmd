@@ -1,0 +1,38 @@
+---
+title: "test"
+format: pdf
+editor: visual
+---
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/ADAS.rda")
+ADAS <- ADAS
+```
+
+```{r}
+library(dplyr)
+
+# 1. Välj kolumner och ta bort dubbletter (RID + VISCODE + VISDATE)
+adas_unique <- ADAS %>%
+  select(RID, VISCODE, VISDATE) %>%
+  distinct()  # tar bort exakta dubbletter
+
+# 2. Räkna antal unika mätningar per individ
+adas_unique <- adas_unique %>%
+  group_by(RID) %>%
+  mutate(n_measurements = n()) %>%
+  ungroup()
+
+# 3. Visa exempel
+adas_unique %>%
+  filter(RID == 1408)  # kolla just den individen
+```
+
+```{r}
+num_individuals <- adas_unique %>%
+  filter(n_measurements > 2) %>%
+  distinct(RID) %>%
+  nrow()
+
+num_individuals
+```
