@@ -75,52 +75,48 @@ library(survival)
 ```{r}
 # load data sets: Charley
 # loading adni library
-library(ADNIMERGE2)
+#library(ADNIMERGE2)
 
 # biomarker data set
-plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+#plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
 # PET scan data
-amyloid_data = UCBERKELEY_AMY_6MM
+#amyloid_data = UCBERKELEY_AMY_6MM
 
 # dx data
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
 # APOE GENOTYPING
-apoe_data = APOERES
+#apoe_data = APOERES
 
 # deprivation index
-deprivation = ADI
+#deprivation = ADI
 
 # demographics
-demog1 = PTDEMOG
-demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
+#demog1 = PTDEMOG
+#demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
 
-demographics = demog1 %>%
-  inner_join(demog2, by = c("RID"))
+#demographics = demog1 %>%
+  #inner_join(demog2, by = c("RID"))
 
 
 
 # # loading data sets: Milou# 
-# # Plasma-biomarkörer
-# load(file.path(outdir, "ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda"))
-# plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
-# 
-# # Amyloid-PET
-# load(file.path(outdir, "ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
-# amyloid_data <- UCBERKELEY_AMY_6MM
-# 
-# # Diagnos
-# load(file.path(outdir, "ADNIMERGE2/data/DXSUM.rda"))
-# diagnosis_data <- DXSUM
+# We load amyloid data 
+#load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+#amyloid_data <- UCBERKELEY_AMY_6MM
 
-# # Demographics
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+# We load plasma data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
+plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
-# # Genotype data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe_data <- APOERES 
+# We load diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+# We load demographics data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 ```
 
 # Introduction
@@ -329,20 +325,9 @@ Summary
 
 <https://www.mybib.com/tools/harvard-referencing-generator>
 
-```{r, warning=FALSE}
-# MERGING DATA TEST
-# merged_data <- plasma_data %>%
-#   inner_join(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
-#   mutate(time_diff = abs(EXAMDATE_plasma - EXAMDATE_dx)) %>%
-#   group_by(RID, EXAMDATE_plasma) %>%
-#   slice_min(time_diff, n = 1) %>%
-#   ungroup() %>%
-#   filter(time_diff <= 90)
-```
+# Pre-processing
 
-# 2. Pre-processing
-
-## 2.1 We select only the required variables and merge them
+## 1. We select only the required variables and merge them
 
 ```{r}
 # selecting the relevant variables -> why these ones???
@@ -357,7 +342,11 @@ diagnosis_data = diagnosis_data %>%
 merged_data = plasma_data %>%
   merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
   mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
-  
+```
+
+## Concerning 381_S_10
+
+```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
 # grep("381_S_10###", merged_data$PTID)
 ```
@@ -366,18 +355,7 @@ merged_data = plasma_data %>%
 unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 ```
 
-## 2.2 We check missing values
-
-```{r}
-# checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
-sum(as.numeric(is.na(merged_data$EXAMDATE_plasma)))
-sum(as.numeric(is.na(merged_data$EXAMDATE_dx)))
-
-# removing the obs with no EXAMDATE_dx
-merged = merged_data %>% filter(as.character(EXAMDATE_dx) != "NA")
-```
-
-## 2.3 We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
 
 ```{r}
 # We keep only the variables we need (RID, birth year, gender)
@@ -400,15 +378,18 @@ merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
 merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")) - merged_data$PTDOBYY
 ```
 
-## 2.4 We filter participants with at least 2 measurements
+## 3. We filter participants with at least 2 measurements
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
 keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 2 measurements 
+length(keep)
 ```
 
-## 2.5 We extract baseline visits, and create an event and time-to-event variable
+## 4. We extract baseline visits, and create an event and time-to-event variable
 
 ```{r}
 # Skapar baseline-datum
@@ -442,9 +423,12 @@ surv_data <- merged_data %>%
 # Lägger survival-data tillbaka i merged_data
 merged_data <- merged_data %>%
   left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
 ```
 
-## 2.6 We create a time variable (time from baseline)
+## 5. We create a time variable (time from baseline)
 
 ```{r}
 # 5) Skapa time_years (tid från baseline)
@@ -457,20 +441,32 @@ merged_data <- merged_data %>%
 colSums(is.na(merged_data[, c("pT217_F", "time_years", "DIAGNOSIS")]))
 ```
 
+## 6. We check for missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
 # 3. Longitudinal model
+
+## 3.1 Fitted LME (linear mixed-effects) model
 
 ```{r}
 # Longitudinal model
-
 long_model <- lme(
-  pT217_F ~ time_years, 
+  pT217_F ~ time_years + age_at_visit + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
-  data = merged_data,
-  na.action = na.omit
-)
+  data = merged_data
+  )
 
 summary(long_model)
 ```
+
+## 3.2 Residuals
 
 ```{r}
 # Residualer
@@ -486,6 +482,8 @@ plot(fitted_values, residuals,
 abline(h = 0, col = "red", lty = 2)
 ```
 
+## 3.3 QQ plot
+
 ```{r}
 qqnorm(residuals)
 qqline(residuals, col = "red")
@@ -493,20 +491,64 @@ qqline(residuals, col = "red")
 
 # 4. Survival model
 
+## 4.1 We create a survival object
+
 ```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
 
-# Cox survival-modell
+## 4.2 Kaplan-Meier curve
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+## 4.3 Kaplan-Meier curve by gender
+
+```{r}
+# Kaplan-Meier curves by gender 
+km_fit_gender <- survfit(Surv(time_to_event, event) ~ PTGENDER, data = surv_data)
+
+# Plot
+plot(
+  km_fit_gender, 
+  col = c("blue","red"),
+  lty = 1,  
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve by Gender"
+)
+```
+
+## 4.4 Fitted Coxph model
+
+```{r}
+# Cox survival-model with covariates
 surv_model <- coxph(
-  Surv(time_to_event, event) ~ 1,   # ~1 = ingen covariat just nu
-  data = surv_data)
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
 
-# Kontrollera modellen
 summary(surv_model)
 ```
 
 # 5. Joint-model
 
 ```{r}
+# Joint model 
 joint_model <- jm(
   surv_model,
   long_model,
@@ -529,42 +571,28 @@ summary(joint_model)
 
 # Kovariater som kan vara till användning?
 
-```{r, warning=FALSE}
-head(demographics[, c("RID", "PTDOBYY", "PTGENDER")])
-```
-
-```{r, warning=FALSE}
-# Vi lägger till AGE och SEX i merged_data
-merged_data <- merged_data %>%
-  left_join(demographics %>% select(RID, PTDOBYY, PTGENDER), by = "RID") %>%
-  mutate(
-    AGE = as.numeric(format(EXAMDATE_plasma, "%Y")) - PTDOBYY,
-    SEX = PTGENDER
-  )
-```
-
-Vi kan kolla på andra variabler också såsom utbildning och etnicitet (variablerna PTEDUCAT och PTETHCAT/PTRACCAT) –\> lägga till de i cox-modellen (survival-modellen)
-
 # Andra sätt vi kan utveckla vår uppsats
 
-1\. Om vi vill lägga till kovariatet APOE4 = genetisk riskfaktor för AD (t.ex. antal alleler: 0,1,2). Kanske i variabeln "GENOTYPE" –\> lägga till de i cox-modellen (survival-modellen)
+1\. Vi kan kolla på andra kovariat också såsom utbildning och etnicitet (variablerna PTEDUCAT och PTETHCAT/PTRACCAT) –\> lägga till de i cox-modellen (survival-modellen)
 
-2\. Lägg till interaktioner i LME (t.ex. time_years \* AGE)
+2\. Om vi vill lägga till kovariatet APOE4 = genetisk riskfaktor för AD (t.ex. antal alleler: 0,1,2). Kanske i variabeln "GENOTYPE" –\> lägga till de i cox-modellen (survival-modellen) (från datasetet APOERES)
 
-3\. Residualdiagnostik för LME
+3\. Lägg till interaktioner (t.ex. time_years \* AGE)
 
-4\. Kolla antagandet om proportional hazards (att hazard ratio är konstant över tid)
+4\. Residualdiagnostik för LME
 
-5\. Sensitivitetsanalyser, t.ex. ändra definitionen av event, såsom olika kriterier för AD-diagnos.
+5\. Kolla antagandet om proportional hazards (att hazard ratio är konstant över tid)
+
+6\. Sensitivitetsanalyser, t.ex. ändra definitionen av event, såsom olika kriterier för AD-diagnos.
 
 **Användning av flera biomarkörer:**
 
-6\. Analysera flera biomarkörer separat - skapa enskilda modeller för varje biomarkör (t.ex. pT217, AB42, tau) för att se deras individuella effekter.
+7\. Analysera flera biomarkörer separat - skapa enskilda modeller för varje biomarkör (t.ex. pT217, AB42, tau) för att se deras individuella effekter.
 
-7\. Modellera flera biomarkörer samtidigt - bygga en multivariat joint-modell där varje biomarkör är ett longitudinellt utfall i modellen.
+8\. Modellera flera biomarkörer samtidigt - bygga en multivariat joint-modell där varje biomarkör är ett longitudinellt utfall i modellen.
 
-8\. Kombinera biomarkörer till ratio eller index - t.ex. AB42/AB40 eller pTau/AB42, och använda dessa som en enda variabel i modellen.
+9\. Kombinera biomarkörer till ratio eller index - t.ex. AB42/AB40 eller pTau/AB42, och använda dessa som en enda variabel i modellen.
 
-9\. Reducera dimension med **PCA** - göra principal component analysis på flera biomarkörer och använda komponenter som utfall i joint-modellen.
+10\. Reducera dimension med **PCA** - göra principal component analysis på flera biomarkörer och använda komponenter som utfall i joint-modellen.
 
-10\. Jämföra modeller med olika biomarkörssammansättningar - utvärdera skillnader i prediktion och signifikans för olika kombinationer av biomarkörer.
+11\. Jämföra modeller med olika biomarkörssammansättningar - utvärdera skillnader i prediktion och signifikans för olika kombinationer av biomarkörer.
