@@ -76,7 +76,7 @@ merged_data <- amyloid_data %>%
 ## 3. We filter participants with at least 2 measurements
 
 ```{r}
-unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+length(unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID))
 ```
 
 ```{r}
@@ -120,6 +120,11 @@ merged_data <- merged_data %>%
 
 # We check the number of events 
 table(surv_data$event)
+```
+
+```{r}
+# checking how many individuals convert to AD (event == 1 and time to event > 0)  
+surv_data %>% filter(time_to_event != 0, event == 1)
 ```
 
 ## 5. We create a time variable (time from baseline)
