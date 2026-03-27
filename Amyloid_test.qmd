@@ -26,12 +26,12 @@ library(survival)
 ```{r}
 # # load data: Milou
 # # We load diagnosis data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
 # 
 # # We load amyloid data 
-# load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
-# amyloid_data <- UCBERKELEY_AMY_6MM
+load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+amyloid_data <- UCBERKELEY_AMY_6MM
 ```
 
 ```{r}
@@ -93,7 +93,7 @@ length(keep)
 # Skapar baseline-datum
 merged_data <- merged_data %>%
   group_by(RID) %>%
-  mutate(baseline_date = min(PROCESSDATE)) %>%
+  mutate(baseline_date = min(SCANDATE)) %>%
   ungroup()
 
 # Skapar event + time_to_event (Dementia räknas som event)
@@ -108,7 +108,7 @@ surv_data <- merged_data %>%
       ifelse(
         any(DIAGNOSIS == "Dementia"),
         min(PROCESSDATE[DIAGNOSIS == "Dementia"]) - min(PROCESSDATE),  # dagar till event
-        max(PROCESSDATE) - min(PROCESSDATE)                               # censurerad tid
+        max(SCANDATE) - min(SCANDATE)                               # censurerad tid
       )
     ) / 365.25  # konvertera till år
   ) %>%
@@ -127,7 +127,7 @@ table(surv_data$event)
 ```{r}
 # 5) Skapa time_years (tid från baseline)
 merged_data <- merged_data %>%
-  mutate(time_years = as.numeric(PROCESSDATE - baseline_date) / 365.25)
+  mutate(time_years = as.numeric(SCANDATE - baseline_date) / 365.25)
 ```
 
 ## 6. We check for missing values
