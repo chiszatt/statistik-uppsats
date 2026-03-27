@@ -8,6 +8,8 @@ MRI-version, med antalet mätningar per indvid
 
 -   Antalet individer med fler än 2 mätningar = 573
 
+-   FÖR GAMMAL DATA DOCK (TYP 2007-2010)
+
 ```{r}
 # Ladda datasetet
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/MRISERIAL.rda")
