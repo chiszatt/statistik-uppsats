@@ -6,7 +6,7 @@ editor: visual
 
 # Amyloid version (instead of plasma biomarkers)
 
-## Problemet här = 
+## Problemet här =
 
 -   Finns både SCANDATE och PROCESSDATE som tidsvariabler, jag vet inte vilken jag ska utgå ifrån (hittills har jag utgått ifrån PROCESSDATE)
 
@@ -24,13 +24,26 @@ library(survival)
 ## 1. We load our datasets
 
 ```{r}
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
+# # load data: Milou
+# # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# 
+# # We load amyloid data 
+# load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+# amyloid_data <- UCBERKELEY_AMY_6MM
+```
 
-# We load amyloid data 
-load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
-amyloid_data <- UCBERKELEY_AMY_6MM
+```{r}
+# load data sets: Charley
+# loading adni library
+library(ADNIMERGE2)
+
+# amyloid data set
+amyloid_data = UCBERKELEY_AMY_6MM
+
+# dx data
+diagnosis_data = DXSUM
 ```
 
 ## 2. We select only the required variables and merge them
@@ -51,16 +64,20 @@ amyloid_data <- amyloid_data %>%
 diagnosis_data = diagnosis_data %>%
   select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
 
-# We merge by RID 
+# # We merge by RID
 # merged_data = amyloid_data %>%
-  #merge(diagnosis_data, by = "RID")
-
+# merge(diagnosis_data, by = "RID")
+# 
 # We merge by RID and VISCODE2
 merged_data <- amyloid_data %>%
   merge(diagnosis_data, by = c("RID", "VISCODE2"))
 ```
 
 ## 3. We filter participants with at least 2 measurements
+
+```{r}
+unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+```
 
 ```{r}
 keep = unique((amyloid_data %>% group_by(RID) %>% filter(n() > 2))$RID)
@@ -113,7 +130,7 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(PROCESSDATE - baseline_date) / 365.25)
 ```
 
-## 6. We check for missing values 
+## 6. We check for missing values
 
 ```{r}
 # We count missing values per column in merged_data
@@ -123,7 +140,7 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## 7. We remove missing values 
+## 7. We remove missing values
 
 ```{r}
 merged_data <- merged_data %>%
@@ -153,7 +170,7 @@ long_model <- lme(
 summary(long_model)
 ```
 
-# Survival model 
+# Survival model
 
 ```{r}
 # We create a Surv object: time and event
@@ -171,7 +188,7 @@ surv_model <- coxph(
 summary(surv_model)
 ```
 
-# Joint model 
+# Joint model
 
 ```{r}
 joint_model <- jm(

@@ -196,12 +196,12 @@ summary(surv_model)
 # 5. Joint-model
 
 ```{r}
-# Joint model 
-joint_model <- jm(
-  surv_model,
-  long_model,
-  time_var = "time_years"
-  )
-
-summary(joint_model)
+# # Joint model 
+# joint_model <- jm(
+#   surv_model,
+#   long_model,
+#   time_var = "time_years"
+#   )
+# 
+# summary(joint_model)
 ```
