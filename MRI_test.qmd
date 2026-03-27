@@ -1,0 +1,55 @@
+---
+title: "test2"
+format: pdf
+editor: visual
+---
+
+MRI-version, med antalet mätningar per indvid
+
+-   Antalet individer med fler än 2 mätningar = 573
+
+```{r}
+# Ladda datasetet
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/MRISERIAL.rda")
+MRI <- MRISERIAL
+```
+
+```{r}
+library(dplyr)
+
+# 1. Ta bort exakta dubbletter
+MRI_unique <- MRI %>%
+  distinct(RID, VISCODE, .keep_all = TRUE)
+
+# 2. Räkna antal rader per RID, bevara ursprunglig ordning
+rid_order <- unique(MRI_unique$RID)
+
+rader_per_rid <- MRI_unique %>%
+  count(RID, name = "antal_rader") %>%
+  slice(match(rid_order, RID))
+
+# 3. Visa resultatet
+head(rader_per_rid)
+```
+
+```{r}
+library(dplyr)
+
+# Filtrera personer med fler än 2 mätningar
+over_2_measurements <- rader_per_rid %>%
+  filter(antal_rader > 2)
+
+# Antal personer med fler än 2 mätningar
+antal_personer <- nrow(over_2_measurements)
+
+antal_personer
+```
+
+```{r}
+# 1. Fördelning av antal mätningar per person
+fordelning <- rader_per_rid %>%
+  count(antal_rader, name = "antal_personer") %>%
+  arrange(antal_rader)
+
+fordelning
+```
