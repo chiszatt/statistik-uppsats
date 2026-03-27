@@ -366,7 +366,7 @@ merged_data = plasma_data %>%
 unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 ```
 
-## 2.2 We check missing values 
+## 2.2 We check missing values
 
 ```{r}
 # checking for missing values in EXAMDATE_dx and EXAMDATE_plasma
