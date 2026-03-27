@@ -13,13 +13,32 @@ Problem = 2 olika tidvariabler för CSF (DRAWDTE och RUNDATE) - Jag valde DRAWDT
 -   DRAWDTE reflects the actual date the CSF sample was taken, capturing the participant’s biological timeline, whereas RUNDATE is just the lab analysis date and doesn’t reflect disease progression.
 
 ```{r}
-# We load CSF data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENNBIOMK_MASTER.rda")
-csf_data <- UPENNBIOMK_MASTER
+library(dplyr)
+```
 
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
+```{r}
+# load data sets: Milou
+# 
+# # We load CSF data 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENNBIOMK_MASTER.rda")
+# csf_data <- UPENNBIOMK_MASTER
+# 
+# # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+```
+
+```{r}
+# load data sets: Charley
+
+# loading adni library
+library(ADNIMERGE2)
+
+# biomarker data set
+csf_data = UPENNBIOMK_MASTER
+
+# dx data
+diagnosis_data = DXSUM
 ```
 
 ## 1. We select only the required variables and merge them
@@ -38,6 +57,13 @@ merged_data = csf_data %>%
 ```
 
 ## 3. We filter participants with at least 2 measurements
+
+```{r}
+# this does not get unique draw dates
+# we need to find a way to get one observation for unique draw date
+# do we want to take an average over all run dates?
+csf_data %>% group_by(RID) %>% filter(n() > 2)
+```
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
@@ -94,7 +120,7 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(DRAWDTE - baseline_date) / 365.25)  # time in years since baseline
 ```
 
-## 6. We check for and remove missing values in both merged_data and long_data 
+## 6. We check for and remove missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
