@@ -1,0 +1,249 @@
+---
+title: "test"
+format: html
+editor: visual
+---
+
+# För att se hur många individer har 5+ mätningar
+
+(se sedan joint modelling längre ner)
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/NEUROBAT.rda")
+cdt_data <- NEUROBAT
+```
+
+```{r}
+library(dplyr)
+
+# 1. Välj kolumner och ta bort dubbletter (RID + VISCODE + VISDATE)
+cdt_unique <- cdt_data %>%
+  select(RID, VISCODE, VISDATE, CLOCKSCOR) %>%  # välj de kolumner du vill behålla
+  filter(!is.na(CLOCKSCOR)) %>%                # ta bort rader med NA i CLOCKSCOR
+  distinct()                                   # tar bort exakta dubbletter
+
+# 2. Räkna antal unika mätningar per individ
+cdt_unique <- cdt_unique %>%
+  group_by(RID) %>%
+  mutate(n_measurements = n()) %>%
+  ungroup()
+
+# 4. Räkna antal individer med fler än 5 mätningar
+num_individuals <- cdt_unique %>%
+  filter(n_measurements > 5) %>%
+  distinct(RID) %>%
+  nrow()
+
+num_individuals  # visar resultatet
+```
+
+# Vanlig analys
+
+## 1. Loading and merging 
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/NEUROBAT.rda")
+cdt_data <- NEUROBAT
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+```
+
+```{r}
+library(dplyr)
+
+# Välj CDT-variabler
+cdt_data <- cdt_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, VISDATE,
+         CLOCKSCOR, CLOCKCIRC, CLOCKNUM, CLOCKHAND, CLOCKTIME, CLOCKSYM)
+
+# Välj diagnosdata
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# Slå ihop CDT-data med diagnosdata via RID
+merged_data <- cdt_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_cdt", "_dx"))
+
+# Ta bort rader med NA i CLOCKSCOR (longitudinal variabel)
+merged_data <- merged_data %>%
+  filter(!is.na(CLOCKSCOR))
+```
+
+## 2. We add age and gender 
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (EXAMDATE.plasma)
+merged_data$age_at_visit <- as.numeric(format(merged_data$VISDATE, "%Y")) - merged_data$PTDOBYY
+```
+
+## 3. We count and filter participants with at least 5 measurements
+
+```{r}
+keep = unique((cdt_data %>% group_by(RID) %>% filter(n() > 5))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 5 measurements 
+length(keep)
+```
+
+## 4. We extract baseline visits, and create an event and time-to-event variable
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(VISDATE)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event)
+surv_data <- merged_data %>%
+  group_by(RID) %>%
+  summarize(
+    # Baseline-variabler
+    age_at_baseline = age_at_visit[which.min(VISDATE)],
+    PTGENDER = PTGENDER[which.min(VISDATE)],
+    
+    # Event = 1 om individen någonsin fått "Dementia", annars 0 (censurerad)
+    event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
+    
+    # Tid till första "Dementia", annars tid till sista observation
+    time_to_event = as.numeric(
+      ifelse(
+        any(DIAGNOSIS == "Dementia"),
+        min(VISDATE[DIAGNOSIS == "Dementia"]) - min(VISDATE),  # dagar till event
+        max(VISDATE) - min(VISDATE)                               # censurerad tid
+      )
+    ) / 365.25  # konvertera till år
+  ) %>%
+  ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(VISDATE - baseline_date) / 365.25)
+```
+
+## 6. We check for and remove missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data = merged_data %>%
+  na.omit()
+
+surv_data = surv_data %>%
+  na.omit()
+
+# We check again
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+# Longitudinal model
+
+## 1 Fitted LME (linear mixed-effects) model
+
+```{r}
+merged_data = merged_data %>%
+  mutate(time_years_s = scale(time_years, center = TRUE, scale = FALSE))
+
+library(nlme)
+# Longitudinal model
+long_model <- lme(
+  CLOCKSCOR ~ time_years_s + age_at_visit + PTGENDER.x, 
+  random = ~ time_years_s | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+```{r}
+library(survival)
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+```{r}
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+# Joint-model
+
+```{r}
+library(JMbayes2)
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years_s"
+  )
+
+summary(joint_model)
+```
+
+```{r}
+
+```
