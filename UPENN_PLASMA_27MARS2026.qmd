@@ -4,53 +4,13 @@ format: pdf
 editor: visual
 ---
 
-```{r}
-library(readr)
-biomarkers <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
-```
+# UPENN-PLASMA 12 MARS 2026
 
-```{r}
-rid_vis_counts <- biomarkers %>%
-  select(RID, VISCODE) %>%        # plocka ut kolumner
-  distinct() %>%                  # ta bort dubbletter
-  group_by(RID) %>%               # gruppera per deltagare
-  summarise(n_measurements = n()) %>%  # räkna antal unika mätningar
-  arrange(desc(n_measurements))   # sortera efter flest mätpunkter
+Försökte först med 2+ mätningar, men det gav instabil joint modell (för höga Rhat-värden, som borde vara \< 1) - Beror förmodligen på för få events (19 events / 126 individer)
 
-# Visa resultatet
-print(rid_vis_counts)
-```
+Samma resultat med multivariat joint modell (för höga Rhat-värden) (OBS = den tar lång tid att render!!!)
 
-```{r}
-# Räkna antal mätpunkter per individ
-individual_counts <- biomarkers %>%
-  group_by(RID) %>%             # gruppera per deltagare
-  summarise(n_measurements = n_distinct(VISCODE)) %>%  # räkna unika tidpunkter
-  ungroup() %>%
-  filter(n_measurements > 2)    # bara de med >2 mätningar
-
-# Antal individer med fler än 2 mätpunkter
-n_individuals_gt2 <- nrow(individual_counts)
-print(n_individuals_gt2)
-```
-
-```{r}
-library(dplyr)
-
-# Räkna antal mätpunkter per individ
-measurement_distribution <- biomarkers %>%
-  group_by(RID) %>%
-  summarise(n_measurements = n_distinct(VISCODE)) %>%
-  ungroup() %>%
-  group_by(n_measurements) %>%
-  summarise(n_individuals = n()) %>%
-  arrange(n_measurements)
-
-# Visa resultatet
-print(measurement_distribution)
-```
-
-# Analysis
+Försökte även med +1 mätningar för att se, men det gav OCKSÅ instabil joint modell (för höga Rhat-värden)
 
 ```{r, warning=FALSE}
 # loading libraries
@@ -62,6 +22,7 @@ library(survival)
 ```
 
 ```{r}
+library(readr)
 plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
 
 # We load diagnosis data
@@ -76,6 +37,7 @@ demographics <- PTDEMOG
 ## 1. We select only the required variables and merge them
 
 ```{r}
+library(dplyr)
 # selecting the relevant variables -> why these ones???
 plasma_data = plasma_data %>%
   select("RID", "VISCODE2", "EXAMDATE", "pT217_F",
@@ -176,7 +138,23 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(EXAMDATE_plasma - baseline_date) / 365.25)
 ```
 
-## 6. We check for missing values in both merged_data and long_data
+## 6. We check the distribution of each relevant variable for multivariate joint model and transform
+
+```{r}
+# Vi kollar efter outliers 
+boxplot(merged_data$pT217_AB42_F, main="pT217_AB42_F")
+boxplot(merged_data$AB42_AB40_F, main="AB42_AB40_F")
+boxplot(merged_data$NfL_Q, main="NfL_Q")
+```
+
+```{r}
+# Vi transformerar dem
+merged_data$log_pT217_AB42_F <- log(merged_data$pT217_AB42_F)
+merged_data$log_AB42_AB40_F <- log(merged_data$AB42_AB40_F)
+merged_data$log_NfL_Q <- log(merged_data$NfL_Q)
+```
+
+## 7. We check for missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
@@ -197,12 +175,35 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+# De matchar inte --> Måste lösa 
+```
+
+```{r}
+# Gör RID till character (säkerhet)
+merged_data$RID <- as.character(merged_data$RID)
+surv_data$RID   <- as.character(surv_data$RID)
+
+# Hitta gemensamma ID:n
+common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
+
+# Behåll endast gemensamma individer
+merged_data <- merged_data %>% filter(RID %in% common_IDs)
+surv_data   <- surv_data %>% filter(RID %in% common_IDs)
+
+# Kontroll
+length(unique(merged_data$RID))  # ska matcha
+length(unique(surv_data$RID))    # ska matcha
+```
+
 # Longitudinal model
 
 ```{r}
 # Longitudinal model
 long_model <- lme(
-  pT217_F ~ time_years + age_at_visit + PTGENDER.x, 
+  log_pT217_AB42_F ~ time_years + age_at_visit + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
@@ -210,7 +211,7 @@ long_model <- lme(
 summary(long_model)
 ```
 
-# Survival model 
+# Survival model
 
 ```{r}
 # We create a Surv object: time and event
@@ -260,32 +261,9 @@ joint_model <- jm(
 summary(joint_model)
 ```
 
+För höga Rhat-värden (\> 1) –\> Betyder att MCMC-kedjorna inte har konvergerat –\> Instabil modell... :(
+
 # Multivariate model
-
-```{r}
-# Vi kollar efter outliers 
-boxplot(merged_data$pT217_AB42_F, main="pT217_AB42_F")
-boxplot(merged_data$AB42_AB40_F, main="AB42_AB40_F")
-boxplot(merged_data$NfL_Q, main="NfL_Q")
-```
-
-```{r}
-# Vi transformerar dem
-merged_data$log_pT217_AB42_F <- log(merged_data$pT217_AB42_F)
-merged_data$log_AB42_AB40_F <- log(merged_data$AB42_AB40_F)
-merged_data$log_NfL_Q <- log(merged_data$NfL_Q)
-```
-
-```{r}
-sapply(merged_data, function(x) sum(is.na(x)))
-```
-
-```{r}
-merged_data <- na.omit(merged_data)
-
-# We count missing values per column in merged_data
-sapply(merged_data, function(x) sum(is.na(x)))
-```
 
 ```{r}
 library(nlme)
@@ -364,15 +342,6 @@ lme_log_NfL_Q <- lme(
 ```
 
 ```{r}
-log_NfL_Q
-lme_log_NfL_Q <- lme(
-  log_NfL_Q ~ time_years + age_at_visit + PTGENDER.x, 
-  random = ~ time_years | RID,   # random intercept + slope
-  data = merged_data
-  )
-```
-
-```{r}
 # Joint model 1 
 joint_model1 <- jm(
   surv_model,
@@ -404,3 +373,5 @@ joint_model3 <- jm(
 
 summary(joint_model3)
 ```
+
+Fortfarande instabila modeller (för höga Rhat-värden), på grund av för få events bland de 126 individerna... :(
