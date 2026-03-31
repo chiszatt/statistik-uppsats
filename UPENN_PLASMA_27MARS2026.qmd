@@ -6,12 +6,6 @@ editor: visual
 
 # UPENN-PLASMA 12 MARS 2026
 
-Försökte först med 2+ mätningar, men det gav instabil joint modell (för höga Rhat-värden, som borde vara \< 1) - Beror förmodligen på för få events (19 events / 126 individer)
-
-Samma resultat med multivariat joint modell (för höga Rhat-värden) (OBS = den tar lång tid att render!!!)
-
-Försökte även med +1 mätningar för att se, men det gav OCKSÅ instabil joint modell (för höga Rhat-värden)
-
 ```{r, warning=FALSE}
 # loading libraries
 library(dplyr)
