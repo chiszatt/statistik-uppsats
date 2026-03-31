@@ -1,0 +1,428 @@
+---
+title: "Full and restricted model comparison"
+format: pdf
+editor: visual
+---
+
+# Comparing full and restricted joint-models
+
+## Pre-processing
+
+```{r}
+# loading librarys
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+library(ggsurvfit)
+```
+
+-   Loading the data
+
+```{r}
+# loading the data sets
+# Charley
+library(ADNIMERGE2)
+
+# dx data
+diagnosis_data = DXSUM
+
+# demographics
+demographics = PTDEMOG
+
+# read data Milou
+library(readr)
+plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
+
+# # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# 
+# # We load demographics data 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+```
+
+-   Selecting relevant variables
+
+```{r}
+# selecting the relevant variables -> why these ones???
+plasma_data = plasma_data %>%
+  select("RID", "VISCODE2", "EXAMDATE", "pT217_F",
+         "AB42_F", "AB40_F", "AB42_AB40_F", "pT217_AB42_F", "NfL_Q", "GFAP_Q")
+
+diagnosis_data = diagnosis_data %>%
+  select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
+```
+
+-   Checking number of individuals after removing missing values
+
+```{r}
+# PLASMA
+# checking for missing values
+sum(is.na(plasma_data))
+
+# checking number of individuals
+length(unique(plasma_data$RID))
+```
+
+-   Merging diagnosis data set with the plasma data set
+
+```{r}
+# merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
+merged_data = plasma_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
+  mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
+```
+
+-   Demographic data: gender as factor, creating age variable, merging
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# Converting EXAMDATE_plasma till Date
+merged_data$EXAMDATE_plasma <- as.Date(merged_data$EXAMDATE_plasma, format="%Y-%m-%d")
+
+# Age at visit
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")) - merged_data$PTDOBYY
+```
+
+-   Creating baseline date, survival time and event variables
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_plasma)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event)
+surv_data = merged_data %>%
+  group_by(RID) %>%
+  summarise(
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_plasma)],
+    time_to_event = case_when(
+      
+# survial time for events
+    any(DIAGNOSIS == "Dementia") ~
+      as.numeric(min(EXAMDATE_plasma[DIAGNOSIS == "Dementia"]) -
+                   min(c(EXAMDATE_plasma, EXAMDATE_dx))),
+    
+# survival time for censored
+    TRUE ~ as.numeric(max(c(EXAMDATE_plasma, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_plasma, EXAMDATE_dx)))) / 365,
+    event = as.integer(any(DIAGNOSIS == "Dementia"))
+    ) %>%
+  ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+# Computing the event ratio
+19/109
+```
+
+-   Time since baseline for the plasma exams
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_plasma - baseline_date) / 365.25)
+```
+
+-   Checking NfL_Q and GFAP_Q values: $618$ with $-4$ which indicates missing data, so remove these variables
+
+```{r}
+# NfL_Q and GFAP_Q have many -4 values, checking how many
+nrow(merged_data %>% filter(NfL_Q < 0))
+nrow(merged_data %>% filter(GFAP_Q < 0))
+
+# checking how many obs have biomarker values less than 0 
+nrow(merged_data %>% filter(pT217_F < 0 | AB42_F < 0 | AB40_F < 0 | AB42_AB40_F < 0 |
+                             pT217_AB42_F < 0 | NfL_Q < 0 | GFAP_Q < 0))
+
+# seems as if the only ones are NfL_Q and GFAP_Q, so we remove them from the data set
+merged_data = merged_data %>% select(!NfL_Q & !GFAP_Q)
+```
+
+-   Checking outliers and transforming variables
+
+```{r}
+# Vi kollar efter outliers 
+boxplot(merged_data$pT217_AB42_F, main="pT217_AB42_F")
+boxplot(merged_data$AB42_AB40_F, main="AB42_AB40_F")
+```
+
+```{r}
+# Vi transformerar dem
+merged_data$log_pT217_AB42_F <- log(merged_data$pT217_AB42_F)
+merged_data$log_AB42_AB40_F <- log(merged_data$AB42_AB40_F)
+```
+
+-   Checking missing vals: **why are there missing values?**
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data <- na.omit(merged_data)
+surv_data <- na.omit(surv_data)
+
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
+# Longitudinal model
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  log_pT217_AB42_F ~ time_years + PTGENDER + age_at_baseline, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+-   Creating the survival object
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+-   Adding PTGENDER into the surv_data data frame
+
+```{r}
+ptgender = merged_data %>% select(RID, PTGENDER)
+surv_data = surv_data %>% merge(ptgender, by = "RID") 
+surv_data = surv_data[!duplicated(surv_data$RID), ]
+```
+
+-   Visual assessment of Kaplan-Meier curves with no covariate, PTGENDER as sole covariate, and age at baseline as sole covariate: ggsurvfit:
+
+```{r}
+# Kaplan-Meier curve
+km_fit = survfit(surv_object ~ 1, data = surv_data)
+
+# Kaplan-Meier curve by gender
+km_fit_gender = survfit(surv_object ~ PTGENDER, data = surv_data)
+
+# Kaplan-Meier curve by age at baseline
+km_fit_age = survfit(surv_object ~ age_at_baseline, data = surv_data)
+
+
+# plotting the survival curves
+ggsurvfit(km_fit) +
+  labs(x = "Years since baseline measurement",
+       title = "Kaplan Meier: Disease-free survival probability") +
+  ylim(0, 1) +
+  theme_classic()
+
+# plotting the survival curves
+ggsurvfit(km_fit_gender) +
+  labs(x = "Years since baseline measurement",
+       title = "Kaplan Meier: Disease-free survival probability (PTGENDER)") +
+  ylim(0, 1) +
+  theme_classic()
+
+# plotting the survival curves
+ggsurvfit(km_fit_age) +
+  labs(x = "Years since baseline measurement",
+       title = "Kaplan Meier: Disease-free survival probability (age_at_baseline)") +
+  ylim(0, 1) +
+  theme_classic()
+```
+
+-   Creating a categorical age variable: \< 70 , \> 70
+
+```{r}
+summary(surv_data$age_at_baseline)
+boxplot(surv_data$age_at_baseline, main="age at baseline")
+```
+
+```{r}
+surv_data = surv_data %>%
+  mutate(age_range = as.factor(case_when(
+    age_at_baseline < 70 ~ "< 70",
+    age_at_baseline > 69 ~ "70+ + "
+  )))
+```
+
+-   Checking Kaplan Meier curve with age range as sole covariate (since coefficients not significant for PTGENDER or age_at_baseline in the cox PH models WITH REDUCED DATA - \> 3 MEASUREMENTS - but no change, coefficient still not significant)
+
+```{r}
+# fitting the KM curve
+km_fit_age_range = survfit(surv_object ~ age_range, data = surv_data)
+
+# plotting the survival curves for age_range
+ggsurvfit(km_fit_age_range) +
+  labs(title = "Kaplan Meier curve for age_range",
+       x = "Years since baseline measurement") +
+  ylim(0, 1) +
+  theme_classic()
+```
+
+```{r}
+# Cox PH model with covariate gender
+surv_model_gender = coxph(
+  surv_object ~ PTGENDER,
+  data = surv_data
+)
+
+# Cox PH model with covariate age at baseline
+surv_model_age = coxph(
+  surv_object ~ age_at_baseline,
+  data = surv_data
+)
+
+# Cox PH model with covariate age_range at baseline
+surv_model_age_range = coxph(
+  surv_object ~ age_range,
+  data = surv_data
+)
+
+# Cox PH model with covariate age at baseline
+surv_model_age_gender = coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model_gender)
+
+summary(surv_model_age)
+
+summary(surv_model_age_range)
+
+summary(surv_model_age_gender)
+```
+
+```{r}
+# Running proportionality tests for all models
+cox.zph(surv_model_gender)
+cox.zph(surv_model_age)
+cox.zph(surv_model_age_range)
+cox.zph(surv_model_age_gender)
+```
+
+# Joint model
+
+-   The Rhat values are $intercept = 1.0007$, $time\_years = 1.0145$, $PTGENDER = 0.9999$, $age\_at\_baseline = 1.0005$, and $sigma = 1.0072$: these are acceptable values.
+
+```{r}
+# Joint model 
+joint_model = jm(
+  surv_model_age_gender,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```
+
+# Restricted model: individuals with \> 3 measurements
+
+-   Filtering for individuals with at least 3 measurements
+
+```{r}
+# Filtering individuals with three or more measurements
+keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data_restricted = merged_data %>% filter(RID %in% keep)
+surv_data_restricted = surv_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(unique(merged_data_restricted$RID))
+length(unique(surv_data_restricted$RID))
+```
+
+# Longitudinal Model
+
+```{r}
+# Longitudinal model
+long_model_restricted <- lme(
+  log_pT217_AB42_F ~ time_years + age_at_baseline + PTGENDER, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data_restricted
+  )
+
+summary(long_model_restricted)
+```
+
+# Survival Model
+
+-   From the full model, we see that PTGENDER and age_at_baseline are significant, so we include these in our restricted model.
+
+```{r}
+# creating a survival object with restricted data
+surv_object_restricted <- Surv(
+  time = surv_data_restricted$time_to_event, 
+  event = surv_data_restricted$event
+)
+
+# fitting the coxph model
+surv_model_restricted = coxph(
+  surv_object_restricted ~ age_at_baseline + PTGENDER,
+  surv_data_restricted,
+  x = TRUE
+)
+
+summary(surv_model_restricted)
+
+cox.zph(surv_model_restricted)
+```
+
+# Joint Model
+
+-   Rhat values are $intercept = 1.0009$, $time\_years = 1.0004$, $age\_at\_baseline = 1.0008$, $PTGENDER = 1.0000$, and $sigma = 1.0012$: these are acceptable values.
+
+```{r}
+# Joint model 
+joint_model_restricted = jm(
+  surv_model_restricted,
+  long_model_restricted,
+  time_var = "time_years"
+  )
+
+summary(joint_model_restricted)
+```
