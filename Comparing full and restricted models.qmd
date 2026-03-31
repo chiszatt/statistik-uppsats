@@ -208,10 +208,12 @@ length(unique(surv_data$RID))     # survival data
 
 # Longitudinal model
 
+-   Using both time_years + age_at_visit is redundant since we have age_at_baseline in the coxph model: if we omit age_at_visit variable from the lme model, the joint model is stable.
+
 ```{r}
 # Longitudinal model
 long_model <- lme(
-  log_pT217_AB42_F ~ time_years + PTGENDER + age_at_baseline, 
+  log_pT217_AB42_F ~ time_years + PTGENDER, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
@@ -378,10 +380,12 @@ length(unique(surv_data_restricted$RID))
 
 # Longitudinal Model
 
+-   Using both time_years + age_at_visit is redundant since we have age_at_baseline in the coxph model: if we omit age_at_visit variable from the lme model, the joint model is stable.
+
 ```{r}
 # Longitudinal model
 long_model_restricted <- lme(
-  log_pT217_AB42_F ~ time_years + age_at_baseline + PTGENDER, 
+  log_pT217_AB42_F ~ time_years + PTGENDER, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data_restricted
   )
