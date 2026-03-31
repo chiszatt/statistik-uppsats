@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-# CLOCK DRAWING TEST 
+# CLOCK DRAWING TEST
 
 ## För att se hur många individer har 5+ mätningar
 
@@ -120,22 +120,17 @@ merged_data <- merged_data %>%
 # Skapar event + time_to_event (Dementia räknas som event)
 surv_data <- merged_data %>%
   group_by(RID) %>%
-  summarize(
-    # Baseline-variabler
+  summarise(
     age_at_baseline = age_at_visit[which.min(VISDATE)],
     PTGENDER = PTGENDER[which.min(VISDATE)],
-    
-    # Event = 1 om individen någonsin fått "Dementia", annars 0 (censurerad)
-    event = ifelse(any(DIAGNOSIS == "Dementia"), 1, 0),
-    
-    # Tid till första "Dementia", annars tid till sista observation
-    time_to_event = as.numeric(
-      ifelse(
-        any(DIAGNOSIS == "Dementia"),
-        min(VISDATE[DIAGNOSIS == "Dementia"]) - min(VISDATE),  # dagar till event
-        max(VISDATE) - min(VISDATE)                               # censurerad tid
-      )
-    ) / 365.25  # konvertera till år
+    time_to_event = case_when(
+      any(DIAGNOSIS == "Dementia") ~
+        as.numeric(min(VISDATE[DIAGNOSIS == "Dementia"]) -
+                   min(c(VISDATE, EXAMDATE))),
+      TRUE ~ as.numeric(max(c(VISDATE, EXAMDATE)) -
+                        min(c(VISDATE, EXAMDATE)))
+    ) / 365,
+    event = as.integer(any(DIAGNOSIS == "Dementia"))
   ) %>%
   ungroup()
 
@@ -147,7 +142,7 @@ merged_data <- merged_data %>%
 table(surv_data$event)
 ```
 
-## 4. We create a time variable 
+## 5. We create a time variable
 
 ```{r}
 # 5) Skapa time_years (tid från baseline)
@@ -155,7 +150,17 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(VISDATE - baseline_date) / 365.25)
 ```
 
-## 6. We check for and remove missing values in both merged_data and long_data
+## 6. We check the distribution of the variables 
+
+```{r}
+boxplot(merged_data$CLOCKSCOR, main="CLOCKSCOR")
+```
+
+```{r}
+merged_data$log_CLOCKSCOR <- log(merged_data$CLOCKSCOR)
+```
+
+## 7. We check for and remove missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
@@ -177,17 +182,36 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
+## 8. We make sure we don't have any extreme values (for the longitudinal model)
+
+```{r}
+summary(merged_data$log_CLOCKSCOR)
+any(is.infinite(merged_data$log_CLOCKSCOR)) # should be FALSE
+# Inf = extreme values 
+```
+
+```{r}
+# Remove rows with -Inf or Inf in log_CENTILOIDS
+merged_data <- merged_data[is.finite(merged_data$log_CLOCKSCOR), ]
+any(is.infinite(merged_data$log_CLOCKSCOR))  # should be FALSE
+any(is.na(merged_data$log_CLOCKSCOR))       # also FALSE
+```
+
+## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
 # Longitudinal model
 
 ```{r}
-merged_data = merged_data %>%
-  mutate(time_years_s = scale(time_years, center = TRUE, scale = FALSE))
-
 library(nlme)
 # Longitudinal model
 long_model <- lme(
-  CLOCKSCOR ~ time_years_s + age_at_visit + PTGENDER.x, 
-  random = ~ time_years_s | RID,   # random intercept + slope
+  log_CLOCKSCOR ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
 
@@ -240,12 +264,137 @@ library(JMbayes2)
 joint_model <- jm(
   surv_model,
   long_model,
-  time_var = "time_years_s"
+  time_var = "time_years"
   )
 
 summary(joint_model)
 ```
 
-```{r}
+# Multivariate version
 
+We check what values the variables take
+
+```{r}
+table(merged_data$CLOCKCIRC, useNA = "ifany")
+table(merged_data$CLOCKNUM, useNA = "ifany")
+table(merged_data$CLOCKHAND, useNA = "ifany")
+table(merged_data$CLOCKTIME, useNA = "ifany")
+table(merged_data$CLOCKSYM, useNA = "ifany")
+```
+
+Vanlig survival modell, men flera olika LME modeller för varje klcock-variabel.
+
+```{r}
+merged_data$CLOCKCIRC <- ifelse(merged_data$CLOCKCIRC == "Correct", 1, 0)
+merged_data$CLOCKNUM  <- ifelse(merged_data$CLOCKNUM  == "Correct", 1, 0)
+merged_data$CLOCKHAND <- ifelse(merged_data$CLOCKHAND == "Correct", 1, 0)
+merged_data$CLOCKTIME <- ifelse(merged_data$CLOCKTIME == "Correct", 1, 0)
+merged_data$CLOCKSYM  <- ifelse(merged_data$CLOCKSYM  == "Correct", 1, 0)
+```
+
+```{r}
+table(merged_data$CLOCKCIRC, useNA = "ifany")
+table(merged_data$CLOCKNUM, useNA = "ifany")
+table(merged_data$CLOCKHAND, useNA = "ifany")
+table(merged_data$CLOCKTIME, useNA = "ifany")
+table(merged_data$CLOCKSYM, useNA = "ifany")
+```
+
+```{r}
+library(nlme)
+library(JMbayes2)
+
+# Modell för CLOCKSCOR
+fm1 <- lme(
+  log_CLOCKSCOR ~ time_years,
+  random = ~ time_years | RID,
+  data = merged_data
+)
+
+fm2 <- mixed_model(
+  CLOCKTIME ~ time_years,
+  random = ~ time_years | RID,
+  family = binomial(),
+  data = merged_data
+)
+
+fm3 <- mixed_model(
+  CLOCKSYM ~ time_years,
+  random = ~ time_years | RID,
+  family = binomial(),
+  data = merged_data
+)
+
+Mixed <- list(fm1, fm2, fm3)
+```
+
+```{r}
+fForms <- list(
+  "log_CLOCKSCOR" = ~ value(log_CLOCKSCOR) + slope(log_CLOCKSCOR),
+  "CLOCKTIME" = ~ area(CLOCKTIME),
+  "CLOCKSYM" = ~ value(CLOCKSYM) + area(CLOCKSYM)
+)
+```
+
+```{r}
+library(survival)
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ 1,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+multi_joint_model <- jm(
+  surv_model,
+  Mixed,
+  time_var = "time_years",
+  functional_forms = fForms,
+  n_chains = 3L,
+  n_iter = 20000L,
+  n_burnin = 2000L
+)
+
+summary(multi_joint_model)
+```
+
+# 3 separata joint models
+
+```{r}
+library(JMbayes2)
+joint_model_scor <- jm(
+  surv_model,
+  fm1,
+  time_var = "time_years"
+)
+summary(joint_model_scor)
+```
+
+```{r}
+  
+joint_model_time <- jm(
+  surv_model,
+  fm2,
+  time_var = "time_years"
+)
+summary(joint_model_time)
+```
+
+```{r}
+  
+joint_model_sym <- jm(
+  surv_model,
+  fm3,
+  time_var = "time_years"
+)
+summary(joint_model_sym)
 ```
