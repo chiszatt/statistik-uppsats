@@ -19,6 +19,7 @@ library(JMbayes2)
 library(lme4) # decide which package will we use for lme
 library(nlme) # decide which package will we use for lme
 library(survival)
+library(corrr) 
 ```
 
 ```{r}
@@ -27,12 +28,12 @@ library(readr)
 plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
 
 # # We load diagnosis data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
 # 
 # # We load demographics data 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 ```
 
 ```{r}
@@ -113,7 +114,7 @@ merged_data <- merged_data %>%
   mutate(baseline_date = min(EXAMDATE_plasma)) %>%
   ungroup()
 
-# Skapar event + time_to_event (Dementia räknas som event)
+# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
@@ -190,29 +191,20 @@ length(unique(surv_data$RID))     # survival data
 # De matchar inte --> Måste lösa 
 ```
 
+# Longitudinal model
+
+## We check correlation between time_years and age_at_visit 
+
 ```{r}
-# Gör RID till character (säkerhet)
-merged_data$RID <- as.character(merged_data$RID)
-surv_data$RID <- as.character(surv_data$RID)
-
-# Hitta gemensamma ID:n
-common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
-
-# Behåll endast gemensamma individer
-merged_data <- merged_data %>% filter(RID %in% common_IDs)
-surv_data <- surv_data %>% filter(RID %in% common_IDs)
-
-# Kontroll
-length(unique(merged_data$RID))  # ska matcha
-length(unique(surv_data$RID))    # ska matcha
+cor(merged_data$age_at_baseline, merged_data$age_at_visit)
 ```
 
-# Longitudinal model
+--\> Using both time_years + age_at_visit is redundant since we have age_at_baseline in the coxph model: if we omit age_at_visit variable from the lme model, the joint model will be stable.
 
 ```{r}
 # Longitudinal model
 long_model <- lme(
-  log_pT217_AB42_F ~ time_years + age_at_visit + PTGENDER.x, 
+  log_pT217_AB42_F ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
@@ -277,15 +269,15 @@ För höga Rhat-värden (\> 1) –\> Betyder att MCMC-kedjorna inte har konverge
 ```{r}
 library(nlme)
 
-fm_pT217 <- lme(log_pT217_AB42_F ~ time_years + age_at_visit + PTGENDER.x,
+fm_pT217 <- lme(log_pT217_AB42_F ~ time_years + PTGENDER.x,
                 random = ~ time_years | RID,
                 data = merged_data)
 
-fm_ABratio <- lme(log_AB42_AB40_F ~ time_years + age_at_visit + PTGENDER.x,
+fm_ABratio <- lme(log_AB42_AB40_F ~ time_years + PTGENDER.x,
                   random = ~ time_years | RID,
                   data = merged_data)
 
-fm_NfL <- lme(log_NfL_Q ~ time_years + age_at_visit + PTGENDER.x,
+fm_NfL <- lme(log_NfL_Q ~ time_years + PTGENDER.x,
               random = ~ time_years | RID,
               data = merged_data)
 ```
@@ -324,27 +316,23 @@ plot(Mixed[[2]])
 plot(Mixed[[3]])
 ```
 
-Instabil modell dock (för höga Rhat-värden, d.v.s. \> 1) –\> Går ej att tolka
-
-Förklaring = För få events (19 st) - Man bör ha \> 10 events per parameter!!!
-
-Lösning = Göra joint modell för varje biomarkör separat och jämföra –\>
+# (Om det behövs - Separata joint models)
 
 ```{r}
 lme_log_pT217_AB42_F <- lme(
-  log_pT217_AB42_F ~ time_years + age_at_visit + PTGENDER.x, 
+  log_pT217_AB42_F ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
 
 lme_log_AB42_AB40_F <- lme(
-  log_AB42_AB40_F ~ time_years + age_at_visit + PTGENDER.x, 
+  log_AB42_AB40_F ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
 
 lme_log_NfL_Q <- lme(
-  log_NfL_Q ~ time_years + age_at_visit + PTGENDER.x, 
+  log_NfL_Q ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
