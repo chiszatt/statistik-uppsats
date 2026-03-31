@@ -193,7 +193,7 @@ length(unique(surv_data$RID))     # survival data
 
 # Longitudinal model
 
-## We check correlation between time_years and age_at_visit 
+## We check correlation between time_years and age_at_visit
 
 ```{r}
 cor(merged_data$age_at_baseline, merged_data$age_at_visit)
@@ -262,8 +262,6 @@ joint_model <- jm(
 summary(joint_model)
 ```
 
-För höga Rhat-värden (\> 1) –\> Betyder att MCMC-kedjorna inte har konvergerat –\> Instabil modell... :(
-
 # Multivariate model
 
 ```{r}
@@ -316,7 +314,9 @@ plot(Mixed[[2]])
 plot(Mixed[[3]])
 ```
 
-# (Om det behövs - Separata joint models)
+Multivariate joint-modellen har dock stora CI –\> Beror förmodligen på lilla n-storleken eller det låga antalet events (ska typ vara 10 events per parameter) –\> Bättre med 3 separata joint-modeller och jämföra istället –\>
+
+# 3 separata joint models
 
 ```{r}
 lme_log_pT217_AB42_F <- lme(
@@ -371,4 +371,4 @@ joint_model3 <- jm(
 summary(joint_model3)
 ```
 
-Fortfarande instabila modeller (för höga Rhat-värden), på grund av för få events bland de 126 individerna... :(
+Alla 3 modeller har små CI –-\> Bättre säkerhet i skattningarna, mer stabila modeller
