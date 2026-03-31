@@ -22,16 +22,28 @@ library(survival)
 ```
 
 ```{r}
+# read data Milou
 library(readr)
 plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
 
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
+# # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# 
+# # We load demographics data 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+```
 
-# We load demographics data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
+```{r}
+# read data Charley
+library(ADNIMERGE2)
+
+# dx data
+diagnosis_data = DXSUM
+
+# demographics
+demographics = PTDEMOG
 ```
 
 ## 1. We select only the required variables and merge them
@@ -90,9 +102,6 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 2 measurements 
 length(keep)
-
-# We check exact number of measurements per individual
-#table(merged_data$RID)
 ```
 
 ## 4. We extract baseline visits, and create an event and time-to-event variable
@@ -184,14 +193,14 @@ length(unique(surv_data$RID))     # survival data
 ```{r}
 # Gör RID till character (säkerhet)
 merged_data$RID <- as.character(merged_data$RID)
-surv_data$RID   <- as.character(surv_data$RID)
+surv_data$RID <- as.character(surv_data$RID)
 
 # Hitta gemensamma ID:n
 common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
 
 # Behåll endast gemensamma individer
 merged_data <- merged_data %>% filter(RID %in% common_IDs)
-surv_data   <- surv_data %>% filter(RID %in% common_IDs)
+surv_data <- surv_data %>% filter(RID %in% common_IDs)
 
 # Kontroll
 length(unique(merged_data$RID))  # ska matcha
