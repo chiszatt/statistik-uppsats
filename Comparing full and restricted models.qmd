@@ -17,6 +17,8 @@ library(nlme) # decide which package will we use for lme
 library(survival)
 library(ggsurvfit)
 library(car) # to compute vif
+library(naniar) # to test for MCAR
+library(tidyr)
 ```
 
 -   Loading the data
@@ -155,16 +157,21 @@ merged_data <- merged_data %>%
 -   Checking NfL_Q and GFAP_Q values: $618$ with $-4$ which indicates missing data, so remove these variables
 
 ```{r}
-# NfL_Q and GFAP_Q have many -4 values, checking how many
-nrow(merged_data %>% filter(NfL_Q < 0))
-nrow(merged_data %>% filter(GFAP_Q < 0))
+biomarkers = c("pT217_F", "AB42_F", "AB40_F", "AB42_AB40_F",
+               "pT217_AB42_F", "NfL_Q", "GFAP_Q")
 
-# checking how many obs have biomarker values less than 0 
-nrow(merged_data %>% filter(pT217_F < 0 | AB42_F < 0 | AB40_F < 0 | AB42_AB40_F < 0 |
-                             pT217_AB42_F < 0 | NfL_Q < 0 | GFAP_Q < 0))
+# checking how many obs for each biomarker have unrealistic values
+colSums(merged_data[biomarkers] < 0, na.rm = TRUE)
 
-# seems as if the only ones are NfL_Q and GFAP_Q, so we remove them from the data set
+# since there are a large number with -4 for NfL_Q and GFAP_Q, we remove these variables
 merged_data = merged_data %>% select(!NfL_Q & !GFAP_Q)
+plasma_data = plasma_data %>% select(!NfL_Q & !GFAP_Q)
+
+# and then filter out the observations with unrealistic values for the other biomarkers
+merged_data = merged_data %>%
+  filter(pT217_F > 0 | AB42_F > 0 | AB40_F > 0 | AB42_AB40_F > 0, pT217_AB42_F > 0)
+plasma_data = plasma_data %>%
+  filter(pT217_F > 0 | AB42_F > 0 | AB40_F > 0 | AB42_AB40_F > 0, pT217_AB42_F > 0)
 ```
 
 -   Checking outliers and transforming variables
@@ -359,14 +366,14 @@ cox.zph(surv_model_age_gender)
 -   The Rhat values are $intercept = 1.0007$, $time\_years = 1.0145$, $PTGENDER = 0.9999$, $age\_at\_baseline = 1.0005$, and $sigma = 1.0072$: these are acceptable values.
 
 ```{r}
-# Joint model 
-joint_model = jm(
-  surv_model_age_gender,
-  long_model,
-  time_var = "time_years"
-  )
-
-summary(joint_model)
+# # Joint model 
+# joint_model = jm(
+#   surv_model_age_gender,
+#   long_model,
+#   time_var = "time_years"
+#   )
+# 
+# summary(joint_model)
 ```
 
 # Restricted model: individuals with \> 3 measurements
@@ -427,12 +434,94 @@ cox.zph(surv_model_restricted)
 -   Rhat values are $intercept = 1.0009$, $time\_years = 1.0004$, $age\_at\_baseline = 1.0008$, $PTGENDER = 1.0000$, and $sigma = 1.0012$: these are acceptable values.
 
 ```{r}
-# Joint model 
-joint_model_restricted = jm(
-  surv_model_restricted,
-  long_model_restricted,
-  time_var = "time_years"
-  )
+# # Joint model 
+# joint_model_restricted = jm(
+#   surv_model_restricted,
+#   long_model_restricted,
+#   time_var = "time_years"
+#   )
+# 
+# summary(joint_model_restricted)
+```
 
-summary(joint_model_restricted)
+# Missing at Random Assumption
+
+-   From what I understand, if we want to include individuals with only one measurement in the joint model, we need to assume the other measurements for these individuals are missing at random, MAR. That is, the missingness mechanism is not related to the unobserved data, but can be related to the observed data.
+
+```{r}
+# visually testing normality assumption for t test
+# distributions of the log of AB42_AB40 and pT217_AB42
+
+ggplot(plasma_data, aes(x = log(AB42_AB40_F))) +
+  geom_histogram(fill = "cornflowerblue", colour = "white", binwidth = 0.05) +
+  theme_classic()
+
+ggplot(plasma_data, aes(x = log(pT217_AB42_F))) +
+  geom_histogram(fill = "cornflowerblue", colour = "white", binwidth = 0.2) +
+  theme_classic()
+```
+
+-   Shapiro-Wilk normality test with $H_0 = \text{The data are normally distributed}$ shows we reject the null hypothesis, meaning we cannot perform a two sample t-test to test whether the group means are significantly different.
+
+```{r}
+# formally testing normality for t test
+shapiro.test(log(plasma_data$pT217_AB42_F))
+shapiro.test(log(plasma_data$AB42_AB40_F))
+```
+
+-   Comparing biomarker values across groups of individuals with 1 measurement and those with \> 1
+
+```{r}
+# comparing biomarker values across individuals with only one measurement and those with > 1
+
+# creating an indicator variable for individuals with only one biomarker exam
+merged_data = merged_data %>%
+  group_by(RID) %>%
+  mutate(n_measurements = n(),
+         sparse = n_measurements == 1) %>%
+  ungroup()
+
+# commparing the biomarker distributions between groups
+merged_data %>%
+  group_by(RID) %>%
+  filter(as.Date(EXAMDATE_plasma, "Y%-%m-d") == min(as.Date(EXAMDATE_plasma, "Y%-%m-d"))) %>%
+  group_by(sparse) %>%
+  summarise(across(c(age_at_baseline, AB42_AB40_F, pT217_AB42_F, event),
+                   ~ mean(.x, na.rm = TRUE)))
+```
+
+-   Little's test for MCAR data: $H_0: \text{the missing data are MCAR}$
+
+-   Reject $H_0$: the missing data are MAR or MNAR
+
+```{r}
+# reshaping the data to wide format: so each row is one individual, and there will be missing values for non-completed biomarker exam visits
+wide_data = merged_data %>%
+  select(RID, VISCODE2_plasma, AB42_AB40_F, pT217_AB42_F) %>%
+  pivot_wider(
+    id_cols = RID,
+    names_from = VISCODE2_plasma,
+    values_from = c(EXAMDATE_plasma, AB42_AB40_F, pT217_AB42_F,
+                    VISCODE2_dx, DIAGNOSIS, EXAMDATE_dx)
+  )
+```
+
+```{r}
+mcar_test(merged_data %>%
+            mutate(DIAGNOSIS = as.factor(DIAGNOSIS)) %>%
+            select(pT217_F, AB42_F, AB40_F, PTGENDER, age_at_baseline, DIAGNOSIS))
+```
+
+```{r}
+# Visualise which variables are missing together
+gg_miss_upset(merged_data)
+
+# Check if missingness in one variable relates to values of another
+gg_miss_var(merged_data)
+
+# Shadow matrix — correlate missingness indicators with observed values
+merged_data[,] %>%
+  bind_shadow() %>%
+  group_by(pT217_AB42_F) %>%
+  summarise(mean_event = mean(event, na.rm = TRUE))
 ```
