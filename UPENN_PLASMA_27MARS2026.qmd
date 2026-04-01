@@ -311,7 +311,7 @@ multi_joint_model <- jm(surv_model, Mixed,
                   time_var = "time_years",
                   functional_forms = fForms,
                   n_chains = 3L,    
-                  n_iter = 20000L,
+                  n_iter = 5000L,
                   n_burnin = 2000L
                   )
 summary(multi_joint_model)
@@ -405,3 +405,86 @@ summary(joint_model4)
 ```
 
 Alla 4 modeller har små CI –-\> Bättre säkerhet i skattningarna, mer stabila modeller - MEN multivariat joint modell har sina egna fördelar som separata modeller inte fångar
+
+# Förslag på att använda APOE
+
+```{r}
+# # We load demographics data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
+```
+
+```{r}
+apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
+
+merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
+
+
+surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
+```
+
+## 1. LME med APOE, men utan interaktion
+
+```{r}
+nlme_ptau_apoe <- lme(
+  log_pT217_F ~ time_years + APOE4_status + time_years:APOE4_status,  # Fixed effects
+  random = ~ time_years | RID,                                        # Random intercept + slope per individ
+  data = merged_data
+  )
+
+summary(nlme_ptau_apoe)
+```
+
+## 2. LME med APOE och med interaktion 
+
+```{r}
+nlme_ptau_apoe_interaction <- lme(
+  log_pT217_F ~ time_years + APOE4_status + time_years:APOE4_status,  # Fixed effects
+  random = ~ time_years | RID,                                        # Random intercept + slope per individ
+  data = merged_data
+  )
+
+summary(nlme_ptau_apoe_interaction)
+```
+
+Interaktionen time_years:APOE4_status påverkar inte lutningen över tid, dvs den är onödig –\> Vi kan exkludera den när vi gör joint-modellen (särskild eftersom vi bara har 19 events), men ändå säga att vi har kollat på det, har sett att den är onödig och därför väljer att exkludera den!
+
+Detsamma för GENDERPT:
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  log_pT217_F ~ time_years + PTGENDER.x + time_years:PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+Interaktionen time_years:GENDERPT.x påverkar inte heller lutningen över tid, dvs den är onödig –\> Vi kan exkludera den när vi gör joint-modellen.
+
+--\> Claude föreslår att använda både kön och APOE i LME-modellen, och sedan byta ut kön till APOE i survival modellen
+
+-   eftersom APOE är mer relevant/biologiskt motiverad, mer rimlig
+
+-   d.v.s. inte ha med båda kovariat, för att begränsa antalet kovariat i den modellen, som är känslig på grund av så få events (= 19)
+
+## 3. Survival-modellen med APOE
+
+```{r}
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + APOE4_status,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+Jämförelse med survival-modell med gender:
+
+-   Starkare statistisk signal (både HR och p-värde).
+
+-   Bättre diskriminering (concordance 0.739 vs 0.672).
+
+-   Biologiskt mer motiverad.
