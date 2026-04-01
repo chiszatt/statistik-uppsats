@@ -1,0 +1,345 @@
+---
+title: "test"
+format: pdf
+editor: visual
+---
+
+# Category Fluency (animals)
+
+Verkar även finnas för vegetables
+
+FÖRSTA DATASETET DÄR COXZP-KODEN (TEST AV ASSUMPTION OM COX PROPORTIONAL HAZARDS) FUNKAR OCH LYCKAS
+
+## För att se hur många individer har 5+ mätningar
+
+```{r}
+library(dplyr)
+# 1. Välj kolumner och ta bort dubbletter (RID + VISCODE + VISDATE)
+catfluency_unique <- NEUROBAT %>%
+  select(RID, VISCODE, VISDATE, CATANIMSC) %>%  # välj de kolumner du vill behålla
+  filter(!is.na(CATANIMSC)) %>%                # ta bort rader med NA i CATANIMSC
+  distinct()                                   # tar bort exakta dubbletter
+
+# 2. Räkna antal unika mätningar per individ
+catfluency_unique <- catfluency_unique %>%
+  group_by(RID) %>%
+  mutate(n_measurements = n()) %>%
+  ungroup()
+
+# 3. Räkna antal individer med fler än 5 mätningar
+num_individuals <- catfluency_unique %>%
+  filter(n_measurements > 5) %>%
+  distinct(RID) %>%
+  nrow()
+
+num_individuals  # visar resultatet
+```
+
+# Vanlig analys
+
+## 1. Loading and merging
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/NEUROBAT.rda")
+NEUROBAT <- NEUROBAT
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+```
+
+```{r}
+# Välj Category Fluency (Animals) och grundläggande identifierare
+cat_anim_data <- NEUROBAT %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, VISDATE, CATANIMSC, CATANPERS, CATANINTR)
+
+# Välj diagnosdata
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# Slå ihop CDT-data med diagnosdata via RID och VISCODE2
+merged_data <- cat_anim_data %>%
+  left_join(diagnosis_data, by = c("RID"), suffix = c("_cat", "_dx"))
+
+# Kontrollera resultatet
+glimpse(merged_data)
+```
+
+## 2. We add age and gender
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (EXAMDATE.plasma)
+merged_data$age_at_visit <- as.numeric(format(merged_data$VISDATE, "%Y")) - merged_data$PTDOBYY
+```
+
+## 3. We count and filter participants with at least 5 measurements
+
+```{r}
+keep = unique((cat_anim_data %>% group_by(RID) %>% filter(n() > 5))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 5 measurements 
+length(keep)
+```
+
+## 4. We extract baseline visits, and create an event and time-to-event variable
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(VISDATE)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event)
+surv_data <- merged_data %>%
+  group_by(RID) %>%
+  summarise(
+    age_at_baseline = age_at_visit[which.min(VISDATE)],
+    PTGENDER = PTGENDER[which.min(VISDATE)],
+    time_to_event = case_when(
+      any(DIAGNOSIS == "Dementia") ~
+        as.numeric(min(VISDATE[DIAGNOSIS == "Dementia"]) -
+                   min(c(VISDATE, EXAMDATE))),
+      TRUE ~ as.numeric(max(c(VISDATE, EXAMDATE)) -
+                        min(c(VISDATE, EXAMDATE)))
+    ) / 365,
+    event = as.integer(any(DIAGNOSIS == "Dementia"))
+  ) %>%
+  ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## 5. We create a time variable
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(VISDATE - baseline_date) / 365.25)
+```
+
+## 6. We check the distribution of the variables 
+
+```{r}
+boxplot(merged_data$CATANIMSC, main="CATANIMSC")
+boxplot(merged_data$CATANPERS, main="CATANPERS")
+boxplot(merged_data$CATANINTR, main="CATANINTR")
+```
+
+```{r}
+merged_data$log_CATANIMSC <- log(merged_data$CATANIMSC)
+merged_data$log_CATANPERS <- log(merged_data$CATANPERS)
+merged_data$log_CATANINTR <- log(merged_data$CATANINTR)
+```
+
+## 7. We check for and remove missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data = merged_data %>%
+  na.omit()
+
+surv_data = surv_data %>%
+  na.omit()
+
+# We check again
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+## 8. We make sure we don't have any extreme values (for the longitudinal model)
+
+```{r}
+summary(merged_data$log_CATANIMSC)
+any(is.infinite(merged_data$log_CATANIMSC)) # should be FALSE
+# Inf = extreme values 
+
+summary(merged_data$log_CATANPERS)
+any(is.infinite(merged_data$log_CATANPERS)) 
+
+summary(merged_data$log_CATANINTR)
+any(is.infinite(merged_data$log_CATANINTR)) 
+```
+
+```{r}
+# Remove rows with -Inf or Inf in log_CENTILOIDS
+merged_data <- merged_data[is.finite(merged_data$log_CATANIMSC), ]
+any(is.infinite(merged_data$log_CATANIMSC))  # should be FALSE
+any(is.na(merged_data$log_CATANIMSC))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_CATANPERS), ]
+any(is.infinite(merged_data$log_CATANPERS))  
+any(is.na(merged_data$log_CATANPERS))    
+
+merged_data <- merged_data[is.finite(merged_data$log_CATANINTR), ]
+any(is.infinite(merged_data$log_CATANINTR))  
+any(is.na(merged_data$log_CATANINTR))   
+```
+
+```{r}
+# We re-check
+summary(merged_data$log_CATANIMSC)
+any(is.infinite(merged_data$log_CATANIMSC)) 
+
+summary(merged_data$log_CATANPERS)
+any(is.infinite(merged_data$log_CATANPERS)) 
+
+summary(merged_data$log_CATANINTR)
+any(is.infinite(merged_data$log_CATANINTR)) 
+# Väldigt skeva fördelningar...
+```
+
+```{r}
+hist(merged_data$CATANIMSC)
+hist(merged_data$log_CATANPERS)
+hist(merged_data$log_CATANINTR)
+# Väldigt skeva...
+```
+
+De 2 andra variablerna har jätteskev fördelning, så vet inte om multivariate kommer kunna funka...
+
+## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
+```{r}
+# Gör RID till character (säkerhet)
+merged_data$RID <- as.character(merged_data$RID)
+surv_data$RID   <- as.character(surv_data$RID)
+
+# Hitta gemensamma ID:n
+common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
+
+# Behåll endast gemensamma individer
+merged_data <- merged_data %>% filter(RID %in% common_IDs)
+surv_data   <- surv_data %>% filter(RID %in% common_IDs)
+
+# Kontroll
+length(unique(merged_data$RID))  # ska matcha
+length(unique(surv_data$RID))    # ska matcha
+```
+
+# Longitudinal model
+
+```{r}
+library(nlme)
+# Longitudinal model
+long_model <- lme(
+  log_CATANIMSC ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+```{r}
+library(survival)
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline category fluency test", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+```{r}
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+```{r}
+library(JMbayes2)
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```
+
+```{r}
+summary <- summary(joint_model)
+summary$Survival
+```
+
+# Multivariate joint model
+
+Eftersom de 2 andra variablerna är jätteskeva så verkar det svårt...
+
+```{r}
+fm1 <- lme(log_CATANIMSC ~ time_years + PTGENDER.x,
+                random = ~ time_years | RID,
+                data = merged_data)
+
+fm2 <- lme(log_CATANPERS ~ time_years + PTGENDER.x,
+                  random = ~ time_years | RID,
+                  data = merged_data)
+
+fm3 <- lme(log_CATANINTR ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+```
+
+```{r}
+Mixed <- list(fm1, fm2, fm3)
+```
