@@ -1,0 +1,452 @@
+---
+title: "Untitled"
+format: pdf
+editor: visual
+---
+
+# UPENN-PLASMA 12 MARS 2026, men inklusive de med bara 1 measurement
+
+```{r, warning=FALSE}
+# loading libraries
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+library(corrr) 
+```
+
+```{r}
+# read data Milou
+library(readr)
+plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
+
+# # We load diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+# 
+# # We load demographics data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+
+# We load APOE data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe_data <- APOERES
+```
+
+```{r}
+# read data Charley
+library(ADNIMERGE2)
+
+# dx data
+diagnosis_data = DXSUM
+
+# demographics
+demographics = PTDEMOG
+```
+
+## 1. We select only the required variables and merge them
+
+```{r}
+library(dplyr)
+# selecting the relevant variables -> why these ones???
+plasma_data = plasma_data %>%
+  select("RID", "VISCODE2", "EXAMDATE", "pT217_F",
+         "AB42_F", "AB40_F", "AB42_AB40_F", "pT217_AB42_F", "NfL_Q", "GFAP_Q")
+
+diagnosis_data = diagnosis_data %>%
+  select("ORIGPROT", "COLPROT", "RID", "VISCODE2", "EXAMDATE", "DIAGNOSIS")
+
+# merging the plasma data set and the diagnosis data set by RID (unique identifier) and recoding the diagnosis variable
+merged_data = plasma_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_plasma", "_dx")) %>%
+  mutate(dx = case_when(DIAGNOSIS == "Dementia" ~ 1, TRUE ~ 0))
+```
+
+## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# 5. Konvertera EXAMDATE_plasma till Date (hanterar både character och factor)
+if (is.factor(merged_data$EXAMDATE_plasma)) {
+  merged_data$EXAMDATE_plasma <- as.character(merged_data$EXAMDATE_plasma)
+}
+merged_data$EXAMDATE_plasma <- as.Date(merged_data$EXAMDATE_plasma, format="%Y-%m-%d")
+
+# 6. Skapa age_at_visit
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")) - merged_data$PTDOBYY
+```
+
+## 3. We filter participants with at least one measurement
+
+```{r}
+# 1) Filtrera personer med minst 2 mätningar
+keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 2 measurements 
+length(keep)
+```
+
+## 4. We extract baseline visits, and create an event and time-to-event variable
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_plasma)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
+surv_data <- merged_data %>%
+group_by(RID) %>%
+summarise(
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_plasma)],
+    PTGENDER = PTGENDER[which.min(EXAMDATE_plasma)],
+    time_to_event = case_when(
+
+    any(DIAGNOSIS == "Dementia") ~
+      as.numeric(min(EXAMDATE_plasma[DIAGNOSIS == "Dementia"]) -
+                   min(c(EXAMDATE_plasma, EXAMDATE_dx))),
+
+    TRUE ~ as.numeric(max(c(EXAMDATE_plasma, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_plasma, EXAMDATE_dx)))) / 365,
+
+  event = as.integer(any(DIAGNOSIS == "Dementia"))
+) %>% ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## 5. We create a time variable (time from baseline)
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_plasma - baseline_date) / 365.25)
+```
+
+## 6. We check the distribution of each relevant variable for multivariate joint model and transform
+
+```{r}
+# Vi kollar efter outliers 
+boxplot(merged_data$pT217_F, main="pT217_F")
+boxplot(merged_data$AB42_F, main="AB42_F")
+boxplot(merged_data$AB40_F, main="AB40_F")
+boxplot(merged_data$pT217_AB42_F, main="pT217_AB42_F")
+boxplot(merged_data$AB42_AB40_F, main="AB42_AB40_F")
+boxplot(merged_data$NfL_Q, main="NfL_Q")
+boxplot(merged_data$GFAP_Q, main="GFAP_Q")
+```
+
+```{r}
+# Vi transformerar dem
+merged_data$log_pT217_F <- log(merged_data$pT217_F)
+merged_data$log_AB42_F <- log(merged_data$AB42_F)
+merged_data$log_AB40_F <- log(merged_data$AB40_F)
+merged_data$log_pT217_AB42_F <- log(merged_data$pT217_AB42_F)
+merged_data$log_AB42_AB40_F <- log(merged_data$AB42_AB40_F)
+merged_data$log_NfL_Q <- log(merged_data$NfL_Q)
+merged_data$log_GFAP_Q <- log(merged_data$GFAP_Q)
+```
+
+## 7. We check for missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data <- na.omit(merged_data)
+surv_data <- na.omit(surv_data)
+
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
+```{r}
+# Gör RID till character (säkerhet)
+merged_data$RID <- as.character(merged_data$RID)
+surv_data$RID   <- as.character(surv_data$RID)
+
+# Hitta gemensamma ID:n
+common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
+
+# Behåll endast gemensamma individer
+merged_data <- merged_data %>% filter(RID %in% common_IDs)
+surv_data   <- surv_data %>% filter(RID %in% common_IDs)
+
+# Kontroll
+length(unique(merged_data$RID))  # ska matcha
+length(unique(surv_data$RID))    # ska matcha
+```
+
+# Longitudinal model
+
+## We check correlation between time_years and age_at_visit
+
+```{r}
+cor(merged_data$age_at_baseline, merged_data$age_at_visit)
+```
+
+--\> Using both time_years + age_at_visit is redundant since we have age_at_baseline in the coxph model: if we omit age_at_visit variable from the lme model, the joint model will be stable.
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  log_pT217_F ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline plasma", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+```{r}
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+# Joint model
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```
+
+# Multivariate model
+
+```{r}
+library(nlme)
+
+fm_pT217 <- lme(log_pT217_F ~ time_years + PTGENDER.x,
+                random = ~ time_years | RID,
+                data = merged_data)
+
+fm_ABratio <- lme(log_AB42_AB40_F ~ time_years + PTGENDER.x,
+                  random = ~ time_years | RID,
+                  data = merged_data)
+
+fm_NfL <- lme(log_NfL_Q ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+```
+
+```{r}
+Mixed <- list(fm_pT217, fm_ABratio, fm_NfL)
+```
+
+```{r}
+# Har modellen stabila random slopes?
+VarCorr(fm_pT217)
+VarCorr(fm_ABratio)
+VarCorr(fm_NfL)
+# Om slope-variansen är runt 0 → den biomarkören bidrar nästan inget i en joint model
+```
+
+```{r}
+fForms <- list(
+  "log_pT217_F"   = ~ value(log_pT217_F) + slope(log_pT217_F),   # tau
+  "log_AB42_AB40_F" = ~ value(log_AB42_AB40_F),                  # amyloid 
+  "log_NfL_Q"     = ~ value(log_NfL_Q) + slope(log_NfL_Q))      # neurodegeneration
+```
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+multi_joint_model <- jm(surv_model, Mixed,
+                  time_var = "time_years",
+                  functional_forms = fForms,
+                  n_chains = 3L,    
+                  n_iter = 10000L,
+                  n_burnin = 2000L
+                  )
+summary(multi_joint_model)
+```
+
+```{r}
+summary <- summary(multi_joint_model)
+summary$Survival 
+```
+
+```{r}
+plot(Mixed[[1]])
+plot(Mixed[[2]])
+plot(Mixed[[3]])
+```
+
+P-värden och Rhat-värden vid 10000L i n_iter:
+
+```         
+                                 P     Rhat
+value(log_pT217_F)     0.000000000 1.043781 
+slope(log_pT217_F)     0.007555556 1.136719 
+value(log_AB42_AB40_F) 0.802666667 1.021286 
+value(log_NfL_Q)       0.138666667 1.057651 
+slope(log_NfL_Q)       0.000000000 1.075836
+```
+
+P-värden och Rhat-värden vid 15000L i n_iter:
+
+```         
+            Mean     StDev        2.5%      97.5%
+
+value(log_pT217_F) 1.1645012 0.1377146  0.90610472  1.4276549
+slope(log_pT217_F) -2.2869174 0.8908001 -3.94984964 -0.5624709
+value(log_AB42_AB40_F) -0.1201799 0.4556441 -0.97080770  0.7763266
+value(log_NfL_Q)   0.2368298 0.1606073 -0.07445107  0.5634655
+slope(log_NfL_Q)  4.1828948 1.3029137  1.86158226  6.9034204
+
+                                 P     Rhat
+value(log_pT217_F)     0.000000000 1.043781 
+slope(log_pT217_F)     0.007555556 1.136719
+value(log_AB42_AB40_F) 0.802666667 1.021286
+value(log_NfL_Q)       0.138666667 1.057651
+slope(log_NfL_Q)       0.000000000 1.075836
+```
+
+--\> Ändrade inte
+
+Multivariate joint-modellen har dock stora CI –\> Beror förmodligen på lilla n-storleken eller det låga antalet events (ska typ vara +10 events per parameter) –\> Bättre med 3 separata joint-modeller och jämföra istället? –\>
+
+# 3 separata joint models
+
+```{r}
+lme_log_pT217_F <- lme(
+  log_pT217_F ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+lme_log_AB42_AB40_F <- lme(
+  log_AB42_AB40_F ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+lme_log_NfL_Q <- lme(
+  log_NfL_Q ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+```
+
+```{r}
+# Joint model 1 
+joint_model1 <- jm(
+  surv_model,
+  lme_log_pT217_F,
+  time_var = "time_years"
+  )
+
+summary(joint_model1)
+```
+
+```{r}
+# Joint model 2
+joint_model2 <- jm(
+  surv_model,
+  lme_log_AB42_AB40_F,
+  time_var = "time_years"
+  )
+
+summary(joint_model2)
+```
+
+```{r}
+# Joint model 3 
+joint_model3 <- jm(
+  surv_model,
+  lme_log_NfL_Q,
+  time_var = "time_years"
+  )
+
+summary(joint_model3)
+```
+
+Alla 3 modeller har små CI –-\> Bättre säkerhet i skattningarna, mer stabila modeller - MEN multivariat joint modell har sina egna fördelar som separata modeller inte fångar –\> Vi kan göra 3 separata för uppsatsen och samtidigt göra en multivariat version i Appendix, och visar då ändå kunskapen.
