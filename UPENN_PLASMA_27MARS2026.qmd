@@ -146,16 +146,24 @@ merged_data <- merged_data %>%
 
 ```{r}
 # Vi kollar efter outliers 
+boxplot(merged_data$pT217_F, main="pT217_F")
+boxplot(merged_data$AB42_F, main="AB42_F")
+boxplot(merged_data$AB40_F, main="AB40_F")
 boxplot(merged_data$pT217_AB42_F, main="pT217_AB42_F")
 boxplot(merged_data$AB42_AB40_F, main="AB42_AB40_F")
 boxplot(merged_data$NfL_Q, main="NfL_Q")
+boxplot(merged_data$GFAP_Q, main="GFAP_Q")
 ```
 
 ```{r}
 # Vi transformerar dem
+merged_data$log_pT217_F <- log(merged_data$pT217_F)
+merged_data$log_AB42_F <- log(merged_data$AB42_F)
+merged_data$log_AB40_F <- log(merged_data$AB40_F)
 merged_data$log_pT217_AB42_F <- log(merged_data$pT217_AB42_F)
 merged_data$log_AB42_AB40_F <- log(merged_data$AB42_AB40_F)
 merged_data$log_NfL_Q <- log(merged_data$NfL_Q)
+merged_data$log_GFAP_Q <- log(merged_data$GFAP_Q)
 ```
 
 ## 7. We check for missing values in both merged_data and long_data
@@ -182,7 +190,6 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ```{r}
 length(unique(merged_data$RID))   # longitudinala data
 length(unique(surv_data$RID))     # survival data
-# De matchar inte --> Måste lösa 
 ```
 
 # Longitudinal model
@@ -198,7 +205,7 @@ cor(merged_data$age_at_baseline, merged_data$age_at_visit)
 ```{r}
 # Longitudinal model
 long_model <- lme(
-  log_pT217_AB42_F ~ time_years + PTGENDER.x, 
+  log_pT217_F ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
@@ -261,7 +268,7 @@ summary(joint_model)
 ```{r}
 library(nlme)
 
-fm_pT217 <- lme(log_pT217_AB42_F ~ time_years + PTGENDER.x,
+fm_pT217 <- lme(log_pT217_F ~ time_years + PTGENDER.x,
                 random = ~ time_years | RID,
                 data = merged_data)
 
@@ -272,33 +279,46 @@ fm_ABratio <- lme(log_AB42_AB40_F ~ time_years + PTGENDER.x,
 fm_NfL <- lme(log_NfL_Q ~ time_years + PTGENDER.x,
               random = ~ time_years | RID,
               data = merged_data)
+
+fm_GFAP <- lme(log_GFAP_Q ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
 ```
 
 ```{r}
-Mixed <- list(fm_pT217, fm_ABratio, fm_NfL)
+Mixed <- list(fm_pT217, fm_ABratio, fm_NfL, fm_GFAP)
+```
+
+```{r}
+# Har modellen stabila random slopes?
+VarCorr(fm_pT217)
+VarCorr(fm_ABratio)
+VarCorr(fm_NfL)
+VarCorr(fm_GFAP)
+# Om slope-variansen är runt 0 → den biomarkören bidrar nästan inget i en joint model
 ```
 
 ```{r}
 fForms <- list(
-  "log_pT217_AB42_F" = ~ value(log_pT217_AB42_F) + slope(log_pT217_AB42_F),
-  "log_AB42_AB40_F" = ~ value(log_AB42_AB40_F),
-  "log_NfL_Q" = ~ value(log_NfL_Q) + slope(log_NfL_Q)
-)
+  "log_pT217_F"   = ~ value(log_pT217_F) + slope(log_pT217_F),   # tau
+  "log_AB42_AB40_F" = ~ value(log_AB42_AB40_F),                  # amyloid 
+  "log_NfL_Q"     = ~ value(log_NfL_Q) + slope(log_NfL_Q),       # neurodegeneration
+  "log_GFAP_Q"    = ~ value(log_GFAP_Q) + slope(log_GFAP_Q))      # astrocyt
 ```
 
 ```{r}
-joint_model <- jm(surv_model, Mixed,
+multi_joint_model <- jm(surv_model, Mixed,
                   time_var = "time_years",
                   functional_forms = fForms,
                   n_chains = 3L,    
                   n_iter = 20000L,
                   n_burnin = 2000L
                   )
-summary(joint_model)
+summary(multi_joint_model)
 ```
 
 ```{r}
-summary <- summary(joint_model)
+summary <- summary(multi_joint_model)
 summary$Survival 
 ```
 
@@ -306,15 +326,16 @@ summary$Survival
 plot(Mixed[[1]])
 plot(Mixed[[2]])
 plot(Mixed[[3]])
+plot(Mixed[[4]])
 ```
 
-Multivariate joint-modellen har dock stora CI –\> Beror förmodligen på lilla n-storleken eller det låga antalet events (ska typ vara 10 events per parameter) –\> Bättre med 3 separata joint-modeller och jämföra istället –\>
+Multivariate joint-modellen har dock stora CI –\> Beror förmodligen på lilla n-storleken eller det låga antalet events (ska typ vara +10 events per parameter) –\> Bättre med 4 separata joint-modeller och jämföra istället? –\>
 
-# 3 separata joint models
+# 4 separata joint models
 
 ```{r}
-lme_log_pT217_AB42_F <- lme(
-  log_pT217_AB42_F ~ time_years + PTGENDER.x, 
+lme_log_pT217_F <- lme(
+  log_pT217_F ~ time_years + PTGENDER.x, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
@@ -330,13 +351,20 @@ lme_log_NfL_Q <- lme(
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
+
+lme_log_GFAP_Q <- lme(
+  log_GFAP_Q ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
 ```
 
 ```{r}
 # Joint model 1 
 joint_model1 <- jm(
   surv_model,
-  lme_log_pT217_AB42_F,
+  lme_log_pT217_F,
   time_var = "time_years"
   )
 
@@ -365,4 +393,15 @@ joint_model3 <- jm(
 summary(joint_model3)
 ```
 
-Alla 3 modeller har små CI –-\> Bättre säkerhet i skattningarna, mer stabila modeller
+```{r}
+# Joint model 4 
+joint_model4 <- jm(
+  surv_model,
+  lme_log_GFAP_F,
+  time_var = "time_years"
+  )
+
+summary(joint_model4)
+```
+
+Alla 4 modeller har små CI –-\> Bättre säkerhet i skattningarna, mer stabila modeller - MEN multivariat joint modell har sina egna fördelar som separata modeller inte fångar
