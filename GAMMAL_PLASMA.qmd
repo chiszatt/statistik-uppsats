@@ -324,6 +324,11 @@ multi_joint_model <- jm(surv_model, Mixed,
 summary(multi_joint_model)
 ```
 
+```{r}
+summary <- summary(multi_joint_model)
+summary$Survival
+```
+
 # 2 separate joint models
 
 ```{r}
