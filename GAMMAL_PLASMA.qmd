@@ -131,6 +131,7 @@ group_by(RID) %>%
 summarise(
     age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
     PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    
     time_to_event = case_when(
 
     any(DIAGNOSIS_dx == "Dementia") ~
@@ -261,7 +262,7 @@ plot(
 # Cox survival-model with covariates
 surv_model <- coxph(
   surv_object ~ age_at_baseline + PTGENDER,
-  data = surv_data
+  data <- surv_data
 )
 
 summary(surv_model)
