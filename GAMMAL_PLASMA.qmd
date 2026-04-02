@@ -64,6 +64,26 @@ merged_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
 
+Checking missing values
+
+```{r}
+# checking for missing values with NA
+
+# NfL
+sum(is.na(nfl_data))
+nfl_data[which(is.na(nfl_data)), ]
+
+# pTAU
+sum(is.na(ptau_data))
+
+# checking with ADNI code -4
+# NfL
+sum(nfl_data$PLASMA_NFL < 0, na.rm = TRUE)
+
+# pTAU
+sum(ptau_data$PLASMAPTAU181 < 0, na.rm = TRUE)
+```
+
 ## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
 
 ```{r}
@@ -86,14 +106,14 @@ merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), fo
 merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
 ```
 
-## 3. We filter participants with at least 2 measurements
+## 3. We filter participants with at least 3 measurements
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
-# We check number of individuals with at least 2 measurements 
+# We check number of individuals with at least 3 measurements 
 length(keep)
 ```
 
