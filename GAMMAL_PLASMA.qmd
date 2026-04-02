@@ -16,19 +16,20 @@ library(JMbayes2)
 ```{r}
 # loading data
 # Milou
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-# nfl_data <- BLENNOWPLASMANFLLONG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
 # 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-# ptau_data <- UGOTPTAU181
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
 # 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
 # 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+```
 
-
+```{r}
 # Charley
 library(ADNIMERGE2)
 nfl_data = BLENNOWPLASMANFLLONG
@@ -321,8 +322,6 @@ multi_joint_model <- jm(surv_model, Mixed,
                   )
 summary(multi_joint_model)
 ```
-
-# 
 
 # 2 separate joint models
 
