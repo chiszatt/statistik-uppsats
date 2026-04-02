@@ -1,0 +1,238 @@
+---
+title: "GAMMAL_PLASMA"
+format: pdf
+editor: visual
+---
+
+# GAMMAL PLASMA
+
+```{r, warning=FALSE}
+library(dplyr)
+library(nlme)
+library(survival)
+library(JMbayes2)
+```
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+```
+
+## 1. We select only the required variables and merge them
+
+```{r}
+nfl_data <- nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+ptau_data <- ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# 1. Lägg _dx på diagnos-kolumner
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# 2. Slå ihop NFL, ptau och diagnos
+merged_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+```
+
+## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# 1. Håll bara demografi-variabler vi behöver och en rad per person
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# 2. Slå ihop med merged_data
+merged_data <- merged_data %>%
+  left_join(demographics_small, by = "RID")
+
+# 3. Säkerställ att kön är faktor
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# 4. Konvertera EXAMDATE_ptau till Date
+merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
+
+# 5. Skapa age_at_visit baserat på ptau datum
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+```
+
+## 3. We filter participants with at least 2 measurements
+
+```{r}
+# 1) Filtrera personer med minst 2 mätningar
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 2 measurements 
+length(keep)
+```
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
+surv_data <- merged_data %>%
+group_by(RID) %>%
+summarise(
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
+    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    time_to_event = case_when(
+
+    any(DIAGNOSIS_dx == "Dementia") ~
+      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
+                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
+
+    TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
+
+  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
+) %>% ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## 5. We create a time variable (time from baseline)
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+## 6. We check the distribution of each relevant variable for multivariate joint model and transform
+
+```{r}
+# Vi kollar efter outliers 
+boxplot(merged_data$PLASMAPTAU181, main="PLASMAPTAU181")
+boxplot(merged_data$PLASMA_NFL, main="PLASMA_NFL")
+```
+
+```{r}
+merged_data$log_PLASMAPTAU181 <- log(merged_data$PLASMAPTAU181)
+merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL)
+```
+
+## 7. We check for missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data <- na.omit(merged_data)
+surv_data <- na.omit(surv_data)
+
+# We re-count missing values
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+## 8. We make sure we don't have any extreme values (for the longitudinal model)
+
+```{r}
+summary(merged_data$log_PLASMAPTAU181)
+any(is.infinite(merged_data$log_PLASMAPTAU181)) # should be FALSE
+# Inf = extreme values 
+
+summary(merged_data$log_PLASMA_NFL)
+any(is.infinite(merged_data$log_PLASMA_NFL)) # should be FALSE
+# Inf = extreme values 
+```
+
+## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
+# Longitudinal model
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  log_PLASMAPTAU181 ~ time_years + PTGENDER.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline amyloid", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+```{r}
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+# Joint model
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```

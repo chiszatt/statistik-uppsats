@@ -75,29 +75,30 @@ library(survival)
 ```{r}
 # load data sets: Charley
 # loading adni library
-library(ADNIMERGE2)
+#library(ADNIMERGE2)
 
 # biomarker data set
-plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+#plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
 # PET scan data
-amyloid_data = UCBERKELEY_AMY_6MM
+#amyloid_data = UCBERKELEY_AMY_6MM
 
 # dx data
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
 # APOE GENOTYPING
-apoe_data = APOERES
+#apoe_data = APOERES
 
 # deprivation index
-deprivation = ADI
+#deprivation = ADI
 
 # demographics
-demog1 = PTDEMOG
-demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
+#demog1 = PTDEMOG
+#demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
 
-demographics = demog1 %>%
-  inner_join(demog2, by = c("RID"))
+#demographics = demog1 %>%
+  #inner_join(demog2, by = c("RID"))
+
 
 
 # # loading data sets: Milou# 
@@ -105,17 +106,17 @@ demographics = demog1 %>%
 #load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
 #amyloid_data <- UCBERKELEY_AMY_6MM
 
-# # We load plasma data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
-# plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
-# 
-# # We load diagnosis data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
-# 
-# # We load demographics data 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+# We load plasma data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
+plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
+
+# We load diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+# We load demographics data 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 ```
 
 # Introduction
@@ -463,11 +464,6 @@ merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_plasma, "%Y")
 ## 3. We filter participants with at least 2 measurements
 
 ```{r}
-# checking how many individuals in the data set with no missing values
-length(unique((na.omit(plasma_data))$RID))
-```
-
-```{r}
 # 1) Filtrera personer med minst 2 mätningar
 # keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 # merged_data <- merged_data %>% filter(RID %in% keep)
@@ -651,14 +647,14 @@ cox.zph(surv_model)
 # 5. Joint-model
 
 ```{r}
-# # Joint model 
-# joint_model <- jm(
-#   surv_model,
-#   long_model,
-#   time_var = "time_years"
-#   )
-# 
-# summary(joint_model)
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
 ```
 
 ```{r}
