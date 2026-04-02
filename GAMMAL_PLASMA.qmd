@@ -167,6 +167,17 @@ any(is.infinite(merged_data$log_PLASMA_NFL)) # should be FALSE
 # Inf = extreme values 
 ```
 
+```{r}
+# Remove rows with -Inf or Inf in log_CENTILOIDS
+merged_data <- merged_data[is.finite(merged_data$log_PLASMAPTAU181), ]
+any(is.infinite(merged_data$log_PLASMAPTAU181))  # should be FALSE
+any(is.na(merged_data$log_PLASMAPTAU181))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_PLASMA_NFL), ]
+any(is.infinite(merged_data$log_PLASMA_NFL))  # should be FALSE
+any(is.na(merged_data$log_PLASMA_NFL))       # also FALSE
+```
+
 ## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
@@ -235,4 +246,83 @@ joint_model <- jm(
   )
 
 summary(joint_model)
+```
+
+# Multivariate joint model
+
+```{r}
+fm_ptau <- lme(log_PLASMAPTAU181 ~ time_years + PTGENDER.x,
+                random = ~ time_years | RID,
+                data = merged_data)
+
+fm_nfl <- lme(log_PLASMA_NFL ~ time_years + PTGENDER.x,
+                  random = ~ time_years | RID,
+                  data = merged_data)
+
+Mixed <- list(fm_ptau, fm_nfl)
+```
+
+```{r}
+# Har modellen stabila random slopes?
+VarCorr(fm_ptau)
+VarCorr(fm_nfl)
+# Om slope-variansen är runt 0 → den biomarkören bidrar nästan inget i en joint model
+```
+
+```{r}
+fForms <- list(
+  "log_PLASMAPTAU181"   = ~ value(log_PLASMAPTAU181) + slope(log_PLASMAPTAU181),   # tau
+  "log_PLASMA_NFL"     = ~ value(log_PLASMA_NFL) + slope(log_PLASMA_NFL)       # neurodegeneration
+  )      
+```
+
+```{r}
+multi_joint_model <- jm(surv_model, Mixed,
+                  time_var = "time_years",
+                  functional_forms = fForms,
+                  n_chains = 3L,    
+                  n_iter = 20000L,
+                  n_burnin = 2000L
+                  )
+summary(multi_joint_model)
+```
+
+# 
+
+# 2 separate joint models
+
+```{r}
+lme_log_PLASMAPTAU181 <- lme(
+  log_PLASMAPTAU181 ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+lme_log_PLASMA_NFL <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER.x, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+```
+
+```{r}
+# Joint model 1 
+joint_model1 <- jm(
+  surv_model,
+  lme_log_PLASMAPTAU181,
+  time_var = "time_years"
+  )
+
+summary(joint_model1)
+```
+
+```{r}
+# Joint model 2
+joint_model2 <- jm(
+  surv_model,
+  lme_log_PLASMA_NFL,
+  time_var = "time_years"
+  )
+
+summary(joint_model2)
 ```
