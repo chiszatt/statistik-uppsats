@@ -93,7 +93,7 @@ library(survival)
 #deprivation = ADI
 
 # demographics
-#demog1 = PTDEMOG
+#demographics = PTDEMOG
 #demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
 
 #demographics = demog1 %>%
@@ -103,20 +103,20 @@ library(survival)
 
 # # loading data sets: Milou# 
 # We load amyloid data 
-#load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
-#amyloid_data <- UCBERKELEY_AMY_6MM
-
-# We load plasma data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
-plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
-
-# We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-
-# We load demographics data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
+# load(file.path("ADNIMERGE2_unpacked/ADNIMERGE2/data/UCBERKELEY_AMY_6MM.rda"))
+# #amyloid_data <- UCBERKELEY_AMY_6MM
+# 
+# # We load plasma data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UPENN_PLASMA_FUJIREBIO_QUANTERIX.rda")
+# plasma_data <- UPENN_PLASMA_FUJIREBIO_QUANTERIX
+# 
+# # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# 
+# # We load demographics data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
 ```
 
 # Introduction
@@ -140,6 +140,12 @@ Where are there gaps??? (This leads on to the next section, why are we doing thi
 ## Research Aims
 
 What are our research questions?
+
+1.  How do longitudinal changes in plasma biomarker levels over time relate to the risk of progression to dementia? (Joint modeling)
+
+2.  How do these associations differ between pTau217, Aβ42/40, and NfL? (Comparison across biomarkers)
+
+3.  How does the precision change for the estimated longitudinal trajectories and survival associations to the inclusion of individuals with different numbers of repeated measurements? (Precision analysis)
 
 Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
 
