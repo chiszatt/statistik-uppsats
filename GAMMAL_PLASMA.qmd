@@ -4,8 +4,13 @@ format: pdf
 editor: visual
 ---
 
+# GAMMAL PLASMA
+
 ```{r}
-library(readr)
+library(dplyr)
+```
+
+```{r}
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
 nfl_data <- BLENNOWPLASMANFLLONG
 
@@ -31,41 +36,35 @@ ptau_data <- ptau_data %>%
 diagnosis_data <- diagnosis_data %>%
   select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
 
+# 1. Lägg _dx på diagnos-kolumner
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# 2. Slå ihop NFL, ptau och diagnos
 merged_data <- nfl_data %>%
-  left_join(ptau_data, 
-            by = c("RID", "VISCODE2"),
-            suffix = c("_nfl", "_ptau")) %>%
-  left_join(diagnosis_data, 
-            by = c("RID", "VISCODE2"),
-            suffix = c("", "_dx"))
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
 
 ## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
 
 ```{r}
-# We keep only the variables we need (RID, birth year, gender)
-demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+# 1. Håll bara demografi-variabler vi behöver och en rad per person
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
 
-# We make sure we only have one row per person
-demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+# 2. Slå ihop med merged_data
+merged_data <- merged_data %>%
+  left_join(demographics_small, by = "RID")
 
-# We merge age and gender into merged_data
-merged_data <- merge(
-  merged_data,
-  demographics_small,
-  by = "RID"
-)
+# 3. Säkerställ att kön är faktor
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
 
-# We make sure that gender is categorical (factor)
-merged_data$PTGENDER.x <- as.factor(merged_data$PTGENDER.x)
+# 4. Konvertera EXAMDATE_ptau till Date
+merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
 
-# 5. Konvertera EXAMDATE_plasma till Date (hanterar både character och factor)
-if (is.factor(merged_data$EXAMDATE_ptau)) {
-  merged_data$EXAMDATE_ptau <- as.character(merged_data$EXAMDATE_ptau)
-}
-merged_data$EXAMDATE_ptau <- as.Date(merged_data$EXAMDATE_ptau, format="%Y-%m-%d")
-
-# 6. Skapa age_at_visit
+# 5. Skapa age_at_visit baserat på ptau datum
 merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
 ```
 
@@ -73,7 +72,7 @@ merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) 
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 2 measurements 
@@ -95,14 +94,14 @@ summarise(
     PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
     time_to_event = case_when(
 
-    any(DIAGNOSIS == "Dementia") ~
-      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS == "Dementia"]) -
+    any(DIAGNOSIS_dx == "Dementia") ~
+      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
                    min(c(EXAMDATE_ptau, EXAMDATE_dx))),
 
     TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
                     min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
 
-  event = as.integer(any(DIAGNOSIS == "Dementia"))
+  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
 ) %>% ungroup()
 
 # Lägger survival-data tillbaka i merged_data
