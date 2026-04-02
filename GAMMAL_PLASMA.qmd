@@ -14,17 +14,32 @@ library(JMbayes2)
 ```
 
 ```{r}
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
+# loading data
+# Milou
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+# 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
+# Charley
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
+ptau_data = UGOTPTAU181
+
+diagnosis_data = DXSUM
+
+demographics = PTDEMOG
+
+APOE = APOERES
 ```
 
 ## 1. We select only the required variables and merge them
