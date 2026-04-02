@@ -21,13 +21,13 @@ library(corrr)
 library(readr)
 plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
 
-# # We load diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-# 
-# # We load demographics data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
+# # # We load diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# # 
+# # # We load demographics data 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
 ```
 
 ```{r}
@@ -397,7 +397,7 @@ summary(joint_model3)
 # Joint model 4 
 joint_model4 <- jm(
   surv_model,
-  lme_log_GFAP_F,
+  lme_log_GFAP_Q,
   time_var = "time_years"
   )
 
@@ -435,7 +435,7 @@ nlme_ptau_apoe <- lme(
 summary(nlme_ptau_apoe)
 ```
 
-## 2. LME med APOE och med interaktion 
+## 2. LME med APOE och med interaktion
 
 ```{r}
 nlme_ptau_apoe_interaction <- lme(
