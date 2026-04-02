@@ -311,6 +311,28 @@ Joint-model options:
 
 ## ADNI
 
+All protocols allow enrollment for individuals aged 55-90.
+
+-   ADNI1
+
+800 subjects (200 controls, 400 MCI, 200 mild AD) recruited at around 50 sites in the United States and Canada
+
+-   ADNI2
+
+Cognitively normal, significant memory concern, early MCI, late MCI, mild AD
+
+Inclusion criteria for rollover participants: originally diagnosed as either MCI (early or late) or CN
+
+-   ADNI3
+
+700 - 800 rollover participants
+
+370 - 1200 newly enrolled
+
+Three cohorts: CN, MCI, mild AD
+
+-   ADNI4
+
 Introducing the study, it's aims and the type of information gathered.
 
 **IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
