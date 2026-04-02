@@ -150,6 +150,12 @@ Introduce the methods we will use.
 
 Why did we choose this method to answer the research question?
 
+## Mixed Effects Models
+
+Why???
+
+We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
+
 ## Linear Mixed Effect Model
 
 **Theory about the model... (specifically why we should use it)**
@@ -175,6 +181,56 @@ $m_i(t):$ the trajectory function which represents the **true unobserved** **val
 $\mathbf{X_i}^T(t)\beta:$ the fixed effects
 
 $\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
+
+The full model becomes:
+
+$$
+y_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+## Generalised Linear Mixed Effects Model
+
+<https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
+
+An extension of GLMs, where the linear predictor contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
+
+Given random effects, $\mathbf{u}$ the dependent variable, $\mathbf{y}$, is distributed according to the exponential family, such that $g(E[\mathbf{y}|\mathbf{u}]) = \mathbf{X𝛽} + \mathbf{Zu}$. Some link function, $g(x)$, links the expected value of $\mathbf{y}$ given the random effects to the linear predictor which included both fixed effects and random effects.
+
+Where:
+
+$\mathbf{X}$ = the fixed effects design matrix
+
+$\mathbf{\beta}$ = the fixed effects
+
+$\mathbf{Z}$ = the random effects design matrix
+
+$\mathbf{u}$ = the random effects
+
+What do we model as random?
+
+We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
+
+We do not tend to estimate $\mathbf{u}$, but instead assume that $u_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(u) = 0$.
+
+For a model with only a random intercept, $\mathbf{G}$ becomes $G = \sigma^2_{intercept}$. If we extend the model to have random slope, we get:
+
+$$
+G =
+\begin{bmatrix}
+\sigma^2_{intercept} & \sigma_{intercept, slope} \\
+\sigma_{intercept, slope} & \sigma^2_{slope}
+\end{bmatrix}
+$$
+
+Like all variance-covariance matrices, some elements are redundant since they are repeated. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, means estimating $\frac{p(p + 1)}{2}$ elements instead. Assuming (**?????**) the random effects are independent, the variance-covariance matrix for the random effects becomes diagonal:
+
+$$
+G =
+\begin{bmatrix}
+\sigma^2_{intercept} & 0 \\
+0 & \sigma^2_{slope}
+\end{bmatrix}
+$$
 
 ### Assumptions!!
 
@@ -351,7 +407,12 @@ merged_data = plasma_data %>%
 ```
 
 ```{r}
-unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+# number of unique individuals with more than three measurements
+n_longitudinal_plasma = length(unique(
+    (plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID))
+
+# number of unique individuals total
+n_plasma = length(unique((plasma_data %>% group_by(RID))$RID))
 ```
 
 ## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
@@ -386,11 +447,11 @@ length(unique((na.omit(plasma_data))$RID))
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-merged_data <- merged_data %>% filter(RID %in% keep)
-
-# We check number of individuals with at least 2 measurements 
-length(keep)
+# keep = unique((plasma_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+# merged_data <- merged_data %>% filter(RID %in% keep)
+# 
+# # We check number of individuals with at least 2 measurements 
+# length(keep)
 
 # We check exact number of measurements per individual
 #table(merged_data$RID)
@@ -430,9 +491,16 @@ surv_data <- merged_data %>%
 # Lägger survival-data tillbaka i merged_data
 merged_data <- merged_data %>%
   left_join(surv_data, by = "RID")
+# 
+# surv_data = na.omit(surv_data)
+# surv_data = surv_data %>% filter(!(event == 1 & time_to_event == 0))
 
 # We check the number of events 
 table(surv_data$event)
+```
+
+```{r}
+
 ```
 
 ## 5. We create a time variable (time from baseline)

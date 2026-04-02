@@ -482,12 +482,21 @@ merged_data = merged_data %>%
   ungroup()
 
 # commparing the biomarker distributions between groups
+# means
 merged_data %>%
   group_by(RID) %>%
   filter(as.Date(EXAMDATE_plasma, "Y%-%m-d") == min(as.Date(EXAMDATE_plasma, "Y%-%m-d"))) %>%
   group_by(sparse) %>%
   summarise(across(c(age_at_baseline, AB42_AB40_F, pT217_AB42_F, event),
                    ~ mean(.x, na.rm = TRUE)))
+
+# sd
+merged_data %>%
+  group_by(RID) %>%
+  filter(as.Date(EXAMDATE_plasma, "Y%-%m-d") == min(as.Date(EXAMDATE_plasma, "Y%-%m-d"))) %>%
+  group_by(sparse) %>%
+  summarise(across(c(age_at_baseline, AB42_AB40_F, pT217_AB42_F),
+                   ~ sd(.x, na.rm = TRUE)))
 ```
 
 -   Little's test for MCAR data: $H_0: \text{the missing data are MCAR}$
