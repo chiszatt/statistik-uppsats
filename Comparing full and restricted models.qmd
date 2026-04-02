@@ -448,6 +448,8 @@ cox.zph(surv_model_restricted)
 
 -   From what I understand, if we want to include individuals with only one measurement in the joint model, we need to assume the other measurements for these individuals are missing at random, MAR. That is, the missingness mechanism is not related to the unobserved data, but can be related to the observed data.
 
+-   <https://stefvanbuuren.name/fimd/sec-MCAR.html>
+
 ```{r}
 # visually testing normality assumption for t test
 # distributions of the log of AB42_AB40 and pT217_AB42
@@ -505,20 +507,35 @@ merged_data %>%
 
 ```{r}
 # reshaping the data to wide format: so each row is one individual, and there will be missing values for non-completed biomarker exam visits
+
+
+# OK - but not arranged chronologially, does this matter?
 wide_data = merged_data %>%
   select(RID, VISCODE2_plasma, AB42_AB40_F, pT217_AB42_F) %>%
-  pivot_wider(
-    id_cols = RID,
-    names_from = VISCODE2_plasma,
-    values_from = c(EXAMDATE_plasma, AB42_AB40_F, pT217_AB42_F,
-                    VISCODE2_dx, DIAGNOSIS, EXAMDATE_dx)
-  )
+  pivot_wider(names_from = VISCODE2_plasma,
+              values_from = c(AB42_AB40_F, pT217_AB42_F),
+              values_fn = mean) %>%
+  
+
+# wide_data = merged_data %>%
+#   select(RID, VISCODE2_dx, dx) %>%
+#   pivot_wider(names_from = VISCODE2_dx,
+#               values_from = c(dx),
+#               values_fn = mean)
+
+# 
+# wide_data = merged_data %>%
+#   select(RID, VISCODE2_plasma, AB42_AB40_F, pT217_AB42_F) %>%
+#   pivot_wider(
+#     id_cols = RID,
+#     names_from = VISCODE2_plasma,
+#     values_from = c(EXAMDATE_plasma, AB42_AB40_F, pT217_AB42_F,
+#                     VISCODE2_dx, DIAGNOSIS, EXAMDATE_dx)
+#   )
 ```
 
 ```{r}
-mcar_test(merged_data %>%
-            mutate(DIAGNOSIS = as.factor(DIAGNOSIS)) %>%
-            select(pT217_F, AB42_F, AB40_F, PTGENDER, age_at_baseline, DIAGNOSIS))
+mcar_test(wide_data)
 ```
 
 ```{r}
@@ -533,4 +550,18 @@ merged_data[,] %>%
   bind_shadow() %>%
   group_by(pT217_AB42_F) %>%
   summarise(mean_event = mean(event, na.rm = TRUE))
+```
+
+# NfL and pTAU 2010 - 2016
+
+```{r}
+blenn = ADNIMERGE2::BLENNOWPLASMANFLLONG
+
+goth = ADNIMERGE2::UGOTPTAU181
+
+nfl_ptau = merge(blenn, goth, by = c("RID", "VISCODE2"), suffix = c("_NfL", "_pTAU"))
+
+nfl_ptau = nfl_ptau[!duplicated(nfl_ptau), ]
+
+length(unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 3))$RID))
 ```
