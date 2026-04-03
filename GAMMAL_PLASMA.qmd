@@ -18,13 +18,13 @@ library(JMbayes2)
 # Milou
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
 nfl_data <- BLENNOWPLASMANFLLONG
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
 ptau_data <- UGOTPTAU181
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 diagnosis_data <- DXSUM
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
 demographics <- PTDEMOG
 ```
@@ -111,7 +111,7 @@ merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) 
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
@@ -281,7 +281,9 @@ joint_model <- jm(
   long_model,
   time_var = "time_years"
   )
+```
 
+```{r}
 summary(joint_model)
 ```
 
@@ -317,7 +319,7 @@ fForms <- list(
 multi_joint_model <- jm(surv_model, Mixed,
                   time_var = "time_years",
                   functional_forms = fForms,
-                  n_chains = 3L,    
+                  n_chains = 3L,
                   n_iter = 20000L,
                   n_burnin = 2000L
                   )
@@ -352,7 +354,9 @@ joint_model1 <- jm(
   lme_log_PLASMAPTAU181,
   time_var = "time_years"
   )
+```
 
+```{r}
 summary(joint_model1)
 ```
 
@@ -363,6 +367,8 @@ joint_model2 <- jm(
   lme_log_PLASMA_NFL,
   time_var = "time_years"
   )
+```
 
+```{r}
 summary(joint_model2)
 ```
