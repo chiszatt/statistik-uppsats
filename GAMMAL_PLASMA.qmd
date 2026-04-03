@@ -222,7 +222,7 @@ length(unique(merged_data$RID))   # longitudinal data
 length(unique(surv_data$RID))     # survival data
 ```
 
-## 9. We check the correlation between the biomarkers 
+## 9. We check the correlation between the biomarkers
 
 ```{r}
 # Correlation between the biomarkers 
@@ -231,7 +231,7 @@ cor(merged_data$log_PLASMAPTAU181, merged_data$log_PLASMA_NFL, use = "complete.o
 
 # Longitudinal model
 
-## 1. For ptau 
+## 1. For ptau
 
 ```{r}
 # Longitudinal model, with chosen covariates 
@@ -259,7 +259,7 @@ qqnorm(res)
 qqline(res)
 ```
 
-## 2. For nfl 
+## 2. For nfl
 
 ```{r}
 # Longitudinal model, with chosen covariates 
