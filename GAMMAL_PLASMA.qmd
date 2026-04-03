@@ -27,6 +27,9 @@ diagnosis_data <- DXSUM
 # 
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
 demographics <- PTDEMOG
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
 ```
 
 ```{r}
@@ -43,23 +46,26 @@ demographics = PTDEMOG
 APOE = APOERES
 ```
 
-## 1. We select only the required variables and merge them
+## 1. We select the required variables and merge them
 
 ```{r}
+# We select the required nfl variables
 nfl_data <- nfl_data %>%
   select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
 
+# We select the required ptau variables
 ptau_data <- ptau_data %>%
   select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
 
+# We select the required diagnosis variables
 diagnosis_data <- diagnosis_data %>%
   select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
 
-# 1. Lägg _dx på diagnos-kolumner
+# We add _dx on the diagnosis variables 
 diagnosis_data_dx <- diagnosis_data %>%
   rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
 
-# 2. Slå ihop NFL, ptau och diagnos
+# We merge NFL, ptau och diagnosis
 merged_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
@@ -85,32 +91,38 @@ sum(nfl_data$PLASMA_NFL < 0, na.rm = TRUE)
 sum(ptau_data$PLASMAPTAU181 < 0, na.rm = TRUE)
 ```
 
-## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+## 2. We add selected demographics variables (age + gender) and apoe4 status, to later use in survival model and longitudinal model
 
 ```{r}
-# 1. Håll bara demografi-variabler vi behöver och en rad per person
+# We only keep the demographics variables we need and one row per person 
 demographics_small <- demographics %>%
   select(RID, PTDOBYY, PTGENDER) %>%
   distinct(RID, .keep_all = TRUE)
 
-# 2. Slå ihop med merged_data
+# We merge with merged_data
 merged_data <- merged_data %>%
   left_join(demographics_small, by = "RID")
 
-# 3. Säkerställ att kön är faktor
+# We make sure that gender is a factor 
 merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
 
-# 4. Konvertera EXAMDATE_ptau till Date
+# We convert EXAMDATE_ptau to date 
 merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
 
-# 5. Skapa age_at_visit baserat på ptau datum
+# We create age_at_visit based on ptau date 
 merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+
+# We create a variable for apoe4 status
+apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
+
+# We merge apoe with merged_data 
+merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
 ```
 
 ## 3. We filter participants with at least 3 measurements
 
 ```{r}
-# 1) Filtrera personer med minst 2 mätningar
+# We filter individuals with at least 3 measurements
 keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 merged_data <- merged_data %>% filter(RID %in% keep)
 
@@ -119,18 +131,18 @@ length(keep)
 ```
 
 ```{r}
-# Skapar baseline-datum
+# We create a baseline-date
 merged_data <- merged_data %>%
   group_by(RID) %>%
   mutate(baseline_date = min(EXAMDATE_ptau)) %>%
   ungroup()
 
-# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
+# We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
     age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
-    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
     
     time_to_event = case_when(
 
@@ -144,7 +156,7 @@ summarise(
   event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
 ) %>% ungroup()
 
-# Lägger survival-data tillbaka i merged_data
+# We put the survival data back into the merged_data
 merged_data <- merged_data %>%
   left_join(surv_data, by = "RID")
 
@@ -155,7 +167,7 @@ table(surv_data$event)
 ## 5. We create a time variable (time from baseline)
 
 ```{r}
-# 5) Skapa time_years (tid från baseline)
+# We create time_years (time from baseline)
 merged_data <- merged_data %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
@@ -163,15 +175,24 @@ merged_data <- merged_data %>%
 ## 6. We check the distribution of each relevant variable for multivariate joint model and transform
 
 ```{r}
-# Vi kollar efter outliers 
-boxplot(merged_data$PLASMAPTAU181, main="PLASMAPTAU181")
-boxplot(merged_data$PLASMA_NFL, main="PLASMA_NFL")
+# We check the distribution of each biomarker
+hist(merged_data$PLASMAPTAU181, main="PLASMAPTAU181")
+hist(merged_data$PLASMA_NFL, main="PLASMA_NFL")
 ```
 
 ```{r}
+# We log transform the biomarkers 
 merged_data$log_PLASMAPTAU181 <- log(merged_data$PLASMAPTAU181)
 merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL)
 ```
+
+```{r}
+# We re-check the distribution of each biomarker  
+hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
+hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+```
+
+Ptau still looks skewed, even after log transformation --\> In our LME model, we can use a Student’s t-distribution instead of a normal distribution (lme() → normal distribution assumed by default); it is more robust to outliers and heavy-tailed residual distributions.
 
 ## 7. We check for missing values in both merged_data and long_data
 
@@ -184,6 +205,7 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
 ```{r}
+# We remove missing values 
 merged_data <- na.omit(merged_data)
 surv_data <- na.omit(surv_data)
 
@@ -192,47 +214,62 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## 8. We make sure we don't have any extreme values (for the longitudinal model)
+## 8. We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
-summary(merged_data$log_PLASMAPTAU181)
-any(is.infinite(merged_data$log_PLASMAPTAU181)) # should be FALSE
-# Inf = extreme values 
-
-summary(merged_data$log_PLASMA_NFL)
-any(is.infinite(merged_data$log_PLASMA_NFL)) # should be FALSE
-# Inf = extreme values 
-```
-
-```{r}
-# Remove rows with -Inf or Inf in log_CENTILOIDS
-merged_data <- merged_data[is.finite(merged_data$log_PLASMAPTAU181), ]
-any(is.infinite(merged_data$log_PLASMAPTAU181))  # should be FALSE
-any(is.na(merged_data$log_PLASMAPTAU181))       # also FALSE
-
-merged_data <- merged_data[is.finite(merged_data$log_PLASMA_NFL), ]
-any(is.infinite(merged_data$log_PLASMA_NFL))  # should be FALSE
-any(is.na(merged_data$log_PLASMA_NFL))       # also FALSE
-```
-
-## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
-
-```{r}
-length(unique(merged_data$RID))   # longitudinala data
+# We check the length of each dataset 
+length(unique(merged_data$RID))   # longitudinal data
 length(unique(surv_data$RID))     # survival data
 ```
 
-# Longitudinal model
+## 9. We check the correlation between the biomarkers 
 
 ```{r}
+# Correlation between the biomarkers 
+cor(merged_data$log_PLASMAPTAU181, merged_data$log_PLASMA_NFL, use = "complete.obs")
+```
+
 # Longitudinal model
-long_model <- lme(
-  log_PLASMAPTAU181 ~ time_years + PTGENDER.y, 
+
+## 1. For ptau 
+
+```{r}
+# Longitudinal model, with chosen covariates 
+library(GLMMadaptive)
+
+# Robust mixed model med t-fördelade residualer
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER,
+  random = ~ time_years | RID,                    
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+```{r}
+res <- residuals(long_model_ptau, type = "pearson")
+fitted_vals <- fitted(long_model_ptau)
+plot(fitted_vals, res)
+```
+
+```{r}
+qqnorm(res)
+qqline(res)
+```
+
+## 2. For nfl 
+
+```{r}
+# Longitudinal model, with chosen covariates 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER, 
   random = ~ time_years | RID,   # random intercept + slope
   data = merged_data
   )
 
-summary(long_model)
+summary(long_model_nfl)
 ```
 
 # Survival model
@@ -259,9 +296,9 @@ plot(
 ```
 
 ```{r}
-# Cox survival-model with covariates
+# Cox survival-model, with covariates
 surv_model <- coxph(
-  surv_object ~ age_at_baseline + PTGENDER,
+  surv_object ~ age_at_baseline + APOE4_status,
   data <- surv_data
 )
 
@@ -274,11 +311,43 @@ cox.zph(surv_model)
 
 # Joint model
 
+## 1. For ptau
+
 ```{r}
 # Joint model 
 joint_model <- jm(
   surv_model,
-  long_model,
+  long_model_t,
+  time_var = "time_years"
+  )
+summary(joint_model)
+```
+
+Om man inkluderar apoe4-status i LME-modellen:
+
+```         
+ Mean   StDev    2.5%    97.5%      P   Rhat (Intercept)    12.0186 10.8322 -1.7967  32.4320 0.2178 1.0109 time_years      1.8400  2.1714 -0.4811   6.2867 0.5400 1.2854 PTGENDER.yMale  6.1144  6.3903 -1.8632  21.1512 0.2422 1.0179 APOE4_status.y 22.4511 10.4932  0.5712  38.8105 0.0000 1.0570 sigma          93.6249 58.5292  1.9585 198.8798 0.0000 1.0461
+```
+
+--\> Rhat-värdet vid "time_years" för högt...
+
+om man exkluderar apoe4-status i LME-modellen:
+
+```         
+                Mean   StDev    2.5%    97.5%      P   Rhat (Intercept)    15.0192  9.8059  0.3463  32.6337 0.0047 1.0126 time_years      2.2955  2.4611 -0.4832   7.1026 0.4838 1.0286 PTGENDER.yMale  8.5018  7.5652 -0.6200  25.1432 0.1222 1.0134 sigma          92.9033 59.1923  1.2973 196.7808 0.0000 1.0296
+```
+
+Variabeln är dock signifikant i LME-modellen (p-värde: 0e+00), men vi ser ju att Rhat-värdena blir för höga med den inkluderad...
+
+--\> Ska vi exkludera den i LME-modellen? (fortfarande ett kovariat i survival-modellen, där den är signifikant
+
+## 2. For NFL
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model_nfl,
   time_var = "time_years"
   )
 
@@ -288,28 +357,22 @@ summary(joint_model)
 # Multivariate joint model
 
 ```{r}
-fm_ptau <- lme(log_PLASMAPTAU181 ~ time_years + PTGENDER.x,
-                random = ~ time_years | RID,
-                data = merged_data)
-
-fm_nfl <- lme(log_PLASMA_NFL ~ time_years + PTGENDER.x,
-                  random = ~ time_years | RID,
-                  data = merged_data)
-
-Mixed <- list(fm_ptau, fm_nfl)
+Mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
 ```{r}
 # Har modellen stabila random slopes?
-VarCorr(fm_ptau)
-VarCorr(fm_nfl)
+summary(long_model_ptau)
+VarCorr(long_model_nfl)
 # Om slope-variansen är runt 0 → den biomarkören bidrar nästan inget i en joint model
 ```
 
+For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036), which indicates that individual biomarker trajectories over time show minimal variation --\> We skip the random slope in fForms:
+
 ```{r}
 fForms <- list(
-  "log_PLASMAPTAU181"   = ~ value(log_PLASMAPTAU181) + slope(log_PLASMAPTAU181),   # tau
-  "log_PLASMA_NFL"     = ~ value(log_PLASMA_NFL) + slope(log_PLASMA_NFL)       # neurodegeneration
+  "log_PLASMAPTAU181"   = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL"     = ~ value(log_PLASMA_NFL) 
   )      
 ```
 
@@ -327,42 +390,4 @@ summary(multi_joint_model)
 ```{r}
 summary <- summary(multi_joint_model)
 summary$Survival
-```
-
-# 2 separate joint models
-
-```{r}
-lme_log_PLASMAPTAU181 <- lme(
-  log_PLASMAPTAU181 ~ time_years + PTGENDER.x, 
-  random = ~ time_years | RID,   # random intercept + slope
-  data = merged_data
-  )
-
-lme_log_PLASMA_NFL <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER.x, 
-  random = ~ time_years | RID,   # random intercept + slope
-  data = merged_data
-  )
-```
-
-```{r}
-# Joint model 1 
-joint_model1 <- jm(
-  surv_model,
-  lme_log_PLASMAPTAU181,
-  time_var = "time_years"
-  )
-
-summary(joint_model1)
-```
-
-```{r}
-# Joint model 2
-joint_model2 <- jm(
-  surv_model,
-  lme_log_PLASMA_NFL,
-  time_var = "time_years"
-  )
-
-summary(joint_model2)
 ```
