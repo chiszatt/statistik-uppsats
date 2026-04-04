@@ -273,7 +273,7 @@ summary(long_model_ptau)
 ```
 
 ```{r}
-# residuals på subject-specific skala
+# residuals on a subject-specific scale
 res <- residuals(long_model_ptau, type = "subject_specific")
 
 # fitted values
@@ -319,7 +319,7 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-## 4. Removing gender
+## 4. Removing gender from nfl LME model
 
 We see that gender is not significant in the model for nfl, so we remove it:
 
@@ -348,7 +348,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## 7. Removing the slope
+## (7. Removing the slope)
 
 To know whether to include a random slope in the LME model or not, we can examine the variance of the slope. If the slope variance is close to zero, this indicates that individual trajectories over time differ very little. Then, the slope contributes almost no information, and including a random slope may destabilize the joint model estimation and lead to high Rhat values:
 
@@ -360,7 +360,7 @@ BUT we can still do a multivariate joint model!
 
 ```{r}
 long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y + APOE4_status.y,
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y,
   random = ~ 1 | RID, # only random intercept
   data = merged_data,
 family = students.t(df = 3, link = "identity")
@@ -371,13 +371,36 @@ summary(long_model_ptau)
 
 ```{r}
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER.y + APOE4_status.y, 
+  log_PLASMA_NFL ~ time_years + APOE4_status.y, 
   random = ~ 1 | RID, # only random intercept
   data = merged_data
   )
 
 summary(long_model_nfl)
 ```
+
+```{r}
+# Joint model without random slope in the LME models
+Mixed <- list(long_model_ptau, long_model_nfl)
+
+fForms <- list(
+  "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) 
+  )    
+
+multi_joint_model <- jm(surv_model, Mixed,
+                  time_var = "time_years",
+                  functional_forms = fForms,
+                  n_chains = 3L,    
+                  n_iter = 20000L,
+                  n_burnin = 2000L
+                  )
+summary(multi_joint_model)
+```
+
+We get bad Rhat-values in the multivariate joint model when removing the slope from the LME models.
+
+--\> So even though the slope variance is very small, including a minimal random slope helps stabilize MCMC in joint models. Without it, the longitudinal and survival parts become numerically decoupled, causing high Rhat, even if the slope theoretically adds little information.
 
 # Survival model
 
