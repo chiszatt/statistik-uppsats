@@ -130,6 +130,8 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
+## 4. We extract baseline visits, and create an event and time-to-event variable
+
 ```{r}
 # We create a baseline-date
 merged_data <- merged_data %>%
@@ -142,6 +144,7 @@ surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
     age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
+    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
     APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
     
     time_to_event = case_when(
@@ -192,9 +195,30 @@ hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
-Ptau still looks skewed, even after log transformation --\> In our LME model, we can use a Student’s t-distribution instead of a normal distribution (lme() → normal distribution assumed by default); it is more robust to outliers and heavy-tailed residual distributions.
+Ptau still looks skewed, even after log transformation
 
-## 7. We check for missing values in both merged_data and long_data
+--\> In our LME model, we can use a Student’s t-distribution instead of a normal distribution (lme() → normal distribution assumed by default); it is more robust to outliers and heavy-tailed residual distributions.
+
+Gamma distribution on the original values could be possible (see if it works below, under Longitudinal model), BUT it's very sensitive to outliers, which we have (see below).
+
+## **7. We check for outliers** 
+
+We still keep them, as we assume they are correct observations.
+
+```{r}
+merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
+
+merged_data$nfl_z <- scale(merged_data$PLASMA_NFL)
+
+# We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
+outliers_ptau <- merged_data[abs(merged_data$ptau_z) > 3, ]
+outliers_ptau
+
+outliers_nfl <- merged_data[abs(merged_data$nfl_z) > 3, ]
+outliers_nfl
+```
+
+## 8. We check for missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
@@ -214,7 +238,7 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## 8. We make sure that merged_data and surv_data have the same length (for the joint model)
+## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
 # We check the length of each dataset 
@@ -222,24 +246,24 @@ length(unique(merged_data$RID))   # longitudinal data
 length(unique(surv_data$RID))     # survival data
 ```
 
-## 9. We check the correlation between the biomarkers
+## 10. We check the correlation between the biomarkers
+
+If the biomarkers are too correlated, the multivariate joint model won't converge, I think.
 
 ```{r}
 # Correlation between the biomarkers 
-cor(merged_data$log_PLASMAPTAU181, merged_data$log_PLASMA_NFL, use = "complete.obs")
+cor(merged_data$PLASMAPTAU181, merged_data$PLASMA_NFL, use = "complete.obs")
 ```
 
 # Longitudinal model
 
-## 1. For ptau
+## 1. For ptau with T-distribution
 
 ```{r}
-# Longitudinal model, with chosen covariates 
+# Longitudinal model with t-distribution (identity link) 
 library(GLMMadaptive)
-
-# Robust mixed model med t-fördelade residualer
 long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER,
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y + APOE4_status.y,
   random = ~ time_years | RID,                    
   data = merged_data,
 family = students.t(df = 3, link = "identity")
@@ -249,9 +273,18 @@ summary(long_model_ptau)
 ```
 
 ```{r}
-res <- residuals(long_model_ptau, type = "pearson")
-fitted_vals <- fitted(long_model_ptau)
-plot(fitted_vals, res)
+# residuals på subject-specific skala
+res <- residuals(long_model_ptau, type = "subject_specific")
+
+# fitted values
+fitted_vals <- fitted(long_model_ptau, type = "subject_specific")
+
+# plot
+plot(fitted_vals, res,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
@@ -259,13 +292,87 @@ qqnorm(res)
 qqline(res)
 ```
 
-## 2. For nfl
+## 2. For ptau with gamma distribution 
+
+```{r}
+# Longitudinal model with gamma distribution (log link) 
+long_model_ptau_gamma <- mixed_model(
+  fixed = PLASMAPTAU181 ~ time_years + PTGENDER.y + APOE4_status.y,  
+  random = ~ time_years | RID,                      
+  data = merged_data,
+  family = Gamma(link = "log")
+)
+
+summary(long_model_ptau_gamma)
+```
+
+## 3. For nfl
 
 ```{r}
 # Longitudinal model, with chosen covariates 
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER, 
+  log_PLASMA_NFL ~ time_years + PTGENDER.y + APOE4_status.y, 
   random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model_nfl)
+```
+
+## 4. Removing gender 
+
+We see that gender is not significant in the model for nfl, so we remove it:
+
+```{r}
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + APOE4_status.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model_nfl)
+```
+
+## 5. Removing APOE4 status from ptau LME model
+
+Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:
+
+```{r}
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y,
+  random = ~ time_years | RID,                    
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+## 7. Removing the slope 
+
+To know whether to include a random slope in the LME model or not, we can examine the variance of the slope. If the slope variance is close to zero, this indicates that individual trajectories over time differ very little. Then, the slope contributes almost no information, and including a random slope may destabilize the joint model estimation and lead to high Rhat values:
+
+summary(long_model_nfl) shows that the slope variance is 0.0011 (Std.Dev = 0.033), which is very small compared to the residual variance (0.047) –\> we include only a random intercept in the joint model to stabilize estimation.
+
+BUT then we can't do separate joint models,
+
+BUT we can still do a multivariate joint model!
+
+```{r}
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y + APOE4_status.y,
+  random = ~ 1 | RID, # only random intercept
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+```{r}
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER.y + APOE4_status.y, 
+  random = ~ 1 | RID, # only random intercept
   data = merged_data
   )
 
@@ -298,6 +405,24 @@ plot(
 ```{r}
 # Cox survival-model, with covariates
 surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER + APOE4_status,
+  data <- surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+apoe4 status uppfyller inte assumption om proportional hazards –\> testa med Time-varying effect istället? - tt(APOE4_status)
+
+Gender is not significant, so we remove it:
+
+```{r}
+# Cox survival-model, without gender 
+surv_model <- coxph(
   surv_object ~ age_at_baseline + APOE4_status,
   data <- surv_data
 )
@@ -311,47 +436,55 @@ cox.zph(surv_model)
 
 # Joint model
 
-## 1. For ptau
+Multivariate joint models generally require more iterations and a longer burn-in period than univariate models, but for a simple joint model, fewer iterations (like 11,000 iterations with 1,000-2,000 burn-in) are usually sufficient. And Rhat is calculated across multiple chains to assess convergence, so we choose 3 chains.
+
+## 1. For ptau with T-distribution
 
 ```{r}
 # Joint model 
 joint_model <- jm(
   surv_model,
-  long_model_t,
-  time_var = "time_years"
+  long_model_ptau,
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
   )
 summary(joint_model)
 ```
 
-Om man inkluderar apoe4-status i LME-modellen:
-
-```         
- Mean   StDev    2.5%    97.5%      P   Rhat (Intercept)    12.0186 10.8322 -1.7967  32.4320 0.2178 1.0109 time_years      1.8400  2.1714 -0.4811   6.2867 0.5400 1.2854 PTGENDER.yMale  6.1144  6.3903 -1.8632  21.1512 0.2422 1.0179 APOE4_status.y 22.4511 10.4932  0.5712  38.8105 0.0000 1.0570 sigma          93.6249 58.5292  1.9585 198.8798 0.0000 1.0461
-```
-
---\> Rhat-värdet vid "time_years" för högt...
-
-om man exkluderar apoe4-status i LME-modellen:
-
-```         
-                Mean   StDev    2.5%    97.5%      P   Rhat (Intercept)    15.0192  9.8059  0.3463  32.6337 0.0047 1.0126 time_years      2.2955  2.4611 -0.4832   7.1026 0.4838 1.0286 PTGENDER.yMale  8.5018  7.5652 -0.6200  25.1432 0.1222 1.0134 sigma          92.9033 59.1923  1.2973 196.7808 0.0000 1.0296
-```
-
-Variabeln är dock signifikant i LME-modellen (p-värde: 0e+00), men vi ser ju att Rhat-värdena blir för höga med den inkluderad...
-
---\> Ska vi exkludera den i LME-modellen? (fortfarande ett kovariat i survival-modellen, där den är signifikant
-
-## 2. For NFL
+## 2. For ptau with gamma distribution 
 
 ```{r}
 # Joint model 
-joint_model <- jm(
+joint_model_gamma <- jm(
+  surv_model,
+  long_model_ptau_gamma,
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_gamma)
+```
+
+Too high Rhat-values!! Probably because gamma is sensitive to outliers
+
+## 3. For nfl
+
+```{r}
+# Joint model 
+joint_model_nfl <- jm(
   surv_model,
   long_model_nfl,
-  time_var = "time_years"
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
   )
 
-summary(joint_model)
+summary(joint_model_nfl)
 ```
 
 # Multivariate joint model
@@ -371,8 +504,8 @@ For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036
 
 ```{r}
 fForms <- list(
-  "log_PLASMAPTAU181"   = ~ value(log_PLASMAPTAU181), 
-  "log_PLASMA_NFL"     = ~ value(log_PLASMA_NFL) 
+  "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) 
   )      
 ```
 
@@ -390,4 +523,116 @@ summary(multi_joint_model)
 ```{r}
 summary <- summary(multi_joint_model)
 summary$Survival
+```
+
+# Multistate survival version
+
+## 1. We convert DIAGNOSIS to numeric state
+
+```{r}
+# We convert DIAGNOSIS to numeric state
+merged_data <- merged_data %>%
+  mutate(state = case_when(
+    DIAGNOSIS_dx == "CN"       ~ 1, # CN = 1
+    DIAGNOSIS_dx == "MCI"      ~ 2, # MCI = 2
+    DIAGNOSIS_dx == "Dementia" ~ 3, # Dementia = 3
+    TRUE ~ NA_real_ # missing/other
+  ))
+```
+
+## 2. We create start-stop times and next_state
+
+```{r}
+# We arrange data by RID and visit date, create start-stop times and next_state
+ms_data <- merged_data %>%
+  arrange(RID, EXAMDATE_ptau) %>%
+  group_by(RID) %>%
+  mutate(
+    baseline_date = first(EXAMDATE_ptau), # baseline exam date
+    
+    time_start = as.numeric(EXAMDATE_ptau - baseline_date) / 365, # time from baseline in years
+    time_stop  = lead(time_start), # time to next visit
+    
+    next_state = lead(state)  # state at next visit
+  ) %>%
+  ungroup()
+
+```
+
+## 3. We define monotonic progression events
+
+```{r}
+ms_data <- ms_data %>%
+  mutate(
+    event = case_when(
+      is.na(next_state) ~ 0, # censored / no progression
+      
+      state == 1 & next_state == 2 ~ 1, # CN → MCI
+      state == 2 & next_state == 3 ~ 2, # MCI → Dementia
+      state == 1 & next_state == 3 ~ 3, # CN → Dementia
+      
+      TRUE ~ 0 # all other transitions (including stays) censored
+    )
+  )
+```
+
+## 4. We add baseline covariates from merged_data
+
+```{r}
+baseline_covariates <- merged_data %>%
+  group_by(RID) %>%
+  summarise(
+    age_at_baseline = first(age_at_visit),
+    APOE4_status    = first(APOE4_status.y)
+  )
+ms_data <- ms_data %>%
+  left_join(baseline_covariates, by = "RID")
+```
+
+## 5. We inspect the transition table
+
+```{r}
+table(ms_data$state, ms_data$next_state)
+```
+
+--\> most individuals remain in their current state (for example 1171 MCI → MCI), while some transitions (particularly CN → Dementia (2 events) and Dementia → other states (0-7 events)) are extremely sparse –\> A full multistate joint model would be unable to provide stable estimates.
+
+## 6. We create an interval-censored survival object (time_start → time_stop)
+
+```{r}
+surv_object <- Surv(time = ms_data$time_start, 
+                    time2 = ms_data$time_stop, 
+                    event = ms_data$event != 0) # counts only progression events
+```
+
+## 7. We fit a multistate Cox model
+
+```{r}
+surv_model <- coxph(
+  surv_object ~ age_at_baseline.y + APOE4_status + strata(event), # lets each transition have its own baseline hazard
+  data = ms_data, 
+  id = RID # handles repeated measures per subject
+)
+
+# We view summary of the model
+summary(surv_model)
+```
+
+```{r}
+cox.zph(fit)
+```
+
+## 8. Joint model
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model_ptau,
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+summary(joint_model)
 ```
