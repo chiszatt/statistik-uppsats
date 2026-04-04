@@ -127,7 +127,7 @@ This analysis used data obtained from the Alzheimer's Neuroimaging Disease Initi
 
 Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
-According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181). **MORE ON PTAU-181**
+According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON PTAU-181**
 
 Neurofilament light chain (NfL) is instead a marker of neuronal injury not specific to AD (Ghahremani et al.).
 
@@ -412,6 +412,8 @@ Summary
 <https://www.mybib.com/tools/harvard-referencing-generator>
 
 Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517.
+
+Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
 # Pre-processing
 
