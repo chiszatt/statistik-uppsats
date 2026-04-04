@@ -121,21 +121,23 @@ library(survival)
 
 # Introduction
 
+This analysis used data obtained from the Alzheimer's Neuroimaging Disease Initiative to assess whether ...
+
 ## Background
 
-General background information.
+Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
-Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.
+According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181). **MORE ON PTAU-181**
+
+Neurofilament light chain (NfL) is instead a marker of neuronal injury not specific to AD (Ghahremani et al.).
+
+The abnormal concentrations of these biomarkers are the result of the neuropathological changes symptomatic of AD.
+
+*General background information. Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.*
 
 ## Research Context
 
-Assessing the current landscape in terms of the scientific literature.
-
-What is known?
-
-What has been done?
-
-Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)
+*Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
 ## Research Aims
 
@@ -153,9 +155,7 @@ How will we accomplish this?
 
 # Method
 
-Introduce the methods we will use.
-
-Why did we choose this method to answer the research question?
+*Introduce the methods we will use. Why did we choose this method to answer the research question?*
 
 ## Mixed Effects Models
 
@@ -315,6 +315,10 @@ Joint-model options:
 
 # Data
 
+The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of pTAU-181 and NfL in blood plasma of $n = xxx$ individuals were analysed.
+
+In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
+
 ## ADNI
 
 All protocols allow enrollment for individuals aged 55-90.
@@ -344,8 +348,6 @@ Introducing the study, it's aims and the type of information gathered.
 **IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
 
 Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.
-
-We checked whether there were any individuals with a PTID in the format "381_S_10###" as per the ADNI leadership guidelines, which state that due to serious data quality concerns, data from these observations should not be used in any analysis. (SOURCE?)
 
 ## Introducing variables... bio-markers/amyloid data...
 
@@ -408,6 +410,8 @@ Summary
 # References
 
 <https://www.mybib.com/tools/harvard-referencing-generator>
+
+Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517.
 
 # Pre-processing
 
