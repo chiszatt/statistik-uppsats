@@ -1,0 +1,316 @@
+---
+title: "Checking"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ADNIMERGE2)
+
+library(lme4)
+library(glmmTMB)
+library(DHARMa) # for running residual diagnostics on GLMM
+```
+
+## Loading data
+
+```{r}
+# loading data
+nfl_data = BLENNOWPLASMANFLLONG
+
+ptau_data = UGOTPTAU181
+
+diagnosis_data = DXSUM
+
+demographics = PTDEMOG
+
+APOE = APOERES
+
+# selecting relevant variables
+nfl_data = nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+ptau_data = ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# 1. Lägg _dx på diagnos-kolumner
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# 2. Slå ihop NFL, ptau och diagnos
+merged_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+```
+
+## Merging nfl and ptau181 data
+
+```{r}
+# merging ptai and nfl data
+nfl_ptau = nfl_data %>% merge(ptau_data, by = c("RID", "VISCODE2"))
+
+# checking how many EXAMDATE match out of all observations
+sum(as.integer(nfl_ptau$EXAMDATE.x %in% nfl_ptau$EXAMDATE.y)) / 3855
+
+# checking for missing values: none
+table(is.na(nfl_ptau))
+```
+
+## Plotting distributions
+
+Seems like the raw variables are Gamma distributed:
+
+-   Only positive values
+
+-   Right-skewed
+
+-   Gamma accomodates increasing variance with increased mean. This is present in the data, as is shown by the computations below.
+
+-   <https://observablehq.com/>@mattiasvillani/gamma-distribution?collection=@mattiasvillani/distributions
+
+So we have a choice: model using a LME on the log-transformed data, or model using a GLMM and assuming Gamma distribution for the response variables (both nfl and ptau181)
+
+```{r}
+# checking the mean and variance for ptau181
+mean(nfl_ptau$PLASMAPTAU181)
+var(nfl_ptau$PLASMAPTAU181)
+```
+
+```{r}
+# checking the mean and variance for nfl
+mean(nfl_ptau$PLASMA_NFL)
+var(nfl_ptau$PLASMA_NFL)
+```
+
+## nfl, raw and transformed
+
+```{r}
+# original scale
+ggplot(nfl_ptau, aes(PLASMA_NFL)) +
+  geom_histogram(binwidth = 5, colour = "white") +
+  theme_classic()
+
+# log-transformed
+ggplot(nfl_ptau, aes(log(PLASMA_NFL))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+# cube-root transformed
+ggplot(nfl_ptau, aes(sqrt(sqrt(PLASMA_NFL)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+```
+
+## ptau181, raw and transformed
+
+```{r}
+# orignal scale
+ggplot(nfl_ptau, aes(PLASMAPTAU181)) +
+  geom_histogram(binwidth = 5, colour = "white") +
+  theme_classic()
+
+# log transformed
+ggplot(nfl_ptau, aes(log(PLASMAPTAU181))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+# cube-root transformed
+ggplot(nfl_ptau, aes(sqrt(sqrt(PLASMAPTAU181)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+```
+
+## We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# 1. Håll bara demografi-variabler vi behöver och en rad per person
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# 2. Slå ihop med merged_data
+merged_data <- merged_data %>%
+  left_join(demographics_small, by = "RID")
+
+# 3. Säkerställ att kön är faktor
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# 4. Konvertera EXAMDATE_ptau till Date
+merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
+
+# 5. Skapa age_at_visit baserat på ptau datum
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+```
+
+## We filter participants with at least 4 measurements
+
+```{r}
+# 1) Filtrera personer med minst 2 mätningar
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+## Baseline date, survival data
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
+surv_data <- merged_data %>%
+group_by(RID) %>%
+summarise(
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
+    
+    time_to_event = case_when(
+
+    any(DIAGNOSIS_dx == "Dementia") ~
+      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
+                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
+
+    TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
+
+  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
+) %>% ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+
+# adding PTGENDER to the survival data
+ptgender = merged_data %>% select(RID, PTGENDER)
+surv_data = surv_data %>% merge(ptgender, by = "RID") 
+surv_data = surv_data[!duplicated(surv_data$RID), ]
+```
+
+## We create a time variable (time from baseline)
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+## Removing missing values
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+
+# getting rid of missing values in both merged and surv
+merged_data = na.omit(merged_data)
+surv_data = na.omit(surv_data)
+```
+
+```{r}
+summary(merged_data$PLASMAPTAU181)
+any(is.infinite(merged_data$PLASMAPTAU181)) # should be FALSE
+# Inf = extreme values 
+
+summary(merged_data$PLASMA_NFL)
+any(is.infinite(merged_data$PLASMA_NFL)) # should be FALSE
+# Inf = extreme values 
+```
+
+```{r}
+length(unique(merged_data$RID)) # longitudinala data
+length(unique(surv_data$RID)) # survival data
+```
+
+## Comparing GLMM and LME
+
+### pTAU-181
+
+```{r}
+# GLMM
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
+                   data = merged_data,
+                   family = Gamma(link = "log"))
+
+# LME approach
+fit_lme_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
+                data = merged_data)
+
+# Lognormal - similar to log-transforming then fitting LME
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                         data = merged_data,
+                         family = lognormal(link = "log"))
+
+# residual tests for each model
+gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
+testResiduals(gamma_residuals_ptau)
+
+lme_residuals_ptau <- simulateResiduals(fit_lme_ptau)
+testResiduals(lme_residuals_ptau)
+
+# lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
+# testResiduals(lognormal_residuals_ptau)
+```
+
+```{r}
+# comparing the fits between models
+AIC(fit_lme_ptau, fit_gamma_ptau, fit_lognormal_ptau)
+```
+
+```{r}
+plotResiduals(gamma_residuals_ptau, form = merged_data$time_years)
+```
+
+### NfL
+
+```{r}
+# GLMM
+fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
+                   data = merged_data,
+                   family = Gamma(link = "log"))
+
+# LME approach
+fit_lme_nfl <- lmer(log(PLASMA_NFL) ~ time_years + (1|RID), 
+                data = merged_data)
+
+# Lognormal - similar to log-transforming then fitting LME
+fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                         data = merged_data,
+                         family = lognormal(link = "log"))
+
+
+# residual tests for each model
+gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
+testResiduals(gamma_residuals_nfl)
+
+lme_residuals_nfl <- simulateResiduals(fit_lme_nfl)
+testResiduals(lme_residuals_nfl)
+
+# lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
+# testResiduals(lognormal_residuals_nfl)
+```
+
+```{r}
+# comparing the fits between models
+AIC(fit_lme_nfl, fit_gamma_nfl, fit_lognormal_nfl)
+```
+
+```{r}
+# troubleshooting fit_gamma
+# residuals over time
+plotResiduals(gamma_residuals_nfl, form = merged_data$time_years)
+```

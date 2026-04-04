@@ -201,7 +201,7 @@ Ptau still looks skewed, even after log transformation
 
 Gamma distribution on the original values could be possible (see if it works below, under Longitudinal model), BUT it's very sensitive to outliers, which we have (see below).
 
-## **7. We check for outliers** 
+## **7. We check for outliers**
 
 We still keep them, as we assume they are correct observations.
 
@@ -292,7 +292,7 @@ qqnorm(res)
 qqline(res)
 ```
 
-## 2. For ptau with gamma distribution 
+## 2. For ptau with gamma distribution
 
 ```{r}
 # Longitudinal model with gamma distribution (log link) 
@@ -319,7 +319,7 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-## 4. Removing gender 
+## 4. Removing gender
 
 We see that gender is not significant in the model for nfl, so we remove it:
 
@@ -348,7 +348,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## 7. Removing the slope 
+## 7. Removing the slope
 
 To know whether to include a random slope in the LME model or not, we can examine the variance of the slope. If the slope variance is close to zero, this indicates that individual trajectories over time differ very little. Then, the slope contributes almost no information, and including a random slope may destabilize the joint model estimation and lead to high Rhat values:
 
@@ -453,7 +453,7 @@ joint_model <- jm(
 summary(joint_model)
 ```
 
-## 2. For ptau with gamma distribution 
+## 2. For ptau with gamma distribution
 
 ```{r}
 # Joint model 
