@@ -348,7 +348,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## (7. Removing the slope)
+## (6. Removing random slope)
 
 To know whether to include a random slope in the LME model or not, we can examine the variance of the slope. If the slope variance is close to zero, this indicates that individual trajectories over time differ very little. Then, the slope contributes almost no information, and including a random slope may destabilize the joint model estimation and lead to high Rhat values:
 
@@ -401,6 +401,31 @@ summary(multi_joint_model)
 We get bad Rhat-values in the multivariate joint model when removing the slope from the LME models.
 
 --\> So even though the slope variance is very small, including a minimal random slope helps stabilize MCMC in joint models. Without it, the longitudinal and survival parts become numerically decoupled, causing high Rhat, even if the slope theoretically adds little information.
+
+## 7. What if we used interactions?
+
+```{r}
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y + time_years:PTGENDER.y,
+  random = ~ time_years | RID,                    
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+```{r}
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + APOE4_status.y + time_years:APOE4_status.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model_nfl)
+```
+
+Both interaction effects are non-significant.
 
 # Survival model
 
