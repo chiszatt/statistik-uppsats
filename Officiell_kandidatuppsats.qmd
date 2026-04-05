@@ -93,18 +93,6 @@ library(survival)
 
 ```{r}
 # Charley
-<<<<<<< HEAD
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-
-#ptau_data = UGOTPTAU181
-
-#diagnosis_data = DXSUM
-
-#demographics = PTDEMOG
-
-#APOE = APOERES
-=======
 # library(ADNIMERGE2)
 # nfl_data = BLENNOWPLASMANFLLONG
 # 
@@ -115,7 +103,6 @@ library(survival)
 # demographics = PTDEMOG
 # 
 # apoe = APOERES
->>>>>>> 95b257b27b2f549a27be29400c0eaf04f35ef937
 ```
 
 # Introduction
