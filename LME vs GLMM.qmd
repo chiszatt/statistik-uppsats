@@ -16,6 +16,8 @@ library(DHARMa) # for running residual diagnostics on GLMM
 library(tidyr)  # pivot_wider()
 ```
 
+# Data pre-processing
+
 ## Loading data
 
 ```{r}
@@ -97,6 +99,8 @@ merged_data <- nfl_data %>%
 
 -   Some of the values are quite different, what do we assume by averaging them? What effect does it have to remove them?
 
+-   For now, remove them:
+
 ```{r}
 # checking observations with more than one measurement recorded on the same exam date for nfl
 nfl_double <- nfl_data %>%
@@ -104,10 +108,11 @@ nfl_double <- nfl_data %>%
   filter(n > 1L) %>%
   select(RID, EXAMDATE)
 
-# extracting the doubled observations
-nfl_data %>%
-  filter(RID %in% nfl_double$RID) %>% 
-  filter(EXAMDATE %in% nfl_double$EXAMDATE)
+# removing the doubled observations
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
 
 # checking observations with more than one measurement recorded on the same exam date for ptau
 ptau_double <- ptau_data %>%
@@ -116,25 +121,26 @@ ptau_double <- ptau_data %>%
   select(RID, EXAMDATE)
 
 # extracting the doubled observations
-ptau_data %>%
-  filter(RID %in% ptau_double$RID) %>% 
-  filter(EXAMDATE %in% ptau_double$EXAMDATE)
+# ptau_data %>%
+#   filter(RID %in% ptau_double$RID) %>% 
+#   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+
+# removing the doubled observations
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
 ```
 
-## Merging nfl and ptau181 data
+## Merging nfl, ptau181 and genetic data
 
 ```{r}
-# merging ptai and nfl data
+# merging ptau and nfl data
 nfl_ptau = nfl_data %>% merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
-
-# checking how many EXAMDATE match out of all observations
-sum(as.integer(nfl_ptau$EXAMDATE.x %in% nfl_ptau$EXAMDATE.y)) / 3855
 
 # checking for missing values: none
 table(is.na(nfl_ptau))
 ```
-
-## Merging nfl and ptau181 data
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -227,51 +233,109 @@ ggplot(nfl_ptau, aes(sqrt(sqrt(PLASMAPTAU181)))) +
 ## We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
 
 ```{r}
-# 1. Håll bara demografi-variabler vi behöver och en rad per person
+# selecting relevant variables (age, gender) and keeping only one row per person
 demographics_small <- demographics %>%
   select(RID, PTDOBYY, PTGENDER) %>%
   distinct(RID, .keep_all = TRUE)
 
-# 2. Slå ihop med merged_data
-merged_data <- merged_data %>%
-  left_join(demographics_small, by = "RID")
-
-# 3. Säkerställ att kön är faktor
-merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
-
-# 4. Konvertera EXAMDATE_ptau till Date
-merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
-
-# 5. Skapa age_at_visit baserat på ptau datum
-merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+# merging the demographic data with the biomarker data
+nfl_ptau <- nfl_ptau %>% merge(demographics_small, by = "RID")
 ```
 
-## We filter participants with at least 4 measurements
+```{r}
+# converting the gender variable to a factor variable 
+nfl_ptau <- nfl_ptau %>% mutate(PTGENDER = as.factor(PTGENDER))
+
+# creating an age at baseline variable
+nfl_ptau <- nfl_ptau %>% mutate(
+  age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
+```
+
+## We filter participants with at least 3 measurements
 
 ```{r}
 # 1) Filtrera personer med minst 2 mätningar
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 3))$RID)
-merged_data <- merged_data %>% filter(RID %in% keep)
+keep <- unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 2))$RID)
+nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
 ```
 
+# Comparing longitudinal models
+
+Suggested models:
+
+-   Gamma: raw data could be modeled well with the gamma distribution since takes no negative values, variance increases with mean, and there is a right-skew to the raw distributions
+
+-   Linear mixed effects model with log-transformed data: approximately normal, yet still some skew
+
+-   Linear mixed effects model with cube root transformed data: again, approximately normal, still a bit of skew (why such a low AIC? seems wrong?)
+
+-   GLMM with log-normal distribution
+
+-   GLMM with Student-t distribution: longer tails
+
+```{r}
+# GLMM
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
+                   data = nfl_ptau,
+                   family = Gamma(link = "log"))
+
+# LME approach with log transformed data
+fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
+                data = nfl_ptau)
+
+# LME approach with log transformed data
+fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years + (1|RID), 
+                data = nfl_ptau)
+
+# Lognormal - similar to log-transforming then fitting LME
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                         data = nfl_ptau,
+                         family = lognormal(link = "log"))
+
+# Student-t
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                         data = nfl_ptau,
+                         family = students.t(df = 3, link = "identity"))
+
+# residual tests for each model
+gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
+testResiduals(gamma_residuals_ptau)
+
+lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
+testResiduals(lme_residuals_log_ptau)
+
+lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
+testResiduals(lme_residuals_cubed_ptau)
+
+lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
+testResiduals(lognormal_residuals_ptau)
+
+student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+testResiduals(student_residuals_ptau)
+
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+```
+
+# Survival data and models
+
 ## Baseline date, survival data
 
 ```{r}
-# Skapar baseline-datum
+# creating a baseline date variable
 merged_data <- merged_data %>%
   group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   ungroup()
 
-# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender 
+# Skapar event + time_to_event (Dementia räknas som event) + lägger till age och gender
 surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
     age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
-    
+
     time_to_event = case_when(
 
     any(DIAGNOSIS_dx == "Dementia") ~
@@ -284,17 +348,17 @@ summarise(
   event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
 ) %>% ungroup()
 
-# Lägger survival-data tillbaka i merged_data
-merged_data <- merged_data %>%
-  left_join(surv_data, by = "RID")
-
-# We check the number of events 
-table(surv_data$event)
-
-# adding PTGENDER to the survival data
-ptgender = merged_data %>% select(RID, PTGENDER)
-surv_data = surv_data %>% merge(ptgender, by = "RID") 
-surv_data = surv_data[!duplicated(surv_data$RID), ]
+# # Lägger survival-data tillbaka i merged_data
+# merged_data <- merged_data %>%
+#   left_join(surv_data, by = "RID")
+# 
+# # We check the number of events 
+# table(surv_data$event)
+# 
+# # adding PTGENDER to the survival data
+# ptgender = merged_data %>% select(RID, PTGENDER)
+# surv_data = surv_data %>% merge(ptgender, by = "RID") 
+# surv_data = surv_data[!duplicated(surv_data$RID), ]
 ```
 
 ## We create a time variable (time from baseline)
