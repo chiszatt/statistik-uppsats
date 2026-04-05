@@ -63,7 +63,7 @@ editor: visual
 knitr::opts_chunk$set(echo = FALSE, output = TRUE)
 ```
 
-```{r}
+```{r, warning=FALSE}
 # loading libraries
 library(dplyr)
 library(JMbayes2)
@@ -112,7 +112,7 @@ apoe <- APOERES
 
 According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, AD continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
 
-The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (ibid., p. 595).
+The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al. 2013: p. 595).
 
 Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
@@ -280,9 +280,29 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ### Extended Cox PH model using time-depending covariates?
 
+In the proportional hazards model, the hazard is assumed to depend solely on covariates with values that remain constant throughout the follow-up period, such as baseline age, sex, and randomized treatment. However, in longitudinal research, it is also of interest to assess whether time-dependent covariates influence the risk of an event. Examples are environmental factors, biochemical or clinical parameters measured during follow-up, and changes in treatment dosage (Rizopoulos, 2012: p. 44).
+
+Time-dependent covariates can be classified into two categories: exogenous (external) and endogenous (internal). Exogenous covariates are those whose future values are not influenced by the occurrence of an event and are predictable at any time. Examples include time of day or season, or treatment strategies adjusted according to pre-specified rules. Endogenous covariates, in contrast, are affected by or associated with the event process and are generally unpredictable. These typically are time-varying measurements taken on the subject, such as biomarkers or clinical parameters (Rizopoulos, 2012: p.45)
+
+The Cox model can be extended to handle exogenous time-dependent covariates using the so called counting process framework. In this formulation, event occurrences are treated as realizations of a slow Poisson process. For subject $i$, the event process is denoted by ${N_i(t), R_i(t)}$, where $N_i(t)$ is the number of events by time $t$ and $R_i(t)$ is a left-continuous at-risk indicator ($R_i(t) = 1$ if the subject is at risk at time $t$, $0$ otherwise). The extended Cox model is written as:
+
+$$h_i(t \mid Y_i(t), w_i) = h_0(t) \, R_i(t) \, \exp\{\gamma^\top w_i + \alpha \, y_i(t)\}$$
+
+where $w_i$ is a vector of baseline covariates (e.g., sex or randomized treatment) and $y_i(t)$ is a vector of time-dependent covariates. The coefficients $\alpha$ have the same interpretation as $\gamma$: for a single time-dependent covariate, $\exp(\alpha)$ represents the relative increase in the hazard at time $t$ associated with a one-unit increase in $y_i(t)$ (Rizopoulos, 2012: p. 47).
+
+Han skriver:
+
+-   "The only difference compared to the syntax used to fit the standard Cox model in Section 3.3, is in the specification of the Surv() function in which the first two arguments denote the limits of the interval, and the last argument is the corresponding event indicator. Moreover, in the data argument the data should be supplied in the long format (s.48)"
+
+MEN sen skriver han också:
+
+-   "However, despite this flexibility the extended Cox model is not appropriate when the time-dependent covariates are of endogenous nature (t.ex. biomarkörer). This is because the extended Cox model assumes that time-dependent covariates are predictable processes, measured without error, and have their complete path fully specified (s. 48). "
+
+-   **Men den artikel jag visade gjorde det ändå, fastän de också kollade på biomarkörer. Om man gör det ändå visar man hur det inte är anpassat för vår typ av data, och får resultaten av de andra modeller man jämför med att se ännu bättre ut.**
+
 ## Joint Models
 
-### Simple Joint Model (frequentist approach) 
+### Simple Joint Model 
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -322,9 +342,13 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### Multivariate Joint Model (bayesian approach) 
+### Frequentist vs Bayesian approach
 
-Besides the traditional approach of maximum likelihood estimation, joint models can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures and can simultaneously accommodate multiple longitudinal outcomes (Andrinopoulou & Rizopoulos, 2016: p.?).
+However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022: p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016: p.?).
+
+### Multivariate Joint Model 
+
+The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
 
 #### The Gelman-Rubin statistic 
 
@@ -418,7 +442,9 @@ Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
-Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517.
+Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517
+
+Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Frontiers in big data*, 5, 812725. <https://doi.org/10.3389/fdata.2022.812725>
 
 Peng. R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4: Monitoring Convergence. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html> \[Last updated 27 may 2022\].
 
@@ -476,7 +502,7 @@ grep("381_S_10###", diagnosis_data$PTID)
 
 ## We select only the required variables and merge them
 
-```{r}
+```{r, warning=FALSE}
 # We select the required nfl variables
 nfl_data <- nfl_data %>%
   select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
@@ -498,8 +524,6 @@ merged_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
-
-## Concerning 381_S_10
 
 ## We check the correlation between the biomarkers
 
@@ -566,19 +590,17 @@ merged_data[-common, ]
 ```
 
 ```{r}
+# We create a baseline-date
 merged_data <- merged_data %>%
   group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
   ungroup()
-
-# We create age_at_baseline based on baseline date 
-merged_data = merged_data %>%
-  mutate(age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
 
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
-summarise(
+  summarise(
+    age_at_baseline = as.numeric(min(baseline_date), "%Y") - min(PTDOBYY),
     PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
     APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
     
@@ -644,7 +666,7 @@ ggplot(merged_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
   theme_classic()
 ```
 
-## 8. We check for outliers
+## We check for outliers
 
 We still keep them, as we assume they are correct observations.
 
