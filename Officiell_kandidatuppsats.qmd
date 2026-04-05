@@ -136,6 +136,16 @@ The abnormal concentrations of these biomarkers are the result of the neuropatho
 
 ## Research Aims
 
+Förslag –\>
+
+This study evaluates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing conventional and advanced statistical approaches. More precisely, the research questions are:
+
+1.  Can the initial (baseline) levels of p-tau181 and NfL predict the progression to Alzheimer’s disease/dementia?
+2.  Do the average biomarker levels over time improve prediction compared to baseline alone?
+3.  Does using the biomarkers’ changing levels over time give a better prediction of disease progression?
+4.  Using a joint model, can modeling the full trajectory of each biomarker improve prediction accuracy?
+5.  Can a multivariate joint model combining both biomarkers provide even better prediction of progression?
+
 What are our research questions?
 
 1.  How do longitudinal changes in plasma biomarker levels over time relate to the risk of progression to dementia? (Joint modeling)
