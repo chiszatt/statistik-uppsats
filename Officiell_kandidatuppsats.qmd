@@ -70,6 +70,7 @@ library(JMbayes2)
 library(lme4) # decide which package will we use for lme
 library(nlme) # decide which package will we use for lme
 library(survival)
+library(ggplot2)
 ```
 
 ```{r}
@@ -468,9 +469,13 @@ merged_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
 
+<<<<<<< HEAD
 ## Concerning 381_S_10
 
 ## We check the correlation between the biomarkers
+=======
+## 2. We check the correlation between the biomarkers
+>>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 # Correlation between the biomarkers 
@@ -492,12 +497,6 @@ merged_data <- merged_data %>%
 # We make sure that gender is a factor 
 merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
 
-# We convert EXAMDATE_ptau to date 
-merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
-
-# We create age_at_visit based on ptau date 
-merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
-
 # We create a variable for apoe4 status
 apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
 
@@ -516,6 +515,7 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
+<<<<<<< HEAD
 ## We extract baseline visits, and create an event variable and a time-to-event variable
 
 ```{r}
@@ -524,6 +524,14 @@ length(keep)
 
 # checking the observations with different exam dates
 #nfl_ptau[-common, ]
+
+## 5. We extract baseline visits, and create an event variable, a time-to-event variable, and age_at_baseline variable
+
+# checking which observations have the same examdate for nfl and ptau
+common = which(merged_data$EXAMDATE_nfl %in% merged_data$EXAMDATE_ptau)
+
+# checking the observations with different exam dates
+merged_data[-common, ]
 
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
 #merged_data <- merged_data %>%
@@ -538,11 +546,16 @@ merged_data <- merged_data %>%
   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   ungroup()
 
+# We create age_at_baseline based on baseline date 
+merged_data = merged_data %>%
+  mutate(age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
+```
+>>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
+
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
-    age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
     PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
     APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
     
@@ -594,9 +607,27 @@ hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
+<<<<<<< HEAD
 ## We check for outliers
+=======
+```{r}
+# cube-root transformed
+ggplot(merged_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+# cube-root transformed
+ggplot(merged_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+```
+
+## 8. We check for outliers
+>>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 We still keep them, as we assume they are correct observations.
+
+-   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
 
 ```{r}
 merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
@@ -604,11 +635,15 @@ merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
 merged_data$nfl_z <- scale(merged_data$PLASMA_NFL)
 
 # We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
-outliers_ptau <- merged_data[abs(merged_data$ptau_z) > 3, ]
-outliers_ptau
+large_outliers_ptau <- merged_data[merged_data$ptau_z > 3, ]
+small_outliers_ptau <- merged_data[merged_data$ptau_z < -3, ]
+large_outliers_ptau
+small_outliers_ptau
 
-outliers_nfl <- merged_data[abs(merged_data$nfl_z) > 3, ]
-outliers_nfl
+large_outliers_nfl <- merged_data[merged_data$nfl_z > 3, ]
+small_outliers_nfl <- merged_data[merged_data$nfl_z < -3, ]
+large_outliers_nfl
+small_outliers_nfl
 ```
 
 ## We check for missing values in both merged_data and long_data
@@ -635,13 +670,135 @@ sapply(surv_data, function(x) sum(is.na(x)))
 
 ```{r}
 # We check the length of each dataset 
-length(unique(merged_data$RID))   # longitudinal data
-length(unique(surv_data$RID))     # survival data
+length(unique(merged_data$RID)) # longitudinal data
+length(unique(surv_data$RID)) # survival data
 ```
 
 # Longitudinal model
 
+<<<<<<< HEAD
 ## Fitted LME model for P-TAU
+=======
+## Comparing longitudinal models
+
+Suggested models:
+
+-   Gamma: raw data could be modelled well with the gamma distribution since takes no negative values, variance increases with mean, and there is a right-skew to the raw distributions
+
+-   Linear mixed effects model with log-transformed data: approximately normal, yet still some skew
+
+-   Linear mixed effects model with cube root transformed data: again, approximately normal, still a bit of skew (why such a low AIC? seems wrong?)
+
+-   GLMM with log-normal distribution
+
+-   GLMM with Student-t distribution: longer tails
+
+### pTAU-181
+
+```{r}
+# checking the mean and variance for ptau181
+mean(merged_data$PLASMAPTAU181)
+var(merged_data$PLASMAPTAU181)
+```
+
+```{r}
+# GLMM
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
+                   data = merged_data,
+                   family = Gamma(link = "log"))
+
+# LME approach with log transformed data
+fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
+                data = merged_data)
+
+# LME approach with log transformed data
+fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years + (1|RID), 
+                           data = merged_data)
+
+# Lognormal - similar to log-transforming then fitting LME
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                              data = merged_data,
+                              family = lognormal(link = "log"))
+
+# Student-t
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            data = merged_data,
+                            family = students.t(df = 3, link = "identity"))
+
+# residual tests for each model
+gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
+testResiduals(gamma_residuals_ptau)
+
+lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
+testResiduals(lme_residuals_log_ptau)
+
+lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
+testResiduals(lme_residuals_cubed_ptau)
+
+lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
+testResiduals(lognormal_residuals_ptau)
+
+student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+testResiduals(student_residuals_ptau)
+
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+```
+
+### NfL
+
+-   Negative AIC for cube root transformed -\> take the absolute value
+
+```{r}
+# checking the mean and variance for nfl
+mean(merged_data$PLASMA_NFL)
+var(merged_data$PLASMA_NFL)
+```
+
+```{r}
+# GLMM
+fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
+                   data = merged_data,
+                   family = Gamma(link = "log"))
+
+# LME approach with log transformed data
+fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years + (1|RID), 
+                data = merged_data)
+
+# LME approach with log transformed data
+fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years + (1|RID), 
+                          data = merged_data)
+
+# Lognormal - similar to log-transforming then fitting LME
+fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                             data = merged_data,
+                             family = lognormal(link = "log"))
+
+# Student-t
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           data = merged_data,
+                           family = students.t(df = 3, link = "identity"))
+
+# residual tests for each model
+gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
+testResiduals(gamma_residuals_nfl)
+
+lme_residuals_log_nfl <- simulateResiduals(fit_lme_log_nfl)
+testResiduals(lme_residuals_log_nfl)
+
+lme_residuals_cubed_nfl <- simulateResiduals(fit_lme_cubed_nfl)
+testResiduals(lme_residuals_cubed_nfl)
+
+lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
+testResiduals(lognormal_residuals_nfl)
+
+student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+testResiduals(student_residuals_nfl)
+
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
+```
+
+## 1. Fitted LME model for P-TAU
+>>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 # Longitudinal model with t-distribution (identity link) 
@@ -676,7 +833,7 @@ We see that gender is not significant in the LME model for NFL, so we remove it:
 ```{r}
 long_model_nfl <- lme(
   log_PLASMA_NFL ~ time_years + APOE4_status.y, 
-  random = ~ time_years | RID,   # random intercept + slope
+  random = ~ time_years | RID, # random intercept + slope
   data = merged_data
   )
 
@@ -842,7 +999,11 @@ summary(joint_model_nfl)
 Mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
+<<<<<<< HEAD
 ## We check wether the models have stable random slopes
+=======
+## 2. We check whether the models have stable random slopes
+>>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 summary(long_model_ptau)
