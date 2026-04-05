@@ -137,7 +137,7 @@ Why is this research relevant to the existing body of literature? What does it a
 
 How will we accomplish this?
 
-# Statistical theory and method
+# Statistical Theory and Methods
 
 Introduce the methods we will use.
 
@@ -265,7 +265,7 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ## Joint Models
 
-### Simple joint model
+### Simple Joint Model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -305,7 +305,7 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### Multivariate joint model
+### Multivariate Joint Model
 
 ...
 
@@ -397,6 +397,52 @@ Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer
 
 # Pre-processing
 
+## Checking RID with more than one measurement recorded on the same exam date
+
+-   There are 52 individuals with two measurements recorded on the same exam date.
+
+-   How should we deal with these? Average the measurements? Remove the observations?
+
+-   Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?
+
+-   For now, remove them:
+
+```{r}
+# checking observations with more than one measurement recorded on the same exam date for nfl
+nfl_double <- nfl_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L) %>%
+  select(RID, EXAMDATE)
+
+# removing the doubled observations
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+
+# checking observations with more than one measurement recorded on the same exam date for ptau
+ptau_double <- ptau_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L)  %>%
+  select(RID, EXAMDATE)
+
+# extracting the doubled observations
+# ptau_data %>%
+#   filter(RID %in% ptau_double$RID) %>% 
+#   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+
+# removing the doubled observations
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+```
+
+```{r}
+# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
+grep("381_S_10###", diagnosis_data$PTID)
+```
+
 ## 1. We select only the required variables and merge them
 
 ```{r}
@@ -423,11 +469,6 @@ merged_data <- nfl_data %>%
 ```
 
 ## Concerning 381_S_10
-
-```{r}
-# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
-# grep("381_S_10###", merged_data$PTID)
-```
 
 ## 2. We check the correlation between the biomarkers
 
@@ -478,12 +519,20 @@ length(keep)
 ## 5. We extract baseline visits, and create an event variable and a time-to-event variable
 
 ```{r}
-# We create a baseline-date
+# checking which observations have the same examdate for nfl and ptau
+common = which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+
+# checking the observations with different exam dates
+nfl_ptau[-common, ]
+
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
 merged_data <- merged_data %>%
   group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   ungroup()
+```
 
+```{r}
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
