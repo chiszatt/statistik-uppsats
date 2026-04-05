@@ -12,22 +12,63 @@ library(ADNIMERGE2)
 library(lme4)
 library(glmmTMB)
 library(DHARMa) # for running residual diagnostics on GLMM
+
+library(tidyr)  # pivot_wider()
 ```
 
 ## Loading data
 
 ```{r}
 # loading data
+
+# NfL
 nfl_data = BLENNOWPLASMANFLLONG
 
+# pTAU
 ptau_data = UGOTPTAU181
 
+# dx data
 diagnosis_data = DXSUM
 
+# demographic data
 demographics = PTDEMOG
 
-APOE = APOERES
+# genetic data
+apoe = APOERES
+```
 
+ApoE genotype information:
+
+-   Genotype information is recorded in the notation $n/m$, where $n\le m$, indicating the presence of one $\epsilon n$ allele and one $\epsilon m$ allele
+
+-    ApoE $\epsilon 4$ homozyotes are recorded as $4/4$
+
+-   Presence of $\epsilon 4$ alleles cause a "significant dose-dependent risk factors for putative sporadic disease" (Wong et al., 2012), whilst the presence of $\epsilon 2$ shows a lower risk.
+
+-   May have three groups within the data set.
+
+```{r}
+table(apoe$GENOTYPE)
+```
+
+```{r}
+# checking there is one unique entry for genetic data per RID
+length(unique(apoe$RID))
+
+# creating a factor variable for ApoE genotype and selecting relevant variables
+apoe = apoe %>% mutate(
+  genotype = as.factor(case_when(
+    GENOTYPE == "4/4" ~ "e4 homozygote",
+    GENOTYPE %in% c("3/4", "2/3") ~ "e4",
+    GENOTYPE == "3/3" ~ "e3 homozygote",
+    GENOTYPE == "2/3" ~ "e2/e3",
+    GENOTYPE == "2/2" ~ "e2 homozygote"
+  ))
+) %>%
+  select(RID, GENOTYPE, genotype)
+```
+
+```{r}
 # selecting relevant variables
 nfl_data = nfl_data %>%
   select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
@@ -48,17 +89,74 @@ merged_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
 
+## Checking RID with more than one measurement recorded on the same exam date
+
+-   There are 52 individuals with two measurements recorded on the same exam date.
+
+-   How should we deal with these? Average the measurements? Remove the observations?
+
+-   Some of the values are quite different, what do we assume by averaging them? What effect does it have to remove them?
+
+```{r}
+# checking observations with more than one measurement recorded on the same exam date for nfl
+nfl_double <- nfl_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L) %>%
+  select(RID, EXAMDATE)
+
+# extracting the doubled observations
+nfl_data %>%
+  filter(RID %in% nfl_double$RID) %>% 
+  filter(EXAMDATE %in% nfl_double$EXAMDATE)
+
+# checking observations with more than one measurement recorded on the same exam date for ptau
+ptau_double <- ptau_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L)  %>%
+  select(RID, EXAMDATE)
+
+# extracting the doubled observations
+ptau_data %>%
+  filter(RID %in% ptau_double$RID) %>% 
+  filter(EXAMDATE %in% ptau_double$EXAMDATE)
+```
+
 ## Merging nfl and ptau181 data
 
 ```{r}
 # merging ptai and nfl data
-nfl_ptau = nfl_data %>% merge(ptau_data, by = c("RID", "VISCODE2"))
+nfl_ptau = nfl_data %>% merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
 
 # checking how many EXAMDATE match out of all observations
 sum(as.integer(nfl_ptau$EXAMDATE.x %in% nfl_ptau$EXAMDATE.y)) / 3855
 
 # checking for missing values: none
 table(is.na(nfl_ptau))
+```
+
+## Merging nfl and ptau181 data
+
+```{r}
+# checking which observations have the same examdate for nfl and ptau
+common = which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+
+# checking the observations with different exam dates
+nfl_ptau[-common, ]
+
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+nfl_ptau <- nfl_ptau %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  ungroup() 
+
+# creating a time since baseline visit variable (in years)
+nfl_ptau <- nfl_ptau %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+```{r}
+# merging nfl_ptau with genetic data
+nfl_ptau = nfl_ptau %>% merge(apoe, by = "RID")
 ```
 
 ## Plotting distributions
@@ -313,4 +411,15 @@ AIC(fit_lme_nfl, fit_gamma_nfl, fit_lognormal_nfl)
 # troubleshooting fit_gamma
 # residuals over time
 plotResiduals(gamma_residuals_nfl, form = merged_data$time_years)
+```
+
+## Checking correlations between biomarkers over time
+
+```{r}
+wide_nfl = nfl_data %>%
+  arrange(EXAMDATE) %>%
+  select(RID, EXAMDATE, PLASMA_NFL) %>%
+  pivot_wider(names_from = EXAMDATE,
+              values_from = c(PLASMA_NFL))
+
 ```
