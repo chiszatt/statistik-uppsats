@@ -75,24 +75,25 @@ library(survival)
 ```{r}
 # Loading data
 # Milou
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
-
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
- 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
- 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe <- APOERES
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+#  
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+#  
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+# 
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe <- APOERES
 ```
 
 ```{r}
 # Charley
+<<<<<<< HEAD
 #library(ADNIMERGE2)
 #nfl_data = BLENNOWPLASMANFLLONG
 
@@ -103,27 +104,39 @@ apoe <- APOERES
 #demographics = PTDEMOG
 
 #APOE = APOERES
+=======
+# library(ADNIMERGE2)
+# nfl_data = BLENNOWPLASMANFLLONG
+# 
+# ptau_data = UGOTPTAU181
+# 
+# diagnosis_data = DXSUM
+# 
+# demographics = PTDEMOG
+# 
+# apoe = APOERES
+>>>>>>> 95b257b27b2f549a27be29400c0eaf04f35ef937
 ```
 
-# 1. Introduction
+# Introduction
 
-## 1.1 Background
+## Background
 
-General background information.
+Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
-Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.
+According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON PTAU-181 here...**
 
-## 1.2 Research Context
+Neurofilament light chain (NfL) is instead a marker of neuronal injury not specific to AD (Ghahremani et al.).
 
-Assessing the current landscape in terms of the scientific literature.
+The abnormal concentrations of these biomarkers are the result of the neuropathological changes symptomatic of AD.
 
-What is known?
+*General background information. Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.*
 
-What has been done?
+## Research Context
 
-Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)
+*Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
-## 1.3 Research Aims
+## Research Aims
 
 What are our research questions?
 
@@ -137,19 +150,23 @@ Why is this research relevant to the existing body of literature? What does it a
 
 How will we accomplish this?
 
-# 2. Statistical theory and method
+# Statistical theory and method
 
 Introduce the methods we will use.
 
 Why did we choose this method to answer the research question?
 
-## 2.1 Mixed Effects Models
+## Longitudinal Data
+
+Longitudinal data in this analysis is defined as $n$ repeated measurements of pTAU-181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $T_{i, j}$ and $N_{i, j}$ denote the measured concentrations of pTAU-181 and NfL respectively for the $i^{th}$ individual at the $j^{th}$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{T:\text{ } i, j} = E(T_{i, j})$ and $\mu_{N:\text{ } i, j} = E(N_{i, j})$. Considering the data are made up of repeated responses on the same individuals, the assumption of independence between observations is illogical. Clearly, the baseline level of pTAU-181 for an individual is correlated to the measurements on subsequent occasions.
+
+## Mixed Effects Models
 
 Why???
 
 We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
 
-### 2.1.1 Linear Mixed Effect Model
+### Linear Mixed Effect Model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -181,9 +198,9 @@ $$
 y_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2)
 $$
 
-### 2.1.2 Generalised Linear Mixed Effects Model
+### Generalised Linear Mixed Effects Model
 
-<https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
+Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
 
 An extension of GLMs, where the linear predictor contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
 
@@ -229,7 +246,7 @@ $$
 
 -   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
 
-## 2.2 Proportional Hazard Model
+## Proportional Hazard Model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -259,9 +276,9 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 -   Proportionality
 
-## 2.3 Joint Models
+## Joint Models
 
-### 2.3.1 Simple joint model
+### Simple joint model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -301,13 +318,15 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### 2.3.2 Multivariate joint model 
+### Multivariate joint model
 
 ...
 
-# 3. Data
+# Data
 
-## 3.1 ADNI
+The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of pTAU-181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
+
+## ADNI
 
 All protocols allow enrollment for individuals aged 55-90.
 
@@ -339,11 +358,11 @@ Explain the different protocols and what they mean for data analysis, if we can 
 
 We checked whether there were any individuals with a PTID in the format "381_S_10###" as per the ADNI leadership guidelines, which state that due to serious data quality concerns, data from these observations should not be used in any analysis. (SOURCE?)
 
-## 3.2 Introducing variables... bio-markers/amyloid data...
+## Introducing variables... biomarkers
 
-Information about the variables we will use and why, what they can show, how are they recorded,
+Information about the variables we will use and why, what they can show, how are they recorded
 
-# 4. Pre-processing
+# Pre-processing
 
 ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
 
@@ -361,45 +380,33 @@ Some bullet points to add to the final paper about things we thought about/did:
 
 -   How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?
 
-# 5. Results
+# Results
 
-Present the results from our analyses.
+Present the results from our analyses. Do not interpret results here! That should be done in the discussion.
 
-Do not interpret results here! That should be done in the discussion.
+# Discussion
 
-## Joint Model
-
-Results from the joint model
-
-## Comparison of predictive accuracy...
-
-Results from comparison of models... not sure what we will do but you get the idea haha
-
-# 6. Discussion
-
-## 6.1 Main findings/summary
+## Main findings/summary
 
 Interpret the results. What did we find?
 
-## 6.2 Discussion - Relating to the research question(s)/previous literature
+## Discussion - Relating to the research question(s)/previous literature
 
-How do our results help to answer the research question?
+How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?
 
-Anything unexpected/not in accordance with previous studies?
+## Further research
 
-## 6.3 Further research
-
-Suggest what kinds of questions this analysis leaves us with?
-
-What more can be done/looked at?
+Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?
 
 # Conclusions
 
 Summary
 
-# References/Bibliography
+# Bibliography
 
-<https://www.mybib.com/tools/harvard-referencing-generator>
+Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517.
+
+Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
 # Pre-processing
 
@@ -733,7 +740,7 @@ surv_model <- coxph(
 summary(surv_model)
 ```
 
-## 4. Removing gender 
+## 4. Removing gender
 
 Gender is not significant in the survival model, so we remove it:
 
@@ -755,7 +762,7 @@ cox.zph(surv_model)
 
 # Joint-model
 
-## 1. Fitted joint model for P-tau 
+## 1. Fitted joint model for P-tau
 
 ```{r}
 # Joint model 
@@ -770,7 +777,7 @@ joint_model <- jm(
 summary(joint_model)
 ```
 
-## 2. Fitted joint model for NFL 
+## 2. Fitted joint model for NFL
 
 ```{r}
 # Joint model 
@@ -788,7 +795,7 @@ summary(joint_model_nfl)
 
 # Multivariate joint model
 
-## 1. We create a mixed object 
+## 1. We create a mixed object
 
 ```{r}
 Mixed <- list(long_model_ptau, long_model_nfl)
@@ -804,7 +811,7 @@ VarCorr(long_model_nfl)
 
 For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036), which indicates that individual biomarker trajectories over time show minimal variation --\> We skip the random slope in fForms:
 
-## 3. fForms 
+## 3. fForms
 
 ```{r}
 fForms <- list(
@@ -813,7 +820,7 @@ fForms <- list(
   )      
 ```
 
-## 4. Fitted multivariate joint model 
+## 4. Fitted multivariate joint model
 
 ```{r}
 multi_joint_model <- jm(surv_model, Mixed,
