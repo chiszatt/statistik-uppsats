@@ -18,13 +18,13 @@ library(JMbayes2)
 # Milou
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
 nfl_data <- BLENNOWPLASMANFLLONG
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
 ptau_data <- UGOTPTAU181
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 diagnosis_data <- DXSUM
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
 demographics <- PTDEMOG
 
@@ -43,7 +43,7 @@ diagnosis_data = DXSUM
 
 demographics = PTDEMOG
 
-APOE = APOERES
+apoe = APOERES
 ```
 
 ## 1. We select the required variables and merge them
@@ -205,17 +205,23 @@ Gamma distribution on the original values could be possible (see if it works bel
 
 We still keep them, as we assume they are correct observations.
 
+-   Checking for observations either side of the mean of the raw data shows there are no values 3 sds below the mean, only above.
+
 ```{r}
 merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
 
 merged_data$nfl_z <- scale(merged_data$PLASMA_NFL)
 
 # We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
-outliers_ptau <- merged_data[abs(merged_data$ptau_z) > 3, ]
-outliers_ptau
+large_outliers_ptau <- merged_data[merged_data$ptau_z > 3, ]
+small_outliers_ptau <- merged_data[merged_data$ptau_z < -3, ]
+large_outliers_ptau
+small_outliers_ptau
 
-outliers_nfl <- merged_data[abs(merged_data$nfl_z) > 3, ]
-outliers_nfl
+large_outliers_nfl <- merged_data[merged_data$nfl_z > 3, ]
+small_outliers_nfl <- merged_data[merged_data$nfl_z < -3, ]
+large_outliers_nfl
+small_outliers_nfl
 ```
 
 ## 8. We check for missing values in both merged_data and long_data
