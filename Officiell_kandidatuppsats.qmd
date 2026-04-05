@@ -93,6 +93,18 @@ library(survival)
 
 ```{r}
 # Charley
+<<<<<<< HEAD
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+
+#ptau_data = UGOTPTAU181
+
+#diagnosis_data = DXSUM
+
+#demographics = PTDEMOG
+
+#APOE = APOERES
+=======
 # library(ADNIMERGE2)
 # nfl_data = BLENNOWPLASMANFLLONG
 # 
@@ -103,6 +115,7 @@ library(survival)
 # demographics = PTDEMOG
 # 
 # apoe = APOERES
+>>>>>>> 95b257b27b2f549a27be29400c0eaf04f35ef937
 ```
 
 # Introduction
@@ -616,6 +629,16 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
+```{r}
+# We remove missing values 
+merged_data <- na.omit(merged_data)
+surv_data <- na.omit(surv_data)
+
+# We re-count missing values
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
 ## 10. We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
@@ -701,11 +724,11 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
-# residuals 
-res_nfl <- residuals(long_model_nfl, type = "subject_specific")
+# residuals
+res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
 # fitted values
-fitted_vals_nfl <- fitted(long_model_nfl, type = "subject_specific")
+fitted_vals_nfl <- fitted(long_model_nfl)  
 
 # plot
 plot(fitted_vals_nfl, res_nfl,
