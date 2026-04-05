@@ -60,7 +60,7 @@ editor: visual
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, output = FALSE)
+knitr::opts_chunk$set(echo = FALSE, output = TRUE)
 ```
 
 ```{r}
@@ -75,20 +75,20 @@ library(survival)
 ```{r}
 # Loading data
 # Milou
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-# nfl_data <- BLENNOWPLASMANFLLONG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
 # 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-# ptau_data <- UGOTPTAU181
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
 #  
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
 #  
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 # 
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe <- APOERES
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
 ```
 
 ```{r}
@@ -443,7 +443,7 @@ ptau_data <- ptau_data %>%
 grep("381_S_10###", diagnosis_data$PTID)
 ```
 
-## 1. We select only the required variables and merge them
+## We select only the required variables and merge them
 
 ```{r}
 # We select the required nfl variables
@@ -470,14 +470,14 @@ merged_data <- nfl_data %>%
 
 ## Concerning 381_S_10
 
-## 2. We check the correlation between the biomarkers
+## We check the correlation between the biomarkers
 
 ```{r}
 # Correlation between the biomarkers 
 cor(merged_data$PLASMAPTAU181, merged_data$PLASMA_NFL, use = "complete.obs")
 ```
 
-## 3. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+## We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
 
 ```{r}
 # We only keep the demographics variables we need and one row per person 
@@ -505,7 +505,7 @@ apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
 merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
 ```
 
-## 4. We filter participants with at least 3 measurements
+## We filter participants with at least 3 measurements
 
 ```{r}
 # We filter individuals with at least 3 measurements
@@ -516,23 +516,28 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## 5. We extract baseline visits, and create an event variable and a time-to-event variable
+## We extract baseline visits, and create an event variable and a time-to-event variable
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
-common = which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+#common = which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
 
 # checking the observations with different exam dates
-nfl_ptau[-common, ]
+#nfl_ptau[-common, ]
 
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+#merged_data <- merged_data %>%
+  #group_by(RID) %>%
+  #mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  #ungroup()
+```
+
+```{r}
 merged_data <- merged_data %>%
   group_by(RID) %>%
   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   ungroup()
-```
 
-```{r}
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
 group_by(RID) %>%
@@ -561,7 +566,7 @@ merged_data <- merged_data %>%
 table(surv_data$event)
 ```
 
-## 6. We create a time variable (time from baseline)
+## We create a time variable (time from baseline)
 
 ```{r}
 # We create time_years (time from baseline)
@@ -569,7 +574,7 @@ merged_data <- merged_data %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
-## 7. We check the distribution of each relevant variable for multivariate joint model and transform
+## We check the distribution of each relevant variable for multivariate joint model and transform
 
 ```{r}
 # We check the distribution of each biomarker
@@ -589,7 +594,7 @@ hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
-## 8. We check for outliers
+## We check for outliers
 
 We still keep them, as we assume they are correct observations.
 
@@ -606,7 +611,7 @@ outliers_nfl <- merged_data[abs(merged_data$nfl_z) > 3, ]
 outliers_nfl
 ```
 
-## 9. We check for missing values in both merged_data and long_data
+## We check for missing values in both merged_data and long_data
 
 ```{r}
 # We count missing values per column in merged_data
@@ -626,7 +631,7 @@ sapply(merged_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## 10. We make sure that merged_data and surv_data have the same length (for the joint model)
+## We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
 # We check the length of each dataset 
@@ -636,7 +641,7 @@ length(unique(surv_data$RID))     # survival data
 
 # Longitudinal model
 
-## 1. Fitted LME model for P-TAU
+## Fitted LME model for P-TAU
 
 ```{r}
 # Longitudinal model with t-distribution (identity link) 
@@ -651,7 +656,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## 2. Fitted LME model for NFL
+## Fitted LME model for NFL
 
 ```{r}
 # Longitudinal model, with chosen covariates 
@@ -664,7 +669,7 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-## 3. Removing gender from NFL LME model
+## Removing gender from NFL LME model
 
 We see that gender is not significant in the LME model for NFL, so we remove it:
 
@@ -678,7 +683,7 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-## 4. Removing APOE4 status from ptau LME model
+## Removing APOE4 status from ptau LME model
 
 Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:
 
@@ -693,7 +698,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## 5 Residuals
+## Residuals
 
 ```{r}
 # residuals 
@@ -739,7 +744,7 @@ qqline(res_nfl, col = "red")
 
 # Survival model
 
-## 1. We create a survival object
+## We create a survival object
 
 ```{r}
 # We create a Surv object: time and event
@@ -749,7 +754,7 @@ surv_object <- Surv(
 )
 ```
 
-## 2. Kaplan-Meier curve
+## Kaplan-Meier curve
 
 ```{r}
 # We fit Kaplan-Meier curve
@@ -764,7 +769,7 @@ plot(
 )
 ```
 
-## 3. Fitted Coxph model
+## Fitted Coxph model
 
 ```{r}
 # Cox survival-model, with covariates
@@ -776,7 +781,7 @@ surv_model <- coxph(
 summary(surv_model)
 ```
 
-## 4. Removing gender
+## Removing gender
 
 Gender is not significant in the survival model, so we remove it:
 
@@ -790,7 +795,7 @@ surv_model <- coxph(
 summary(surv_model)
 ```
 
-## 5. Testing for the assumption of proportional hazards
+## Testing for the assumption of proportional hazards
 
 ```{r}
 cox.zph(surv_model)
@@ -798,7 +803,7 @@ cox.zph(surv_model)
 
 # Joint-model
 
-## 1. Fitted joint model for P-tau
+## Fitted joint model for P-tau
 
 ```{r}
 # Joint model 
@@ -813,7 +818,7 @@ joint_model <- jm(
 summary(joint_model)
 ```
 
-## 2. Fitted joint model for NFL
+## Fitted joint model for NFL
 
 ```{r}
 # Joint model 
@@ -831,13 +836,13 @@ summary(joint_model_nfl)
 
 # Multivariate joint model
 
-## 1. We create a mixed object
+## We create a mixed object
 
 ```{r}
 Mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
-## 2. We check wether the models have stable random slopes
+## We check wether the models have stable random slopes
 
 ```{r}
 summary(long_model_ptau)
@@ -847,7 +852,7 @@ VarCorr(long_model_nfl)
 
 For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036), which indicates that individual biomarker trajectories over time show minimal variation --\> We skip the random slope in fForms:
 
-## 3. fForms
+## fForms
 
 ```{r}
 fForms <- list(
@@ -856,7 +861,7 @@ fForms <- list(
   )      
 ```
 
-## 4. Fitted multivariate joint model
+## Fitted multivariate joint model
 
 ```{r}
 multi_joint_model <- jm(surv_model, Mixed,
