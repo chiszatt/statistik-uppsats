@@ -1,0 +1,822 @@
+---
+format:
+  pdf:
+    include-before-body:
+      text: |
+        \begin{titlepage}
+        \raggedleft
+        \vspace*{2cm}
+        
+        {\Huge\bfseries Kandidatuppsats\par}
+        \vspace{1.5cm}
+        
+        {\Large Statistiska Instiutionen\par}
+        \vspace{3cm}
+        
+        {\Huge\bfseries Nr 2026:x\par}
+        \vspace{0.5cm}
+        
+        {\LARGE \bfseries Title in English\par}
+
+        {\large Title in Swedish\par}
+        \vspace{0.5cm}
+        
+        {\large \today\par}
+        \vspace{3cm}
+        
+        {\Huge Charlotte Emily Iszatt and Milou Rossi\par}
+        
+        \vfill
+        
+        \end{titlepage}
+        
+        \begin{titlepage}
+        \raggedleft
+        
+        {\normalsize Självständigt arbete 15 högskolepoäng inom Statistik III, VT2026\par}
+        {\normalsize Handledare: Hans Nyqvist\par}
+        \vspace{2cm}
+        
+        \raggedright
+        {\huge\bfseries Abstract\par}
+        \vspace{1cm}
+        
+        {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
+        \vspace{3cm}
+        
+        \vfill
+        
+        \end{titlepage}
+    toc: false
+    colorlinks: false
+    number-sections: true
+editor: visual
+---
+
+```{=latex}
+\tableofcontents
+
+\newpage
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, output = FALSE)
+```
+
+```{r}
+# loading libraries
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+```
+
+```{r}
+# Loading data
+# Milou
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
+ 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+ 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
+```
+
+```{r}
+# Charley
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+
+ptau_data = UGOTPTAU181
+
+diagnosis_data = DXSUM
+
+demographics = PTDEMOG
+
+APOE = APOERES
+```
+
+# 1. Introduction
+
+## 1.1 Background
+
+General background information.
+
+Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.
+
+## 1.2 Research Context
+
+Assessing the current landscape in terms of the scientific literature.
+
+What is known?
+
+What has been done?
+
+Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)
+
+## 1.3 Research Aims
+
+What are our research questions?
+
+1.  How do longitudinal changes in plasma biomarker levels over time relate to the risk of progression to dementia? (Joint modeling)
+
+2.  How do these associations differ between pTau181 and NfL? (Comparison across biomarkers)
+
+3.  How does the precision change for the estimated longitudinal trajectories and survival associations to the inclusion of individuals with different numbers of repeated measurements? (Precision analysis)
+
+Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
+
+How will we accomplish this?
+
+# 2. Statistical theory and method
+
+Introduce the methods we will use.
+
+Why did we choose this method to answer the research question?
+
+## 2.1 Mixed Effects Models
+
+Why???
+
+We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
+
+### 2.1.1 Linear Mixed Effect Model
+
+**Theory about the model... (specifically why we should use it)**
+
+-   Biomarker process
+
+-   Describes the trajectory of biomarkers at the individual level 
+
+**Linear mixed effects models?** What are these - why use them here?
+
+$$
+y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+$$
+m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2)
+$$
+
+$y_i(t):$ the observed longitudinal biomarker
+
+$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
+
+$\mathbf{X_i}^T(t)\beta:$ the fixed effects
+
+$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
+
+The full model becomes:
+
+$$
+y_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2)
+$$
+
+### 2.1.2 Generalised Linear Mixed Effects Model
+
+<https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
+
+An extension of GLMs, where the linear predictor contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
+
+Given random effects, $\mathbf{u}$ the dependent variable, $\mathbf{y}$, is distributed according to the exponential family, such that $g(E[\mathbf{y}|\mathbf{u}]) = \mathbf{X𝛽} + \mathbf{Zu}$. Some link function, $g(x)$, links the expected value of $\mathbf{y}$ given the random effects to the linear predictor which included both fixed effects and random effects.
+
+Where:
+
+$\mathbf{X}$ = the fixed effects design matrix
+
+$\mathbf{\beta}$ = the fixed effects
+
+$\mathbf{Z}$ = the random effects design matrix
+
+$\mathbf{u}$ = the random effects
+
+What do we model as random?
+
+We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
+
+We do not tend to estimate $\mathbf{u}$, but instead assume that $u_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(u) = 0$.
+
+For a model with only a random intercept, $\mathbf{G}$ becomes $G = \sigma^2_{intercept}$. If we extend the model to have random slope, we get:
+
+$$
+G =
+\begin{bmatrix}
+\sigma^2_{intercept} & \sigma_{intercept, slope} \\
+\sigma_{intercept, slope} & \sigma^2_{slope}
+\end{bmatrix}
+$$
+
+Like all variance-covariance matrices, some elements are redundant since they are repeated. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, means estimating $\frac{p(p + 1)}{2}$ elements instead. Assuming (**?????**) the random effects are independent, the variance-covariance matrix for the random effects becomes diagonal:
+
+$$
+G =
+\begin{bmatrix}
+\sigma^2_{intercept} & 0 \\
+0 & \sigma^2_{slope}
+\end{bmatrix}
+$$
+
+### Assumptions!!
+
+-   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+
+## 2.2 Proportional Hazard Model
+
+**Theory about the model... (specifically why we should use it)**
+
+-   Time-to-diagnosis process
+
+-   Parametric baseline hazard: **flexible parametrics, splines??**
+
+-   OR leave undefined -\> Cox PH model
+
+Assuming a Cox PH survival sub-model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
+$$
+
+$\mathbf{v_i}:$ vector of time-independent co-variates
+
+$\phi:$ vector of log-hazard ratios
+
+$\alpha:$ the association parameter
+
+$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
+
+### Assumptions!!
+
+-   What do we assume about the censoring process?
+
+-   Proportionality
+
+## 2.3 Joint Models
+
+### 2.3.1 Simple joint model
+
+**Theory about the model... (specifically why we should use it)**
+
+In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
+
+The association structure of the joint model:
+
+-   How is the longitudinal model linked to the survival model? 
+
+-   Does this association structure change for different biomarkers?
+
+-   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
+
+If we include the current rate of change alongside the current value in the proportional-hazard model:
+
+$$
+h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
+$$
+
+$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
+
+$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
+
+Joint-model options:
+
+-   Longitudinal sub-model: model of class lme()
+
+### Assumptions!!
+
+-   Full conditional independence
+
+    -   Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
+
+    -   This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
+
+-   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
+
+-   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+
+### 2.3.2 Multivariate joint model 
+
+...
+
+# 3. Data
+
+## 3.1 ADNI
+
+All protocols allow enrollment for individuals aged 55-90.
+
+-   ADNI1
+
+800 subjects (200 controls, 400 MCI, 200 mild AD) recruited at around 50 sites in the United States and Canada
+
+-   ADNI2
+
+Cognitively normal, significant memory concern, early MCI, late MCI, mild AD
+
+Inclusion criteria for rollover participants: originally diagnosed as either MCI (early or late) or CN
+
+-   ADNI3
+
+700 - 800 rollover participants
+
+370 - 1200 newly enrolled
+
+Three cohorts: CN, MCI, mild AD
+
+-   ADNI4
+
+Introducing the study, it's aims and the type of information gathered.
+
+**IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
+
+Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.
+
+We checked whether there were any individuals with a PTID in the format "381_S_10###" as per the ADNI leadership guidelines, which state that due to serious data quality concerns, data from these observations should not be used in any analysis. (SOURCE?)
+
+## 3.2 Introducing variables... bio-markers/amyloid data...
+
+Information about the variables we will use and why, what they can show, how are they recorded,
+
+# 4. Pre-processing
+
+ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
+
+Some bullet points to add to the final paper about things we thought about/did:
+
+-   Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)
+
+-   Selecting relevant variables from diagnosis and biomarker/amyloid data set
+
+-   What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)
+
+-   What variables do we need for survival sub-model? (Event, time followed?)
+
+-   Joint model: time-var: a character string indicating the time variable in the mixed-effects model
+
+-   How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?
+
+# 5. Results
+
+Present the results from our analyses.
+
+Do not interpret results here! That should be done in the discussion.
+
+## Joint Model
+
+Results from the joint model
+
+## Comparison of predictive accuracy...
+
+Results from comparison of models... not sure what we will do but you get the idea haha
+
+# 6. Discussion
+
+## 6.1 Main findings/summary
+
+Interpret the results. What did we find?
+
+## 6.2 Discussion - Relating to the research question(s)/previous literature
+
+How do our results help to answer the research question?
+
+Anything unexpected/not in accordance with previous studies?
+
+## 6.3 Further research
+
+Suggest what kinds of questions this analysis leaves us with?
+
+What more can be done/looked at?
+
+# Conclusions
+
+Summary
+
+# References/Bibliography
+
+<https://www.mybib.com/tools/harvard-referencing-generator>
+
+# Pre-processing
+
+## 1. We select only the required variables and merge them
+
+```{r}
+# We select the required nfl variables
+nfl_data <- nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+# We select the required ptau variables
+ptau_data <- ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required diagnosis variables
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# We add _dx on the diagnosis variables 
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# We merge NFL, ptau och diagnosis
+merged_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+```
+
+## Concerning 381_S_10
+
+```{r}
+# checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
+# grep("381_S_10###", merged_data$PTID)
+```
+
+## 2. We check the correlation between the biomarkers
+
+```{r}
+# Correlation between the biomarkers 
+cor(merged_data$PLASMAPTAU181, merged_data$PLASMA_NFL, use = "complete.obs")
+```
+
+## 3. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+
+```{r}
+# We only keep the demographics variables we need and one row per person 
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# We merge with merged_data
+merged_data <- merged_data %>%
+  left_join(demographics_small, by = "RID")
+
+# We make sure that gender is a factor 
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We convert EXAMDATE_ptau to date 
+merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
+
+# We create age_at_visit based on ptau date 
+merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+
+# We create a variable for apoe4 status
+apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
+
+# We merge apoe with merged_data 
+merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
+```
+
+## 4. We filter participants with at least 3 measurements
+
+```{r}
+# We filter individuals with at least 3 measurements
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+## 5. We extract baseline visits, and create an event variable and a time-to-event variable
+
+```{r}
+# We create a baseline-date
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  ungroup()
+
+# We create event and time_to_event (where dementia is the event) and add age och gender 
+surv_data <- merged_data %>%
+group_by(RID) %>%
+summarise(
+    age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
+    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
+    
+    time_to_event = case_when(
+
+    any(DIAGNOSIS_dx == "Dementia") ~
+      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
+                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
+
+    TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
+
+  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
+) %>% ungroup()
+
+# We put the survival data back into the merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## 6. We create a time variable (time from baseline)
+
+```{r}
+# We create time_years (time from baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+## 7. We check the distribution of each relevant variable for multivariate joint model and transform
+
+```{r}
+# We check the distribution of each biomarker
+hist(merged_data$PLASMAPTAU181, main="PLASMAPTAU181")
+hist(merged_data$PLASMA_NFL, main="PLASMA_NFL")
+```
+
+```{r}
+# We log transform the biomarkers 
+merged_data$log_PLASMAPTAU181 <- log(merged_data$PLASMAPTAU181)
+merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL)
+```
+
+```{r}
+# We re-check the distribution of each biomarker  
+hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
+hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+```
+
+## 8. We check for outliers
+
+We still keep them, as we assume they are correct observations.
+
+```{r}
+merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
+
+merged_data$nfl_z <- scale(merged_data$PLASMA_NFL)
+
+# We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
+outliers_ptau <- merged_data[abs(merged_data$ptau_z) > 3, ]
+outliers_ptau
+
+outliers_nfl <- merged_data[abs(merged_data$nfl_z) > 3, ]
+outliers_nfl
+```
+
+## 9. We check for missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+## 10. We make sure that merged_data and surv_data have the same length (for the joint model)
+
+```{r}
+# We check the length of each dataset 
+length(unique(merged_data$RID))   # longitudinal data
+length(unique(surv_data$RID))     # survival data
+```
+
+# Longitudinal model
+
+## 1. Fitted LME model for P-TAU
+
+```{r}
+# Longitudinal model with t-distribution (identity link) 
+library(GLMMadaptive)
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y + APOE4_status.y,
+  random = ~ time_years | RID,                    
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+## 2. Fitted LME model for NFL
+
+```{r}
+# Longitudinal model, with chosen covariates 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER.y + APOE4_status.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model_nfl)
+```
+
+## 3. Removing gender from NFL LME model
+
+We see that gender is not significant in the LME model for NFL, so we remove it:
+
+```{r}
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + APOE4_status.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model_nfl)
+```
+
+## 4. Removing APOE4 status from ptau LME model
+
+Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:
+
+```{r}
+long_model_ptau <- mixed_model(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER.y,
+  random = ~ time_years | RID,                    
+  data = merged_data,
+family = students.t(df = 3, link = "identity")
+)
+
+summary(long_model_ptau)
+```
+
+## 5 Residuals
+
+```{r}
+# residuals 
+res_ptau <- residuals(long_model_ptau, type = "subject_specific")
+
+# fitted values
+fitted_vals_ptau <- fitted(long_model_ptau, type = "subject_specific")
+
+# plot
+plot(fitted_vals_ptau, res_ptau,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for P-TAU")
+abline(h = 0, col = "red", lty = 2)
+```
+
+```{r}
+# residuals 
+res_nfl <- residuals(long_model_nfl, type = "subject_specific")
+
+# fitted values
+fitted_vals_nfl <- fitted(long_model_nfl, type = "subject_specific")
+
+# plot
+plot(fitted_vals_nfl, res_nfl,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for NFL")
+abline(h = 0, col = "red", lty = 2)
+```
+
+## 6. QQ plot
+
+```{r}
+# For P-tau
+qqnorm(res_ptau)
+qqline(res_ptau, col = "red")
+
+# For NFL 
+qqnorm(res_nfl)
+qqline(res_nfl, col = "red")
+```
+
+# Survival model
+
+## 1. We create a survival object
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+## 2. Kaplan-Meier curve
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+## 3. Fitted Coxph model
+
+```{r}
+# Cox survival-model, with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER + APOE4_status,
+  data <- surv_data
+)
+
+summary(surv_model)
+```
+
+## 4. Removing gender 
+
+Gender is not significant in the survival model, so we remove it:
+
+```{r}
+# Cox survival-model, without gender 
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + APOE4_status,
+  data <- surv_data
+)
+
+summary(surv_model)
+```
+
+## 5. Testing for the assumption of proportional hazards
+
+```{r}
+cox.zph(surv_model)
+```
+
+# Joint-model
+
+## 1. Fitted joint model for P-tau 
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model_ptau,
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+summary(joint_model)
+```
+
+## 2. Fitted joint model for NFL 
+
+```{r}
+# Joint model 
+joint_model_nfl <- jm(
+  surv_model,
+  long_model_nfl,
+  time_var = "time_years",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_nfl)
+```
+
+# Multivariate joint model
+
+## 1. We create a mixed object 
+
+```{r}
+Mixed <- list(long_model_ptau, long_model_nfl)
+```
+
+## 2. We check wether the models have stable random slopes
+
+```{r}
+summary(long_model_ptau)
+VarCorr(long_model_nfl)
+
+```
+
+For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036), which indicates that individual biomarker trajectories over time show minimal variation --\> We skip the random slope in fForms:
+
+## 3. fForms 
+
+```{r}
+fForms <- list(
+  "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) 
+  )      
+```
+
+## 4. Fitted multivariate joint model 
+
+```{r}
+multi_joint_model <- jm(surv_model, Mixed,
+                  time_var = "time_years",
+                  functional_forms = fForms,
+                  n_chains = 3L,    
+                  n_iter = 20000L,
+                  n_burnin = 2000L
+                  )
+summary(multi_joint_model)
+```
+
+```{r}
+summary <- summary(multi_joint_model)
+summary$Survival
+```
