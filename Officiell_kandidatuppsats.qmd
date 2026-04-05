@@ -110,9 +110,19 @@ apoe <- APOERES
 
 ## Background
 
+According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, AD continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
+
+The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (ibid., p. 595).
+
 Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
 According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON PTAU-181 here...**
+
+Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112> –\> kanske hitta bättre, mer konkreta källor för infon, men bra info?
+
+-   Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in cerebrospinal fluid (CSF) and plasma.
+
+-   Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD.
 
 Neurofilament light chain (NfL) is instead a marker of neuronal injury not specific to AD (Ghahremani et al.).
 
@@ -264,9 +274,15 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 -   Proportionality
 
+### Cox PH model using baseline (initial) values of each biomarker
+
+### Cox PH model using time-averaged values of each biomarker?
+
+### Extended Cox PH model using time-depending covariates?
+
 ## Joint Models
 
-### Simple Joint Model
+### Simple Joint Model (frequentist approach) 
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -306,9 +322,15 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### Multivariate Joint Model
+### Multivariate Joint Model (bayesian approach) 
 
-...
+Besides the traditional approach of maximum likelihood estimation, joint models can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures and can simultaneously accommodate multiple longitudinal outcomes (Andrinopoulou & Rizopoulos, 2016: p.?).
+
+#### The Gelman-Rubin statistic 
+
+According to Peng (2022), convergence can be evaluated by running multiple chains from different starting values. All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar.
+
+Peng (2022) further explains that the Gelman-Rubin statistic R formalizes this idea. As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
 # Data
 
@@ -388,13 +410,21 @@ Suggest what kinds of questions this analysis leaves us with? What more can be d
 
 # Conclusions
 
-Summary
+What we conclude based on our findings.
 
 # Bibliography
 
+Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures. Statistics in medicine, 35(26), 4813-4823. <https://doi.org/10.1002/sim.7027>
+
+Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
+
 Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Disease Neuroimaging Initiative\*. Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*. 2023 Feb 14;100(7):e683-e693. doi: 10.1212/WNL.0000000000201517.
 
+Peng. R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4: Monitoring Convergence. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html> \[Last updated 27 may 2022\].
+
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
+
+World Health Organization (2025). *Dementia*. URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
 
 # Pre-processing
 
@@ -469,13 +499,9 @@ merged_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 ```
 
-<<<<<<< HEAD
 ## Concerning 381_S_10
 
 ## We check the correlation between the biomarkers
-=======
-## 2. We check the correlation between the biomarkers
->>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 # Correlation between the biomarkers 
@@ -515,7 +541,6 @@ merged_data <- merged_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-<<<<<<< HEAD
 ## We extract baseline visits, and create an event variable and a time-to-event variable
 
 ```{r}
@@ -549,8 +574,6 @@ merged_data <- merged_data %>%
 # We create age_at_baseline based on baseline date 
 merged_data = merged_data %>%
   mutate(age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
-```
->>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
@@ -607,9 +630,8 @@ hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
-<<<<<<< HEAD
 ## We check for outliers
-=======
+
 ```{r}
 # cube-root transformed
 ggplot(merged_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
@@ -623,7 +645,6 @@ ggplot(merged_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
 ```
 
 ## 8. We check for outliers
->>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 We still keep them, as we assume they are correct observations.
 
@@ -676,9 +697,8 @@ length(unique(surv_data$RID)) # survival data
 
 # Longitudinal model
 
-<<<<<<< HEAD
 ## Fitted LME model for P-TAU
-=======
+
 ## Comparing longitudinal models
 
 Suggested models:
@@ -798,7 +818,6 @@ AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_st
 ```
 
 ## 1. Fitted LME model for P-TAU
->>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 # Longitudinal model with t-distribution (identity link) 
@@ -999,11 +1018,7 @@ summary(joint_model_nfl)
 Mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
-<<<<<<< HEAD
 ## We check wether the models have stable random slopes
-=======
-## 2. We check whether the models have stable random slopes
->>>>>>> 51fc3c76063ce4ded9cbdfc6b9a42870dc5cabf3
 
 ```{r}
 summary(long_model_ptau)
