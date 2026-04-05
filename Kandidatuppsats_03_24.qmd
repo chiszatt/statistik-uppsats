@@ -157,6 +157,10 @@ How will we accomplish this?
 
 *Introduce the methods we will use. Why did we choose this method to answer the research question?*
 
+## Longitudinal Data
+
+Longitudinal data in this analysis is defined as $n$ repeated measurements of pTAU-181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $T_{i, j}$ and $N_{i, j}$ denote the measured concentrations of pTAU-181 and NfL respectively for the $i^{th}$ individual at the $j^{th}$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{T:\text{ } i, j} = E(T_{i, j})$ and $\mu_{N:\text{ } i, j} = E(N_{i, j})$. Considering the data are made up of repeated responses on the same individuals, the assumption of independence between observations is illogical. Clearly, the baseline level of pTAU-181 for an individual is correlated to the measurements on subsequent occasions.
+
 ## Mixed Effects Models
 
 Why???
