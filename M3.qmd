@@ -1,0 +1,205 @@
+---
+title: "Test"
+format: pdf
+editor: visual
+---
+
+```{r}
+# loading libraries
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+library(ggplot2)
+```
+
+```{r}
+# Milou
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
+# 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
+#  
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+#  
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+# 
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
+```
+
+```{r}
+# We select the required nfl variables
+nfl_data <- nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+# We select the required ptau variables
+ptau_data <- ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required diagnosis variables
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# We add _dx on the diagnosis variables 
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# We merge NFL, ptau och diagnosis
+merged_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+```
+
+```{r}
+# We only keep the demographics variables we need and one row per person 
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# We merge with merged_data
+merged_data <- merged_data %>%
+  left_join(demographics_small, by = "RID")
+
+# We make sure that gender is a factor 
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create a variable for apoe4 status
+apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
+
+# We merge apoe with merged_data 
+merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
+```
+
+```{r}
+# We filter individuals with at least 3 measurements
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+```{r}
+# We create a baseline-date
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  ungroup()
+
+# We create event and add age och gender 
+surv_data <- merged_data %>%
+group_by(RID) %>%
+  summarise(
+    age_at_baseline = as.numeric(min(baseline_date), "%Y") - min(PTDOBYY),
+    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
+    PLASMAPTAU181 = PLASMAPTAU181[which.min(EXAMDATE_ptau)],
+    PLASMA_NFL = PLASMA_NFL[which.min(EXAMDATE_ptau)],
+    event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
+) %>% ungroup()
+
+# We put the survival data back into the merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+# We create time_years (time from baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+```{r}
+# We log transform the biomarkers in merged_data
+merged_data$log_PLASMAPTAU181 <- log(merged_data$PLASMAPTAU181.x)
+merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL.x)
+
+# We log transform the biomarkers in surv_data
+surv_data$log_PLASMAPTAU181 <- log(surv_data$PLASMAPTAU181)
+surv_data$log_PLASMA_NFL <- log(surv_data$PLASMA_NFL)
+```
+
+```{r}
+# We remove missing values 
+merged_data <- na.omit(merged_data)
+surv_data <- na.omit(surv_data)
+
+# We re-count missing values
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# We check the length of each dataset 
+length(unique(merged_data$RID)) # longitudinal data
+length(unique(surv_data$RID)) # survival data
+```
+
+# M3 - Time-dependent Cox PH model
+
+```{r}
+surv_data <- merged_data %>%
+  arrange(RID, time_years) %>%
+  group_by(RID) %>%
+  mutate(
+    # Time intervals
+    time_start = lag(time_years, default = 0),
+    time_end   = time_years,
+    # Event only at last interval
+    event_interval    = ifelse(row_number() == n(), event, 0),
+  ) %>%
+  filter(time_end > time_start) %>%
+  ungroup() %>%
+  select(RID, time_start, time_end, event_interval,
+         age_at_baseline, PTGENDER.x, APOE4_status.x,
+         log_PLASMAPTAU181, log_PLASMA_NFL, event)
+```
+
+För att kolla om det är korrekt:
+
+```{r}
+# Pick one RID to inspect
+rid_check <- 2  # example
+
+surv_data %>%
+  filter(RID == rid_check) %>%
+  select(RID, time_start, time_end, event_interval,
+         log_PLASMAPTAU181, log_PLASMA_NFL, event)
+```
+
+Cox PH modell
+
+```{r}
+# Create Surv object for time-dependent Cox
+surv_td <- Surv(
+  time = surv_data$time_start,
+  time2 = surv_data$time_end,
+  event = surv_data$event_interval
+)
+```
+
+```{r}
+cox_PLASMAPTAU181 <- coxph(
+  surv_td ~ log_PLASMAPTAU181 + age_at_baseline + PTGENDER.x + APOE4_status.x,
+  data = surv_data
+)
+summary(cox_PLASMAPTAU181)
+```
+
+Gender not significant –\> We remove it:
+
+```{r}
+cox_PLASMAPTAU181 <- coxph(
+  surv_td ~ log_PLASMAPTAU181 + age_at_baseline + APOE4_status.x,
+  data = surv_data
+)
+summary(cox_PLASMAPTAU181)
+```
