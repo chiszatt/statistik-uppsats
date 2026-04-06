@@ -78,32 +78,32 @@ library(ggplot2)
 # Milou
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
 nfl_data <- BLENNOWPLASMANFLLONG
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
 ptau_data <- UGOTPTAU181
-#  
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
 diagnosis_data <- DXSUM
-#  
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
 demographics <- PTDEMOG
-# 
+#
 load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
 apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-# library(ADNIMERGE2)
-# nfl_data = BLENNOWPLASMANFLLONG
-# 
-# ptau_data = UGOTPTAU181
-# 
-# diagnosis_data = DXSUM
-# 
-# demographics = PTDEMOG
-# 
-# apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+
+ptau_data = UGOTPTAU181
+
+diagnosis_data = DXSUM
+
+demographics = PTDEMOG
+
+apoe = APOERES
 ```
 
 # Introduction
@@ -151,6 +151,8 @@ What are our research questions?
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 
 3.  How does the precision change for the estimated longitudinal trajectories and survival associations to the inclusion of individuals with different numbers of repeated measurements? (Precision analysis)
+
+Sensitivity → how do the estimates of the the joint model parameters change when excluding sparce individuals with only one biomarker measurement?
 
 Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
 
@@ -575,32 +577,24 @@ length(keep)
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
-#common = which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
-
-# checking the observations with different exam dates
-#nfl_ptau[-common, ]
-
-## 5. We extract baseline visits, and create an event variable, a time-to-event variable, and age_at_baseline variable
-
-# checking which observations have the same examdate for nfl and ptau
 common = which(merged_data$EXAMDATE_nfl %in% merged_data$EXAMDATE_ptau)
 
 # checking the observations with different exam dates
 merged_data[-common, ]
 
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-#merged_data <- merged_data %>%
-  #group_by(RID) %>%
-  #mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-  #ungroup()
+merged_data <- merged_data %>%
+group_by(RID) %>%
+mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+ungroup()
 ```
 
 ```{r}
 # We create a baseline-date
-merged_data <- merged_data %>%
-  group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
-  ungroup()
+# merged_data <- merged_data %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+#   ungroup()
 
 # We create event and time_to_event (where dementia is the event) and add age och gender 
 surv_data <- merged_data %>%
@@ -721,9 +715,7 @@ length(unique(merged_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-# Longitudinal model
-
-## Fitted LME model for P-TAU
+# Longitudinal modelFitted LME model for P-TAU
 
 ## Comparing longitudinal models
 
