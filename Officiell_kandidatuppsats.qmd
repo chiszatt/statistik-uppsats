@@ -134,7 +134,9 @@ The abnormal concentrations of these biomarkers are the result of the neuropatho
 
 Recent research has applied a range of prognostic models, from traditional to advanced, to estimate disease progression and related adverse outcomes in Alzheimer’s disease. For instance, the article "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic" (Cano, 2024: p. 1) investigated the predictive value of plasma p-tau181 for conversion from mild cognitive impairment (MCI) to Alzheimer’s disease dementia. Using Cox proportional hazards models, the study found that higher baseline plasma p-tau181 levels were associated with a significantly increased risk of progression, with a hazard ratio of around 1.84, compared with lower levels, even after adjusting for age, sex, and APOE genotype (Cano, 2024: p. 1).
 
-Another article, called “Blood biomarkers in dynamic prediction of conversion to Alzheimer’s disease: An application of joint modeling” (Smith et al., 2023: p. 5), extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL. The study demonstrated that modeling the full trajectories of these biomarkers, rather than only baseline levels, improved the prediction of progression to dementia. Importantly, higher longitudinal p-tau181 levels were associated with a substantially increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 (Smith et al., 2023: p. 5).
+Another article called “Blood biomarkers in dynamic prediction of conversion to Alzheimer’s disease: An application of joint modeling” (Yuan et al., 2024: p. 1) extended this approach further by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL. By modeling the full trajectories of these biomarkers rather than only baseline levels, the study showed improved prediction of progression to dementia. Notably, higher longitudinal p-tau181 levels were associated with a substantially increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NFL (Yuan et al., 2024: p. 1). Additionally, the two biomarkers were combined in one multivariate joint model, which led to improved performance (Yuan et al., 2024: p. 1, 3).
+
+The majority of these sort of studies, however, only include the participants with repeated measurements, meaning that those with only one measurement are often excluded in the modelling process. On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
 
 ## Research Aims
 
@@ -144,7 +146,7 @@ Förslag 1.
 
 This study evaluates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing conventional and advanced statistical approaches. More precisely, the research questions are:
 
-1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, average levels over time, trajectories, single-biomarker joint models, and multivariate joint models)?
+1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, average levels over time, single-biomarker joint models, and multivariate joint models)?
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
 
@@ -299,20 +301,6 @@ H(CA)_t(X_i) = \frac{\sum_{j=0}^{m_i} I(t_{ij} < t) X_i(t_{ij})}{\sum_{j=0}^{m_i
 $$
 
 where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Sweeting et al., 2017, p.4516).
-
-### Extended Cox PH model using time-depending covariates?
-
-In the proportional hazards model, the hazard is assumed to depend solely on covariates with values that remain constant throughout the follow-up period, such as baseline age, sex, and randomized treatment. However, in longitudinal research, it is also of interest to assess whether time-dependent covariates influence the risk of an event. Examples are environmental factors, biochemical or clinical parameters measured during follow-up, and changes in treatment dosage (Rizopoulos, 2012: p. 44).
-
-Time-dependent covariates can be classified into two categories: exogenous (external) and endogenous (internal). Exogenous covariates are those whose future values are not influenced by the occurrence of an event and are predictable at any time. Examples include time of day or season, or treatment strategies adjusted according to pre-specified rules. Endogenous covariates, in contrast, are affected by or associated with the event process and are generally unpredictable. These typically are time-varying measurements taken on the subject, such as biomarkers or clinical parameters (Rizopoulos, 2012: p.45)
-
-The Cox model can be extended to handle exogenous time-dependent covariates using the so called counting process framework. In this formulation, event occurrences are treated as realizations of a slow Poisson process. For subject $i$, the event process is denoted by ${N_i(t), R_i(t)}$, where $N_i(t)$ is the number of events by time $t$ and $R_i(t)$ is a left-continuous at-risk indicator ($R_i(t) = 1$ if the subject is at risk at time $t$, $0$ otherwise). The extended Cox model is written as:
-
-$$h_i(t \mid Y_i(t), w_i) = h_0(t) \, R_i(t) \, \exp\{\gamma^\top w_i + \alpha \, y_i(t)\}$$
-
-where $w_i$ is a vector of baseline covariates (e.g., sex or randomized treatment) and $y_i(t)$ is a vector of time-dependent covariates. The coefficients $\alpha$ have the same interpretation as $\gamma$: for a single time-dependent covariate, $\exp(\alpha)$ represents the relative increase in the hazard at time $t$ associated with a one-unit increase in $y_i(t)$ (Rizopoulos, 2012: p. 47).
-
-Despite its flexibility, the extended Cox model may however be problematic when time-dependent covariates are endogenous. This is because it relies on the assumption that such covariates behave as predictable processes, are measured without error, and have their full trajectory completely specified (Rizopoulos, 2012: p. 48).
 
 ## Joint Models
 
@@ -509,6 +497,8 @@ Wolfe, R. A., & Strawderman, R. L. (1996). Logical and statistical fallacies in 
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
 World Health Organization (2025). *Dementia*. URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
+
+Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
 
 # Pre-processing
 
