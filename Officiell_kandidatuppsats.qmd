@@ -140,11 +140,9 @@ Förslag 1.
 
 This study evaluates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing conventional and advanced statistical approaches. More precisely, the research questions are:
 
-1.  Can the initial (baseline) levels of p-tau181 and NfL predict the progression to Alzheimer’s disease/dementia?
-2.  Do the average biomarker levels over time improve prediction compared to baseline alone?
-3.  Does using the biomarkers’ changing levels over time give a better prediction of disease progression?
-4.  Using a joint model, can modeling the full trajectory of each biomarker improve prediction accuracy?
-5.  Can a multivariate joint model combining both biomarkers provide even better prediction of progression?
+1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, average levels over time, trajectories, single-biomarker joint models, and multivariate joint models)?
+2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
+3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
 
 Förslag 2.
 
@@ -310,15 +308,7 @@ $$h_i(t \mid Y_i(t), w_i) = h_0(t) \, R_i(t) \, \exp\{\gamma^\top w_i + \alpha \
 
 where $w_i$ is a vector of baseline covariates (e.g., sex or randomized treatment) and $y_i(t)$ is a vector of time-dependent covariates. The coefficients $\alpha$ have the same interpretation as $\gamma$: for a single time-dependent covariate, $\exp(\alpha)$ represents the relative increase in the hazard at time $t$ associated with a one-unit increase in $y_i(t)$ (Rizopoulos, 2012: p. 47).
 
-Han skriver:
-
--   "The only difference compared to the syntax used to fit the standard Cox model in Section 3.3, is in the specification of the Surv() function in which the first two arguments denote the limits of the interval, and the last argument is the corresponding event indicator. Moreover, in the data argument the data should be supplied in the long format (s.48)"
-
-MEN sen skriver han också:
-
--   "However, despite this flexibility the extended Cox model is not appropriate when the time-dependent covariates are of endogenous nature (t.ex. biomarkörer). This is because the extended Cox model assumes that time-dependent covariates are predictable processes, measured without error, and have their complete path fully specified (s. 48). "
-
--   **Men den artikel jag visade gjorde det ändå, fastän de också kollade på biomarkörer. Om man gör det ändå visar man hur det inte är anpassat för vår typ av data, och får resultaten av de andra modeller man jämför med att se ännu bättre ut.**
+Despite its flexibility, the extended Cox model may however be problematic when time-dependent covariates are endogenous. This is because it relies on the assumption that such covariates behave as predictable processes, are measured without error, and have their full trajectory completely specified (Rizopoulos, 2012: p. 48).
 
 ## Joint Models
 
