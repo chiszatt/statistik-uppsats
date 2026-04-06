@@ -132,6 +132,10 @@ The abnormal concentrations of these biomarkers are the result of the neuropatho
 
 *Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
+Recent research has applied a range of prognostic models, from traditional to advanced, to estimate disease progression and related adverse outcomes in Alzheimer’s disease. For instance, the article "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic" (Cano, 2024: p. 1) investigated the predictive value of plasma p-tau181 for conversion from mild cognitive impairment (MCI) to Alzheimer’s disease dementia. Using Cox proportional hazards models, the study found that higher baseline plasma p-tau181 levels were associated with a significantly increased risk of progression, with a hazard ratio of around 1.84, compared with lower levels, even after adjusting for age, sex, and APOE genotype (Cano, 2024: p. 1).
+
+Another article, called “Blood biomarkers in dynamic prediction of conversion to Alzheimer’s disease: An application of joint modeling” (Smith et al., 2023: p. 5), extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL. The study demonstrated that modeling the full trajectories of these biomarkers, rather than only baseline levels, improved the prediction of progression to dementia. Importantly, higher longitudinal p-tau181 levels were associated with a substantially increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 (Smith et al., 2023: p. 5).
+
 ## Research Aims
 
 What are our research questions?
@@ -487,6 +491,8 @@ What we conclude based on our findings.
 # Bibliography
 
 Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures. Statistics in medicine, 35(26), 4813-4823. <https://doi.org/10.1002/sim.7027>
+
+Cano, A., Capdevila, M., Puerta, R., Arranz, J., Montrreal, L., de Rojas, I., García-González, P., Olivé, C., García-Gutiérrez, F., Sotolongo-Grau, O., Orellana, A., Aguilera, N., Ramis, M., Rosende-Roca, M., Lleó, A., Fortea, J., Tartari, J. P., Lafuente, A., Vargas, L., Pérez-Cordón, A., … Ruiz, A. (2024). Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic. *EBioMedicine*, 108, 105345. <https://doi.org/10.1016/j.ebiom.2024.105345>
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
