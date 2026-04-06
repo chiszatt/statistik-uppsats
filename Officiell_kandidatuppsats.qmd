@@ -172,7 +172,7 @@ Longitudinal data in this analysis is defined as $n$ repeated measurements of p-
 
 Why???
 
-We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
+Models with both fixed and random effects are useful for accounting for correlations between repeated observations on the same experimental unit. In this instance, we have repeated biomarker measurements on the same set of individuals, where the observations can be though of as grouped by individual. We expect the measurements *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
 
 ### Linear Mixed Effect Model
 
@@ -210,9 +210,9 @@ $$
 
 Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
 
-An extension of GLMs, where the linear predictor contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
+An extension of generalised linear models (GLMs), generalised linear mixed models (GLMMs) link the expected value of the response variable to a linear predictor which contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
 
-Given random effects, $\mathbf{u}$ the dependent variable, $\mathbf{y}$, is distributed according to the exponential family, such that $g(E[\mathbf{y}|\mathbf{u}]) = \mathbf{X𝛽} + \mathbf{Zu}$. Some link function, $g(x)$, links the expected value of $\mathbf{y}$ given the random effects to the linear predictor which included both fixed effects and random effects.
+Given random effects, $\mathbf{b}$ the dependent variable, $\mathbf{y}$, is distributed according to the exponential family, such that$g(E[\mathbf{y}_i|\mathbf{b}_i]) = \eta_i =  \mathbf{X}_i\boldsymbol{𝛽} + \mathbf{Z}_i\mathbf{b}_i$. The link function, $g(x)$, links the expected value of $\mathbf{y}$ given the random effects to the linear predictor which included both fixed effects and random effects.
 
 Where:
 
@@ -222,28 +222,28 @@ $\mathbf{\beta}$ = the fixed effects
 
 $\mathbf{Z}$ = the random effects design matrix
 
-$\mathbf{u}$ = the random effects
+$\mathbf{b}$ = the random effects
 
 What do we model as random?
 
 We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
 
-We do not tend to estimate $\mathbf{u}$, but instead assume that $u_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(u) = 0$.
+We do not tend to estimate $\mathbf{u}$, but instead assume that $b_i \sim N(0, \boldsymbol{\Sigma})$, where $\boldsymbol{\Sigma}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(b) = 0$.
 
-For a model with only a random intercept, $\mathbf{G}$ becomes $G = \sigma^2_{intercept}$. If we extend the model to have random slope, we get:
+For a model with only a random intercept, $\boldsymbol{\Sigma}$ becomes $\sigma^2_{intercept}$. If we extend the model to have random slope, we get:
 
 $$
-G =
+\boldsymbol{\Sigma} =
 \begin{bmatrix}
 \sigma^2_{intercept} & \sigma_{intercept, slope} \\
 \sigma_{intercept, slope} & \sigma^2_{slope}
 \end{bmatrix}
 $$
 
-Like all variance-covariance matrices, some elements are redundant since they are repeated. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, means estimating $\frac{p(p + 1)}{2}$ elements instead. Assuming (**?????**) the random effects are independent, the variance-covariance matrix for the random effects becomes diagonal:
+Like all variance-covariance matrices, some elements are redundant since they are repeated. Estimating instead some function of $\boldsymbol{\Sigma}$, where $\boldsymbol{\Sigma} = \sigma(\theta)$, means estimating $\frac{p(p + 1)}{2}$ elements instead. Assuming (**?????**) the random effects are independent, the variance-covariance matrix for the random effects becomes diagonal:
 
 $$
-G =
+\boldsymbol{\Sigma} =
 \begin{bmatrix}
 \sigma^2_{intercept} & 0 \\
 0 & \sigma^2_{slope}
@@ -253,6 +253,16 @@ $$
 ### Assumptions!!
 
 -   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+
+## Parameter Estimation
+
+Maximum Likelihood Estimation (MLE) is a method of estimating the parameters of a model by selecting the parameters which maximised the probability of observing the data (Wackerly et al., 2008, pg 477). Estimating GLMMs using MLE involves integrating the joint likelihood function with respect to $\mathbf{b}$, the random effects (Pinheiro et al., 2006, pg 61). Since the resonse variable follows a non-Gaussian distribution, yet the random effects are assumed to follow a Gaussion distribution, the likelihood has no analytic form, and thus approximation methods must be employed.
+
+$$
+L(\theta) = \int p(y|\mathbf{b},\boldsymbol{\beta})p(\mathbf{b}|\theta) d\mathbf{b}
+$$
+
+There are several packages available in $R$ for estimating GLMM based on different methods of estimation. The $lme4$ and $glmmTMB$ packages use Laplace approximation as a default, whilst the $GLMMadaptive$ package uses the adaptive Gauss-Hermite quadrature (AGHQ) rule for estimation.
 
 ## Proportional Hazard Model
 
@@ -493,6 +503,10 @@ Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Dise
 Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Frontiers in big data*, 5, 812725. <https://doi.org/10.3389/fdata.2022.812725>
 
 Peng. R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
+
+Pinheiro, J.C. and Chao, E.C. (2006). Efficient Laplacian and Adaptive Gaussian Quadrature Algorithms for Multilevel Generalized Linear Mixed Models. *Journal of Computational and Graphical Statistics*, 15(1), pp.58–81. doi:https://doi.org/10.1198/106186006x96962.
+
+Wackerly, D.D., Mendenhall, W. and Scheaffer, R.L. (2008). *Mathematical statistics with applications*. Belmont, Calif.: Brooks-Cole.
 
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
