@@ -364,7 +364,45 @@ The data collected for the joint model-based analyses are also often featured by
 
 According to Peng (2022), convergence can be evaluated by running multiple chains from different starting values. All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar.
 
-Peng (2022) further explains that the Gelman-Rubin statistic R formalizes this idea. As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
+Peng (2022) further explains that the Gelman-Rubin statistic R formalizes this idea. Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
+
+Then calculate the chain mean for each chain,
+
+$$
+\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}
+$$
+
+the overall mean across all chains (the grand mean),
+
+$$
+\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j
+$$
+
+the between-chain variance,
+
+$$
+B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2
+$$
+
+the within-chain variance for each chain,
+
+$$
+s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2
+$$
+
+and finally, the average within-chain variance,
+
+$$
+W = \frac{1}{J} \sum_{j=1}^{J} s_j^2
+$$
+
+Subsequently, the Gelman-Rubin statistic is:
+
+$$
+R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}
+$$
+
+As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
 # Data
 
@@ -454,7 +492,7 @@ Ghahremani M, Wang M, Chen HY, Zetterberg H, Smith E, Ismail Z; Alzheimer's Dise
 
 Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Frontiers in big data*, 5, 812725. <https://doi.org/10.3389/fdata.2022.812725>
 
-Peng. R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4: Monitoring Convergence. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html> \[Last updated 27 may 2022\].
+Peng. R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
 
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
