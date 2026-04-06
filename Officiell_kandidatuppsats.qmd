@@ -408,6 +408,8 @@ As the number of iterations L increases and the between-chain variation B decrea
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
+Inclusion/exclusion criteria
+
 ## ADNI
 
 *Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.*
