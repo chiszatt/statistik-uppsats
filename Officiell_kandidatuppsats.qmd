@@ -112,15 +112,13 @@ apoe <- APOERES
 
 According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, AD continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
 
-The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al. 2013: p. 595).
+The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al. 2013: p. 595).
 
 Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
-According to the National Institude on Aging and the Alzheimer's Association (NIA-AA), there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (pTAU-181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON PTAU-181 here...**
-
 Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112> –\> kanske hitta bättre, mer konkreta källor för infon, men bra info?
 
--   Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in cerebrospinal fluid (CSF) and plasma.
+Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in cerebrospinal fluid (CSF) and plasma. According to the NIA-AA, there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON p-tau181 here...**
 
 -   Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD.
 
@@ -150,7 +148,7 @@ What are our research questions?
 
 1.  How do longitudinal changes in plasma biomarker levels over time relate to the risk of progression to dementia? (Joint modeling)
 
-2.  How do these associations differ between pTau181 and NfL? (Comparison across biomarkers)
+2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 
 3.  How does the precision change for the estimated longitudinal trajectories and survival associations to the inclusion of individuals with different numbers of repeated measurements? (Precision analysis)
 
@@ -166,7 +164,7 @@ Why did we choose this method to answer the research question?
 
 ## Longitudinal Data
 
-Longitudinal data in this analysis is defined as $n$ repeated measurements of pTAU-181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $T_{i, j}$ and $N_{i, j}$ denote the measured concentrations of pTAU-181 and NfL respectively for the $i^{th}$ individual at the $j^{th}$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{T:\text{ } i, j} = E(T_{i, j})$ and $\mu_{N:\text{ } i, j} = E(N_{i, j})$. Considering the data are made up of repeated responses on the same individuals, the assumption of independence between observations is illogical. Clearly, the baseline level of pTAU-181 for an individual is correlated to the measurements on subsequent occasions.
+Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $T_{i, j}$ and $N_{i, j}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at the $j^{th}$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{T:\text{ } i, j} = E(T_{i, j})$ and $\mu_{N:\text{ } i, j} = E(N_{i, j})$. Considering the data are made up of repeated responses on the same individuals, the assumption of independence between observations is illogical. Clearly, the baseline levels of p-tau181 and NfL for an individual are correlated with the measurements on subsequent occasions.
 
 ## Mixed Effects Models
 
@@ -312,7 +310,7 @@ MEN sen skriver han också:
 
 ## Joint Models
 
-### Simple Joint Model 
+### Simple Joint Model
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -356,11 +354,11 @@ Joint-model options:
 
 However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022: p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016: p.?).
 
-### Multivariate Joint Model 
+### Multivariate Joint Model
 
 The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
 
-#### The Gelman-Rubin statistic 
+#### The Gelman-Rubin statistic
 
 According to Peng (2022), convergence can be evaluated by running multiple chains from different starting values. All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar.
 
@@ -368,9 +366,11 @@ Peng (2022) further explains that the Gelman-Rubin statistic R formalizes this i
 
 # Data
 
-The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of pTAU-181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
+The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
 ## ADNI
+
+*Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.*
 
 All protocols allow enrollment for individuals aged 55-90.
 
@@ -397,10 +397,6 @@ Three cohorts: CN, MCI, mild AD
 Introducing the study, it's aims and the type of information gathered.
 
 **IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
-
-Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.
-
-We checked whether there were any individuals with a PTID in the format "381_S_10###" as per the ADNI leadership guidelines, which state that due to serious data quality concerns, data from these observations should not be used in any analysis. (SOURCE?)
 
 ## Introducing variables... biomarkers
 
@@ -661,8 +657,6 @@ merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL)
 hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
-
-## We check for outliers
 
 ```{r}
 # cube-root transformed
