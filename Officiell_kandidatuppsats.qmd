@@ -110,9 +110,15 @@ apoe = APOERES
 
 ## Background
 
-According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, AD continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
+According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
 
 The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al. 2013: p. 595).
+
+In the context of Alzheimer's disease, as well as diseases in general, the term "biomarker" is commonly used. According to the Biomarkers Definitions Working Group, a biomarker can be defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001: p. 91). Similarly, the International Programme on Chemical Safety, which is a a joint venture on chemical safety led by the World Health Organization (WHO) and in coordination with the United Nations and the International Labor Organization, defines it as "any substance, structure, or process that can be measured in the body or its products and influence or predict the incidence of outcome or disease" (WHO International Programme on Chemical Safety, 2001: p. 1).
+
+Concerning Alzheimer's disease, WHO also published a PPC called "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease", in which they emphasize the fact that scientific evidence on the use of blood-based biomarkers to support the diagnosis of AD has shown promising advances in recent years.
+
+<https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
 Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
@@ -486,6 +492,8 @@ What we conclude based on our findings.
 
 Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures. Statistics in medicine, 35(26), 4813-4823. <https://doi.org/10.1002/sim.7027>
 
+Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework. *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
+
 Cano, A., Capdevila, M., Puerta, R., Arranz, J., Montrreal, L., de Rojas, I., García-González, P., Olivé, C., García-Gutiérrez, F., Sotolongo-Grau, O., Orellana, A., Aguilera, N., Ramis, M., Rosende-Roca, M., Lleó, A., Fortea, J., Tartari, J. P., Lafuente, A., Vargas, L., Pérez-Cordón, A., … Ruiz, A. (2024). Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic. *EBioMedicine*, 108, 105345. <https://doi.org/10.1016/j.ebiom.2024.105345>
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
@@ -509,6 +517,8 @@ World Health Organization (2025). *Dementia*. URL: [https://www.who.int/news-roo
 Xu, Lan, "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data" (2021). *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>
 
 Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
+
+# Appendix
 
 # Pre-processing
 
