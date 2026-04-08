@@ -36,7 +36,7 @@ demographics = PTDEMOG
 
 # read data Milou
 library(readr)
-plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
+plasma_data_NEW <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
 
 # # We load diagnosis data
 # load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
@@ -514,7 +514,7 @@ wide_data = merged_data %>%
   select(RID, VISCODE2_plasma, AB42_AB40_F, pT217_AB42_F) %>%
   pivot_wider(names_from = VISCODE2_plasma,
               values_from = c(AB42_AB40_F, pT217_AB42_F),
-              values_fn = mean) %>%
+              values_fn = mean)
   
 
 # wide_data = merged_data %>%
@@ -563,5 +563,5 @@ nfl_ptau = merge(blenn, goth, by = c("RID", "VISCODE2"), suffix = c("_NfL", "_pT
 
 nfl_ptau = nfl_ptau[!duplicated(nfl_ptau), ]
 
-length(unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 3))$RID))
+length(unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 2))$RID))
 ```

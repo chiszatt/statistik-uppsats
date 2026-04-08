@@ -43,7 +43,7 @@ ApoE genotype information:
 
 -   Genotype information is recorded in the notation $n/m$, where $n\le m$, indicating the presence of one $\epsilon n$ allele and one $\epsilon m$ allele
 
--    ApoE $\epsilon 4$ homozyotes are recorded as $4/4$
+-   ApoE $\epsilon 4$ homozyotes are recorded as $4/4$
 
 -   Presence of $\epsilon 4$ alleles cause a "significant dose-dependent risk factors for putative sporadic disease" (Wong et al., 2012), whilst the presence of $\epsilon 2$ shows a lower risk.
 
@@ -67,7 +67,7 @@ apoe = apoe %>% mutate(
     GENOTYPE == "2/2" ~ "e2 homozygote"
   ))
 ) %>%
-  select(RID, GENOTYPE, genotype)
+  select(RID, genotype)
 ```
 
 ```{r}
@@ -324,6 +324,12 @@ AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fi
 ## Baseline date, survival data
 
 ```{r}
+
+# merging the demographic data with the biomarker data
+merged_data <- merged_data %>% merge(demographics_small, by = "RID")
+```
+
+```{r}
 # creating a baseline date variable
 merged_data <- merged_data %>%
   group_by(RID) %>%
@@ -334,7 +340,7 @@ merged_data <- merged_data %>%
 surv_data <- merged_data %>%
 group_by(RID) %>%
 summarise(
-    age_at_baseline = age_at_visit[which.min(EXAMDATE_ptau)],
+    age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY,
 
     time_to_event = case_when(
 
@@ -354,11 +360,13 @@ summarise(
 # 
 # # We check the number of events 
 # table(surv_data$event)
-# 
-# # adding PTGENDER to the survival data
-# ptgender = merged_data %>% select(RID, PTGENDER)
-# surv_data = surv_data %>% merge(ptgender, by = "RID") 
-# surv_data = surv_data[!duplicated(surv_data$RID), ]
+```
+
+```{r}
+# adding PTGENDER to the survival data
+ptgender = merged_data %>% select(RID, PTGENDER)
+surv_data = surv_data %>% merge(ptgender, by = "RID")
+surv_data = surv_data[!duplicated(surv_data$RID), ]
 ```
 
 ## We create a time variable (time from baseline)
@@ -486,4 +494,10 @@ wide_nfl = nfl_data %>%
   pivot_wider(names_from = EXAMDATE,
               values_from = c(PLASMA_NFL))
 
+```
+
+```{r}
+microRNA = read.csv("UOTAGO_PLA_miRNA_06Apr2026.csv")
+
+microRNA = microRNA %>% group_by(RID) %>% arrange(as.Date(EXAMDATE, "%Y-%m-%d"))
 ```

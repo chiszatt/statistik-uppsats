@@ -75,29 +75,25 @@ library(survival)
 ```{r}
 # load data sets: Charley
 # loading adni library
-#library(ADNIMERGE2)
+library(ADNIMERGE2)
 
 # biomarker data set
-#plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
+plasma_data = UPENN_PLASMA_FUJIREBIO_QUANTERIX
 
 # PET scan data
-#amyloid_data = UCBERKELEY_AMY_6MM
+amyloid_data = UCBERKELEY_AMY_6MM
 
 # dx data
-#diagnosis_data = DXSUM
+diagnosis_data = DXSUM
 
 # APOE GENOTYPING
-#apoe_data = APOERES
+apoe = APOERES
 
 # deprivation index
-#deprivation = ADI
+deprivation = ADI
 
 # demographics
-#demographics = PTDEMOG
-#demog2 = DM %>% rename(RID = SUBJID) %>% mutate(RID = as.numeric(RID))
-
-#demographics = demog1 %>%
-  #inner_join(demog2, by = c("RID"))
+demographics = PTDEMOG
 
 
 
@@ -657,20 +653,20 @@ summary(surv_model)
 ## 4.5 Testing for the assumption of proportional hazards
 
 ```{r}
-cox.zph(surv_model)
+# cox.zph(surv_model)
 ```
 
 # 5. Joint-model
 
 ```{r}
 # Joint model 
-joint_model <- jm(
-  surv_model,
-  long_model,
-  time_var = "time_years"
-  )
-
-summary(joint_model)
+# joint_model <- jm(
+#   surv_model,
+#   long_model,
+#   time_var = "time_years"
+#   )
+# 
+# summary(joint_model)
 ```
 
 ```{r}

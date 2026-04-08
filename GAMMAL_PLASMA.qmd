@@ -478,7 +478,7 @@ Gender is not significant, so we remove it:
 # Cox survival-model, without gender 
 surv_model <- coxph(
   surv_object ~ age_at_baseline + APOE4_status,
-  data <- surv_data
+  data = surv_data
 )
 
 summary(surv_model)
