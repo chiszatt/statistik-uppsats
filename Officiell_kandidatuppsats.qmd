@@ -77,21 +77,21 @@ library(DHARMa) # for running residual diagnostics on GLMM
 
 ```{r}
 # Loading data
-# Milou
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-# nfl_data <- BLENNOWPLASMANFLLONG
+#Milou
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
 # #
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-# ptau_data <- UGOTPTAU181
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
 # #
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
 # #
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 # #
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe <- APOERES
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
 ```
 
 ```{r}
@@ -180,7 +180,7 @@ Sensitivity → how do the estimates of the the joint model parameters change wh
 
 Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
 
-# Method
+# Methodology
 
 How will we accomplish this? –\> Introduce the methods we will use.
 
@@ -377,6 +377,8 @@ However, as the joint model includes a linear mixed-effects model with the norma
 ### Multivariate Joint Model
 
 The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
+
+### Joint latent process model
 
 #### The Gelman-Rubin statistic
 
@@ -580,9 +582,9 @@ ptau_double <- ptau_data %>%
   select(RID, EXAMDATE)
 
 # extracting the doubled observations
-# ptau_data %>%
-#   filter(RID %in% ptau_double$RID) %>% 
-#   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+ptau_data %>%
+   filter(RID %in% ptau_double$RID) %>% 
+   filter(EXAMDATE %in% ptau_double$EXAMDATE)
 
 # removing the doubled observations
 ptau_data <- ptau_data %>%
@@ -615,17 +617,21 @@ diagnosis_data <- diagnosis_data %>%
 diagnosis_data_dx <- diagnosis_data %>%
   rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
 
-# We merge NFL, ptau och diagnosis
-merged_data <- nfl_data %>%
+# We merge NFL and ptau for longitudinal data by RID and viscode 
+long_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+
+# We merge NFL and ptau for survival data only by RID 
+surv_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
-  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+  left_join(diagnosis_data_dx, by = c("RID"))
 ```
 
 ## We check the correlation between the biomarkers
 
 ```{r}
 # Correlation between the biomarkers 
-cor(merged_data$PLASMAPTAU181, merged_data$PLASMA_NFL, use = "complete.obs")
+cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
 ```
 
 ## We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
@@ -636,26 +642,31 @@ demographics_small <- demographics %>%
   select(RID, PTDOBYY, PTGENDER) %>%
   distinct(RID, .keep_all = TRUE)
 
-# We merge with merged_data
-merged_data <- merged_data %>%
-  left_join(demographics_small, by = "RID")
-
-# We make sure that gender is a factor 
-merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
-
 # We create a variable for apoe4 status
 apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
 
-# We merge apoe with merged_data 
-merged_data <- merge(merged_data, apoe[, c("RID", "APOE4_status")], by="RID")
+# We merge gender with merged_data and surv_data
+long_data <- long_data %>%
+  left_join(demographics_small, by = "RID")
+surv_data <- surv_data %>%
+  left_join(demographics_small, by = "RID")
+
+# We make sure that gender is a factor 
+long_data$PTGENDER <- as.factor(long_data$PTGENDER)
+surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
+
+# We merge apoe with merged_data and surv_data
+long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
+surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
 ```
 
 ## We filter participants with at least 3 measurements
 
 ```{r}
-# We filter individuals with at least 3 measurements
+# We filter individuals with at least 3 measurements of ptau_data
 keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-merged_data <- merged_data %>% filter(RID %in% keep)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
@@ -678,35 +689,28 @@ ungroup()
 ```
 
 ```{r}
-# We create a baseline-date
-# merged_data <- merged_data %>%
-#   group_by(RID) %>%
-#   mutate(baseline_date = min(EXAMDATE_ptau)) %>%
-#   ungroup()
-
-# We create event and time_to_event (where dementia is the event) and add age och gender 
-surv_data <- merged_data %>%
-group_by(RID) %>%
-  summarise(
-    age_at_baseline = as.numeric(min(baseline_date), "%Y") - min(PTDOBYY),
-    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
-    APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
-    
+surv_data <- surv_data %>%
+  group_by(RID) %>%
+  
+  # We create baseline date per patient
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  
+  # We calculate event and time_to_event based on all diagnosis data
+  mutate(
+    event = as.integer(any(DIAGNOSIS_dx == "Dementia")),  # 1 if patient ever developed dementia
     time_to_event = case_when(
-
-    any(DIAGNOSIS_dx == "Dementia") ~
-      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
-                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
-
-    TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
-                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
-
-  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
-) %>% ungroup()
-
-# We put the survival data back into the merged_data
-merged_data <- merged_data %>%
-  left_join(surv_data, by = "RID")
+      event == 1 ~ as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) - baseline_date)/365,
+      TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) - baseline_date)/365
+    ),
+    # We calculate age at baseline
+    age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY
+  ) %>%
+  
+  # We keep only one baseline row per patient
+  slice_min(order_by = EXAMDATE_ptau, n = 1, with_ties = FALSE) %>%
+    
+  # We remove grouping
+  ungroup()
 
 # We check the number of events 
 table(surv_data$event)
@@ -716,7 +720,9 @@ table(surv_data$event)
 
 ```{r}
 # We create time_years (time from baseline)
-merged_data <- merged_data %>%
+long_data <- long_data %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - min(EXAMDATE_ptau)) / 365.25)
+surv_data <- surv_data %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
@@ -724,30 +730,30 @@ merged_data <- merged_data %>%
 
 ```{r}
 # We check the distribution of each biomarker
-hist(merged_data$PLASMAPTAU181, main="PLASMAPTAU181")
-hist(merged_data$PLASMA_NFL, main="PLASMA_NFL")
+hist(long_data$PLASMAPTAU181, main="PLASMAPTAU181")
+hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
 ```
 
 ```{r}
 # We log transform the biomarkers 
-merged_data$log_PLASMAPTAU181 <- log(merged_data$PLASMAPTAU181)
-merged_data$log_PLASMA_NFL <- log(merged_data$PLASMA_NFL)
+long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
+long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
 ```
 
 ```{r}
 # We re-check the distribution of each biomarker  
-hist(merged_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
-hist(merged_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
+hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
 ```{r}
 # cube-root transformed
-ggplot(merged_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
+ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
   geom_histogram(binwidth = 0.1, colour = "white") +
   theme_classic()
 
 # cube-root transformed
-ggplot(merged_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
+ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
   geom_histogram(binwidth = 0.1, colour = "white") +
   theme_classic()
 ```
@@ -759,18 +765,18 @@ We still keep them, as we assume they are correct observations.
 -   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
 
 ```{r}
-merged_data$ptau_z <- scale(merged_data$PLASMAPTAU181)
+long_data$ptau_z <- scale(long_data$PLASMAPTAU181)
 
-merged_data$nfl_z <- scale(merged_data$PLASMA_NFL)
+long_data$nfl_z <- scale(long_data$PLASMA_NFL)
 
 # We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
-large_outliers_ptau <- merged_data[merged_data$ptau_z > 3, ]
-small_outliers_ptau <- merged_data[merged_data$ptau_z < -3, ]
+large_outliers_ptau <- long_data[long_data$ptau_z > 3, ]
+small_outliers_ptau <- long_data[long_data$ptau_z < -3, ]
 large_outliers_ptau
 small_outliers_ptau
 
-large_outliers_nfl <- merged_data[merged_data$nfl_z > 3, ]
-small_outliers_nfl <- merged_data[merged_data$nfl_z < -3, ]
+large_outliers_nfl <- long_data[long_data$nfl_z > 3, ]
+small_outliers_nfl <- long_data[long_data$nfl_z < -3, ]
 large_outliers_nfl
 small_outliers_nfl
 ```
@@ -779,7 +785,7 @@ small_outliers_nfl
 
 ```{r}
 # We count missing values per column in merged_data
-sapply(merged_data, function(x) sum(is.na(x)))
+sapply(long_data, function(x) sum(is.na(x)))
 
 # We count missing values per column in surv_data
 sapply(surv_data, function(x) sum(is.na(x)))
@@ -787,11 +793,11 @@ sapply(surv_data, function(x) sum(is.na(x)))
 
 ```{r}
 # We remove missing values 
-merged_data <- na.omit(merged_data)
+merged_data <- na.omit(long_data)
 surv_data <- na.omit(surv_data)
 
 # We re-count missing values
-sapply(merged_data, function(x) sum(is.na(x)))
+sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
@@ -799,8 +805,15 @@ sapply(surv_data, function(x) sum(is.na(x)))
 
 ```{r}
 # We check the length of each dataset 
-length(unique(merged_data$RID)) # longitudinal data
+length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
+```
+
+```{r}
+joint_data <- long_data %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+
+length(unique(joint_data$RID)) # survival data
 ```
 
 # Longitudinal modelFitted LME model for p-tau181
