@@ -424,6 +424,53 @@ $$
 
 As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
+### Latent Class Joint Models
+
+-   Useful for modelling the relationship between longitudinal data and survival data when the population is thought to be heterogeneous
+
+-   Disease trajectories assumed to differ between these different sub-groups
+
+-   Not often implemented in research, as it can be difficult
+
+-   Composed of 3 models: multinomial logistic submodel (latent class model), the linear mixed submodel (biomarker trajectory), and the survival submodel
+
+-   Assume that the study population, $N$, is made up of $G$ homogenous, unobservable classes
+
+-   $c_i$ is the class that individual $i, i = (1, ... , N)$ belongs to, where the multinomial logistic submodel models the probabilities for each individual of belonging to latent class $g$, given the predefined variables $X_{1,i}$. HOWEVER: no prior assumptions about the latent classes, no covariates included in the model
+
+$$
+\pi_{i, g} = P(c_i = g | X_{1,i})
+$$
+
+-   The linear submodel now becomes unique to each latent class
+
+-   The survival submodel is defined for all latent classes
+
+-   Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
+
+Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, pg 122).
+
+-   Correlations between observations (biomarker measurements) are modelled by the random effects, $b_i$, in the longitudinal model
+
+-   The relationship between the biomarker trajectory and the time-to-diagnosis is described by the latent class indicator, $c_i$
+
+-   THESE ARE THE CONDITIONAL INDEPENDENCE ASSUMPTIONS
+
+According to Rizopoulos, the multinomial logistic regression models the latent classes, such that:
+
+$$
+Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
+\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}
+$$
+
+If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, 2025). This then simplifies the model to:
+
+$$
+Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
+$$
+
+An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
+
 # Data
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
@@ -524,7 +571,7 @@ Charalambous, C., Pan, J., Shen, J., & Wang, C. (2024). "Modeling biomarker vari
 
 Chen, S. D., Dong, Q., Guo, Y., Huang, Y. Y., Shen, X. N., Tan, L. & Yu, J. T. (2021). "Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer’s disease". *Translational Psychiatry*, 11(1), 356. DOI: <https://doi.org/10.1038/s41398-021-01476-7>.
 
-**Chen, H.Y., Ghahremani, M., Ismail, Z., Smith, E., Wang, M. & Zetterberg, H. (2023). Alzheimer's Disease Neuroimaging Initiative\*. "Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease". *Neurology*, 100(7), e683-e693. doi: 10.1212/WNL.0000000000201517**
+Ghahremani, M., Wang, M., Chen, H.-Y., Zetterberg, H., Smith, E. and Ismail, Z. (2022). Plasma P-Tau181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*, p.10.1212. DOI: [10.1212/WNL.0000000000201517](https://doi.org/10.1212/WNL.0000000000201517)
 
 Cui, Q., Guo, G., Han, H., Li, Z., Ma, Y., Meng, W., Shi, F., Song, W., Wang, A., Wang, S., Wang, Y., Yang, X. & Zhang, Z. (2026). "Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study". *Sci Rep*. DOI: <https://doi.org/10.1038/s41598-026-44192-2>.
 
@@ -533,6 +580,8 @@ Fang, Y., Li, X., Lian, S., Long, X. & Yuan, M. (2024). "Blood biomarkers in dyn
 Grambsch, P.M & Therneau, T.M. (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. DOI: <https://doi.org/10.1007/978-1-4757-3294-8>.
 
 Huang, Y., Chen, J., Tang, N. S. & Xu, L. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5, 812725. DOI: <https://doi.org/10.3389/fdata.2022.812725>.
+
+Kyheng M, Babykina G, Duhamel A. Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research. Stat Med. 2025 Apr;44(8-9):e70047. doi: [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.
 
 Peng. R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
 
@@ -544,7 +593,7 @@ Strawderman, R. L. & Wolfe, R. A. (1996). "Logical and statistical fallacies in 
 
 World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
 
--    (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>.
+-   (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>.
 
 Xu, Lan, "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data" (2021). *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>.
 
