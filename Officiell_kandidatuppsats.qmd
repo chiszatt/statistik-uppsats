@@ -742,24 +742,21 @@ merged_data <- long_data %>%
 surv_data <- surv_data %>%
   group_by(RID) %>%
   
-  # We create baseline date per participant
-  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
-  
-  # We calculate event and time_to_event based on all diagnosis data
+  # We calculate baseline_date, event, and time_to_event per individual
   mutate(
-    event = as.integer(any(DIAGNOSIS_dx == "Dementia")),  # 1 if patient ever developed dementia
+    baseline_date = min(EXAMDATE_ptau),
+    event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
     time_to_event = case_when(
-      event == 1 ~ as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) - baseline_date)/365,
-      TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) - baseline_date)/365
-    ),
-    # We calculate age at baseline
-    age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY
+      event == 1 ~ as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) - baseline_date) / 365,
+      TRUE ~ as.numeric(max(EXAMDATE_ptau) - baseline_date) / 365
+    )
   ) %>%
   
-  # We keep only one baseline row per patient
-  slice_min(order_by = EXAMDATE_ptau, n = 1, with_ties = FALSE) %>%
-    
-  # We remove grouping
+  # We keep only one row per individual even if multiple rows have the same baseline date
+  filter(EXAMDATE_ptau == baseline_date) %>%
+  slice_head(n = 1) %>%
+  
+  # We ungroup the data
   ungroup()
 
 # We check the number of events 
@@ -777,9 +774,6 @@ long_data <- long_data %>%
     time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25
   ) %>%
   ungroup()
-
-surv_data <- surv_data %>%
-  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
 ## We check the distribution of each relevant variable for multivariate joint model and transform
