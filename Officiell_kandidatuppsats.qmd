@@ -96,16 +96,16 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-# library(ADNIMERGE2)
-# nfl_data = BLENNOWPLASMANFLLONG
-# 
-# ptau_data = UGOTPTAU181
-# 
-# diagnosis_data = DXSUM
-# 
-# demographics = PTDEMOG
-# 
-# apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+
+ptau_data = UGOTPTAU181
+
+diagnosis_data = DXSUM
+
+demographics = PTDEMOG
+
+apoe = APOERES
 ```
 
 # Introduction
@@ -676,6 +676,26 @@ surv_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID"))
 ```
 
+## We check for missing values in both merged_data and long_data
+
+```{r}
+# We count missing values per column in merged_data
+sapply(long_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# We remove missing values 
+long_data <- na.omit(long_data)
+surv_data <- na.omit(surv_data)
+
+# We re-count missing values
+sapply(long_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
 ## We check the correlation between the biomarkers
 
 ```{r}
@@ -725,13 +745,13 @@ length(keep)
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
-common = which(merged_data$EXAMDATE_nfl %in% merged_data$EXAMDATE_ptau)
+common = which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 
-# checking the observations with different exam dates
-merged_data[-common, ]
+# checking the observations with different exam dates (9 obs)
+long_data[-common, ]
 
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-merged_data <- merged_data %>%
+long_data <- long_data %>%
 group_by(RID) %>%
 mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
 ungroup()
@@ -741,8 +761,8 @@ ungroup()
 surv_data <- surv_data %>%
   group_by(RID) %>%
   
-  # We create baseline date per patient
-  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  # We create baseline date per patient (whichever EXAMDATE comes first, nfl or ptau)
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   
   # We calculate event and time_to_event based on all diagnosis data
   mutate(
@@ -770,7 +790,7 @@ table(surv_data$event)
 ```{r}
 # We create time_years (time from baseline)
 long_data <- long_data %>%
-  mutate(time_years = as.numeric(EXAMDATE_ptau - min(EXAMDATE_ptau)) / 365.25)
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 surv_data <- surv_data %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
@@ -830,32 +850,17 @@ large_outliers_nfl
 small_outliers_nfl
 ```
 
-## We check for missing values in both merged_data and long_data
-
-```{r}
-# We count missing values per column in merged_data
-sapply(long_data, function(x) sum(is.na(x)))
-
-# We count missing values per column in surv_data
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
-```{r}
-# We remove missing values 
-merged_data <- na.omit(long_data)
-surv_data <- na.omit(surv_data)
-
-# We re-count missing values
-sapply(long_data, function(x) sum(is.na(x)))
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
 ## We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
 # We check the length of each dataset 
 length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
+```
+
+```{r}
+# observations which are not in surv_data that 
+long_data[ which(!(unique(long_data$RID) %in% unique(surv_data$RID))), ]
 ```
 
 ```{r}
@@ -1151,31 +1156,31 @@ cox.zph(surv_model)
 
 ```{r}
 # Joint model 
-joint_model <- jm(
-  surv_model,
-  long_model_ptau,
-  time_var = "time_years",
-  n_chains = 3L, 
-  n_iter = 11000L, 
-  n_burnin = 1000L
-  )
-summary(joint_model)
+# joint_model <- jm(
+#   surv_model,
+#   long_model_ptau,
+#   time_var = "time_years",
+#   n_chains = 3L, 
+#   n_iter = 11000L, 
+#   n_burnin = 1000L
+#   )
+# summary(joint_model)
 ```
 
 ## Fitted joint model for NFL
 
 ```{r}
 # Joint model 
-joint_model_nfl <- jm(
-  surv_model,
-  long_model_nfl,
-  time_var = "time_years",
-  n_chains = 3L, 
-  n_iter = 11000L, 
-  n_burnin = 1000L
-  )
-
-summary(joint_model_nfl)
+# joint_model_nfl <- jm(
+#   surv_model,
+#   long_model_nfl,
+#   time_var = "time_years",
+#   n_chains = 3L, 
+#   n_iter = 11000L, 
+#   n_burnin = 1000L
+#   )
+# 
+# summary(joint_model_nfl)
 ```
 
 # Multivariate joint model
@@ -1208,17 +1213,17 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-multi_joint_model <- jm(surv_model, Mixed,
-                  time_var = "time_years",
-                  functional_forms = fForms,
-                  n_chains = 3L,    
-                  n_iter = 20000L,
-                  n_burnin = 2000L
-                  )
-summary(multi_joint_model)
+# multi_joint_model <- jm(surv_model, Mixed,
+#                   time_var = "time_years",
+#                   functional_forms = fForms,
+#                   n_chains = 3L,    
+#                   n_iter = 20000L,
+#                   n_burnin = 2000L
+#                   )
+# summary(multi_joint_model)
 ```
 
 ```{r}
-summary <- summary(multi_joint_model)
-summary$Survival
+# summary <- summary(multi_joint_model)
+# summary$Survival
 ```
