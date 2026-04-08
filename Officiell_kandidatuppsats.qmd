@@ -112,17 +112,19 @@ library(DHARMa) # for running residual diagnostics on GLMM
 
 ## Background
 
+*General background information. Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.*
+
 According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025).
 
 The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013: p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al. 2013: p. 595).
 
-In the context of Alzheimer's disease, as well as diseases in general, the term "biomarker" is commonly used. According to the Biomarkers Definitions Working Group, a biomarker can be defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001: p. 91). Similarly, the International Programme on Chemical Safety, which is a a joint venture on chemical safety led by the World Health Organization (WHO) and in coordination with the United Nations and the International Labor Organization, defines it as "any substance, structure, or process that can be measured in the body or its products and influence or predict the incidence of outcome or disease" (2001: p. 1).
+In the context of Alzheimer's disease, as well as diseases in general, the term "biomarker" is commonly used. According to the *Biomarkers Definitions Working Group*, a biomarker can be defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001: p. 91). Similarly, the *International Programme on Chemical Safety*, which is a a joint venture on chemical safety led by the *World Health Organization* (WHO) and in coordination with the *United Nations* and the *International Labor Organization*, defines it as "any substance, structure, or process that can be measured in the body or its products and influence or predict the incidence of outcome or disease" (2001: p. 1).
 
-When it comes to Alzheimer’s disease, WHO published in 2024 a report highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (2024: p.
+When it comes to Alzheimer’s disease, the detection of AD pathophysiology was historically done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
+
+WHO published in 2024 a report highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis. Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7).
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
-
-Historically, the detection of AD pathophysiology was done by positron emission topography (PET) to detect the presence of amyloid plaques in the brain, or by analysis of cerbrospinal fluid (CSF) to quantify the concentration of biological molecules implicated in AD pathology. Recent advances in research have made it possible to replace these invasive procedures with blood tests.
 
 Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112> –\> kanske hitta bättre, mer konkreta källor för infon, men bra info?
 
@@ -134,7 +136,7 @@ Neurofilament light chain (NfL) is instead a marker of neuronal injury not speci
 
 The abnormal concentrations of these biomarkers are the result of the neuropathological changes symptomatic of AD.
 
-*General background information. Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.*
+These two biomarkers, along with various other biomarkers and clinical measures related to Alzheimer’s disease, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. The current phase, ADNI4, began in 2022 and is expected to be completed in 2027. Its main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of Alzheimer’s disease (ADNI, n.d.)
 
 ## Research Context
 
@@ -142,11 +144,15 @@ The abnormal concentrations of these biomarkers are the result of the neuropatho
 
 Recent research has applied a range of prognostic models, from traditional to advanced, to estimate disease progression and related adverse outcomes in Alzheimer’s disease. For instance, one article from 2024 investigated the predictive value of plasma p-tau181 for conversion from mild cognitive impairment (MCI) to Alzheimer’s disease dementia using Cox proportional hazards models (Aguilera, 2024: p. 1): the most widely used procedure for modeling survival outcomes and other censored data in relation to covariates (Grambsch & Therneau, 2000: p. 39). The study found that higher baseline plasma p-tau181 levels were associated with a significantly increased risk of progression, with a hazard ratio of around 1.84, compared with lower levels, even after adjusting for age, sex, and APOE genotype (Aguilera, 2024: p. 1).
 
-Another article from the same year further extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Fang et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). The study found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Fang et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Fang et al., 2024: p. 1, 3). Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia, particularly when considering the added value of longitudinal biomarker information.
+Another article from the same year further extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Fang et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). In fact, several studies have examined these biomarkers using only a longitudinal model (Andreasson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Fang et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Fang et al., 2024: p. 1, 3).
 
-Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Cui et al., 2026). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), only participants with recorded height and weight and at least three biomarker measurements were included (Xu, 2021: p. 9). Another study on AIDS reports that “there are 1,598 subjects with more than three measurements on HIV viral load and CD4 cell counts” (Lu, 2017: p. 2407).
+Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia, particularly when considering the added value of longitudinal biomarker information.
+
+Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Cui et al., 2026). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021: p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker. This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Charalambous et al., 2024: p. 591-592).
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
+
+Inför en källa som säger att individerna borde ha 3 eller fler mätningar
 
 **Behövs källa** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
 
@@ -174,13 +180,21 @@ Sensitivity → how do the estimates of the the joint model parameters change wh
 
 Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
 
-How will we accomplish this?
+# Method
 
-# Statistical Theory and Methods
+How will we accomplish this? –\> Introduce the methods we will use.
 
-Introduce the methods we will use.
+Why did we choose this method to answer the research question? Why not other methods, such as cox models with time-dependent covariates - just den anses inte som lämplig för vår data, bara lämpligt för viss typ av data. Dessutom har vi begränsad tid och utrymme, så om vi hade valt fler modeller hade vi inte kunnat utforska respektive en lika mycket på djupet, vi valde de vi ansåg som viktigast och som skiljer sig mest från varandra, för att verkligen kunna se bredden/variationen av modeller som finns.
 
-Why did we choose this method to answer the research question?
+Why did we only choose to look at p-tau181 and NfL and not other biomarkers? - För att vi har begränsad tid och begränsat utrymme att skriva på, och två är tillräckligt för att vi ska kunna jämföra mellan biomarkörer. Om vi hade valt fler hade vi inte kunnat utforska vardera biomarkör på djupet lika mycket. Dessa två dataset hade även väldigt många individer med samma RID, så det var väldigt lämpligt. Många individer med många mätningar i båda dataseten.
+
+Varför inte mer aktuell data? För det inte finns tillräckligt många individer med 3 eller fler mätningar i aktuella än, skulle ha gett för litet stickprovsstorlek om vi valde det och därmed stor osäkerhet i skattningarna.
+
+Varför just ADNI data? Inte lika relevant för oss som är i Sverige. - För det är den enda data som vi fick tillgång tid på så kort tid, vi hade tidsbegränsning, och i Sverige är det svårt generellt att få tillgång på individ-hälsodata på grund av regler.
+
+# Statistical theory
+
+Describe the statistical theories behind the chosen methods
 
 ## Longitudinal Data
 
@@ -312,7 +326,7 @@ $$
 H^{(CA)}_t(X_i) = \frac{\sum_{j=0}^{m_i} I(t_{ij} < t) X_i(t_{ij})}{\sum_{j=0}^{m_i} I(t_{ij} < t)}
 $$
 
-where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Sweeting et al., 2017, p.4516).
+where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Barrett et al., 2017, p.4516).
 
 ## Joint Models
 
@@ -490,39 +504,47 @@ What we conclude based on our findings.
 
 # Bibliography
 
-Andrinopoulou, E. R., & Rizopoulos, D. (2016). "Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures". *Statistics in medicine*, 35(26), 4813-4823. <https://doi.org/10.1002/sim.7027>
+Aguilera, N., Alcolea, D., Alegret, M., Arranz, J., Boada, M., Cano, A., Capdevila, M., de Rojas, I., Fernández, V., Fortea, J., García-González, P., García-Gutiérrez, F., Lafuente, A., Lleó, A., Marquié, M., Montrreal, L., Muñoz, N., Olivé, C., … Ruiz, A. (2024). "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic". *EBioMedicine*, 108(1), 105345. DOI: <https://doi.org/10.1016/j.ebiom.2024.105345>.
 
-Barrett, J. K., Sweeting, M. J., Thompson, S. G. & Wood, A. M. (2017). "The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study". *Statistics in medicine*, 36(28), 4514-4528. <https://doi.org/10.1002/sim.7144>
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.). "About ADNI". URL: <https://adni.loni.usc.edu/about/>.
 
-Biomarkers Definitions Working Group. (2001). "Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
+Andreasson, U., Blennow, K., Cullen, N. C., Mattsson, N., & Zetterberg, H. (2019). "Association between longitudinal plasma neurofilament light and neurodegeneration in patients with Alzheimer disease". *JAMA Neurology*, 76(7), 791-799. DOI: <https://doi.org/10.1001/jamaneurol.2019.0765>.
 
-Aguilera, N., Alcolea, D., Alegret, M., Arranz, J., Boada, M., Cano, A., Capdevila, M., de Rojas, I., Fernández, V., Fortea, J., García-González, P., García-Gutiérrez, F., Lafuente, A., Lleó, A., Marquié, M., Montrreal, L., Muñoz, N., Olivé, C., … Ruiz, A. (2024). "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic". *EBioMedicine*, 108(1), 105345. <https://doi.org/10.1016/j.ebiom.2024.105345>
+Andrinopoulou, E. R., & Rizopoulos, D. (2016). "Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures". *Statistics in medicine*, 35(26), 4813-4823. DOI: <https://doi.org/10.1002/sim.7027>.
 
-Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). "Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria". *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
+Barrett, J. K., Sweeting, M. J., Thompson, S. G. & Wood, A. M. (2017). "The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study". *Statistics in medicine*, 36(28), 4514-4528. DOI: <https://doi.org/10.1002/sim.7144>.
+
+Biomarkers Definitions Working Group. (2001). "Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. DOI: <https://doi.org/10.1067/mcp.2001.113989>.
+
+Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). "Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria". *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. DOI: <https://doi.org/10.1016/j.jalz.2013.05.1762>.
+
+Charalambous, C., Pan, J., Shen, J., & Wang, C. (2024). "Modeling biomarker variability in joint analysis of longitudinal and time-to-event data". *Biostatistics*, 25(2), 577-596. DOI: <https://doi.org/10.1093/biostatistics/kxad009>.
+
+Chen, S. D., Dong, Q., Guo, Y., Huang, Y. Y., Shen, X. N., Tan, L. & Yu, J. T. (2021). "Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer’s disease". *Translational Psychiatry*, 11(1), 356. DOI: <https://doi.org/10.1038/s41398-021-01476-7>.
 
 **Chen, H.Y., Ghahremani, M., Ismail, Z., Smith, E., Wang, M. & Zetterberg, H. (2023). Alzheimer's Disease Neuroimaging Initiative\*. "Plasma Phosphorylated Tau at Threonine 181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease". *Neurology*, 100(7), e683-e693. doi: 10.1212/WNL.0000000000201517**
 
-Cui, Q., Guo, G., Han, H., Li, Z., Ma, Y., Meng, W., Shi, F., Song, W., Wang, A., Wang, S., Wang, Y., Yang, X. & Zhang, Z. (2026). "Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study". *Sci Rep*. <https://doi.org/10.1038/s41598-026-44192-2>
+Cui, Q., Guo, G., Han, H., Li, Z., Ma, Y., Meng, W., Shi, F., Song, W., Wang, A., Wang, S., Wang, Y., Yang, X. & Zhang, Z. (2026). "Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study". *Sci Rep*. DOI: <https://doi.org/10.1038/s41598-026-44192-2>.
 
-Grambsch, P.M & Therneau, T.M. (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. <https://doi.org/10.1007/978-1-4757-3294-8>
+Fang, Y., Li, X., Lian, S., Long, X. & Yuan, M. (2024). "Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling". *International journal of geriatric psychiatry*, 39(3), e6079. DOI: <https://doi.org/10.1002/gps.6079>.
 
-Huang, Y., Chen, J., Tang, N. S. & Xu, L. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5, 812725. <https://doi.org/10.3389/fdata.2022.812725>
+Grambsch, P.M & Therneau, T.M. (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. DOI: <https://doi.org/10.1007/978-1-4757-3294-8>.
 
-Lu T. (2017). "Bayesian nonparametric mixed-effects joint model for longitudinal-competing risks data analysis in presence of multiple data features". *Statistical methods in medical research*, 26(5), 2407-2423. <https://doi.org/10.1177/0962280215597939>
+Huang, Y., Chen, J., Tang, N. S. & Xu, L. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5, 812725. DOI: <https://doi.org/10.3389/fdata.2022.812725>.
 
 Peng. R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
 
-Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b12208>
+Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. DOI: <https://doi.org/10.1201/b12208>.
 
-Strawderman, R. L. & Wolfe, R. A. (1996). "Logical and statistical fallacies in the use of Cox regression models". *American journal of kidney diseases : the official journal of the National Kidney Foundation*, 27(1), 124-129. <https://doi.org/10.1016/s0272-6386(96)90039-6>
+Strawderman, R. L. & Wolfe, R. A. (1996). "Logical and statistical fallacies in the use of Cox regression models". *American journal of kidney diseases : the official journal of the National Kidney Foundation*, 27(1), 124-129. DOI: <https://doi.org/10.1016/s0272-6386(96)90039-6>.
 
 **Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.**
 
-World Health Organization (2025). *Dementia*. URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
+World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
 
-Xu, Lan, "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data" (2021). *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>
+-    (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>.
 
-Fang, Y., Li, X., Lian, S., Long, X. & Yuan, M. (2024). "Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling". *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
+Xu, Lan, "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data" (2021). *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>.
 
 # Appendix
 
@@ -781,7 +803,7 @@ length(unique(merged_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-# Longitudinal modelFitted LME model for P-TAU
+# Longitudinal modelFitted LME model for p-tau181
 
 ## Comparing longitudinal models
 
@@ -797,7 +819,7 @@ Suggested models:
 
 -   GLMM with Student-t distribution: longer tails
 
-### pTAU-181
+### p-tau181
 
 ```{r}
 # checking the mean and variance for ptau181
