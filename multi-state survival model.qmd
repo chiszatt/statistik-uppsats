@@ -242,7 +242,7 @@ ms_data <- ms_data %>%
   )
 ```
 
-###  Specifying which transitions are possible
+### Specifying which transitions are possible
 
 -   CN -\> MCI
 
@@ -316,7 +316,7 @@ sojourn.msm(fit_msm)
 # plot(fit_msm, range = c(0, 8.01))
 ```
 
-### Need to fit a coxPH model 
+### Need to fit a coxPH model
 
 ```{r}
 
