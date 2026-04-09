@@ -677,26 +677,6 @@ surv_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID"))
 ```
 
-## We check for missing values in both merged_data and long_data
-
-```{r}
-# We count missing values per column in merged_data
-sapply(long_data, function(x) sum(is.na(x)))
-
-# We count missing values per column in surv_data
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
-```{r}
-# We remove missing values 
-long_data <- na.omit(long_data)
-surv_data <- na.omit(surv_data)
-
-# We re-count missing values
-sapply(long_data, function(x) sum(is.na(x)))
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
 ## We check the correlation between the biomarkers
 
 ```{r}
@@ -728,6 +708,10 @@ surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
 # We merge apoe with merged_data and surv_data
 long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
 surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
+
+# We create age_at_visit 
+long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
+surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
 ```
 
 ## We filter participants with at least 3 measurements
@@ -769,49 +753,66 @@ ungroup()
 ```
 
 ```{r}
+# We calculate baseline for each biomarker per participant
 surv_data <- surv_data %>%
   group_by(RID) %>%
-  
-  # We calculate baseline_date, event, and time_to_event per individual
-  # We create baseline date per patient (whichever EXAMDATE comes first, nfl or ptau)
-  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-  
-  # We calculate event and time_to_event based on all diagnosis data
   mutate(
-    baseline_date = min(EXAMDATE_ptau),
+    # We calculate baseline for pTau using the first non-missing measurement
+    baseline_pTau = ifelse(all(is.na(PLASMAPTAU181)), NA, min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])),
+    
+    # We calculate baseline for NFL using the first non-missing measurement
+    baseline_NFL  = ifelse(all(is.na(PLASMA_NFL)), NA, min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])),
+    
+    # We define a common baseline date as the earliest biomarker measurement
+    baseline_date = pmin(baseline_pTau, baseline_NFL, na.rm = TRUE),
+    
+    # Age at baseline (age at the participant's baseline visit)
+    age_at_baseline = age_at_visit[EXAMDATE_ptau == baseline_date | EXAMDATE_nfl == baseline_date][1],
+    
+    # We indicate whether the participant ever developed dementia
     event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
+    
+    # We calculate time-to-event from the baseline date
     time_to_event = case_when(
-      event == 1 ~ as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) - baseline_date) / 365,
-      TRUE ~ as.numeric(max(EXAMDATE_ptau) - baseline_date) / 365
+      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_date)/365,
+      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_date)/365
     )
+    
   ) %>%
-  
-  # We keep only one row per individual even if multiple rows have the same baseline date
-  filter(EXAMDATE_ptau == baseline_date) %>%
-  slice_head(n = 1) %>%
-  
-  # We ungroup the data
   ungroup()
 
-# We check the number of events 
+# We only keep one baseline row per participant
+surv_data <- surv_data %>%
+  group_by(RID) %>%
+  # We keep rows where either pTau or NFL measurement matches the baseline
+  filter(EXAMDATE_ptau == baseline_date | EXAMDATE_nfl == baseline_date) %>%
+  slice(1) %>%  # We take the first row if multiple rows match
+  ungroup()
+
+# We count how many participants experienced the event
 table(surv_data$event)
+
+# Example
+surv_data %>%
+    filter(RID == 61)
 ```
 
 ## We create a time variable (time from baseline)
 
 ```{r}
-# We create time_years (time from baseline)
 long_data <- long_data %>%
   group_by(RID) %>%
+  # We create baseline for PTau
   mutate(
-    baseline_date = min(EXAMDATE_ptau),
-    time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25
+    baseline_date_ptau = min(EXAMDATE_ptau, na.rm = TRUE),
+    time_years_ptau = as.numeric(EXAMDATE_ptau - baseline_date_ptau) / 365.25
+  ) %>%
+  # We create baseline for NFL
+  mutate(
+    baseline_date_nfl = min(EXAMDATE_nfl, na.rm = TRUE),
+    time_years_nfl = as.numeric(EXAMDATE_nfl - baseline_date_nfl) / 365.25
   ) %>%
   ungroup()
-
-  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
-surv_data <- surv_data %>%
-  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
 ## We check the distribution of each relevant variable for multivariate joint model and transform
@@ -889,7 +890,6 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-=======
 ## We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
@@ -901,13 +901,6 @@ length(unique(surv_data$RID)) # survival data
 ```{r}
 # We find common IDs (RID)
 common_IDs <- intersect(unique(long_data$RID), unique(surv_data$RID))
-# observations which are not in surv_data that 
-long_data[ which(!(unique(long_data$RID) %in% unique(surv_data$RID))), ]
-```
-
-```{r}
-joint_data <- long_data %>%
-  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
 
 # We keep only the common IDs
 long_data <- long_data %>% filter(RID %in% common_IDs)
