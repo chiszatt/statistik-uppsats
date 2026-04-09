@@ -399,7 +399,7 @@ $$
 
 "where we postulate that patients in different latent groups have both different longitudinal evolutions and different risks for an event. The last equation specifies a multinomial submodel for the latent class membership probabilities, with $u_i$ denoting the vector of covariates associated with these probabilities with a corresponding vector of regression coefficients vector $\lambda^\top = (\lambda_1^\top, \ldots, \lambda_G^\top)$, with $\lambda_G = 0$ for identifiability. The random effects $b_{ig} \sim N(\mu_g, \sigma_g^2 D)$ are also assumed to be latent-class specific, though for computational stability, their covariance matrix is typically assumed to depend on $c_i$ only via the scalar variance parameter $\sigma_g^2$." (Rizopoulos, 2012: s. 123)
 
-### Assumptions 
+### Assumptions
 
 "Contrary to the stratified joint model, latent class joint models assume that the subpopulations that constitute the population are latent, in the sense that heterogeneity is not captured by any of the observed covariates. To define latent class joint models, we assume that there are G subpopulations that constitute our original population and we introduce the unobserved class indicator ci = 1, . . . , G that denotes the class membership of the ith subject. These models work under the following set of conditional independence assumptions:"
 
@@ -843,13 +843,23 @@ surv_data <- surv_data %>%
     
     # We calculate time-to-event from each biomarker baseline
     time_to_event_pTau = case_when(
-      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_pTau)/365,
-      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_pTau)/365
-    ),
+  event == 1 ~ as.numeric(
+    min(EXAMDATE_dx[
+      DIAGNOSIS_dx == "Dementia" & EXAMDATE_dx >= baseline_pTau
+    ]) - baseline_pTau
+  ) / 365,
+  
+  TRUE ~ as.numeric(max(EXAMDATE_dx) - baseline_pTau) / 365
+),
     time_to_event_NFL = case_when(
-      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_NFL)/365,
-      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_NFL)/365
-    )
+  event == 1 ~ as.numeric(
+    min(EXAMDATE_dx[
+      DIAGNOSIS_dx == "Dementia" & EXAMDATE_dx >= baseline_NFL
+    ]) - baseline_NFL
+  ) / 365,
+  
+  TRUE ~ as.numeric(max(EXAMDATE_dx) - baseline_NFL) / 365
+)
     
   ) %>%
   ungroup()
@@ -948,6 +958,22 @@ small_outliers_nfl
 # We re-count missing values after pre-processing
 sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# We also check negative values 
+sapply(long_data, function(x) {
+  if (is.numeric(x)) sum(x < 0, na.rm = TRUE) else NA
+})
+
+sapply(surv_data, function(x) {
+  if (is.numeric(x)) sum(x < 0, na.rm = TRUE) else NA
+})
+```
+
+```{r}
+long_data <- long_data %>%
+  filter(PLASMAPTAU181 > 0)
 ```
 
 ```{r}
@@ -1233,7 +1259,7 @@ plot(
 # Cox survival-model, with covariates
 surv_model_ptau <- coxph(
   surv_object_ptau ~ age_at_baseline_pTau + PTGENDER + APOE4_status,
-  data <- surv_data,
+  data = surv_data,
    x = TRUE
 )
 
@@ -1241,7 +1267,7 @@ summary(surv_model_ptau)
 
 surv_model_nfl <- coxph(
   surv_object_nfl ~ age_at_baseline_NFL + PTGENDER + APOE4_status,
-  data <- surv_data, 
+  data = surv_data, 
   x = TRUE
 )
 
@@ -1256,14 +1282,14 @@ Gender is not significant in the survival model, so we remove it:
 # Cox survival-model, without gender 
 surv_model_ptau <- coxph(
   surv_object_ptau ~ age_at_baseline_pTau + APOE4_status,
-  data <- surv_data
+  data = surv_data
 )
 
 summary(surv_model_ptau)
 
 surv_model_nfl <- coxph(
   surv_object_nfl ~ age_at_baseline_NFL + APOE4_status,
-  data <- surv_data
+  data = surv_data
 )
 
 summary(surv_model_nfl)
