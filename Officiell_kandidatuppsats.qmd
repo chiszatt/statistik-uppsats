@@ -786,43 +786,48 @@ surv_data <- surv_data %>%
   group_by(RID) %>%
   mutate(
     # We calculate baseline for pTau using the first non-missing measurement
-    baseline_pTau = ifelse(all(is.na(PLASMAPTAU181)), NA, min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])),
+    baseline_pTau = {
+      if(all(is.na(PLASMAPTAU181))) NA else min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
+    },    
     
     # We calculate baseline for NFL using the first non-missing measurement
-    baseline_NFL  = ifelse(all(is.na(PLASMA_NFL)), NA, min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])),
+    baseline_NFL  = {
+      if(all(is.na(PLASMA_NFL))) NA else min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    },
     
-    # We define a common baseline date as the earliest biomarker measurement
-    baseline_date = pmin(baseline_pTau, baseline_NFL, na.rm = TRUE),
-    
-    # Age at baseline (age at the participant's baseline visit)
-    age_at_baseline = age_at_visit[EXAMDATE_ptau == baseline_date | EXAMDATE_nfl == baseline_date][1],
+    # We record age at baseline for each biomarker
+    age_at_baseline_pTau = age_at_visit[EXAMDATE_ptau == baseline_pTau][1],
+    age_at_baseline_NFL  = age_at_visit[EXAMDATE_nfl == baseline_NFL][1],
     
     # We indicate whether the participant ever developed dementia
     event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
     
-    # We calculate time-to-event from the baseline date
-    time_to_event = case_when(
-      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_date)/365,
-      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_date)/365
+    # We calculate time-to-event from each biomarker baseline
+    time_to_event_pTau = case_when(
+      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_pTau)/365,
+      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_pTau)/365
+    ),
+    time_to_event_NFL = case_when(
+      event == 1 ~ as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - baseline_NFL)/365,
+      TRUE      ~ as.numeric(max(EXAMDATE_dx) - baseline_NFL)/365
     )
     
   ) %>%
   ungroup()
 
-# We only keep one baseline row per participant
+# We only keep one baseline row per participant for pTau or NFL
 surv_data <- surv_data %>%
   group_by(RID) %>%
-  # We keep rows where either pTau or NFL measurement matches the baseline
-  filter(EXAMDATE_ptau == baseline_date | EXAMDATE_nfl == baseline_date) %>%
+  filter(EXAMDATE_ptau == baseline_pTau | EXAMDATE_nfl == baseline_NFL) %>%
   slice(1) %>%  # We take the first row if multiple rows match
   ungroup()
 
 # We count how many participants experienced the event
 table(surv_data$event)
 
-# Example
+# Example: show participant with RID 61
 surv_data %>%
-    filter(RID == 61)
+  filter(RID == 61)
 ```
 
 ## We create a time variable (time from baseline)
@@ -906,19 +911,17 @@ length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-\*\* I think we don't need to do the code below, we can just remove missing values after creating both surv_data and long_data. Doing it this way we have n = 729 for both surv_data and long_data, but if we move removing missing values further up we have n = 768 \*\*
-
 ```{r}
-# # We find common IDs (RID)
-# common_IDs <- intersect(unique(long_data$RID), unique(surv_data$RID))
-# 
-# # We keep only the common IDs
-# long_data <- long_data %>% filter(RID %in% common_IDs)
-# surv_data   <- surv_data %>% filter(RID %in% common_IDs)
-# 
-# # We re-check the length of each dataset 
-# length(unique(long_data$RID))  
-# length(unique(surv_data$RID)) 
+# Slå ihop baseline-datum från long_data och surv_data
+baseline_check <- surv_data %>%
+  select(RID, baseline_date) %>%
+  left_join(
+    long_data %>% group_by(RID) %>% summarise(baseline_long = min(EXAMDATE_ptau, na.rm = TRUE)),
+    by = "RID"
+  )
+
+# Kolla om det finns mismatch
+baseline_check %>% filter(baseline_date != baseline_long)
 ```
 
 # Longitudinal model
@@ -1158,8 +1161,13 @@ qqline(res_nfl, col = "red")
 
 ```{r}
 # We create a Surv object: time and event
-surv_object <- Surv(
-  time = surv_data$time_to_event, 
+surv_object_ptau <- Surv(
+  time = surv_data$time_to_event_pTau, 
+  event = surv_data$event
+)
+
+surv_object_nfl <- Surv(
+  time = surv_data$time_to_event_NFL, 
   event = surv_data$event
 )
 ```
@@ -1168,12 +1176,20 @@ surv_object <- Surv(
 
 ```{r}
 # We fit Kaplan-Meier curve
-km_fit <- survfit(surv_object ~ 1, data = surv_data)
-
+km_fit <- survfit(surv_object_ptau ~ 1, data = surv_data)
 # Plot
 plot(
   km_fit, 
-  xlab = "Days since baseline", 
+  xlab = "Days since p-tau181 baseline", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object_nfl ~ 1, data = surv_data)
+plot(
+  km_fit, 
+  xlab = "Days since NfL baseline", 
   ylab = "Survival probability (no dementia)", 
   main = "Kaplan-Meier Curve for Dementia"
 )
@@ -1183,12 +1199,19 @@ plot(
 
 ```{r}
 # Cox survival-model, with covariates
-surv_model <- coxph(
-  surv_object ~ age_at_baseline + PTGENDER + APOE4_status,
+surv_model_ptau <- coxph(
+  surv_object_ptau ~ age_at_baseline_pTau + PTGENDER + APOE4_status,
   data <- surv_data
 )
 
-summary(surv_model)
+summary(surv_model_ptau)
+
+surv_model_nfl <- coxph(
+  surv_object_nfl ~ age_at_baseline_NFL + PTGENDER + APOE4_status,
+  data <- surv_data
+)
+
+summary(surv_model_nfl)
 ```
 
 ## Removing gender
@@ -1197,12 +1220,19 @@ Gender is not significant in the survival model, so we remove it:
 
 ```{r}
 # Cox survival-model, without gender 
-surv_model <- coxph(
-  surv_object ~ age_at_baseline + APOE4_status,
+surv_model_ptau <- coxph(
+  surv_object_ptau ~ age_at_baseline_pTau + APOE4_status,
   data <- surv_data
 )
 
-summary(surv_model)
+summary(surv_model_ptau)
+
+surv_model_nfl <- coxph(
+  surv_object_nfl ~ age_at_baseline_NFL + APOE4_status,
+  data <- surv_data
+)
+
+summary(surv_model_nfl)
 ```
 
 ## Testing for the assumption of proportional hazards
@@ -1217,14 +1247,14 @@ cox.zph(surv_model)
 
 ```{r}
 # Joint model 
-# joint_model <- jm(
-#   surv_model,
-#   long_model_ptau,
-#   time_var = "time_years",
-#   n_chains = 3L, 
-#   n_iter = 11000L, 
-#   n_burnin = 1000L
-#   )
+joint_model <- jm(
+  surv_model,
+  long_model_ptau,
+  time_var = "time_years_ptau",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
 # summary(joint_model)
 ```
 
