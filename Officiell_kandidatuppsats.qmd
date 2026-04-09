@@ -1260,31 +1260,32 @@ cox.zph(surv_model)
 
 ```{r}
 # Joint model 
-joint_model <- jm(
-  surv_model,
+joint_model_ptau <- jm(
+  surv_model_ptau,
   long_model_ptau,
   time_var = "time_years_ptau",
   n_chains = 3L, 
   n_iter = 11000L, 
   n_burnin = 1000L
   )
-# summary(joint_model)
+
+summary(joint_model_ptau)
 ```
 
 ## Fitted joint model for NFL
 
 ```{r}
 # Joint model 
-# joint_model_nfl <- jm(
-#   surv_model,
-#   long_model_nfl,
-#   time_var = "time_years",
-#   n_chains = 3L, 
-#   n_iter = 11000L, 
-#   n_burnin = 1000L
-#   )
-# 
-# summary(joint_model_nfl)
+joint_model_nfl <- jm(
+  surv_model_nfl,
+  long_model_nfl,
+  time_var = "time_years_nfl",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_nfl)
 ```
 
 # Multivariate joint model
