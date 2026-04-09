@@ -632,9 +632,9 @@ ptau_double <- ptau_data %>%
   select(RID, EXAMDATE)
 
 # extracting the doubled observations
-ptau_data %>%
-   filter(RID %in% ptau_double$RID) %>% 
-   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+# ptau_data %>%
+#    filter(RID %in% ptau_double$RID) %>% 
+#    filter(EXAMDATE %in% ptau_double$EXAMDATE)
 
 # removing the doubled observations
 ptau_data <- ptau_data %>%
@@ -680,11 +680,18 @@ surv_data <- nfl_data %>%
 ## We check for missing values in both merged_data and long_data
 
 ```{r}
-# We count missing values per column in merged_data
+# We count missing values per column in long_data: all these are variables we will use in the model, so we can remove with na.omit()
 sapply(long_data, function(x) sum(is.na(x)))
+```
 
-# We count missing values per column in surv_data
+```{r}
+# We count missing values per column in surv_data: VISCODE2.y will not be used in the model, so we need to see how these observations look
 sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# no rows with missing VISCODE2.y with full data for the model variables, so we can remove all with na.omit()
+surv_data %>% filter(is.na(VISCODE2.y))
 ```
 
 ```{r}
@@ -901,24 +908,15 @@ small_outliers_nfl
 ## We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
+# We re-count missing values after pre-processing
+sapply(long_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
 # We check the length of each dataset 
 length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
-```
-
-\*\* I think we don't need to do the code below, we can just remove missing values after creating both surv_data and long_data. Doing it this way we have n = 729 for both surv_data and long_data, but if we move removing missing values further up we have n = 768 \*\*
-
-```{r}
-# # We find common IDs (RID)
-# common_IDs <- intersect(unique(long_data$RID), unique(surv_data$RID))
-# 
-# # We keep only the common IDs
-# long_data <- long_data %>% filter(RID %in% common_IDs)
-# surv_data   <- surv_data %>% filter(RID %in% common_IDs)
-# 
-# # We re-check the length of each dataset 
-# length(unique(long_data$RID))  
-# length(unique(surv_data$RID)) 
 ```
 
 # Longitudinal model
