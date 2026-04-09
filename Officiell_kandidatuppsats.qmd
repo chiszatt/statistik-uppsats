@@ -143,13 +143,13 @@ These two biomarkers, along with various other biomarkers and clinical measures 
 
 *Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
-Recent research has applied a range of prognostic models, from traditional to advanced, to estimate disease progression and related adverse outcomes in Alzheimer’s disease. For instance, one article from 2024 investigated the predictive value of plasma p-tau181 for conversion from mild cognitive impairment (MCI) to Alzheimer’s disease dementia using Cox proportional hazards models (Aguilera, 2024: p. 1): the most widely used procedure for modeling survival outcomes and other censored data in relation to covariates (Grambsch & Therneau, 2000: p. 39). The study found that higher baseline plasma p-tau181 levels were associated with a significantly increased risk of progression, with a hazard ratio of around 1.84, compared with lower levels, even after adjusting for age, sex, and APOE genotype (Aguilera, 2024: p. 1).
+Recent research has applied a range of prognostic models, from traditional to advanced, to estimate disease progression and related adverse outcomes in Alzheimer’s disease. For instance, one article from 2024 investigated the predictive value of plasma p-tau181 for conversion from mild cognitive impairment (MCI) to Alzheimer’s disease dementia using Cox proportional hazards models (Cano, 2024: p. 1): the most widely used procedure for modeling survival outcomes and other censored data in relation to covariates (Therneau & Grambsch, 2000: p. 39). The study found that higher baseline plasma p-tau181 levels were associated with a significantly increased risk of progression, with a hazard ratio of around 1.84, compared with lower levels, even after adjusting for age, sex, and APOE genotype (Cano, 2024: p. 1).
 
-Another article from the same year further extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Fang et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). In fact, several studies have examined these biomarkers using only a longitudinal model (Andreasson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Fang et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Fang et al., 2024: p. 1, 3).
+Another article from the same year further extended this approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Yuan et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). In fact, several studies have examined these biomarkers using only a longitudinal model (Mattsson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Yuan et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Yuan et al., 2024: p. 1, 3).
 
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia, particularly when considering the added value of longitudinal biomarker information.
 
-Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Cui et al., 2026). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021: p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker. This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Charalambous et al., 2024: p. 591-592).
+Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021: p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker. This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., 2024: p. 591-592).
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
@@ -321,13 +321,13 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ### Cox PH model using time-averaged values of each biomarker
 
-Additionally, the cumulative average observed up through each time could be used as a time-dependent covariate, particularly if that covariate is under study as a cause of mortality (Strawderman & Wolfe,1996: p.128). This average provides an unbiased estimate of the true mean, assuming no underlying trend, bias or heteroskedasticity (Barrett et al., 2017: p.4516). The resulting time-varying predictor, called the cumulative average (CA), is defined as:
+Additionally, the cumulative average observed up through each time could be used as a time-dependent covariate, particularly if that covariate is under study as a cause of mortality (Wolfe & Strawderman,1996: p.128). This average provides an unbiased estimate of the true mean, assuming no underlying trend, bias or heteroskedasticity (Sweeting et al., 2017: p.4516). The resulting time-varying predictor, called the cumulative average (CA), is defined as:
 
 $$
 H^{(CA)}_t(X_i) = \frac{\sum_{j=0}^{m_i} I(t_{ij} < t) X_i(t_{ij})}{\sum_{j=0}^{m_i} I(t_{ij} < t)}
 $$
 
-where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Barrett et al., 2017, p.4516).
+where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Sweeting et al., 2017, p.4516).
 
 ## Joint Models
 
@@ -554,41 +554,39 @@ What we conclude based on our findings.
 
 # Bibliography
 
-Aguilera, N., Alcolea, D., Alegret, M., Arranz, J., Boada, M., Cano, A., Capdevila, M., de Rojas, I., Fernández, V., Fortea, J., García-González, P., García-Gutiérrez, F., Lafuente, A., Lleó, A., Marquié, M., Montrreal, L., Muñoz, N., Olivé, C., … Ruiz, A. (2024). "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic". *EBioMedicine*, 108(1), 105345. DOI: <https://doi.org/10.1016/j.ebiom.2024.105345>.
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.). "About ADNI". URL: <https://adni.loni.usc.edu/about/>
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.). "About ADNI". URL: <https://adni.loni.usc.edu/about/>.
+Andrinopoulou, E. R., & Rizopoulos, D. (2016). "Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures". *Statistics in medicine*, 35(26), 4813-4823. DOI: <https://doi.org/10.1002/sim.7027>
 
-Andreasson, U., Blennow, K., Cullen, N. C., Mattsson, N., & Zetterberg, H. (2019). "Association between longitudinal plasma neurofilament light and neurodegeneration in patients with Alzheimer disease". *JAMA Neurology*, 76(7), 791-799. DOI: <https://doi.org/10.1001/jamaneurol.2019.0765>.
+Biomarkers Definitions Working Group. (2001). "Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. DOI: <https://doi.org/10.1067/mcp.2001.113989>
 
-Andrinopoulou, E. R., & Rizopoulos, D. (2016). "Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures". *Statistics in medicine*, 35(26), 4813-4823. DOI: <https://doi.org/10.1002/sim.7027>.
+Cano, A., Capdevila, M., Puerta, R., Arranz, J., Montrreal, L., de Rojas, I., García-González, P., Olivé, C., García-Gutiérrez, F., Sotolongo-Grau, O., Orellana, A., Aguilera, N., Ramis, M., Rosende-Roca, M., Lleó, A., Fortea, J., Tartari, J. P., Lafuente, A., Vargas, L., Pérez-Cordón, A., … Ruiz, A. (2024). "Clinical value of plasma pTau181 to predict Alzheimer's disease pathology in a large real-world cohort of a memory clinic". *EBioMedicine*, 108, 105345. DOI: <https://doi.org/10.1016/j.ebiom.2024.105345>
 
-Barrett, J. K., Sweeting, M. J., Thompson, S. G. & Wood, A. M. (2017). "The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study". *Statistics in medicine*, 36(28), 4514-4528. DOI: <https://doi.org/10.1002/sim.7144>.
+Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). "Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria". *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. DOI: <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
-Biomarkers Definitions Working Group. (2001). "Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. DOI: <https://doi.org/10.1067/mcp.2001.113989>.
+Chen, S. D., Huang, Y. Y., Shen, X. N., Guo, Y., Tan, L., Dong, Q., Yu, J. T., & Alzheimer’s Disease Neuroimaging Initiative (2021). "Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer's disease". *Translational psychiatry*, 11(1), 356. DOI: <https://doi.org/10.1038/s41398-021-01476-7>
 
-Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). "Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria". *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. DOI: <https://doi.org/10.1016/j.jalz.2013.05.1762>.
+Ghahremani, M., Wang, M., Chen, H.-Y., Zetterberg, H., Smith, E. & Ismail, Z. (2022). "Plasma P-Tau181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease". *Neurology*, p.10.1212. DOI: [10.1212/WNL.0000000000201517](https://doi.org/10.1212/WNL.0000000000201517)
 
-Charalambous, C., Pan, J., Shen, J., & Wang, C. (2024). "Modeling biomarker variability in joint analysis of longitudinal and time-to-event data". *Biostatistics*, 25(2), 577-596. DOI: <https://doi.org/10.1093/biostatistics/kxad009>.
+Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z., Zhang, Z., Meng, W., & Wang, S. (2026). "Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study". *Sci Rep*. DOI: <https://doi.org/10.1038/s41598-026-44192-2>
 
-Chen, S. D., Dong, Q., Guo, Y., Huang, Y. Y., Shen, X. N., Tan, L. & Yu, J. T. (2021). "Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer’s disease". *Translational Psychiatry*, 11(1), 356. DOI: <https://doi.org/10.1038/s41398-021-01476-7>.
+Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5(1), 812725. DOI: <https://doi.org/10.3389/fdata.2022.812725>
 
-Ghahremani, M., Wang, M., Chen, H.-Y., Zetterberg, H., Smith, E. and Ismail, Z. (2022). Plasma P-Tau181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*, p.10.1212. DOI: [10.1212/WNL.0000000000201517](https://doi.org/10.1212/WNL.0000000000201517)
+**Kyheng, M., Babykina, G., & Duhamel, A. (2025). "Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research". *Stat Med*, 44(8-9):e70047. DOI: [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.**
 
-Cui, Q., Guo, G., Han, H., Li, Z., Ma, Y., Meng, W., Shi, F., Song, W., Wang, A., Wang, S., Wang, Y., Yang, X. & Zhang, Z. (2026). "Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study". *Sci Rep*. DOI: <https://doi.org/10.1038/s41598-026-44192-2>.
+Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019). Association Between Longitudinal Plasma Neurofilament Light and Neurodegeneration in Patients With Alzheimer Disease. *JAMA neurology*, 76(7), 791-799. DOI: <https://doi.org/10.1001/jamaneurol.2019.0765>
 
-Fang, Y., Li, X., Lian, S., Long, X. & Yuan, M. (2024). "Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling". *International journal of geriatric psychiatry*, 39(3), e6079. DOI: <https://doi.org/10.1002/gps.6079>.
+Peng, R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
 
-Grambsch, P.M & Therneau, T.M. (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. DOI: <https://doi.org/10.1007/978-1-4757-3294-8>.
+Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. DOI: <https://doi.org/10.1201/b12208>.'
 
-Huang, Y., Chen, J., Tang, N. S. & Xu, L. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5, 812725. DOI: <https://doi.org/10.3389/fdata.2022.812725>.
+Sweeting, M. J., Barrett, J. K., Thompson, S. G., & Wood, A. M. (2017). "The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study". *Statistics in medicine*, 36(28), 4514-4528. <https://doi.org/10.1002/sim.7144>
 
-Kyheng M, Babykina G, Duhamel A. Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research. Stat Med. 2025 Apr;44(8-9):e70047. doi: [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.
+Therneau, T.M. & Grambsch, P.M (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. DOI: <https://doi.org/10.1007/978-1-4757-3294-8>
 
-Peng. R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
+Wang, C., Shen, J., Charalambous, C., & Pan, J. (2024). "Modeling biomarker variability in joint analysis of longitudinal and time-to-event data". *Biostatistics* (Oxford, England), 25(2), 577–596. DOI: <https://doi.org/10.1093/biostatistics/kxad009>
 
-Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. DOI: <https://doi.org/10.1201/b12208>.
-
-Strawderman, R. L. & Wolfe, R. A. (1996). "Logical and statistical fallacies in the use of Cox regression models". *American journal of kidney diseases : the official journal of the National Kidney Foundation*, 27(1), 124-129. DOI: <https://doi.org/10.1016/s0272-6386(96)90039-6>.
+Wolfe, R. A., & Strawderman, R. L. (1996). "Logical and statistical fallacies in the use of Cox regression models". *American journal of kidney diseases : the official journal of the National Kidney Foundation*, 27(1), 124-129. DOI: <https://doi.org/10.1016/s0272-6386(96)90039-6>
 
 **Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.**
 
@@ -596,7 +594,9 @@ World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-roo
 
 -   (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>.
 
-Xu, Lan, "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data" (2021). *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>.
+Xu, L. (2021). "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data". *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>
+
+Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). "Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling". *International journal of geriatric psychiatry*, 39(3), e6079. DOI: <https://doi.org/10.1002/gps.6079>
 
 # Appendix
 
@@ -924,20 +924,7 @@ length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-```{r}
-# Slå ihop baseline-datum från long_data och surv_data
-baseline_check <- surv_data %>%
-  select(RID, baseline_date) %>%
-  left_join(
-    long_data %>% group_by(RID) %>% summarise(baseline_long = min(EXAMDATE_ptau, na.rm = TRUE)),
-    by = "RID"
-  )
-
-# Kolla om det finns mismatch
-baseline_check %>% filter(baseline_date != baseline_long)
-```
-
-======= \# Longitudinal model
+# Longitudinal model
 
 ## Comparing longitudinal models
 
@@ -1214,14 +1201,16 @@ plot(
 # Cox survival-model, with covariates
 surv_model_ptau <- coxph(
   surv_object_ptau ~ age_at_baseline_pTau + PTGENDER + APOE4_status,
-  data <- surv_data
+  data <- surv_data,
+   x = TRUE
 )
 
 summary(surv_model_ptau)
 
 surv_model_nfl <- coxph(
   surv_object_nfl ~ age_at_baseline_NFL + PTGENDER + APOE4_status,
-  data <- surv_data
+  data <- surv_data, 
+  x = TRUE
 )
 
 summary(surv_model_nfl)
@@ -1331,4 +1320,10 @@ fForms <- list(
 ```{r}
 # summary <- summary(multi_joint_model)
 # summary$Survival
+```
+
+Test
+
+```{r}
+
 ```
