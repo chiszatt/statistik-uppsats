@@ -79,20 +79,20 @@ library(DHARMa) # for running residual diagnostics on GLMM
 # Loading data
 #Milou
 # NfL data 
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
-# P-tau181 data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
-# Diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-# Demographics data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-# Apoe data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe <- APOERES
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+# # Diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# # Demographics data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+# # Apoe data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe <- APOERES
 ```
 
 ```{r}
@@ -939,26 +939,26 @@ var(long_data$PLASMAPTAU181)
 
 ```{r}
 # GLMM
-fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
                    data = long_data,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
-                data = merged_data)
+fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
+                data = long_data)
 
 # LME approach with log transformed data
-fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years + (1|RID), 
-                           data = merged_data)
+fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
+                           data = long_data)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                              data = merged_data,
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                              data = long_data,
                               family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            data = merged_data,
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                            data = long_data,
                             family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -992,26 +992,26 @@ var(merged_data$PLASMA_NFL)
 
 ```{r}
 # GLMM
-fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
-                   data = merged_data,
+fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
+                   data = long_data,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years + (1|RID), 
-                data = merged_data)
+fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
+                data = long_data)
 
 # LME approach with log transformed data
-fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years + (1|RID), 
-                          data = merged_data)
+fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
+                          data = long_data)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                             data = merged_data,
+fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                             data = long_data,
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           data = merged_data,
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                           data = long_data,
                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -1037,8 +1037,8 @@ AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_st
 
 ```{r}
 long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
-  random = ~ time_years | RID,                    
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
+  random = ~ time_years_ptau | RID,                    
   data = long_data
 )
 
@@ -1049,8 +1049,8 @@ summary(long_model_ptau)
 # Longitudinal model with t-distribution (identity link) 
 library(GLMMadaptive)
 long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
-  random = ~ time_years | RID,                    
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
+  random = ~ time_years_ptau | RID,                    
   data = long_data,
 family = students.t(df = 3, link = "identity")
 )
@@ -1063,8 +1063,8 @@ summary(long_model_ptau)
 ```{r}
 # Longitudinal model, with chosen covariates 
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
-  random = ~ time_years | RID,   # random intercept + slope
+  log_PLASMA_NFL ~ time_years_nfl + PTGENDER + APOE4_status, 
+  random = ~ time_years_nfl | RID,   # random intercept + slope
   data = long_data
   )
 
@@ -1077,8 +1077,8 @@ We see that gender is not significant in the LME model for NFL, so we remove it:
 
 ```{r}
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years + APOE4_status, 
-  random = ~ time_years | RID, # random intercept + slope
+  log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
+  random = ~ time_years_nfl | RID, # random intercept + slope
   data = long_data
   )
 
@@ -1091,8 +1091,8 @@ Even though APOE4 status was significant in the LME model for ptau, including it
 
 ```{r}
 long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER,
-  random = ~ time_years | RID,                    
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER,
+  random = ~ time_years_ptau | RID,                    
   data = long_data,
 family = students.t(df = 3, link = "identity")
 )
