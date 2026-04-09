@@ -746,7 +746,7 @@ length(keep)
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
-common = which(long_data$EXAMDATE_nfl %in% merged_data$EXAMDATE_ptau)
+common = which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 
 # checking the observations with different exam dates
 long_data[-common, ]
@@ -756,6 +756,8 @@ merged_data <- long_data %>%
   group_by(RID) %>%
   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
   ungroup()
+
+# checking which observations have the same examdate for nfl and ptau
 common = which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 
 # checking the observations with different exam dates (9 obs)
@@ -763,8 +765,8 @@ long_data[-common, ]
 
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
 long_data <- long_data %>%
-group_by(RID) %>%
-mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
 ungroup()
 ```
 
@@ -889,7 +891,6 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-=======
 ## We make sure that merged_data and surv_data have the same length (for the joint model)
 
 ```{r}
