@@ -14,6 +14,7 @@ library(lcmm)
 library(JMbayes2)
 library(msm)
 library(mstate)
+library(lubridate)
 ```
 
 ```{r}
@@ -51,7 +52,7 @@ demographics <- PTDEMOG
 apoe <- APOERES
 ```
 
--   Check how we merge with diagnosis data: we have more data than is present here. For example RID 2 changes from CN to MCI to CN again, but with the full diagnosis data we see that they convert again to MCI. Let's think about how to include this data correctly. Should we make a different data set with conversions from the full diagnosis data set?
+# Pre-processing
 
 ```{r}
 # selecting relevant variables
@@ -87,6 +88,12 @@ nfl_data[which(is.na(nfl_data)), ]
 # pTAU
 sum(is.na(ptau_data))
 
+# dx data
+sum(is.na(diagnosis_data))
+
+# genetic data
+sum(is.na(apoe$GENOTYPE))
+
 # checking with ADNI code -4
 # NfL
 sum(nfl_data$PLASMA_NFL < 0, na.rm = TRUE)
@@ -96,7 +103,7 @@ sum(ptau_data$PLASMAPTAU181 < 0, na.rm = TRUE)
 ```
 
 ```{r}
-# removing missing values
+# removing missing values from nfl data and diagnosis data
 nfl_ptau <- na.omit(nfl_ptau)
 diagnosis_data <- na.omit(diagnosis_data)
 ```
@@ -144,33 +151,65 @@ ptau_data <- ptau_data %>%
 
 ## Baseline date in nfl_ptau
 
+### Creating a single EXAMDATE variable
+
+-   Taking the mid point between EXAMDATE_nfl and EXAMDATE_ptau and adding to EXAMDATE_nfl
+
 ```{r}
-# checking which observations have the same examdate for nfl and ptau
-common <- which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+nfl_ptau <- nfl_ptau %>%
+  mutate(EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau))
+```
 
-# checking the observations with different exam dates
-nfl_ptau[-common, ]
+### Creating a baseline_date from the new EXAMDATE variable
 
-# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+```{r}
 nfl_ptau <- nfl_ptau %>%
   group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  mutate(baseline_date = min(EXAMDATE)) %>%
   ungroup()
+```
+
+Code for creating the baseline_date out of the earliest of the two EXAMDATEs
+
+```{r}
+# # checking which observations have the same examdate for nfl and ptau
+# common <- which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+# 
+# # checking the observations with different exam dates
+# nfl_ptau[-common, ]
+# 
+# # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+# nfl_ptau <- nfl_ptau %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+#   ungroup()
 ```
 
 ## Time since baseline in nfl ptau
 
+### Creating variable
+
 ```{r}
 # creating a time since baseline visit variable (in years)
 nfl_ptau <- nfl_ptau %>%
-  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+  mutate(time_years = as.numeric(EXAMDATE - baseline_date) / 365.25)
 ```
 
-## Selected demographics in nfl_ptau
+### Rearranging the data frame
 
--   Merging DOB, gender and creating an age at baseline variable
+-   Moving the time variable together and the biomarker variables together
 
--   Converting gender to factor variable
+-   Removing EXAMDATE_nfl and EXAMDATE_ptau
+
+```{r}
+nfl_ptau <- nfl_ptau %>%
+  relocate(c(EXAMDATE, baseline_date, time_years), .after = VISCODE2) %>%
+  select(!c(EXAMDATE_nfl, EXAMDATE_ptau))
+```
+
+## Adding demographic data
+
+### Selecting relevant variables from demographic data and merging with nfl_ptau
 
 ```{r}
 # selecting relevant variables (age, gender) and keeping only one row per person
@@ -182,6 +221,8 @@ demographics_small <- demographics %>%
 nfl_ptau <- nfl_ptau %>% merge(demographics_small, by = "RID")
 ```
 
+### Converting gender to factor, creating an age_at_baseline variable
+
 ```{r}
 # converting the gender variable to a factor variable 
 nfl_ptau <- nfl_ptau %>% mutate(PTGENDER = as.factor(PTGENDER))
@@ -191,11 +232,13 @@ nfl_ptau <- nfl_ptau %>% mutate(
   age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
 ```
 
-## Factor variable for genotype in apoe
+## Genetic data
 
 -   Trying with a factor for each specific genotype
 
 -   If there is not good distinction between these, since we do not have many individuals with some genotypes, we can collpase down to fewer factors later
+
+### Creating factor variable for the different variants
 
 ```{r}
 # creating a factor variable for ApoE genotype and selecting relevant variables
@@ -210,7 +253,7 @@ apoe = apoe %>% mutate(
   select(RID, genotype)
 ```
 
-## We filter participants with at least 3 measurements in nfl_ptau
+## Individuals with \> 2 biomarker measurements
 
 ```{r}
 # Filtering individuals with at least 3 measurements
@@ -234,19 +277,31 @@ merged_data <- nfl_ptau %>% merge(diagnosis_data_dx, by = "RID")
 ```
 
 ```{r}
+# checking how many missing values are in the merged data frame
+table(is.na(merged_data))
+
+# checking how many missing values per variable
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# since VISCODE2.y is not a model variable, we need to see if these observations have full data for the model variables
+merged_data %>% filter(is.na(VISCODE2.y)) %>% select(EXAMDATE_dx, DIAGNOSIS_dx)
+```
+
+```{r}
+# the rows with missing values can be safely removed since we have none that have full data for the model variables
 merged_data <- na.omit(merged_data)
 ```
 
 ```{r}
-merged_data <- merged_data %>%
-  mutate(
-    Tevent = as.numeric(EXAMDATE_dx - baseline_date) / 365.25
-  )
+# merged_data <- merged_data %>%
+#   mutate(
+#     Tevent = as.numeric(EXAMDATE_dx - baseline_date) / 365.25
+#   )
 ```
 
-# Multi-State Survival Data
+# Multi-State Survival
 
--   For a multistate cox PH model
+## Survival data
 
 ```{r}
 # old code
@@ -261,6 +316,10 @@ merged_data <- merged_data %>%
 #   ) %>% ungroup()
 ```
 
+### Diagnosis times data frame
+
+-   Creating variables from time from CN dx to MCI dx and from MCI dx to AD dx
+
 ```{r}
 # creating a data frame with diagnosis times: CN -> MCI, MCI -> AD
 dx_times <- diagnosis_data %>%
@@ -274,7 +333,11 @@ dx_times <- diagnosis_data %>%
 # creating a variable for the time from first AD dx to every MCI dx
     t_MCI_AD = ifelse(DIAGNOSIS == "MCI",
                       as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
-                      NA)
+                      NA),
+
+    t_CN_AD = ifelse(DIAGNOSIS == "CN",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
+                      NA),
 # 
   ) %>% ungroup()
 ```
@@ -299,8 +362,10 @@ sum(na.omit((dx_times %>% select(backwards_MCI, RID) %>% distinct())$backwards_M
 
 # number of individuals which move backwards from MCI -> CN = 0
 sum(na.omit((dx_times %>% select(backwards_AD, RID) %>% distinct())$backwards_AD))
+```
 
-# removing the backwards_AD variable as 
+```{r}
+# removing the backwards_AD variable as there are 0 cases
 dx_times <- dx_times %>% select(!backwards_AD)
 ```
 
@@ -325,7 +390,11 @@ dx_times_short <- dx_times %>%
   ) %>% ungroup()
 ```
 
+OLD
+
 ### Transition times
+
+-   For a multistate cox PH model
 
 ```{r}
 # times for transitions from CN -> MCI
@@ -539,16 +608,6 @@ nfl_ptau <- nfl_ptau %>% arrange(RID, time_years)
 # )
 ```
 
-## Creating a single EXAMDATE variable
-
-```{r}
-library(lubridate)
-nfl_ptau <- nfl_ptau %>%
-  mutate(EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau)) %>%
-  select(!c(EXAMDATE_nfl, EXAMDATE_ptau)) %>%
-  relocate(c(baseline_date, EXAMDATE, time_years), .after = VISCODE2)
-```
-
 ## Survival data (CN/MCI -\> AD only)
 
 ```{r}
@@ -585,35 +644,6 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 # We check the number of events 
 table(surv_data$event)
 ```
-
-## Joint Latent Class Mixed Models DATA
-
-```{r}
-# reference
-# lcmm package data - example that works with the jlcmm
-d = data_lcmm
-```
-
-```{r}
-# merging longitudinal and survival data
-jlcmm_data <- nfl_ptau %>%
-  merge(surv_data, by = "RID") %>%
-  relocate(c(event, time_to_event), .after = time_years)
-```
-
-```{r}
-# transforming the data
-jlcmm_data <- jlcmm_data %>%
-  mutate(ln_PLASMA_NFL = log(PLASMA_NFL))
-```
-
-```{r}
-# merging genetic data
-jlcmm_data <- jlcmm_data %>%
-  merge(apoe, by = "RID")
-```
-
-# 
 
 ## Collapsing genotype down to 3 factors
 
