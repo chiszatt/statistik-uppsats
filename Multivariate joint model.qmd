@@ -150,6 +150,16 @@ length(keep)
 ```
 
 ```{r}
+# We log transform the biomarkers 
+long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
+long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
+```
+
+# Two separate joint models
+
+## Two separate baseline, age_at_baseline and time_to_event (one for ptau, one for nfl) 
+
+```{r}
 # We calculate baseline for each biomarker per participant
 surv_data_simple <- surv_data %>%
   group_by(RID) %>%
@@ -209,8 +219,10 @@ surv_data_simple %>%
   filter(RID == 61)
 ```
 
+## Two separate time_years (one for ptau, one for nfl) 
+
 ```{r}
-long_data <- long_data %>%
+long_data_simple <- long_data %>%
   group_by(RID) %>%
   # We create baseline for PTau
   mutate(
@@ -225,24 +237,13 @@ long_data <- long_data %>%
   ungroup()
 ```
 
-```{r}
-# We log transform the biomarkers 
-long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
-long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
-```
-
-```{r}
-long_data <- long_data %>%
-  filter(PLASMAPTAU181 > 0)
-```
-
-# LME model
+## Longitudinal models
 
 ```{r}
 long_model_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
   random = ~ time_years_ptau | RID,                    
-  data = long_data
+  data = long_data_simple
 )
 
 summary(long_model_ptau)
@@ -252,13 +253,13 @@ summary(long_model_ptau)
 long_model_nfl <- lme(
   log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
   random = ~ time_years_nfl | RID, # random intercept + slope
-  data = long_data
+  data = long_data_simple
   )
 
 summary(long_model_nfl)
 ```
 
-# Survival model
+## Survival model
 
 ```{r}
 # We create a Surv object: time and event
@@ -292,9 +293,38 @@ surv_model_nfl <- coxph(
 summary(surv_model_nfl)
 ```
 
-# Multivariate joint model
+## Two separate joint models (one for ptau, one for nfl) 
 
-## We create a global baseline
+```{r}
+joint_model_ptau <- jm(
+  surv_model_ptau,
+  long_model_ptau,
+  time_var = "time_years_ptau",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_ptau)
+```
+
+```{r}
+# Joint model 
+joint_model_nfl <- jm(
+  surv_model_nfl,
+  long_model_nfl,
+  time_var = "time_years_nfl",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_nfl)
+```
+
+# One multivariate joint model
+
+## Global/common version of baseline, age_at_baseline and time_to_event
 
 ```{r}
 # We calculate global baseline for each participant
@@ -348,10 +378,10 @@ surv_data_multi %>%
   filter(RID == 61)
 ```
 
-## Global time_years
+## Global version of time_years
 
 ```{r}
-long_data_global <- long_data %>%
+long_data_multi <- long_data %>%
   group_by(RID) %>%
   
   mutate(
@@ -367,7 +397,7 @@ long_data_global <- long_data %>%
   ungroup()
 ```
 
-## Survival model with global time_to_event
+## Survival model with global time_to_event and global age_at_baseline
 
 ```{r}
 surv_object_multi <- Surv(
@@ -396,16 +426,16 @@ surv_model_multi <- coxph(
 # Nya lme modeller
 long_model_ptau_multi <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
-  random = ~ time_years_ptau | RID,                    
-  data = long_data_global
+  random = ~ time_years | RID,                    
+  data = long_data_multi
 )
 
 summary(long_model_ptau_multi)
 
 long_model_nfl_multi <- lme(
   log_PLASMA_NFL ~ time_years + APOE4_status, 
-  random = ~ time_years_nfl | RID, # random intercept + slope
-  data = long_data_global
+  random = ~ time_years | RID, # random intercept + slope
+  data = long_data_multi
   )
 
 summary(long_model_nfl_multi)
@@ -414,7 +444,7 @@ summary(long_model_nfl_multi)
 ## We create a mixed object
 
 ```{r}
-Mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
+mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 ```
 
 ## We check if the models have stable random slopes
@@ -433,8 +463,10 @@ fForms <- list(
   )      
 ```
 
+## One multivariate joint model 
+
 ```{r}
-multi_joint_model <- jm(surv_model_multi, Mixed,
+multi_joint_model <- jm(surv_model_multi, mixed,
                         time_var = "time_years",
                         functional_forms = fForms,
                         n_chains = 3L,    
