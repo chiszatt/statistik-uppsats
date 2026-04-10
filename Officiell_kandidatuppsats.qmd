@@ -379,40 +379,6 @@ However, as the joint model includes a linear mixed-effects model with the norma
 
 The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
 
-### Joint latent process model
-
---\> Bara info, inte skrivit om än med egna ord!
-
-A general definition of the latent class joint model involves the following submodels:
-
-$$
-h_i(t \mid c_i = g) = h_{0g}(t)\exp(\gamma_g^\top w_i)
-$$
-
-$$
-\{y_i(t) \mid c_i = g\} = x_i^\top(t)\beta_g + z_i^\top(t)b_{ig} + \varepsilon_i(t), \quad \varepsilon_i(t) \sim N(0, \sigma^2)
-$$
-
-$$
-\Pr(c_i = g) = \frac{\exp(\lambda_g^\top u_i)}{\sum_{l=1}^G \exp(\lambda_l^\top u_i)}
-$$
-
-"where we postulate that patients in different latent groups have both different longitudinal evolutions and different risks for an event. The last equation specifies a multinomial submodel for the latent class membership probabilities, with $u_i$ denoting the vector of covariates associated with these probabilities with a corresponding vector of regression coefficients vector $\lambda^\top = (\lambda_1^\top, \ldots, \lambda_G^\top)$, with $\lambda_G = 0$ for identifiability. The random effects $b_{ig} \sim N(\mu_g, \sigma_g^2 D)$ are also assumed to be latent-class specific, though for computational stability, their covariance matrix is typically assumed to depend on $c_i$ only via the scalar variance parameter $\sigma_g^2$." (Rizopoulos, 2012: s. 123)
-
-### Assumptions
-
-"Contrary to the stratified joint model, latent class joint models assume that the subpopulations that constitute the population are latent, in the sense that heterogeneity is not captured by any of the observed covariates. To define latent class joint models, we assume that there are G subpopulations that constitute our original population and we introduce the unobserved class indicator ci = 1, . . . , G that denotes the class membership of the ith subject. These models work under the following set of conditional independence assumptions:"
-
-$$
-p(T_i, \delta_i, y_i \mid c_i = g, b_i; \theta) = p(T_i, \delta_i \mid c_i = g; \theta)\, p(y_i \mid c_i = g, b_i; \theta)
-$$
-
-$$
-p(y_i \mid c_i = g, b_i; \theta) = \prod_j p\{y_i(t_{ij}) \mid c_i = g, b_i; \theta\}
-$$
-
-"In particular, these models assume that the correlations between the repeated measurements in the longitudinal outcome are captured by the random effects bi , whereas the association between the event time and longitudinal processes is explained by the shared latent class indicator ci . The use of two latent components is advantageous from the point of view that it allows for more flexible association structures compared to the classical joint model that assumes the same set of random effects bi to account for both types of association" (Rizopoulos, 2012: s. 122)
-
 #### The Gelman-Rubin statistic
 
 According to Peng (2022), convergence can be evaluated by running multiple chains from different starting values. All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar.
@@ -604,7 +570,7 @@ Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z
 
 Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). "Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study". *Frontiers in big data*, 5(1), 812725. DOI: <https://doi.org/10.3389/fdata.2022.812725>
 
-**Kyheng, M., Babykina, G., & Duhamel, A. (2025). "Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research". *Stat Med*, 44(8-9):e70047. DOI: [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.**
+Kyheng, M., Babykina, G., & Duhamel, A. (2025). "Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research". *Stat Med*, 44(8-9):e70047. DOI: [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.
 
 Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019). Association Between Longitudinal Plasma Neurofilament Light and Neurodegeneration in Patients With Alzheimer Disease. *JAMA neurology*, 76(7), 791-799. DOI: <https://doi.org/10.1001/jamaneurol.2019.0765>
 
@@ -620,7 +586,7 @@ Wang, C., Shen, J., Charalambous, C., & Pan, J. (2024). "Modeling biomarker vari
 
 Wolfe, R. A., & Strawderman, R. L. (1996). "Logical and statistical fallacies in the use of Cox regression models". *American journal of kidney diseases : the official journal of the National Kidney Foundation*, 27(1), 124-129. DOI: <https://doi.org/10.1016/s0272-6386(96)90039-6>
 
-**Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.**
+Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
 World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
 
