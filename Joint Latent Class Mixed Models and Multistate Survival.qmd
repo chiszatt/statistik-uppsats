@@ -10,6 +10,8 @@ library(lcmm)
 library(dplyr)
 library(survival)
 library(ADNIMERGE2)
+library(nlme)
+library(lcmm)
 ```
 
 ```{r}
@@ -603,6 +605,24 @@ jlcmm_data <- jlcmm_data %>%
 
 -   Variance-covariance matrix for the random effects
 
+### Model fitting examples from the lcmm package
+
+```{r}
+# jlcmm1 <- Jointlcmm(Ydep1 ~ X1 * Time,
+#                     random = ~ Time,
+#                     subject = "ID",
+#                     survival = Surv(Tevent, Event) ~ X1 + X2, hazard = "3-quant-splines",
+#                     data = d)
+
+# jlcmm2 <- Jointlcmm(Ydep1 ~ Time * X1,
+#                     random = ~ Time,
+#                     subject = "ID",
+#                     mixture = ~ Time,
+#                     survival = Surv(Tevent, Event) ~ X1 + mixture(X2),
+#                     hazard = "3-quant-splines", hazardtype = "PH", ng = 2,
+#                     data = data_lcmm, B = jlcmm1)
+```
+
 ```{r}
 jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years,
@@ -626,11 +646,7 @@ jlcmm(
 
 # JLCMM PROBLEMS
 
--   Infinite parameters:
-
--   The program stopped abnormally:
-
--   
+-   Infinite parameters/the program stopped abnormally: Hessian matrix does not converge
 
 ```{r}
 # checking for slope variance = 0 or correlation = +-1
@@ -736,7 +752,7 @@ summary(m0)
 plot(m0)
 ```
 
-## Try with normal time_years and ln_PLASMA_NFL 
+## Try with normal time_years and ln_PLASMA_NFL
 
 -   $AIC = 3237.74$
 
@@ -764,7 +780,7 @@ summary(m0)
 plot(m0)
 ```
 
-## Try with time_years_z and ln_PLASMA_NFL 
+## Try with time_years_z and ln_PLASMA_NFL
 
 -   $AIC = 3237$
 
@@ -876,7 +892,9 @@ $$
 
 -   The variance of the intercept and slope should not be 0. The question is, what constitutes *too* small?
 
--   
+-   $AIC = 3236$
+
+-   $BIC = 3282$
 
 ```{r}
 m0 <- jlcmm(
@@ -901,38 +919,114 @@ summary(m0)
 plot(m0)
 ```
 
-## Trying with ng \> 1
+## Trying with ng = 2
+
+### Start values from m0
+
+-   Score test statistic no longer significant, conditional independence assumption is met
+
+-   $AIC = 3145$
+
+-   $BIC = 3214$
 
 ```{r}
-jlcmm(
-  fixed = ln_PLASMA_NFL ~ time_years,
-  random = ~ time_years,
-  mixture = ~ time_years,
+m1 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
   subject = "RID",
   survival = Surv(time_to_event, event) ~ genotype,
   data = jlcmm_data_test,
-  ng = 3,
-  B = m0,
-  maxiter = 500
+  B = m0
 )
 ```
 
-### Model fitting examples from the lcmm package
-
 ```{r}
-jlcmm1 <- Jointlcmm(Ydep1 ~ X1 * Time,
-                    random = ~ Time,
-                    subject = "ID",
-                    survival = Surv(Tevent, Event) ~ X1 + X2, hazard = "3-quant-splines",
-                    data = d)
+summary(m1)
 ```
 
 ```{r}
-jlcmm2 <- Jointlcmm(Ydep1 ~ Time * X1,
-                    random = ~ Time,
-                    subject = "ID",
-                    mixture = ~ Time,
-                    survival = Surv(Tevent, Event) ~ X1 + mixture(X2),
-                    hazard = "3-quant-splines", hazardtype = "PH", ng = 2,
-                    data = data_lcmm, B = jlcmm1)
+plot(m1)
+```
+
+### Random start values
+
+-   Score test statistic no longer significant, conditional independence assumption is met
+
+-   $AIC = 3145$
+
+-   $BIC = 3214$
+
+```{r}
+m1 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = random(m0)
+)
+```
+
+```{r}
+summary(m1)
+```
+
+```{r}
+plot(m1)
+```
+
+## Trying with ng = 3
+
+### Start values from m0
+
+```{r}
+m2 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = m0
+)
+```
+
+```{r}
+summary(m2)
+```
+
+```{r}
+plot(m2)
+```
+
+### Random start values
+
+```{r}
+m2 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = random(m0)
+)
+```
+
+```{r}
+summary(m2)
+```
+
+```{r}
+plot(m2)
 ```
