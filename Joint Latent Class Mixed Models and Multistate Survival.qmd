@@ -13,6 +13,7 @@ library(ADNIMERGE2)
 library(nlme)
 library(lcmm)
 library(lubridate)
+library(ggsurvfit)
 ```
 
 ```{r}
@@ -280,17 +281,36 @@ jlcmm_data <- jlcmm_data %>%
 
 -   Goodness-of-fit statistics
 
-    -   Information criteria are model selection criteria. Some information criteria are better than others for a specific purpose, depending on, for example the data generating process, suggested models and sample size (pg.2).
+    -   Information criteria are an example of model selection criteria. Some information criteria are better than others for a specific purpose, depending on, for example the data generating process, suggested models and sample size (pg 2). Zhang et al. (pg 4) explain how when the objective of model selection is for prediction, it may not be critical that the selected covariates change with sample size, yet when the focus is on inference, stable model covariates are necessary for a clear interpretation of the data genereating process. Model consistency: inference, model efficiency: prediction.
 
         Zhang, J., Yang, Y. and Ding, J. (2023). Information criteria for model selection. *Wiley interdisciplinary reviews. Computational statistics*, 15(5). doi:https://doi.org/10.1002/wics.1607.
 
-    -   Akaike Information Criterion
+    -   Akaike Information Criterion: Akaike (1974, 1998 -\> original sources)
 
-    -   Bayesian Information Criterion
+        $$
+        AIC = 2k - 2 ln(\widehat L)
+        $$
+
+        $$
+        \begin{aligned}
+        where \quad \widehat L =\text{the maximised value of the likelihood function} \\
+        k = \text{the number of parameters estimated by the model}
+        \end{aligned}
+        $$
+
+    -   Bayesian Information Criterion: Schwarz (1978): penalises complex models more than AIC
+
+        $$
+        BIC = kln(n) - 2ln(\widehat L)
+        $$
+
+    -   The score statistic for the score test of conditional independence (Jacqmin-Gadda)
 
 -   Estimates, Wald and p-value
 
 -   Variance-covariance matrix for the random effects
+
+    -   If the
 
 ### Model fitting examples from the lcmm package
 
@@ -319,16 +339,6 @@ jlcmm(
   data = jlcmm_data,
   maxiter = 500
 )
-
-# to do on the 1 class model if not converging -> local maxima
-# gridsearch(jlcmm(
-#   fixed = ln_PLASMA_NFL ~ time_years,
-#   random = ~ 1,
-#   subject = "RID",
-#   survival = Surv(time_to_event, event) ~ age_,
-#   data = jlcmm_data
-#   ),
-#   rep = 20, maxiter = 20, minit = 10)
 ```
 
 # JLCMM PROBLEMS
@@ -475,6 +485,8 @@ plot(m0)
 
 -   Increased slope variance
 
+# M0
+
 ```{r}
 m0 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -616,6 +628,8 @@ plot(m0)
 
 -   $BIC = 3214$
 
+# M1
+
 ```{r}
 m1 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -674,8 +688,6 @@ plot(m1)
 
 -   100 iterations without convergence
 
--   Try with 500
-
 ```{r}
 m2 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -718,13 +730,23 @@ plot(m2)
 ```
 
 ```{r}
-summary(m2)
+# summary(m2)
 ```
 
-### Random start values
+### Try with gridsearch()
 
 ```{r}
-m2 <- jlcmm(
+# not converging -> local maxima -> try to find global maximum with gridsearch()
+
+gridsearch(rep = 20, maxiter = 20,
+           minit = jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+),
+           m = jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
   random = ~ 1 + time_years_z,
   mixture = ~ time_years_z,
@@ -733,14 +755,104 @@ m2 <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ genotype,
   data = jlcmm_data_test,
-  B = random(m0)
+  B = m0
+))
+```
+
+## Checking if Weibull is better fit than cox
+
+-   Fitting the cox PH model and a Weibull regression model
+
+```{r}
+fit_cox <- coxph(Surv(time_to_event, event) ~ genotype,
+                 data = jlcmm_data_test)
+
+fit_weib <- survreg(Surv(time_to_event, event) ~ genotype,
+                    dist="weibull", data = jlcmm_data_test)
+```
+
+```{r}
+summary(fit_cox)
+```
+
+-   Testing the proportional hazard assumption, significant test statistic means we cannot assume proportionality at the 0.05 significance level
+
+-   Schoenfield residuals should be flat and centered around 0 to assume proportionality
+
+-   <https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html>
+
+```{r}
+cox.zph(fit_cox)
+
+plot(cox.zph(fit_cox))
+```
+
+```{r}
+par(mfrow = c(1, 2))
+
+surv_fit <- (survfit(Surv(time_to_event, event) ~ genotype, data = jlcmm_data_test))
+
+ggsurvfit(surv_fit) +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "Kaplan-Meier curves by genotype") +
+  theme_classic()
+
+ggsurvfit(surv_fit, type = "cloglog") +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "log-log survival curve") +
+  theme_classic()
+```
+
+```{r}
+summary(fit_weib)
+```
+
+### Trying with splines hazard
+
+-   ng = 1
+
+```{r}
+m0_splines <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  hazard = "splines",
+  data = jlcmm_data_test,
 )
 ```
 
 ```{r}
-summary(m2)
+summary(m0_splines)
 ```
 
 ```{r}
-plot(m2)
+plot(m0_splines)
+```
+
+-   ng = 2
+
+```{r}
+m1_splines <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  hazard = "splines",
+  data = jlcmm_data_test,
+  B = m0_splines
+)
+```
+
+```{r}
+summary(m1_splines)
+```
+
+```{r}
+plot(m1_splines)
 ```
