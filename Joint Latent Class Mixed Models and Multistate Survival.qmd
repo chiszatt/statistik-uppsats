@@ -985,6 +985,10 @@ plot(m1)
 
 ### Start values from m0
 
+-   100 iterations without convergence
+
+-   Try with 500
+
 ```{r}
 m2 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -1005,6 +1009,29 @@ summary(m2)
 
 ```{r}
 plot(m2)
+```
+
+### Try with max 500 iterations
+
+-   Still does not converge
+
+```{r}
+m2 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = m0,
+  maxiter = 500
+)
+```
+
+```{r}
+summary(m2)
 ```
 
 ### Random start values
