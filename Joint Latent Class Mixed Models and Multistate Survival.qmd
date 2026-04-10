@@ -1,0 +1,746 @@
+---
+title: "Joint Latent Class Mixed Models / Multistate Survival"
+format: pdf
+editor: visual
+---
+
+```{r}
+# loading the packages
+library(lcmm)
+library(dplyr)
+library(survival)
+library(ADNIMERGE2)
+library(nlme)
+library(lcmm)
+library(lubridate)
+```
+
+```{r}
+# loading data
+# NfL
+nfl_data <- BLENNOWPLASMANFLLONG
+
+# pTAU
+ptau_data <- UGOTPTAU181
+
+# dx data
+diagnosis_data <- DXSUM
+
+# demographic data
+demographics <- PTDEMOG
+
+# genetic data
+apoe <- APOERES
+```
+
+# Pre-processing
+
+-   Check how we merge with diagnosis data: we have more data than is present here. For example RID 2 changes from CN to MCI to CN again, but with the full diagnosis data we see that they convert again to MCI. Let's think about how to include this data correctly. Should we make a different data set with conversions from the full diagnosis data set?
+
+```{r}
+# selecting relevant variables
+nfl_data <- nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+ptau_data <- ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# adding a suffix to the dx data
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# merging only nfl and ptau
+nfl_ptau <- nfl_data %>%
+  merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+```
+
+```{r}
+# removing missing values
+nfl_ptau <- na.omit(nfl_ptau)
+diagnosis_data <- na.omit(diagnosis_data)
+```
+
+## Checking RID with more than one measurement recorded on the same exam date
+
+-   There are 52 individuals with two measurements recorded on the same exam date.
+
+-   How should we deal with these? Average the measurements? Remove the observations?
+
+-   Some of the values are quite different, what do we assume by averaging them? What effect does it have to remove them?
+
+-   For now, remove them:
+
+```{r}
+# checking observations with more than one measurement recorded on the same exam date for nfl
+nfl_double <- nfl_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L) %>%
+  select(RID, EXAMDATE)
+
+# removing the doubled observations
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+
+# checking observations with more than one measurement recorded on the same exam date for ptau
+ptau_double <- ptau_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L)  %>%
+  select(RID, EXAMDATE)
+
+# extracting the doubled observations
+# ptau_data %>%
+#   filter(RID %in% ptau_double$RID) %>% 
+#   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+
+# removing the doubled observations
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+```
+
+## Baseline date in nfl_ptau
+
+```{r}
+# checking which observations have the same examdate for nfl and ptau
+common <- which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+
+# checking the observations with different exam dates
+nfl_ptau[-common, ]
+
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+nfl_ptau <- nfl_ptau %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+  ungroup()
+```
+
+## Time since baseline in nfl ptau
+
+```{r}
+# creating a time since baseline visit variable (in years)
+nfl_ptau <- nfl_ptau %>%
+  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
+```
+
+## Selected demographics in nfl_ptau
+
+-   Merging DOB, gender and creating an age at baseline variable
+
+-   Converting gender to factor variable
+
+```{r}
+# selecting relevant variables (age, gender) and keeping only one row per person
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# merging the demographic data with the biomarker data
+nfl_ptau <- nfl_ptau %>% merge(demographics_small, by = "RID")
+```
+
+```{r}
+# converting the gender variable to a factor variable 
+nfl_ptau <- nfl_ptau %>% mutate(PTGENDER = as.factor(PTGENDER))
+
+# creating an age at baseline variable
+nfl_ptau <- nfl_ptau %>% mutate(
+  age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
+```
+
+## Factor variable for genotype in apoe
+
+-   Trying with a factor for each specific genotype
+
+-   If there is not good distinction between these, since we do not have many individuals with some genotypes, we can collpase down to fewer factors later
+
+```{r}
+# creating a factor variable for ApoE genotype and selecting relevant variables
+apoe = apoe %>% mutate(
+  genotype = as.factor(case_when(
+    GENOTYPE == "4/4" ~ "e4/e4",
+    GENOTYPE %in% c("3/4", "2/4") ~ "e4",
+    GENOTYPE == "3/3" ~ "e3/e3",
+    GENOTYPE %in% c("2/3", "2/2") ~ "e2"
+  ))
+) %>%
+  select(RID, genotype)
+```
+
+## We filter participants with at least 3 measurements in nfl_ptau
+
+```{r}
+# Filtering individuals with at least 3 measurements
+keep <- unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 2))$RID)
+nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+## Survival data
+
+```{r}
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+
+surv_data <- diagnosis_data %>%
+  group_by(RID) %>%
+  
+  # We create baseline date per patient (whichever EXAMDATE comes first, nfl or ptau)
+  mutate(baseline_date = min(EXAMDATE),
+  
+  # We calculate event and time_to_event based on all diagnosis data
+    # 1 if patient ever developed dementia
+  event = as.integer(any(DIAGNOSIS == "Dementia")),
+  time_to_event = case_when(
+    event == 1 ~
+      as.numeric(min(EXAMDATE[DIAGNOSIS == "Dementia"]) - baseline_date)/365,
+    TRUE ~
+      as.numeric(max(EXAMDATE) - baseline_date)/365)) %>%
+  
+      ungroup() %>%
+  select(RID, event, time_to_event) %>%
+  distinct()
+  
+surv_data <- surv_data %>% filter(RID %in% keep)
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## Creating a single EXAMDATE variable
+
+```{r}
+nfl_ptau <- nfl_ptau %>%
+  mutate(EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau)) %>%
+  select(!c(EXAMDATE_nfl, EXAMDATE_ptau)) %>%
+  relocate(c(baseline_date, EXAMDATE, time_years), .after = VISCODE2)
+```
+
+## Joint Latent Class Mixed Models DATA
+
+Creating the survival data from the diagnosis data, and then merging the longitudinal data and survival data by RID
+
+-   Keeps all diagnosis data
+
+-   We can then use diagnoses which happen not on the same VISCODE as the biomarker data
+
+-   Check VISCODE2 variable names -\> change to \_bio and \_dx
+
+```{r}
+# reference
+# lcmm package data - example that works with the jlcmm
+d = data_lcmm
+```
+
+```{r}
+# ordering the data
+nfl_ptau <- nfl_ptau %>% arrange(RID, time_years)
+```
+
+```{r}
+# merging longitudinal and survival data by RID only not VISCODE
+jlcmm_data <- nfl_ptau %>%
+  merge(surv_data, by = "RID") %>%
+  relocate(c(event, time_to_event), .after = time_years)
+```
+
+```{r}
+# transforming the data
+jlcmm_data <- jlcmm_data %>%
+  mutate(ln_PLASMA_NFL = log(PLASMA_NFL))
+```
+
+```{r}
+# merging genetic data
+jlcmm_data <- jlcmm_data %>%
+  merge(apoe, by = "RID")
+```
+
+# JLCMM fitting
+
+## Specifying random components
+
+-   random = \~ 1 (random intercept)
+
+-   random = \~ time (random slope)
+
+-   random = \~ 1 + time (random intercept + slope)
+
+## Model summary output
+
+-   Iteration process/convergence criteria
+
+    -   
+
+-   Goodness-of-fit statistics
+
+    -   Information criteria are model selection criteria. Some information criteria are better than others for a specific purpose, depending on, for example the data generating process, suggested models and sample size (pg.2).
+
+        Zhang, J., Yang, Y. and Ding, J. (2023). Information criteria for model selection. *Wiley interdisciplinary reviews. Computational statistics*, 15(5). doi:https://doi.org/10.1002/wics.1607.
+
+    -   Akaike Information Criterion
+
+    -   Bayesian Information Criterion
+
+-   Estimates, Wald and p-value
+
+-   Variance-covariance matrix for the random effects
+
+### Model fitting examples from the lcmm package
+
+```{r}
+# jlcmm1 <- Jointlcmm(Ydep1 ~ X1 * Time,
+#                     random = ~ Time,
+#                     subject = "ID",
+#                     survival = Surv(Tevent, Event) ~ X1 + X2, hazard = "3-quant-splines",
+#                     data = d)
+
+# jlcmm2 <- Jointlcmm(Ydep1 ~ Time * X1,
+#                     random = ~ Time,
+#                     subject = "ID",
+#                     mixture = ~ Time,
+#                     survival = Surv(Tevent, Event) ~ X1 + mixture(X2),
+#                     hazard = "3-quant-splines", hazardtype = "PH", ng = 2,
+#                     data = data_lcmm, B = jlcmm1)
+```
+
+```{r}
+jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years,
+  random = ~ time_years,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data,
+  maxiter = 500
+)
+
+# to do on the 1 class model if not converging -> local maxima
+# gridsearch(jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years,
+#   random = ~ 1,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ age_,
+#   data = jlcmm_data
+#   ),
+#   rep = 20, maxiter = 20, minit = 10)
+```
+
+# JLCMM PROBLEMS
+
+-   Infinite parameters/the program stopped abnormally: Hessian matrix does not converge
+
+```{r}
+# checking for slope variance = 0 or correlation = +-1
+lme(ln_PLASMA_NFL ~ time_years, random = ~ time_years | RID, data = jlcmm_data)
+```
+
+```{r}
+# checking for the event distribution by genotype
+table(jlcmm_data$event, jlcmm_data$genotype)
+```
+
+```{r}
+# checking the range for time_years and ln_PLASMA_NFL
+summary(jlcmm_data$time_years)
+summary(jlcmm_data$ln_PLASMA_NFL)
+```
+
+## Try again with time_years_z
+
+```{r}
+# adding a scaled time_years variable
+jlcmm_data <- jlcmm_data %>%
+  mutate(time_years_z = scale(time_years))
+```
+
+```{r}
+# fitting a simple mixed model to check the random slope 
+lme(ln_PLASMA_NFL ~ time_years_z, random = ~ time_years_z | RID, data = jlcmm_data)
+```
+
+```{r}
+jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data,
+  maxiter = 500
+)
+```
+
+## Try again with time_years_z and ln_NFL_z
+
+```{r}
+jlcmm_data <- jlcmm_data %>%
+  mutate(ln_PLASMA_NFL_z = scale(ln_PLASMA_NFL))
+```
+
+```{r}
+# fitting a simple mixed model to check the random slope 
+lme(ln_PLASMA_NFL_z ~ time_years_z, random = ~ time_years_z | RID, data = jlcmm_data)
+```
+
+```{r}
+jlcmm(
+  fixed = ln_PLASMA_NFL_z ~ time_years_z,
+  random = ~ time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data,
+  maxiter = 500
+)
+```
+
+## Try again with only time_to_event \> 0
+
+-   This works!
+
+-   $AIC = 7419$
+
+-   $BIC = 7470$
+
+-   Non-significant intercept
+
+-   Low slope variance
+
+-   We see that genotype e3/e3 is not significantly different from genotypes containing e2 (maybe since we have lower number of individuals with e2 genotypes): we can try collapsing the genotype variable down to e2/e3 containing genotypes, e4 heterozygotes and e4 homozygotes (try later)
+
+```{r}
+# there are 83 individuals with a start dementia dx, so time_to_event is 0
+# remove these and test the model again
+jlcmm_data %>% filter(time_to_event <= 0)
+
+# creating a test data frame with no time_to_event = 0
+jlcmm_data_test <- jlcmm_data %>% filter(time_to_event > 0)
+```
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL_z ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+plot(m0)
+```
+
+## Try with normal time_years and ln_PLASMA_NFL
+
+-   $AIC = 3237.74$
+
+-   $BIC = 3288.37$
+
+-   Lower information criteria, and significant intercept and slope
+
+-   Even lower slope variance
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+plot(m0)
+```
+
+## Try with time_years_z and ln_PLASMA_NFL
+
+-   $AIC = 3237$
+
+-   $BIC = 3288$
+
+-   Increased slope variance
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+plot(m0)
+```
+
+## Collapsing genotype down to 3 factors
+
+-   e2/e3 containing genotypes
+
+-   e4 heterozygotes
+
+-   e4 homozygotes
+
+-   Now all genotype factors significant
+
+-   Now time_years variance still low, try with only random intercept
+
+```{r}
+# checking current factors
+table(jlcmm_data_test$genotype)
+```
+
+```{r}
+jlcmm_data_test <- jlcmm_data_test %>%
+  mutate(
+    genotype = case_when(
+      genotype == "e2" ~ "e2 e3",
+      genotype == "e3/e3" ~ "e2 e3",
+      genotype == "e4" ~ "e4",
+      genotype == "e4/e4" ~ "e4/e4"
+    )
+  )
+```
+
+```{r}
+# checking changed factors
+table(jlcmm_data_test$genotype)
+```
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+plot(m0)
+```
+
+## Try with only random intercept
+
+-   Higher AIC and BIC
+
+-   Actually figure out what is 'too small' slope variance...
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+plot(m0)
+```
+
+## Trying again with slope and intercept
+
+-   Correlation should not be +- 1: no violation here
+
+$$
+Corr_{intercept, slope} = \frac{cov_{intercept, slope}}{\sigma_{intercept}\sigma_{slope}} =  \frac{0.00669}{\sqrt{0.19574}\sqrt{0.00255}} \approx 0.30 
+$$
+
+-   The variance of the intercept and slope should not be 0. The question is, what constitutes *too* small?
+
+-   $AIC = 3236$
+
+-   $BIC = 3282$
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+# calculating the correlation betweent the random intercept and slope, this should not be 1
+0.00669 / (sqrt(0.19574) * sqrt(0.00255))
+```
+
+```{r}
+plot(m0)
+```
+
+## Trying with ng = 2
+
+### Start values from m0
+
+-   Score test statistic no longer significant, conditional independence assumption is met
+
+-   $AIC = 3145$
+
+-   $BIC = 3214$
+
+```{r}
+m1 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = m0
+)
+```
+
+```{r}
+summary(m1)
+```
+
+```{r}
+plot(m1)
+```
+
+### Random start values
+
+-   Score test statistic no longer significant, conditional independence assumption is met
+
+-   $AIC = 3145$
+
+-   $BIC = 3214$
+
+```{r}
+m1 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = random(m0)
+)
+```
+
+```{r}
+summary(m1)
+```
+
+```{r}
+plot(m1)
+```
+
+## Trying with ng = 3
+
+### Start values from m0
+
+-   100 iterations without convergence
+
+-   Try with 500
+
+```{r}
+m2 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = m0
+)
+```
+
+```{r}
+summary(m2)
+```
+
+```{r}
+plot(m2)
+```
+
+### Try with max 500 iterations
+
+-   Still does not converge
+
+```{r}
+# m2 <- jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ 1 + time_years_z,
+#   mixture = ~ time_years_z,
+#   classmb = ~ 1,
+#   ng = 3,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data_test,
+#   B = m0,
+#   maxiter = 500
+# )
+```
+
+```{r}
+summary(m2)
+```
+
+### Random start values
+
+```{r}
+m2 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test,
+  B = random(m0)
+)
+```
+
+```{r}
+summary(m2)
+```
+
+```{r}
+plot(m2)
+```

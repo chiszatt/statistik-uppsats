@@ -5,12 +5,16 @@ editor: visual
 ---
 
 ```{r, warning=FALSE}
+# loading the packages
+library(lcmm)
 library(dplyr)
-library(nlme)
 library(survival)
+library(nlme)
+library(lcmm)
 library(JMbayes2)
 library(msm)
 library(mstate)
+library(lubridate)
 ```
 
 ```{r}
@@ -27,24 +31,31 @@ library(mstate)
 # 
 # load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
 # demographics <- PTDEMOG
-
-
-# Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-
-ptau_data = UGOTPTAU181
-
-diagnosis_data = DXSUM
-
-demographics = PTDEMOG
-
-APOE = APOERES
 ```
 
-## 1. We select only the required variables and merge them
+```{r}
+library(ADNIMERGE2)
+# loading data
+# NfL
+nfl_data <- BLENNOWPLASMANFLLONG
+
+# pTAU
+ptau_data <- UGOTPTAU181
+
+# dx data
+diagnosis_data <- DXSUM
+
+# demographic data
+demographics <- PTDEMOG
+
+# genetic data
+apoe <- APOERES
+```
+
+# Pre-processing
 
 ```{r}
+# selecting relevant variables
 nfl_data <- nfl_data %>%
   select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
 
@@ -54,27 +65,34 @@ ptau_data <- ptau_data %>%
 diagnosis_data <- diagnosis_data %>%
   select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
 
-# 1. Lägg _dx på diagnos-kolumner
+# adding a suffix to the dx data
 diagnosis_data_dx <- diagnosis_data %>%
   rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
 
-# 2. Slå ihop NFL, ptau och diagnos
+# merging the data sets
 merged_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
   left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
-```
 
-Checking missing values
+# merging only nfl and ptau
+nfl_ptau <- nfl_data %>%
+  merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+```
 
 ```{r}
 # checking for missing values with NA
-
 # NfL
 sum(is.na(nfl_data))
 nfl_data[which(is.na(nfl_data)), ]
 
 # pTAU
 sum(is.na(ptau_data))
+
+# dx data
+sum(is.na(diagnosis_data))
+
+# genetic data
+sum(is.na(apoe$GENOTYPE))
 
 # checking with ADNI code -4
 # NfL
@@ -84,38 +102,584 @@ sum(nfl_data$PLASMA_NFL < 0, na.rm = TRUE)
 sum(ptau_data$PLASMAPTAU181 < 0, na.rm = TRUE)
 ```
 
-## 2. We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+```{r}
+# removing missing values from nfl data and diagnosis data
+nfl_ptau <- na.omit(nfl_ptau)
+diagnosis_data <- na.omit(diagnosis_data)
+```
+
+## Checking RID with more than one measurement recorded on the same exam date
+
+-   There are 52 individuals with two measurements recorded on the same exam date.
+
+-   How should we deal with these? Average the measurements? Remove the observations?
+
+-   Some of the values are quite different, what do we assume by averaging them? What effect does it have to remove them?
+
+-   For now, remove them:
 
 ```{r}
-# 1. Håll bara demografi-variabler vi behöver och en rad per person
+# checking observations with more than one measurement recorded on the same exam date for nfl
+nfl_double <- nfl_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L) %>%
+  select(RID, EXAMDATE)
+
+# removing the doubled observations
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+
+# checking observations with more than one measurement recorded on the same exam date for ptau
+ptau_double <- ptau_data %>%
+  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
+  filter(n > 1L)  %>%
+  select(RID, EXAMDATE)
+
+# extracting the doubled observations
+# ptau_data %>%
+#   filter(RID %in% ptau_double$RID) %>% 
+#   filter(EXAMDATE %in% ptau_double$EXAMDATE)
+
+# removing the doubled observations
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() == 1) %>%
+  ungroup()
+```
+
+## Baseline date in nfl_ptau
+
+### Creating a single EXAMDATE variable
+
+-   Taking the mid point between EXAMDATE_nfl and EXAMDATE_ptau and adding to EXAMDATE_nfl
+
+```{r}
+nfl_ptau <- nfl_ptau %>%
+  mutate(EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau))
+```
+
+### Creating a baseline_date from the new EXAMDATE variable
+
+```{r}
+nfl_ptau <- nfl_ptau %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE)) %>%
+  ungroup()
+```
+
+Code for creating the baseline_date out of the earliest of the two EXAMDATEs
+
+```{r}
+# # checking which observations have the same examdate for nfl and ptau
+# common <- which(nfl_ptau$EXAMDATE_nfl %in% nfl_ptau$EXAMDATE_ptau)
+# 
+# # checking the observations with different exam dates
+# nfl_ptau[-common, ]
+# 
+# # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+# nfl_ptau <- nfl_ptau %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+#   ungroup()
+```
+
+## Time since baseline in nfl ptau
+
+### Creating variable
+
+```{r}
+# creating a time since baseline visit variable (in years)
+nfl_ptau <- nfl_ptau %>%
+  mutate(time_years = as.numeric(EXAMDATE - baseline_date) / 365.25)
+```
+
+### Rearranging the data frame
+
+-   Moving the time variable together and the biomarker variables together
+
+-   Removing EXAMDATE_nfl and EXAMDATE_ptau
+
+```{r}
+nfl_ptau <- nfl_ptau %>%
+  relocate(c(EXAMDATE, baseline_date, time_years), .after = VISCODE2) %>%
+  select(!c(EXAMDATE_nfl, EXAMDATE_ptau))
+```
+
+## Adding demographic data
+
+### Selecting relevant variables from demographic data and merging with nfl_ptau
+
+```{r}
+# selecting relevant variables (age, gender) and keeping only one row per person
 demographics_small <- demographics %>%
   select(RID, PTDOBYY, PTGENDER) %>%
   distinct(RID, .keep_all = TRUE)
 
-# 2. Slå ihop med merged_data
-merged_data <- merged_data %>%
-  left_join(demographics_small, by = "RID")
-
-# 3. Säkerställ att kön är faktor
-merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
-
-# 4. Konvertera EXAMDATE_ptau till Date
-merged_data$EXAMDATE_ptau <- as.Date(as.character(merged_data$EXAMDATE_ptau), format="%Y-%m-%d")
-
-# 5. Skapa age_at_visit baserat på ptau datum
-merged_data$age_at_visit <- as.numeric(format(merged_data$EXAMDATE_ptau, "%Y")) - merged_data$PTDOBYY
+# merging the demographic data with the biomarker data
+nfl_ptau <- nfl_ptau %>% merge(demographics_small, by = "RID")
 ```
 
-## 3. We filter participants with at least 3 measurements
+### Converting gender to factor, creating an age_at_baseline variable
 
 ```{r}
-# 1) Filtrera personer med minst 2 mätningar
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-merged_data <- merged_data %>% filter(RID %in% keep)
+# converting the gender variable to a factor variable 
+nfl_ptau <- nfl_ptau %>% mutate(PTGENDER = as.factor(PTGENDER))
+
+# creating an age at baseline variable
+nfl_ptau <- nfl_ptau %>% mutate(
+  age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
+```
+
+## Genetic data
+
+-   Trying with a factor for each specific genotype
+
+-   If there is not good distinction between these, since we do not have many individuals with some genotypes, we can collpase down to fewer factors later
+
+### Creating factor variable for the different variants
+
+```{r}
+# creating a factor variable for ApoE genotype and selecting relevant variables
+apoe = apoe %>% mutate(
+  genotype = as.factor(case_when(
+    GENOTYPE == "4/4" ~ "e4/e4",
+    GENOTYPE %in% c("3/4", "2/4") ~ "e4",
+    GENOTYPE == "3/3" ~ "e3/e3",
+    GENOTYPE %in% c("2/3", "2/2") ~ "e2"
+  ))
+) %>%
+  select(RID, genotype)
+```
+
+## Individuals with \> 2 biomarker measurements
+
+```{r}
+# Filtering individuals with at least 3 measurements
+keep <- unique((nfl_ptau %>% group_by(RID) %>% filter(n() > 2))$RID)
+nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
 ```
+
+## Merging biomarker data with diagnosis data by RID but not by VISCODE
+
+-   Keeps all diagnosis data
+
+-   We can then use diagnoses which happen not on the same VISCODE as the biomarker data
+
+-   Check VISCODE2 variable names -\> change to \_bio and \_dx
+
+```{r}
+merged_data <- nfl_ptau %>% merge(diagnosis_data_dx, by = "RID") 
+```
+
+```{r}
+# checking how many missing values are in the merged data frame
+table(is.na(merged_data))
+
+# checking how many missing values per variable
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# since VISCODE2.y is not a model variable, we need to see if these observations have full data for the model variables
+merged_data %>% filter(is.na(VISCODE2.y)) %>% select(EXAMDATE_dx, DIAGNOSIS_dx)
+```
+
+```{r}
+# the rows with missing values can be safely removed since we have none that have full data for the model variables
+merged_data <- na.omit(merged_data)
+```
+
+```{r}
+# merged_data <- merged_data %>%
+#   mutate(
+#     Tevent = as.numeric(EXAMDATE_dx - baseline_date) / 365.25
+#   )
+```
+
+# Multi-State Survival
+
+## Survival data
+
+```{r}
+# old code
+# dx_times <- merged_data %>%
+#   arrange(RID, EXAMDATE_dx) %>%
+#   group_by(RID) %>%
+#   summarise(
+#     t_CN  = first(EXAMDATE_dx[DIAGNOSIS_dx == "CN"]),
+#     t_MCI = first(EXAMDATE_dx[DIAGNOSIS_dx == "MCI"]),
+#     t_AD  = first(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]),
+#     censor_time = max(EXAMDATE_dx)
+#   ) %>% ungroup()
+```
+
+### Diagnosis times data frame
+
+-   Creating variables from time from CN dx to MCI dx and from MCI dx to AD dx
+
+```{r}
+# creating a data frame with diagnosis times: CN -> MCI, MCI -> AD
+dx_times <- diagnosis_data %>%
+  arrange(RID, EXAMDATE) %>%
+  group_by(RID) %>%
+  mutate(
+# creating a variable for the time from first MCI dx to every CN dx
+    t_CN_MCI = ifelse(DIAGNOSIS == "CN",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "MCI"]) - EXAMDATE) / 365.25,
+                      NA),
+# creating a variable for the time from first AD dx to every MCI dx
+    t_MCI_AD = ifelse(DIAGNOSIS == "MCI",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
+                      NA),
+
+    t_CN_AD = ifelse(DIAGNOSIS == "CN",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
+                      NA),
+# 
+  ) %>% ungroup()
+```
+
+```{r}
+# adding a variable to the dx times data frame which tells us whether an individual goes "backwards" from MCI -> CN or from AD -> MCI
+dx_times <- dx_times %>%
+  arrange(RID, t_CN_MCI) %>%
+  group_by(RID) %>% 
+  mutate(backwards_MCI = case_when(
+    (any(DIAGNOSIS == "CN") & any(DIAGNOSIS == "MCI")) == TRUE ~
+      # (ifelse(is.na(t_CN_MCI) == TRUE,
+      #         NA,
+              first(t_CN_MCI) < 0),
+    
+    backwards_AD = ifelse(is.na(t_MCI_AD) == TRUE,
+                          NA,
+                          first(t_MCI_AD) < 0))
+
+# number of individuals which move backwards from MCI -> CN
+sum(na.omit((dx_times %>% select(backwards_MCI, RID) %>% distinct())$backwards_MCI))
+
+# number of individuals which move backwards from MCI -> CN = 0
+sum(na.omit((dx_times %>% select(backwards_AD, RID) %>% distinct())$backwards_AD))
+```
+
+```{r}
+# removing the backwards_AD variable as there are 0 cases
+dx_times <- dx_times %>% select(!backwards_AD)
+```
+
+```{r}
+# creating a shorter version of dx_times where the t_MCI takes the first MCI dx which does not revert to CN dx
+dx_times_short <- dx_times %>%
+  arrange(RID, EXAMDATE) %>%
+  group_by(RID) %>%
+  summarise(
+    t_CN  = first(EXAMDATE[DIAGNOSIS == "CN"]),
+    
+    t_MCI = case_when(
+# for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE 
+      unique(backwards_MCI) == TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"][-1]),
+# otherwise, we take the first EXAMDATE where dx = MCI
+      TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"])
+      ),
+
+# there are no reversions from AD dx, so we just take the first AD dx date
+    t_AD  = first(EXAMDATE[DIAGNOSIS == "Dementia"]),
+    censor_time = max(EXAMDATE)
+  ) %>% ungroup()
+```
+
+OLD
+
+### Transition times
+
+-   For a multistate cox PH model
+
+```{r}
+# times for transitions from CN -> MCI
+# CN_MCI <- dx_times_short %>% filter(is.na(t_CN) == FALSE) %>%
+#   mutate(
+#     from = "CN",
+#     to = "MCI",
+#     Tstart = 0,
+#     Tstop = as.numeric(case_when(
+#       is.na(t_MCI) == TRUE ~ censor_time - t_CN,
+#       TRUE ~ t_MCI - t_CN) / 365.25),
+#     event = case_when(
+#       is.na(t_MCI) == TRUE ~ 0,
+#       TRUE ~ 1
+#     )) %>%
+# #   filtering out any instances of MCI -> CN
+#   filter(
+#     Tstop > 0
+#   ) %>%
+#   select(RID, from, to, Tstart, Tstop, event)
+```
+
+```{r}
+# times for transitions from MCI -> AD
+# MCI_AD <- dx_times_short %>% filter(is.na(t_MCI) == FALSE) %>%
+#   mutate(
+#     from = "MCI",
+#     to = "AD",
+#     Tstart = case_when(
+#       is.na(t_CN) == FALSE ~ as.numeric(t_MCI - t_CN) / 365.25,
+#       TRUE ~ 0),
+#     Tstop = as.numeric(case_when(
+#       is.na(t_AD) == TRUE ~ censor_time - t_CN,
+#       TRUE ~ t_AD - t_CN) / 365.25),
+#     event = case_when(
+#       is.na(t_AD) == TRUE ~ 0,
+#       TRUE ~ 1
+#     )) %>%
+# #   filtering out any instances of AD -> MCI
+#   filter(
+#     Tstart >= 0,
+#     Tstop > 0
+#   ) %>%
+#   select(RID, from, to, Tstart, Tstop, event)
+```
+
+```{r}
+# times for transitions from CN -> AD
+# CN_AD <- dx_times_short %>% filter(is.na(t_CN) == FALSE, is.na(t_AD) == FALSE, is.na(t_MCI) == TRUE) %>%
+#   mutate(
+#     from = "CN",
+#     to = "AD",
+#     Tstart = 0,
+#     Tstop = as.numeric(case_when(
+#       is.na(t_AD) == TRUE ~ censor_time - t_CN,
+#       TRUE ~ t_AD - t_CN) / 365.25),
+#     event = case_when(
+#       is.na(t_AD) == TRUE ~ 0,
+#       TRUE ~ 1
+#     )) %>%
+# #   filtering out any instances of AD -> CN
+#   filter(
+#     Tstart >= 0,
+#     Tstop > 0
+#   ) %>%
+#   select(RID, from, to, Tstart, Tstop, event)
+```
+
+```{r}
+# # times for transitions from CN -> AD or MCI -> AD
+# AD_transitions <- dx_times_short %>%
+#   mutate(
+#     Tstart = 0,
+#     Tstop = as.numeric(case_when(
+#       is.na(t_AD) == TRUE ~ ifelse(is.na(t_CN) == TRUE,
+#                                    censor_time - t_MCI,
+#                                    censor_time - t_CN),
+#       TRUE ~ ifelse(is.na(t_CN) == TRUE,
+#                                    t_AD - t_MCI,
+#                                    t_AD - t_CN)) / 365.25),
+#     event = case_when(
+#       is.na(t_AD) == TRUE ~ 0,
+#       TRUE ~ 1
+#     )) %>%
+# #   filtering out any instances of AD -> CN/MCI
+#   filter(
+#     Tstop > 0
+#   ) %>%
+#   select(RID, Tstart, Tstop, event)
+```
+
+```{r}
+# multistate_data <- bind_rows(CN_MCI, MCI_AD, CN_AD) %>%
+#   arrange(RID, Tstart) %>%
+#   filter(Tstop >= Tstart)
+```
+
+```{r}
+surv_data <- merged_data %>%
+  group_by(RID) %>%
+  summarise(
+    age_at_baseline = unique(age_at_baseline),
+    PTGENDER = unique(PTGENDER),
+    time_to_event = case_when(
+      any(DIAGNOSIS_dx == "Dementia") ~
+        as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
+                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
+      
+      TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
+    
+    event = as.integer(any(DIAGNOSIS_dx == "Dementia"))) %>%
+  ungroup()
+
+# surv_data = merged_data %>% group_by(RID) %>%
+#   summarise(
+#     age_at_baseline = unique(age_at_baseline),
+#     PTGENDER = unique(PTGENDER),
+# 
+#     time_to_dementia = case_when(
+# 
+#     any(DIAGNOSIS_dx == "Dementia") ~
+#       as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) -
+#                    unique(baseline_date)),
+# 
+#     TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+#                     unique(baseline_date)) / 365),
+# 
+#     time_to_MCI = case_when(
+# 
+#     any(DIAGNOSIS_dx == "MCI") ~
+#       as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "MCI"]) -
+#                    unique(baseline_date)),
+# 
+#     TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+#                     unique(baseline_date)) / 365),
+# 
+#     last_dx = DIAGNOSIS_dx[which.max(EXAMDATE_dx)],
+# 
+#     event = case_when(
+#       last_dx == "CN" ~ 0,
+#       last_dx == "MCI" ~ 1,
+#       last_dx == "Dementia" ~ 2,
+#     ))
+```
+
+```{r}
+# selecting the relevant variables for the survial model
+# biomarkers <- nfl_ptau %>%
+#   select(RID, time_years, PLASMA_NFL, PLASMAPTAU181)
+# 
+# # multistate data with the most recent biomarker value added
+# multistate_data_biomarkers <- multistate_data %>%
+#   left_join(biomarkers, by = "RID") %>%
+#   group_by(RID, Tstart, Tstop, from, to, event) %>%
+#   # keep only biomarker values measured before interval end
+#   filter(time_years <= Tstop) %>%
+#   # pick the most recent biomarker
+#   slice_max(time_years, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+```
+
+# Multistate model with coxph()
+
+```{r}
+# fit <- coxph(
+#   Surv(Tstart, Tstop, event) ~ log(PLASMA_NFL) + log(PLASMAPTAU181) + strata(from, to),
+#   data = multistate_data_biomarkers
+# )
+# 
+# summary(fit)
+```
+
+# Survival Model
+
+-   merge event data to nfl_ptau
+
+-   event
+
+-   event time
+
+```{r}
+# jlcmm_data = nfl_ptau %>% merge(AD_transitions, by = "RID")
+```
+
+```{r}
+nfl_ptau <- nfl_ptau %>% arrange(RID, time_years)
+```
+
+```{r}
+# surv_data <- merged_data %>%
+#   group_by(RID) %>%
+#   summarise(
+#     Tevent = ifelse(any(DIAGNOSIS_dx == "Dementia"),
+#                     min(time_years[DIAGNOSIS_dx=="Dementia"]),
+#                     max(time_years)),
+#     event = ifelse(any(DIAGNOSIS_dx == "Dementia"), 1, 0)
+#   )
+```
+
+```{r}
+# Jointlcmm(
+#   fixed = PLASMA_NFL ~ time_years,
+#   random = ~ RID,
+#   mixture = ~ time_years,
+#   classmb = ~ 1,
+#   subject = "RID",
+#   survival = Surv(Tstop, event) ~ age_at_baseline,
+#   data = jlcmm_data,
+#   ng = 3
+# )
+```
+
+## Survival data (CN/MCI -\> AD only)
+
+```{r}
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+
+surv_data <- diagnosis_data %>%
+  group_by(RID) %>%
+  
+  # We create baseline date per patient (whichever EXAMDATE comes first, nfl or ptau)
+  mutate(baseline_date = min(EXAMDATE),
+  
+  # We calculate event and time_to_event based on all diagnosis data
+    # 1 if patient ever developed dementia
+  event = as.integer(any(DIAGNOSIS == "Dementia")),
+  time_to_event = case_when(
+    event == 1 ~
+      as.numeric(min(EXAMDATE[DIAGNOSIS == "Dementia"]) - baseline_date)/365,
+    TRUE ~
+      as.numeric(max(EXAMDATE) - baseline_date)/365)) %>%
+  
+    # We calculate age at baseline
+  # age_at_baseline = as.numeric(format(unique(baseline_date), "%Y")) - PTDOBYY) %>%
+      ungroup() %>%
+  select(RID, event, time_to_event) %>%
+  distinct()
+  
+surv_data <- surv_data %>% filter(RID %in% keep)
+
+  # # We keep only one baseline row per patient
+  # slice_min(order_by = EXAMDATE_ptau, n = 1, with_ties = FALSE)
+    
+  # We remove grouping
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+## Collapsing genotype down to 3 factors
+
+-   e2/e3 containing genotypes
+
+-   e4 heterozygotes
+
+-   e4 homozygotes
+
+-   Now all genotype factors significant
+
+-   Now time_years variance still low, try with only random intercept
+
+```{r}
+# checking current factors
+table(jlcmm_data_test$genotype)
+```
+
+```{r}
+jlcmm_data_test <- jlcmm_data_test %>%
+  mutate(
+    genotype = case_when(
+      genotype == "e2" ~ "e2 e3",
+      genotype == "e3/e3" ~ "e2 e3",
+      genotype == "e4" ~ "e4",
+      genotype == "e4/e4" ~ "e4/e4"
+    )
+  )
+```
+
+```{r}
+# checking changed factors
+table(jlcmm_data_test$genotype)
+```
+
+# OLD
 
 ```{r}
 # Skapar baseline-datum
@@ -155,66 +719,12 @@ merged_data <- merged_data %>%
 table(surv_data$event)
 ```
 
-## 5. We create a time variable (time from baseline)
-
-```{r}
-# 5) Skapa time_years (tid från baseline)
-merged_data <- merged_data %>%
-  mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
-```
-
-## 7. We check for missing values in both merged_data and long_data
-
-```{r}
-# We count missing values per column in merged_data
-sapply(merged_data, function(x) sum(is.na(x)))
-
-# We count missing values per column in surv_data
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
-```{r}
-merged_data <- na.omit(merged_data)
-surv_data <- na.omit(surv_data)
-
-# We re-count missing values
-sapply(merged_data, function(x) sum(is.na(x)))
-sapply(surv_data, function(x) sum(is.na(x)))
-```
-
-## 8. We make sure we don't have any extreme values (for the longitudinal model)
-
-```{r}
-summary(merged_data$log_PLASMAPTAU181)
-any(is.infinite(merged_data$log_PLASMAPTAU181)) # should be FALSE
-# Inf = extreme values 
-
-summary(merged_data$log_PLASMA_NFL)
-any(is.infinite(merged_data$log_PLASMA_NFL)) # should be FALSE
-# Inf = extreme values 
-```
-
-## 9. We make sure that merged_data and surv_data have the same length (for the joint model)
-
 ```{r}
 length(unique(merged_data$RID))   # longitudinala data
 length(unique(surv_data$RID))     # survival data
 ```
 
-# Longitudinal model
-
-```{r}
-# Longitudinal model
-long_model <- lme(
-  log_PLASMAPTAU181 ~ time_years + PTGENDER.y,
-  random = ~ time_years | RID,   # random intercept + slope
-  data = merged_data
-  )
-
-summary(long_model)
-```
-
-# Survival model
+# Multistate model with msm()
 
 ```{r}
 # multi-state data
@@ -314,23 +824,4 @@ sojourn.msm(fit_msm)
 # # Plot transition probabilities over time
 # range = range(ms_data$time_years)
 # plot(fit_msm, range = c(0, 8.01))
-```
-
-### Need to fit a coxPH model
-
-```{r}
-
-```
-
-# Joint model
-
-How to use a msm object in jm() function? -\> pass coxPH multistate model instead of msm()!!
-
-```{r}
-# Joint model 
-joint_model <- jm(
-  fit_msm,
-  long_model,
-  time_var = "time_years"
-  )
 ```
