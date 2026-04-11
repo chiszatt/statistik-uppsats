@@ -157,7 +157,7 @@ long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
 
 # Two separate joint models
 
-## Two separate baseline, age_at_baseline and time_to_event (one for ptau, one for nfl) 
+## Two separate baseline, age_at_baseline and time_to_event (one for ptau, one for nfl)
 
 ```{r}
 # We calculate baseline for each biomarker per participant
@@ -219,7 +219,7 @@ surv_data_simple %>%
   filter(RID == 61)
 ```
 
-## Two separate time_years (one for ptau, one for nfl) 
+## Two separate time_years (one for ptau, one for nfl)
 
 ```{r}
 long_data_simple <- long_data %>%
@@ -293,7 +293,7 @@ surv_model_nfl <- coxph(
 summary(surv_model_nfl)
 ```
 
-## Two separate joint models (one for ptau, one for nfl) 
+## Two separate joint models (one for ptau, one for nfl)
 
 ```{r}
 joint_model_ptau <- jm(
@@ -463,7 +463,7 @@ fForms <- list(
   )      
 ```
 
-## One multivariate joint model 
+## One multivariate joint model
 
 ```{r}
 multi_joint_model <- jm(surv_model_multi, mixed,
@@ -481,3 +481,100 @@ summary(multi_joint_model)
 summary <- summary(multi_joint_model)
 summary$Survival
 ```
+
+# Test av latent class joint model
+
+Funkade inte, konvergerade inte, men man kan göra two stage approach istället, där man gör hlme_ptau_2 + cox
+
+```{r}
+# 1. PACKAGES
+library(dplyr)
+library(lcmm)
+library(survival)
+
+# 2. LONGITUDINAL MODEL (STEP 1)
+# Standardize biomarker (recommended for stability)
+long_data_simple$log_PLASMAPTAU181_z <- as.numeric(
+  scale(long_data_simple$log_PLASMAPTAU181)
+)
+
+# Fit latent class mixed model (2 classes)
+hlme_1 <- hlme(
+  fixed   = log_PLASMAPTAU181_z ~ time_years_ptau,
+  random  = ~ time_years_ptau,
+  subject = "RID",
+  ng      = 1,
+  data    = long_data_simple
+)
+
+hlme_ptau_2 <- gridsearch(
+  rep = 20,
+  maxiter = 30,
+  minit = hlme_1,
+  hlme(
+    fixed   = log_PLASMAPTAU181_z ~ time_years_ptau,
+    mixture = ~ time_years_ptau,
+    random  = ~ time_years_ptau,
+    subject = "RID",
+    ng      = 2,
+    data    = long_data_simple
+  )
+)
+
+summary(hlme_ptau_2)
+```
+
+```{r}
+# 3. ASSIGN LATENT CLASSES
+# Extract most likely class per subject
+class_df <- hlme_ptau_2$pprob[, c("RID", "class")]
+
+# Merge class into survival dataset
+surv_data_simple <- surv_data_simple %>%
+  left_join(class_df, by = "RID")
+```
+
+```{r}
+# 4. SURVIVAL MODELS (STEP 2)
+# --- Baseline Cox model (no biomarker structure)
+cox_base <- coxph(
+  Surv(time_to_event_pTau, event) ~ age_at_baseline_pTau + APOE4_status,
+  data = surv_data_simple
+)
+
+summary(cox_base)
+
+# --- Two-stage Cox model 
+cox_twostage <- coxph(
+  Surv(time_to_event_pTau, event) ~ class + age_at_baseline_pTau + APOE4_status,
+  data = surv_data_simple
+)
+
+summary(cox_twostage)
+```
+
+```{r}
+# 5. MODEL PERFORMANCE (C-INDEX)
+cox_base$concordance
+cox_twostage$concordance
+```
+
+```{r}
+# 6. SURVIVAL CURVES BY CLASS
+library(survminer)
+
+fit <- survfit(
+  Surv(time_to_event_pTau, event) ~ class,
+  data = surv_data_simple
+)
+
+ggsurvplot(
+  fit,
+  data = surv_data_simple,
+  risk.table = TRUE,
+  pval = TRUE,
+  conf.int = TRUE
+)
+```
+
+Latent class membership was significantly associated with dementia-free survival (p = 0.046), with class 2 showing poorer outcomes. However, discrimination performance was modest, indicating that while trajectory classes capture underlying heterogeneity, they provide limited incremental prognostic value beyond traditional covariates.
