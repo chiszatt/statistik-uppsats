@@ -14,6 +14,7 @@ library(nlme)
 library(lcmm)
 library(lubridate)
 library(ggsurvfit)
+library(Hmisc)
 ```
 
 ```{r}
@@ -64,7 +65,7 @@ nfl_ptau <- na.omit(nfl_ptau)
 diagnosis_data <- na.omit(diagnosis_data)
 ```
 
-## Checking RID with more than one measurement recorded on the same exam date
+### Checking RID with more than one measurement recorded on the same exam date
 
 -   There are 52 individuals with two measurements recorded on the same exam date.
 
@@ -105,7 +106,7 @@ ptau_data <- ptau_data %>%
   ungroup()
 ```
 
-## Baseline date in nfl_ptau
+### Baseline date in nfl_ptau
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -121,7 +122,7 @@ nfl_ptau <- nfl_ptau %>%
   ungroup()
 ```
 
-## Time since baseline in nfl ptau
+### Time since baseline in nfl ptau
 
 ```{r}
 # creating a time since baseline visit variable (in years)
@@ -129,7 +130,7 @@ nfl_ptau <- nfl_ptau %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
-## Selected demographics in nfl_ptau
+### Selected demographics in nfl_ptau
 
 -   Merging DOB, gender and creating an age at baseline variable
 
@@ -154,7 +155,7 @@ nfl_ptau <- nfl_ptau %>% mutate(
   age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
 ```
 
-## Factor variable for genotype in apoe
+### Factor variable for genotype in apoe
 
 -   Trying with a factor for each specific genotype
 
@@ -173,7 +174,7 @@ apoe = apoe %>% mutate(
   select(RID, genotype)
 ```
 
-## We filter participants with at least 3 measurements in nfl_ptau
+### We filter participants with at least 3 measurements in nfl_ptau
 
 ```{r}
 # Filtering individuals with at least 3 measurements
@@ -182,6 +183,10 @@ nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
+```
+
+```{r}
+boxplot(PLASMA_NFL ~ RID, data = nfl_ptau)
 ```
 
 ## Survival data
@@ -214,7 +219,13 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 table(surv_data$event)
 ```
 
-## Creating a single EXAMDATE variable
+### Merging genotype data
+
+```{r}
+surv_data <- surv_data %>% merge(apoe, by = "RID")
+```
+
+### Creating a single EXAMDATE variable
 
 ```{r}
 nfl_ptau <- nfl_ptau %>%
@@ -223,9 +234,9 @@ nfl_ptau <- nfl_ptau %>%
   relocate(c(baseline_date, EXAMDATE, time_years), .after = VISCODE2)
 ```
 
-## Joint Latent Class Mixed Models DATA
+# Joint Latent Class Mixed Models DATA
 
-Creating the survival data from the diagnosis data, and then merging the longitudinal data and survival data by RID
+### Creating the survival data from the diagnosis data, and then merging the longitudinal data and survival data by RID
 
 -   Keeps all diagnosis data
 
@@ -255,12 +266,6 @@ jlcmm_data <- nfl_ptau %>%
 # transforming the data
 jlcmm_data <- jlcmm_data %>%
   mutate(ln_PLASMA_NFL = log(PLASMA_NFL))
-```
-
-```{r}
-# merging genetic data
-jlcmm_data <- jlcmm_data %>%
-  merge(apoe, by = "RID")
 ```
 
 # JLCMM fitting
@@ -331,14 +336,14 @@ jlcmm_data <- jlcmm_data %>%
 ```
 
 ```{r}
-jlcmm(
-  fixed = ln_PLASMA_NFL ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data,
-  maxiter = 500
-)
+# jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years,
+#   random = ~ time_years,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data,
+#   maxiter = 500
+# )
 ```
 
 # JLCMM PROBLEMS
@@ -408,7 +413,7 @@ jlcmm(
 )
 ```
 
-## Try again with only time_to_event \> 0
+## jlcmm_data_test: try again with only time_to_event \> 0
 
 -   This works!
 
@@ -759,38 +764,41 @@ gridsearch(rep = 20, maxiter = 20,
 ))
 ```
 
-## Checking if Weibull is better fit than cox
+# Testing Weibull and Cox
 
--   Fitting the cox PH model and a Weibull regression model
+### CoxPH and Weibull regressions
+
+-   Surv object, removing time_to_event = 0
+
+-   Both model outputs show that the e3 homozyogotic genotype does not have a hazard significantly different from the baseline level, which is genotypes containing the e2 allele (whether that be heterozygotic or homozygotic). This gives more support to collapsing the genotype into three levels instead of four.
 
 ```{r}
-fit_cox <- coxph(Surv(time_to_event, event) ~ genotype,
-                 data = jlcmm_data_test)
+surv_data_test <- surv_data %>% filter(time_to_event > 0)
+s_data <- Surv(surv_data_test$time_to_event, surv_data_test$event)
+```
 
-fit_weib <- survreg(Surv(time_to_event, event) ~ genotype,
-                    dist="weibull", data = jlcmm_data_test)
+```{r}
+# fitting a coxph model with surv_data_test 
+fit_cox <- coxph(s_data ~ genotype, data = surv_data_test)
+
+# fitting a weibull regression model with surv_data_test 
+fit_weib <- survreg(s_data ~ genotype, dist="weibull", data = surv_data_test)
 ```
 
 ```{r}
 summary(fit_cox)
 ```
 
--   Testing the proportional hazard assumption, significant test statistic means we cannot assume proportionality at the 0.05 significance level
-
--   Schoenfield residuals should be flat and centered around 0 to assume proportionality
-
--   <https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html>
-
 ```{r}
-cox.zph(fit_cox)
-
-plot(cox.zph(fit_cox))
+summary(fit_weib)
 ```
+
+### Kaplan-Meier and log-log survival curves
 
 ```{r}
 par(mfrow = c(1, 2))
 
-surv_fit <- (survfit(Surv(time_to_event, event) ~ genotype, data = jlcmm_data_test))
+surv_fit <- (survfit(s_data ~ genotype, data = surv_data_test))
 
 ggsurvfit(surv_fit) +
           labs(x = "Time-to-diagnosis",
@@ -806,8 +814,113 @@ ggsurvfit(surv_fit, type = "cloglog") +
 ```
 
 ```{r}
+# rcorr.cens(predict(s_data), surv_data_test)["C Index"]
+# rcorr.cens(predict(s_data), surv_data_test)["C Index"]
+```
+
+### Assumption of proportional hazards, residuals
+
+-   Testing the proportional hazard assumption, significant test statistic means we cannot assume proportionality at the 0.05 significance level
+
+-   Schoenfield residuals should be flat and centered around 0 to assume proportionality
+
+-   <https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html>
+
+```{r}
+cox.zph(fit_cox)
+
+plot(cox.zph(fit_cox))
+```
+
+### Log-rank and generalized Wilcoxon tests
+
+-   Log-rank
+
+-   Generalised Wilcoxon
+
+```{r}
+# computing the log-rank test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 0)
+
+# computing the generalised Wilcoxon test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 1)
+```
+
+## Collapsing genotype down to 4 factors
+
+```{r}
+surv_data_test <- surv_data_test %>%
+  mutate(
+    genotype = case_when(
+      genotype == "e2" ~ "e2 e3",
+      genotype == "e3/e3" ~ "e2 e3",
+      genotype == "e4" ~ "e4",
+      genotype == "e4/e4" ~ "e4/e4"
+    )
+  )
+```
+
+### CoxPH and Weibull regressions with 3 genotype levels
+
+```{r}
+s_data <- Surv(surv_data_test$time_to_event, surv_data_test$event)
+```
+
+```{r}
+# fitting a coxph model with time_to_event > 0 and 3 levels to genotype
+fit_cox <- coxph(s_data ~ genotype, data = surv_data_test)
+
+# fitting a weibull regression model with time_to_event > 0 and 3 levels to genotype
+fit_weib <- survreg(s_data ~ genotype, dist="weibull", data = surv_data_test)
+```
+
+```{r}
+summary(fit_cox)
+```
+
+```{r}
 summary(fit_weib)
 ```
+
+### Kaplan-Meier and log-log survival curves
+
+```{r}
+par(mfrow = c(1, 2))
+
+surv_fit <- (survfit(s_data ~ genotype, data = surv_data_test))
+
+ggsurvfit(surv_fit) +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "Kaplan-Meier curves by genotype") +
+  theme_classic()
+
+ggsurvfit(surv_fit, type = "cloglog") +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "log-log survival curve") +
+  theme_classic()
+```
+
+### Assumption of proportional hazards, residuals
+
+```{r}
+cox.zph(fit_cox)
+
+plot(cox.zph(fit_cox))
+```
+
+### Log-rank and generalized Wilcoxon tests
+
+```{r}
+# computing the log-rank test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 0)
+
+# computing the generalised Wilcoxon test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 1)
+```
+
+# Testing different hazards
 
 ### Trying with splines hazard
 
