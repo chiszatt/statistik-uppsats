@@ -484,7 +484,7 @@ summary$Survival
 
 # Test av latent class joint model
 
-Funkade inte, konvergerade inte, men man kan göra two stage approach istället, där man gör hlme_ptau_2 + cox
+Vi börjar med att kolla om det finns latent struktur ens, om det finns 2 klasser:
 
 ```{r}
 # 1. PACKAGES
@@ -523,6 +523,16 @@ hlme_ptau_2 <- gridsearch(
 
 summary(hlme_ptau_2)
 ```
+
+Posterior probabilities
+
+```{r}
+postprob(hlme_ptau_2)
+```
+
+Modellen separerar individer ganska tydligt, MEN den separerar en pytteliten grupp (där class 1 = 20 personer (2.6%), och Class 2 = 748 personer (97.4%)) –\> Inte direkt 2 klasser, utan bara en extremgrupp.... Säkert därför en latent class joint modell inte konvergerar (eftersom det finns ingen LATENT STRUKTUR)
+
+(Nu är det ju onödigt, men om vi skulle vilja använda en two stage approach (cox model + klass(hlme_ptau_2)) skulle det ske såhär:)
 
 ```{r}
 # 3. ASSIGN LATENT CLASSES
