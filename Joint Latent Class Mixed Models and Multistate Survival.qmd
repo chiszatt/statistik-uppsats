@@ -13,6 +13,8 @@ library(ADNIMERGE2)
 library(nlme)
 library(lcmm)
 library(lubridate)
+library(ggsurvfit)
+library(Hmisc)
 ```
 
 ```{r}
@@ -63,7 +65,7 @@ nfl_ptau <- na.omit(nfl_ptau)
 diagnosis_data <- na.omit(diagnosis_data)
 ```
 
-## Checking RID with more than one measurement recorded on the same exam date
+### Checking RID with more than one measurement recorded on the same exam date
 
 -   There are 52 individuals with two measurements recorded on the same exam date.
 
@@ -104,7 +106,7 @@ ptau_data <- ptau_data %>%
   ungroup()
 ```
 
-## Baseline date in nfl_ptau
+### Baseline date in nfl_ptau
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -120,7 +122,7 @@ nfl_ptau <- nfl_ptau %>%
   ungroup()
 ```
 
-## Time since baseline in nfl ptau
+### Time since baseline in nfl ptau
 
 ```{r}
 # creating a time since baseline visit variable (in years)
@@ -128,7 +130,7 @@ nfl_ptau <- nfl_ptau %>%
   mutate(time_years = as.numeric(EXAMDATE_ptau - baseline_date) / 365.25)
 ```
 
-## Selected demographics in nfl_ptau
+### Selected demographics in nfl_ptau
 
 -   Merging DOB, gender and creating an age at baseline variable
 
@@ -153,7 +155,7 @@ nfl_ptau <- nfl_ptau %>% mutate(
   age_at_baseline = as.numeric(format(baseline_date, "%Y")) - PTDOBYY)
 ```
 
-## Factor variable for genotype in apoe
+### Factor variable for genotype in apoe
 
 -   Trying with a factor for each specific genotype
 
@@ -172,7 +174,7 @@ apoe = apoe %>% mutate(
   select(RID, genotype)
 ```
 
-## We filter participants with at least 3 measurements in nfl_ptau
+### We filter participants with at least 3 measurements in nfl_ptau
 
 ```{r}
 # Filtering individuals with at least 3 measurements
@@ -181,6 +183,10 @@ nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
+```
+
+```{r}
+boxplot(PLASMA_NFL ~ RID, data = nfl_ptau)
 ```
 
 ## Survival data
@@ -213,7 +219,13 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 table(surv_data$event)
 ```
 
-## Creating a single EXAMDATE variable
+### Merging genotype data
+
+```{r}
+surv_data <- surv_data %>% merge(apoe, by = "RID")
+```
+
+### Creating a single EXAMDATE variable
 
 ```{r}
 nfl_ptau <- nfl_ptau %>%
@@ -222,9 +234,9 @@ nfl_ptau <- nfl_ptau %>%
   relocate(c(baseline_date, EXAMDATE, time_years), .after = VISCODE2)
 ```
 
-## Joint Latent Class Mixed Models DATA
+# Joint Latent Class Mixed Models DATA
 
-Creating the survival data from the diagnosis data, and then merging the longitudinal data and survival data by RID
+### Creating the survival data from the diagnosis data, and then merging the longitudinal data and survival data by RID
 
 -   Keeps all diagnosis data
 
@@ -256,12 +268,6 @@ jlcmm_data <- jlcmm_data %>%
   mutate(ln_PLASMA_NFL = log(PLASMA_NFL))
 ```
 
-```{r}
-# merging genetic data
-jlcmm_data <- jlcmm_data %>%
-  merge(apoe, by = "RID")
-```
-
 # JLCMM fitting
 
 ## Specifying random components
@@ -280,17 +286,36 @@ jlcmm_data <- jlcmm_data %>%
 
 -   Goodness-of-fit statistics
 
-    -   Information criteria are model selection criteria. Some information criteria are better than others for a specific purpose, depending on, for example the data generating process, suggested models and sample size (pg.2).
+    -   Information criteria are an example of model selection criteria. Some information criteria are better than others for a specific purpose, depending on, for example the data generating process, suggested models and sample size (pg 2). Zhang et al. (pg 4) explain how when the objective of model selection is for prediction, it may not be critical that the selected covariates change with sample size, yet when the focus is on inference, stable model covariates are necessary for a clear interpretation of the data genereating process. Model consistency: inference, model efficiency: prediction.
 
         Zhang, J., Yang, Y. and Ding, J. (2023). Information criteria for model selection. *Wiley interdisciplinary reviews. Computational statistics*, 15(5). doi:https://doi.org/10.1002/wics.1607.
 
-    -   Akaike Information Criterion
+    -   Akaike Information Criterion: Akaike (1974, 1998 -\> original sources)
 
-    -   Bayesian Information Criterion
+        $$
+        AIC = 2k - 2 ln(\widehat L)
+        $$
+
+        $$
+        \begin{aligned}
+        where \quad \widehat L =\text{the maximised value of the likelihood function} \\
+        k = \text{the number of parameters estimated by the model}
+        \end{aligned}
+        $$
+
+    -   Bayesian Information Criterion: Schwarz (1978): penalises complex models more than AIC
+
+        $$
+        BIC = kln(n) - 2ln(\widehat L)
+        $$
+
+    -   The score statistic for the score test of conditional independence (Jacqmin-Gadda)
 
 -   Estimates, Wald and p-value
 
 -   Variance-covariance matrix for the random effects
+
+    -   If the
 
 ### Model fitting examples from the lcmm package
 
@@ -311,24 +336,14 @@ jlcmm_data <- jlcmm_data %>%
 ```
 
 ```{r}
-jlcmm(
-  fixed = ln_PLASMA_NFL ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data,
-  maxiter = 500
-)
-
-# to do on the 1 class model if not converging -> local maxima
-# gridsearch(jlcmm(
+# jlcmm(
 #   fixed = ln_PLASMA_NFL ~ time_years,
-#   random = ~ 1,
+#   random = ~ time_years,
 #   subject = "RID",
-#   survival = Surv(time_to_event, event) ~ age_,
-#   data = jlcmm_data
-#   ),
-#   rep = 20, maxiter = 20, minit = 10)
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data,
+#   maxiter = 500
+# )
 ```
 
 # JLCMM PROBLEMS
@@ -398,7 +413,7 @@ jlcmm(
 )
 ```
 
-## Try again with only time_to_event \> 0
+## jlcmm_data_test: try again with only time_to_event \> 0
 
 -   This works!
 
@@ -474,6 +489,8 @@ plot(m0)
 -   $BIC = 3288$
 
 -   Increased slope variance
+
+# M0
 
 ```{r}
 m0 <- jlcmm(
@@ -616,6 +633,8 @@ plot(m0)
 
 -   $BIC = 3214$
 
+# M1
+
 ```{r}
 m1 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -674,8 +693,6 @@ plot(m1)
 
 -   100 iterations without convergence
 
--   Try with 500
-
 ```{r}
 m2 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -718,13 +735,23 @@ plot(m2)
 ```
 
 ```{r}
-summary(m2)
+# summary(m2)
 ```
 
-### Random start values
+### Try with gridsearch()
 
 ```{r}
-m2 <- jlcmm(
+# not converging -> local maxima -> try to find global maximum with gridsearch()
+
+gridsearch(rep = 20, maxiter = 20,
+           minit = jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+),
+           m = jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
   random = ~ 1 + time_years_z,
   mixture = ~ time_years_z,
@@ -733,14 +760,212 @@ m2 <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ genotype,
   data = jlcmm_data_test,
-  B = random(m0)
+  B = m0
+))
+```
+
+# Testing Weibull and Cox
+
+### CoxPH and Weibull regressions
+
+-   Surv object, removing time_to_event = 0
+
+-   Both model outputs show that the e3 homozyogotic genotype does not have a hazard significantly different from the baseline level, which is genotypes containing the e2 allele (whether that be heterozygotic or homozygotic). This gives more support to collapsing the genotype into three levels instead of four.
+
+```{r}
+surv_data_test <- surv_data %>% filter(time_to_event > 0)
+s_data <- Surv(surv_data_test$time_to_event, surv_data_test$event)
+```
+
+```{r}
+# fitting a coxph model with surv_data_test 
+fit_cox <- coxph(s_data ~ genotype, data = surv_data_test)
+
+# fitting a weibull regression model with surv_data_test 
+fit_weib <- survreg(s_data ~ genotype, dist="weibull", data = surv_data_test)
+```
+
+```{r}
+summary(fit_cox)
+```
+
+```{r}
+summary(fit_weib)
+```
+
+### Kaplan-Meier and log-log survival curves
+
+```{r}
+par(mfrow = c(1, 2))
+
+surv_fit <- (survfit(s_data ~ genotype, data = surv_data_test))
+
+ggsurvfit(surv_fit) +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "Kaplan-Meier curves by genotype") +
+  theme_classic()
+
+ggsurvfit(surv_fit, type = "cloglog") +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "log-log survival curve") +
+  theme_classic()
+```
+
+```{r}
+# rcorr.cens(predict(s_data), surv_data_test)["C Index"]
+# rcorr.cens(predict(s_data), surv_data_test)["C Index"]
+```
+
+### Assumption of proportional hazards, residuals
+
+-   Testing the proportional hazard assumption, significant test statistic means we cannot assume proportionality at the 0.05 significance level
+
+-   Schoenfield residuals should be flat and centered around 0 to assume proportionality
+
+-   <https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html>
+
+```{r}
+cox.zph(fit_cox)
+
+plot(cox.zph(fit_cox))
+```
+
+### Log-rank and generalized Wilcoxon tests
+
+-   Log-rank
+
+-   Generalised Wilcoxon
+
+```{r}
+# computing the log-rank test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 0)
+
+# computing the generalised Wilcoxon test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 1)
+```
+
+## Collapsing genotype down to 4 factors
+
+```{r}
+surv_data_test <- surv_data_test %>%
+  mutate(
+    genotype = case_when(
+      genotype == "e2" ~ "e2 e3",
+      genotype == "e3/e3" ~ "e2 e3",
+      genotype == "e4" ~ "e4",
+      genotype == "e4/e4" ~ "e4/e4"
+    )
+  )
+```
+
+### CoxPH and Weibull regressions with 3 genotype levels
+
+```{r}
+s_data <- Surv(surv_data_test$time_to_event, surv_data_test$event)
+```
+
+```{r}
+# fitting a coxph model with time_to_event > 0 and 3 levels to genotype
+fit_cox <- coxph(s_data ~ genotype, data = surv_data_test)
+
+# fitting a weibull regression model with time_to_event > 0 and 3 levels to genotype
+fit_weib <- survreg(s_data ~ genotype, dist="weibull", data = surv_data_test)
+```
+
+```{r}
+summary(fit_cox)
+```
+
+```{r}
+summary(fit_weib)
+```
+
+### Kaplan-Meier and log-log survival curves
+
+```{r}
+par(mfrow = c(1, 2))
+
+surv_fit <- (survfit(s_data ~ genotype, data = surv_data_test))
+
+ggsurvfit(surv_fit) +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "Kaplan-Meier curves by genotype") +
+  theme_classic()
+
+ggsurvfit(surv_fit, type = "cloglog") +
+          labs(x = "Time-to-diagnosis",
+               y = "log-log survival",
+               title = "log-log survival curve") +
+  theme_classic()
+```
+
+### Assumption of proportional hazards, residuals
+
+```{r}
+cox.zph(fit_cox)
+
+plot(cox.zph(fit_cox))
+```
+
+### Log-rank and generalized Wilcoxon tests
+
+```{r}
+# computing the log-rank test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 0)
+
+# computing the generalised Wilcoxon test statistic for genotype
+survdiff(s_data ~ surv_data_test$genotype, rho = 1)
+```
+
+# Testing different hazards
+
+### Trying with splines hazard
+
+-   ng = 1
+
+```{r}
+m0_splines <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  hazard = "splines",
+  data = jlcmm_data_test,
 )
 ```
 
 ```{r}
-summary(m2)
+summary(m0_splines)
 ```
 
 ```{r}
-plot(m2)
+plot(m0_splines)
+```
+
+-   ng = 2
+
+```{r}
+m1_splines <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  hazard = "splines",
+  data = jlcmm_data_test,
+  B = m0_splines
+)
+```
+
+```{r}
+summary(m1_splines)
+```
+
+```{r}
+plot(m1_splines)
 ```
