@@ -702,6 +702,8 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
+## We check the length of longitudinal data and survival data
+
 ```{r}
 # We check the length of each dataset 
 length(unique(long_data$RID)) # longitudinal data
@@ -757,7 +759,7 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## We extract baseline visits, and create an event variable and a time-to-event variable
+## Titel? 
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -783,84 +785,6 @@ long_data <- long_data %>%
   group_by(RID) %>%
   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
 ungroup()
-```
-
-```{r}
-# We calculate baseline for each biomarker per participant
-surv_data <- surv_data %>%
-  group_by(RID) %>%
-  mutate(
-    # We calculate baseline for pTau using the first non-missing measurement
-    baseline_pTau = {
-      if(all(is.na(PLASMAPTAU181))) NA else min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
-    },    
-    
-    # We calculate baseline for NFL using the first non-missing measurement
-    baseline_NFL  = {
-      if(all(is.na(PLASMA_NFL))) NA else min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-    },
-    
-    # We record age at baseline for each biomarker
-    age_at_baseline_pTau = age_at_visit[EXAMDATE_ptau == baseline_pTau][1],
-    age_at_baseline_NFL  = age_at_visit[EXAMDATE_nfl == baseline_NFL][1],
-    
-    # We indicate whether the participant ever developed dementia
-    event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
-    
-    # We calculate time-to-event from each biomarker baseline
-    time_to_event_pTau = case_when(
-  event == 1 ~ as.numeric(
-    min(EXAMDATE_dx[
-      DIAGNOSIS_dx == "Dementia" & EXAMDATE_dx >= baseline_pTau
-    ]) - baseline_pTau
-  ) / 365,
-  
-  TRUE ~ as.numeric(max(EXAMDATE_dx) - baseline_pTau) / 365
-),
-    time_to_event_NFL = case_when(
-  event == 1 ~ as.numeric(
-    min(EXAMDATE_dx[
-      DIAGNOSIS_dx == "Dementia" & EXAMDATE_dx >= baseline_NFL
-    ]) - baseline_NFL
-  ) / 365,
-  
-  TRUE ~ as.numeric(max(EXAMDATE_dx) - baseline_NFL) / 365
-)
-    
-  ) %>%
-  ungroup()
-
-# We only keep one baseline row per participant for pTau or NFL
-surv_data <- surv_data %>%
-  group_by(RID) %>%
-  filter(EXAMDATE_ptau == baseline_pTau | EXAMDATE_nfl == baseline_NFL) %>%
-  slice(1) %>%  # We take the first row if multiple rows match
-  ungroup()
-
-# We count how many participants experienced the event
-table(surv_data$event)
-
-# Example: show participant with RID 61
-surv_data %>%
-  filter(RID == 61)
-```
-
-## We create a time variable (time from baseline)
-
-```{r}
-long_data <- long_data %>%
-  group_by(RID) %>%
-  # We create baseline for PTau
-  mutate(
-    baseline_date_ptau = min(EXAMDATE_ptau, na.rm = TRUE),
-    time_years_ptau = as.numeric(EXAMDATE_ptau - baseline_date_ptau) / 365.25
-  ) %>%
-  # We create baseline for NFL
-  mutate(
-    baseline_date_nfl = min(EXAMDATE_nfl, na.rm = TRUE),
-    time_years_nfl = as.numeric(EXAMDATE_nfl - baseline_date_nfl) / 365.25
-  ) %>%
-  ungroup()
 ```
 
 ## We check the distribution of each relevant variable for multivariate joint model and transform
@@ -918,7 +842,287 @@ large_outliers_nfl
 small_outliers_nfl
 ```
 
-## We make sure that merged_data and surv_data have the same length (for the joint model)
+## Preparing for two separate joint models 
+
+### Two separate baseline, age_at_baseline and time_to_event (one for p-tau181, one for NfL)
+
+```{r}
+##### We prepare survival data for ptau
+ptau_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
+    EXAMDATE_dx   = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first valid pTau measurement date per individual
+    baseline_ptau = min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+    
+    # We define age at baseline pTau visit
+    age_at_baseline_ptau = age_at_visit[
+      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
+    ][1],
+    
+    # We define the event date as the first dementia diagnosis after baseline
+    event_date = {
+      
+      # We extract baseline for filtering
+      base <- min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
+      
+      # We extract all dementia diagnosis dates
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      
+      # We restrict events to those occurring strictly after baseline
+      dx_dates <- dx_dates[dx_dates > base]
+      
+      # We assign NA if no dementia event occurs after baseline
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up as the maximum observed visit across all data sources
+    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
+    event_ptau = as.integer(!is.na(event_date)),
+    
+    # We compute time-to-event in years from baseline to event or censoring
+    time_to_event_ptau = if_else(
+      
+      # We use event date if dementia occurred
+      event_ptau == 1,
+      
+      # We calculate time difference in years between event and baseline
+      as.numeric(event_date - baseline_ptau) / 365.25,
+      
+      # We calculate time difference in years between last follow-up and baseline
+      as.numeric(last_followup - baseline_ptau) / 365.25
+    )
+  )
+
+# We keep one row per participant and attach all original variables
+surv_data_ptau <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(ptau_core, by = "RID")
+
+# We tabulate the ptau event indicator (1 = dementia, 0 = censored)
+table(surv_data_ptau$event_ptau)
+```
+
+```{r}
+##### We prepare survival data for ptau
+nfl_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
+    EXAMDATE_dx  = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first valid NFL measurement date per individual
+    baseline_nfl = min(EXAMDATE_nfl[!is.na(PLASMA_NFL)]),
+    
+    # We define age at baseline NFL visit
+    age_at_baseline_nfl = age_at_visit[
+      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ][1],
+    
+    # We define the event date as the first dementia diagnosis after baseline
+    event_date = {
+      
+      # We extract baseline for filtering
+      base <- min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      
+      # We extract all dementia diagnosis dates
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      
+      # We restrict events to those occurring strictly after baseline
+      dx_dates <- dx_dates[dx_dates > base]
+      
+      # We assign NA if no dementia event occurs after baseline
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up as the maximum observed visit across all data sources
+    last_followup = max(c(EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
+    event_nfl = as.integer(!is.na(event_date)),
+    
+    # We compute time-to-event in years from baseline to event or censoring
+    time_to_event_nfl = if_else(
+      
+      # We use event date if dementia occurred
+      event_nfl == 1,
+      
+      # We calculate time difference in years between event and baseline
+      as.numeric(event_date - baseline_nfl) / 365.25,
+      
+      # We calculate time difference in years between last follow-up and baseline
+      as.numeric(last_followup - baseline_nfl) / 365.25
+    )
+  )
+
+# We keep one row per participant and attach all original variables
+surv_data_nfl <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(nfl_core, by = "RID")
+
+# We tabulate the nfl event indicator (1 = dementia, 0 = censored)
+table(surv_data_nfl$event_nfl)
+```
+
+```{r}
+# We inspect all pTau survival data for a specific participant (RID = 61)
+#ptau_core %>%
+  #filter(RID == 61)
+
+# We inspect all NFL survival data for a specific participant (RID = 61)
+#nfl_core %>%
+  #filter(RID == 61)
+
+# We compare with original, longitudinal data, to see if it's correct
+#surv_data %>%
+  #filter(RID == 61) %>%
+  #arrange(EXAMDATE_dx)
+```
+
+### Two separate time_years (one for p-tau181, one for NfL)
+
+```{r}
+# We compute baseline date and time since baseline for pTau in the longitudinal form
+long_data_ptau <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    
+    # We define baseline as the earliest available pTau measurement date per individual
+    baseline_date_ptau = min(EXAMDATE_ptau, na.rm = TRUE),
+    
+    # We compute time in years since pTau baseline for each visit
+    time_years_ptau = as.numeric(EXAMDATE_ptau - baseline_date_ptau) / 365.25
+    
+  ) %>%
+  ungroup()
+
+
+# We compute baseline date and time since baseline for NFL in the longitudinal form
+long_data_nfl <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    
+    # We define baseline as the earliest available NFL measurement date per individual
+    baseline_date_nfl = min(EXAMDATE_nfl, na.rm = TRUE),
+    
+    # We compute time in years since NFL baseline for each visit
+    time_years_nfl = as.numeric(EXAMDATE_nfl - baseline_date_nfl) / 365.25
+    
+  ) %>%
+  ungroup()
+```
+
+## Preparing for one multivariate joint model
+
+### Global/common version of baseline, age_at_baseline and time_to_event
+
+```{r}
+# We construct a unified survival dataset with a single event and time-to-event definition
+surv_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
+    EXAMDATE_nfl  = as.Date(EXAMDATE_nfl),
+    EXAMDATE_dx   = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first available biomarker measurement (ptau or nfl)
+    baseline = min(c(
+      min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+      min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ), na.rm = TRUE),
+    
+    # We define age at baseline (closest visit conceptually)
+    age_at_baseline = age_at_visit[
+      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
+      EXAMDATE_nfl  == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ][1],
+    
+    # We define first dementia event AFTER baseline
+    event_date = {
+      
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      dx_dates <- dx_dates[dx_dates > min(c(
+        min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+        min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      ), na.rm = TRUE)]
+      
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up across all sources
+    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We define event indicator
+    event = as.integer(!is.na(event_date)),
+    
+    # We define ONE shared time-to-event for all analyses
+    time_to_event = if_else(
+      event == 1,
+      as.numeric(event_date - baseline) / 365.25,
+      as.numeric(last_followup - baseline) / 365.25
+    )
+  )
+
+# We attach original data (longitudinal structure preserved)
+surv_data_multi <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(surv_core, by = "RID")
+
+# We tabulate event distribution
+table(surv_data_multi$event)
+```
+
+### Global version of time_years
+
+```{r}
+long_data_multi <- long_data %>%
+  group_by(RID) %>%
+  
+  # We define a single baseline per participant across biomarkers
+  mutate(
+    global_baseline = min(c(EXAMDATE_ptau, EXAMDATE_nfl), na.rm = TRUE)
+  ) %>%
+  
+  # We compute time from global baseline for all biomarker observations
+  mutate(
+    time_years = as.numeric(coalesce(EXAMDATE_ptau, EXAMDATE_nfl) - global_baseline) / 365.25
+  ) %>%
+  
+  ungroup()
+```
+
+## We re-count missing values after pre-processing
 
 ```{r}
 # We re-count missing values after pre-processing
@@ -926,29 +1130,20 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-```{r}
-# We also check negative values 
-sapply(long_data, function(x) {
-  if (is.numeric(x)) sum(x < 0, na.rm = TRUE) else NA
-})
-
-sapply(surv_data, function(x) {
-  if (is.numeric(x)) sum(x < 0, na.rm = TRUE) else NA
-})
-```
-
-```{r}
-long_data <- long_data %>%
-  filter(PLASMAPTAU181 > 0)
-```
+## We make sure that longitudinal data and survival data have the same length (for the joint model)
 
 ```{r}
 # We check the length of each dataset 
-length(unique(long_data$RID)) # longitudinal data
-length(unique(surv_data$RID)) # survival data
+length(unique(long_data_ptau$RID)) # longitudinal data for ptau
+length(unique(long_data_nfl$RID)) # longitudinal data for nfl
+length(unique(long_data_multi$RID)) # longitudinal data, global version
+
+length(unique(surv_data_ptau$RID)) # survival data for ptau
+length(unique(surv_data_nfl$RID)) # survival data for nfl
+length(unique(surv_data_multi$RID)) # survival data, global version
 ```
 
-# Longitudinal model
+# Longitudinal models
 
 ## Comparing longitudinal models
 
@@ -1068,45 +1263,44 @@ testResiduals(student_residuals_nfl)
 AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
 ```
 
-## Fitted LME model for P-TAU
+## For separate joint models 
+
+### Fitted LME models (one for p-tau181, one for NfL)
 
 ```{r}
+# Longitudinal model for p-tau181 with normal distribution 
 long_model_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
   random = ~ time_years_ptau | RID,                    
-  data = long_data
+  data = long_data_ptau
 )
 
 summary(long_model_ptau)
+
+# Longitudinal model for NfL with normal distribution 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
+  random = ~ time_years_nfl | RID, # random intercept + slope
+  data = long_data_nfl
+  )
+
+summary(long_model_nfl)
 ```
 
 ```{r}
-# Longitudinal model with t-distribution (identity link) 
+# Longitudinal model for p-tau181 with t-distribution (identity link) 
 library(GLMMadaptive)
 long_model_ptau <- mixed_model(
   fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
   random = ~ time_years_ptau | RID,                    
-  data = long_data,
+  data = long_data_ptau,
 family = students.t(df = 3, link = "identity")
 )
 
 summary(long_model_ptau)
 ```
 
-## Fitted LME model for NFL
-
-```{r}
-# Longitudinal model, with chosen covariates 
-long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years_nfl + PTGENDER + APOE4_status, 
-  random = ~ time_years_nfl | RID,   # random intercept + slope
-  data = long_data
-  )
-
-summary(long_model_nfl)
-```
-
-## Removing gender from NFL LME model
+### Removing gender from NfL LME model
 
 We see that gender is not significant in the LME model for NFL, so we remove it:
 
@@ -1114,15 +1308,15 @@ We see that gender is not significant in the LME model for NFL, so we remove it:
 long_model_nfl <- lme(
   log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
   random = ~ time_years_nfl | RID, # random intercept + slope
-  data = long_data
+  data = long_data_nfl
   )
 
 summary(long_model_nfl)
 ```
 
-## Removing APOE4 status from ptau LME model
+### (Removing APOE4 status from ptau LME model)
 
-Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:
+(Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:)
 
 ```{r}
 long_model_ptau <- mixed_model(
@@ -1135,16 +1329,16 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-## Residuals
+### We check the residuals
 
 ```{r}
-# residuals 
-res_ptau <- residuals(long_model_ptau, type = "subject_specific")
+# residuals of the p-tau181 LME model
+res_ptau <- residuals(long_model_ptau, type = "pearson")
 
-# fitted values
-fitted_vals_ptau <- fitted(long_model_ptau, type = "subject_specific")
+# fitted values of the p-tau181 LME model
+fitted_vals_ptau <- fitted(long_model_ptau)  
 
-# plot
+# plot of residuals vs fitted values 
 plot(fitted_vals_ptau, res_ptau,
      xlab = "Fitted values",
      ylab = "Residuals",
@@ -1153,13 +1347,13 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
-# residuals
+# residuals of the NfL LME model
 res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
-# fitted values
+# fitted values of the NfL LME model
 fitted_vals_nfl <- fitted(long_model_nfl)  
 
-# plot
+# plot of residuals vs fitted values 
 plot(fitted_vals_nfl, res_nfl,
      xlab = "Fitted values",
      ylab = "Residuals",
@@ -1167,112 +1361,219 @@ plot(fitted_vals_nfl, res_nfl,
 abline(h = 0, col = "red", lty = 2)
 ```
 
-## QQ plot
+### QQ plots (one 
 
 ```{r}
 # For P-tau
-qqnorm(res_ptau)
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
 qqline(res_ptau, col = "red")
 
 # For NFL 
-qqnorm(res_nfl)
+qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
 
-# Survival model
+## For multivariate joint model
 
-## We create a survival object
+### Fitted longitudinal models (one for p-tau181, one for NfL) with global time_years, that we then create mixed object for
+
+```{r}
+# Longitudinal model for p-tau181 with normal distribution and global time_years
+long_model_ptau_multi <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  random = ~ time_years | RID,                    
+  data = long_data_multi
+)
+summary(long_model_ptau_multi)
+
+# Longitudinal model for p-tau181 with normal distribution and global time_years
+long_model_nfl_multi <- lme(
+  log_PLASMA_NFL ~ time_years + APOE4_status, 
+  random = ~ time_years | RID, 
+  data = long_data_multi
+  )
+summary(long_model_nfl_multi)
+
+# Mixed object 
+mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
+```
+
+# Survival models
+
+## For separate joint models 
+
+### We create survival objects (one for p-tau181, one for NfL)
 
 ```{r}
 # We create a Surv object: time and event
+# For p-tau181
 surv_object_ptau <- Surv(
-  time = surv_data$time_to_event_pTau, 
-  event = surv_data$event
+  time = surv_data_ptau$time_to_event_ptau, 
+  event = surv_data_ptau$event_ptau
 )
 
+# For NfL
 surv_object_nfl <- Surv(
-  time = surv_data$time_to_event_NFL, 
-  event = surv_data$event
+  time = surv_data_nfl$time_to_event_nfl, 
+  event = surv_data_nfl$event_nfl
 )
 ```
 
-## Kaplan-Meier curve
+### Kaplan-Meier curves (one for p-tau181, one for NfL)
 
 ```{r}
-# We fit Kaplan-Meier curve
-km_fit <- survfit(surv_object_ptau ~ 1, data = surv_data)
+# We fit Kaplan-Meier curve for p-tau181
+km_fit_ptau <- survfit(surv_object_ptau ~ 1, data = surv_data)
 # Plot
 plot(
-  km_fit, 
+  km_fit_ptau, 
   xlab = "Days since p-tau181 baseline", 
   ylab = "Survival probability (no dementia)", 
-  main = "Kaplan-Meier Curve for Dementia"
+  main = "Kaplan-Meier Curve for Dementia (p-tau181 baseline)"
 )
 
-# We fit Kaplan-Meier curve
-km_fit <- survfit(surv_object_nfl ~ 1, data = surv_data)
+# We fit Kaplan-Meier curve for NfL
+km_fit_nfl <- survfit(surv_object_nfl ~ 1, data = surv_data)
+# Plot
 plot(
-  km_fit, 
+  km_fit_nfl, 
   xlab = "Days since NfL baseline", 
   ylab = "Survival probability (no dementia)", 
-  main = "Kaplan-Meier Curve for Dementia"
+  main = "Kaplan-Meier Curve for Dementia (NfL baseline)"
 )
 ```
 
-## Fitted Coxph model
+### Fitted Cox PH models (one for p-tau181, one for NfL)
 
 ```{r}
-# Cox survival-model, with covariates
+# Cox survival-models, with covariates
+# For p-tau181
 surv_model_ptau <- coxph(
-  surv_object_ptau ~ age_at_baseline_pTau + PTGENDER + APOE4_status,
-  data = surv_data,
-   x = TRUE
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status,
+  data = surv_data_ptau,
+  x = TRUE
 )
 
 summary(surv_model_ptau)
 
+# For NfL
 surv_model_nfl <- coxph(
-  surv_object_nfl ~ age_at_baseline_NFL + PTGENDER + APOE4_status,
-  data = surv_data, 
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
+  data = surv_data_nfl,
   x = TRUE
 )
 
 summary(surv_model_nfl)
 ```
 
-## Removing gender
+### Removing gender from Cox PH models
 
-Gender is not significant in the survival model, so we remove it:
+Gender is not significant in the survival models, so we remove it:
 
 ```{r}
-# Cox survival-model, without gender 
+# Cox survival-models without gender 
+# For p-tau181
 surv_model_ptau <- coxph(
-  surv_object_ptau ~ age_at_baseline_pTau + APOE4_status,
-  data = surv_data
+  surv_object_ptau ~ age_at_baseline_ptau + APOE4_status,
+  data = surv_data_ptau,
+  x = TRUE
 )
 
 summary(surv_model_ptau)
 
+# For NfL
 surv_model_nfl <- coxph(
-  surv_object_nfl ~ age_at_baseline_NFL + APOE4_status,
-  data = surv_data
+  surv_object_nfl ~ age_at_baseline_nfl + APOE4_status,
+  data = surv_data_nfl,
+  x = TRUE
 )
 
 summary(surv_model_nfl)
 ```
 
-## Testing for the assumption of proportional hazards
+### Testing for the assumption of proportional hazards
 
 ```{r}
-cox.zph(surv_model)
+# For the Cox PH model for p-tau181 
+cox.zph(surv_model_ptau)
+
+# For the Cox PH model for NfL
+cox.zph(surv_model_nfl)
 ```
 
-# Joint-model
+## For multivariate joint model
 
-## Fitted joint model for P-tau
+### Survival object with global event, time_to_event and age_at_baseline
 
 ```{r}
-# Joint model 
+surv_object_multi <- Surv(
+  time = surv_data_global$time_to_event, 
+  event = surv_data_global$event
+  )
+```
+
+### Kaplan-Meier curve for global version of survival object 
+
+```{r}
+# We fit Kaplan-Meier curve for global version of survival object
+km_fit_multi <- survfit(surv_object_multi ~ 1, data = surv_data)
+# Plot
+plot(
+  km_fit_multi, 
+  xlab = "Days since p-tau181 baseline", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia (global baseline)"
+)
+```
+
+### Fitted Cox PH model with global survival object
+
+```{r}
+surv_model_multi <- coxph(
+  surv_object_multi ~ age_at_baseline + PTGENDER + APOE4_status,
+  data = surv_data_multi
+)
+
+summary(surv_model_multi)
+```
+
+### Removing gender from Cox PH model with global survival object
+
+```{r}
+surv_model_multi <- coxph(
+  surv_object_multi ~ age_at_baseline + APOE4_status,
+  data = surv_data_multi
+)
+
+summary(surv_model_multi)
+```
+
+### Testing for the assumption of proportional hazards
+
+```{r}
+# For the Cox PH model with global survival object
+cox.zph(surv_model_multi)
+```
+
+# Two separate joint models 
+
+## Fitted joint model for p-tau181
+
+```{r}
+library(JM)
+# Joint model for p-tau181 using package JM (frequentist approach)
+joint_model_ptau <- jointModel(
+  long_model_ptau,   
+  surv_model_ptau,  
+  timeVar = "time_years_ptau"
+)
+
+summary(joint_model_ptau)
+```
+
+```{r}
+library(JMbayes2)
+# Joint model for NfL using package JMbayes2 (bayesian approach)
 joint_model_ptau <- jm(
   surv_model_ptau,
   long_model_ptau,
@@ -1285,10 +1586,21 @@ joint_model_ptau <- jm(
 summary(joint_model_ptau)
 ```
 
-## Fitted joint model for NFL
+## Fitted joint model for NfL
 
 ```{r}
-# Joint model 
+# Joint model for NfL using package JM (frequentist approach)
+joint_model_nfl <- jointModel(
+  long_model_nfl,   
+  surv_model_nfl, 
+  timeVar = "time_years_nfl"
+)
+
+summary(joint_model_nfl)
+```
+
+```{r}
+# Joint model for NfL using package JMbayes2 (bayesian approach)
 joint_model_nfl <- jm(
   surv_model_nfl,
   long_model_nfl,
@@ -1303,18 +1615,11 @@ summary(joint_model_nfl)
 
 # Multivariate joint model
 
-## We create a mixed object
-
-```{r}
-Mixed <- list(long_model_ptau, long_model_nfl)
-```
-
-## We check wether the models have stable random slopes
+## We check whether the models have stable random slopes
 
 ```{r}
 summary(long_model_ptau)
 VarCorr(long_model_nfl)
-
 ```
 
 For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036), which indicates that individual biomarker trajectories over time show minimal variation --\> We skip the random slope in fForms:
@@ -1331,23 +1636,18 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-# multi_joint_model <- jm(surv_model, Mixed,
-#                   time_var = "time_years",
-#                   functional_forms = fForms,
-#                   n_chains = 3L,    
-#                   n_iter = 20000L,
-#                   n_burnin = 2000L
-#                   )
-# summary(multi_joint_model)
+multi_joint_model <- jm(surv_model_multi, mixed ,
+                        time_var = "time_years",
+                        functional_forms = fForms,
+                        n_chains = 3L,    
+                        n_iter = 20000L,
+                        n_burnin = 2000L
+                        )
+
+summary(multi_joint_model)
 ```
 
 ```{r}
-# summary <- summary(multi_joint_model)
-# summary$Survival
-```
-
-Test
-
-```{r}
-
+summary <- summary(multi_joint_model)
+summary$Survival
 ```
