@@ -185,8 +185,24 @@ nfl_ptau <- nfl_ptau %>% filter(RID %in% keep)
 length(keep)
 ```
 
+# Data visualisation
+
+## Plotting the relationships between biomarkers by RID
+
 ```{r}
+par(mfrow = c(1, 2))
 boxplot(PLASMA_NFL ~ RID, data = nfl_ptau)
+boxplot(PLASMAPTAU181 ~ RID, data = nfl_ptau)
+```
+
+```{r}
+ggplot(jlcmm_data, aes(x = time_years, y = PLASMA_NFL, colour = as.factor(event))) +
+  geom_point() +
+  theme_classic()
+
+ggplot(jlcmm_data, aes(x = time_years, y = PLASMAPTAU181, colour = as.factor(event))) +
+  geom_point() +
+  theme_classic()
 ```
 
 ## Survival data
@@ -309,7 +325,19 @@ jlcmm_data <- jlcmm_data %>%
         BIC = kln(n) - 2ln(\widehat L)
         $$
 
-    -   The score statistic for the score test of conditional independence (Jacqmin-Gadda)
+    -   The score statistic for the score test of conditional independence (Jacqmin-Gadda) tests whether there is residual dependence betweent the longitudinal outcome and the survival outcome: given the latent class, the responses are independent of each other, there are no residual correlations after conditioning on class. In other words, the latent class is the sole cause of the observed variables, and if we knew the latent classes, there would be NO residual dependence between the outcomes (they are independent of each other) such that:
+
+        $$
+        P(Y_1, ... , Y_J|C) = \prod^J_{j = 1}P(Y_j|C)
+        $$
+
+        Pairs $(Y_i, Y_k)$ are chosen, and a residual association, $\delta_{i,k}$ is defined for each pair. Under conditional independence:
+
+        $$
+        H_0 : \delta_{i,k} = 0 \quad \text{for all item pairs}
+        $$
+
+        A restricted model assuming conditional independence is fit. An alternative model is posited, where $\delta_{i,k}$ is allowed to be non-zero. The score statistics analyses the slope of the log-likelihood of the restricted model, and if allowances for non-zero residual associations would improve fit, the conditional independence assumption is violated. If the score statistic is large (significant, p-value \< 0.05) then we cannot assume conditional independence.
 
 -   Estimates, Wald and p-value
 
@@ -490,7 +518,142 @@ plot(m0)
 
 -   Increased slope variance
 
+# Latent class model (intercept and slope)
+
+-   Need to run latent class model first to check latent structure
+
+-   hlme() fits linear mixed models (ng = 1) and latent class linear mixed models (ng \> 1). Fit hlme() with ng = 1 and use the model with one class as a start point for the model with ng = 2
+
+### M0
+
+-   $log-likelihood = 747.51$
+
+-   $AIC = 1507$
+
+-   $BIC = 1535$
+
+```{r}
+hlme_m0 <- hlme(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ time_years_z,
+  subject = "RID",
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(hlme_m0)
+```
+
+### M1
+
+-   Intercept and slope nearly identical between classes, log-likelihood identical between model with 1 latent class and model with 2 latent classes
+
+-   $log-likelihood = -747.51$
+
+-   $AIC = 1513$
+
+-   $BIC = 1554$
+
+```{r}
+hlme_m1 <- hlme(
+    fixed = ln_PLASMA_NFL ~ time_years_z,
+    mixture = ~ time_years_z,
+    random = ~ time_years_z,
+    subject = "RID",
+    ng = 2,
+    data = jlcmm_data_test,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m1)
+```
+
+-   Two classes show a nearly even split, shows no real class structure, random 50/50 split
+
+-   Posterior classification table shows no distinction between classes
+
+$$
+P(C_1 |C_1) = 0.51 \quad P(C_1 |C_2) = 0.49 \quad P(C_2 |C_1) = 0.49 \quad P(C_2 |C_2) = 0.51
+$$
+
+```{r}
+postprob(hlme_m1)
+```
+
+## Adding covariates to the latent class structure
+
+### M0: same as before
+
+-   $AIC = 1640$
+
+-   $BIC = 1663$
+
+```{r}
+hlme_m0 <- hlme(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ time_years_z,
+  subject = "RID",
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(hlme_m0)
+```
+
+### M1
+
+-   All genotype levels (with e2 allele collapsed into e3 variants), age at baseline, and gender are significant
+
+-   $AIC = 1283$
+
+-   $BIC = 1343$
+
+-   $log-likelihood = -628.46$
+
+-   Both information criteria are reduced and log-likelihood increased
+
+-   Intercepts and slopes are much different for the two classes compared to the reduced model specified above
+
+-   $19$ iterations vs. $5$ from the reduced model
+
+```{r}
+hlme_m1 <- hlme(
+    fixed = ln_PLASMA_NFL ~ time_years_z,
+    mixture = ~ time_years_z,
+    random = ~ time_years_z,
+    classmb = ~ genotype + age_at_baseline + PTGENDER,
+    subject = "RID",
+    ng = 2,
+    data = jlcmm_data_test,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m1)
+```
+
+### Posterior probabilities
+
+-   Much better separation:
+
+$$
+P(C_1 |C_1) = 0.89 \quad P(C_1 |C_2) = 0.11 \quad P(C_2 |C_1) = 0.11 \quad P(C_2 |C_2) = 0.89
+$$
+
+-   $86\%$ have posterior probabilities over 0.70, $77\%$ over 0.80 and $65 - 67 \%$ have over 0.90.
+
+```{r}
+postprob(hlme_m1)
+```
+
 # M0
+
+-   Score test statistic for the assumption of conditional independence is significant: this means the assumption is violated. There is some residual dependence between the longitudinal outcome and the survival outcome. This is evidence for there being more than one latent class in the sample.
 
 ```{r}
 m0 <- jlcmm(
@@ -568,6 +731,8 @@ plot(m0)
 
 -   Actually figure out what is 'too small' slope variance...
 
+-   Again, significant score test statistic is evidence for latent classes.
+
 ```{r}
 m0 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
@@ -627,7 +792,7 @@ plot(m0)
 
 ### Start values from m0
 
--   Score test statistic no longer significant, conditional independence assumption is met
+-   Score test statistic no longer significant, conditional independence assumption is met: is this evidence for 2 latent classes as opposed to 3? Is that why the joint latent class model with ng = 3 does not converge?
 
 -   $AIC = 3145$
 
@@ -743,25 +908,59 @@ plot(m2)
 ```{r}
 # not converging -> local maxima -> try to find global maximum with gridsearch()
 
-gridsearch(rep = 20, maxiter = 20,
-           minit = jlcmm(
+# gridsearch(rep = 20, maxiter = 20,
+#            minit = jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ 1 + time_years_z,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data_test
+# ),
+#            m = jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ 1 + time_years_z,
+#   mixture = ~ time_years_z,
+#   classmb = ~ 1,
+#   ng = 3,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data_test,
+#   B = m0
+# ))
+```
+
+## 2 latent classes + same covariates as in hlme()
+
+```{r}
+m0 <- jlcmm(
   fixed = ln_PLASMA_NFL ~ time_years_z,
   random = ~ 1 + time_years_z,
   subject = "RID",
   survival = Surv(time_to_event, event) ~ genotype,
   data = jlcmm_data_test
-),
-           m = jlcmm(
-  fixed = ln_PLASMA_NFL ~ time_years_z,
-  random = ~ 1 + time_years_z,
-  mixture = ~ time_years_z,
-  classmb = ~ 1,
-  ng = 3,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data_test,
-  B = m0
-))
+)
+```
+
+```{r}
+m1_genotype_age_gender <- jlcmm(
+    fixed = ln_PLASMA_NFL ~ time_years_z,
+    random = ~ 1 + time_years_z,
+    mixture = ~ time_years_z,
+    classmb = ~ genotype + age_at_baseline + PTGENDER,
+    survival = Surv(time_to_event, event) ~ genotype,
+    subject = "RID",
+    ng = 2,
+    data = jlcmm_data_test,
+    B = random(m0)
+  )
+```
+
+```{r}
+summary(m1_genotype_age_gender)
+```
+
+```{r}
+postprob(m1_genotype_age_gender)
 ```
 
 # Testing Weibull and Cox
@@ -820,7 +1019,7 @@ ggsurvfit(surv_fit, type = "cloglog") +
 
 ### Assumption of proportional hazards, residuals
 
--   Testing the proportional hazard assumption, significant test statistic means we cannot assume proportionality at the 0.05 significance level
+-   Testing the proportional hazard assumption, test statistic is not significant, so we can assume proportionality between hazards of the different genotypes
 
 -   Schoenfield residuals should be flat and centered around 0 to assume proportionality
 
@@ -834,9 +1033,7 @@ plot(cox.zph(fit_cox))
 
 ### Log-rank and generalized Wilcoxon tests
 
--   Log-rank
-
--   Generalised Wilcoxon
+-   Log-rank and generalised Wilcoxon both have significant test statistics, therefore we can conclude that there is a significant difference in baseline hazard for the different levels of genotype
 
 ```{r}
 # computing the log-rank test statistic for genotype
@@ -911,6 +1108,8 @@ plot(cox.zph(fit_cox))
 ```
 
 ### Log-rank and generalized Wilcoxon tests
+
+-   Log-rank and generalised Wilcoxon both have significant test statistics, therefore we can conclude that there is a significant difference in baseline hazard for the different levels of genotype
 
 ```{r}
 # computing the log-rank test statistic for genotype
