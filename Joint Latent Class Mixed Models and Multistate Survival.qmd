@@ -571,6 +571,8 @@ hlme_m1 <- hlme(
 summary(hlme_m1)
 ```
 
+### Posterior probabilities
+
 -   Two classes show a nearly even split, shows no real class structure, random 50/50 split
 
 -   Posterior classification table shows no distinction between classes
@@ -579,8 +581,71 @@ $$
 P(C_1 |C_1) = 0.51 \quad P(C_1 |C_2) = 0.49 \quad P(C_2 |C_1) = 0.49 \quad P(C_2 |C_2) = 0.51
 $$
 
+-   Histograms of the posterior probabilities by class show values clustered around 0.5 for both class1 and class2
+
+-   Scatterplot of class certainty again shows values clustered in the center
+
 ```{r}
 postprob(hlme_m1)
+```
+
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
+
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
+
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
+```
+
+### Shannon Entropy
+
+-   Entropy is a quantification of the (average) level of uncertainty associated with a random variable's potential outcomes (similary to entropy in thermodynamics) <https://en.wikipedia.org/wiki/Entropy_(information_theory)>
+
+-   The expected amount of information needed to describe the state of the random variable, given the distribution of probabilities across all possible outcomes
+
+-   "Information content" of an outcome is related to how probable it is. If a highly likely outcome occurs, the information content is small. The information/surprisal, $I(E)$ of an event approaches $0$ as $p(E)$ approaches $1$:
+
+$$
+I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))
+$$
+
+-   Entropy $H$ calculates the average expected amount of information across all possible outcomes of an random variable, $X$, such that:
+
+    $$ 
+    H(X) = - \sum_{x \in X} p(x)log(p(x))
+    $$
+
+-   why 1 - p(x)log(p(x))
+
+-   <https://www.youtube.com/watch?v=LBOVhy3ITA4>
+
+-   <https://www.youtube.com/watch?v=-4y4X8ELcEM>
+
+### Assignment based entropy
+
+```{r}
+p <- as.matrix(pp[, grep("prob", names(pp))])  # extract prob columns
+N <- nrow(p)
+G <- ncol(p)
+
+entropy <- 1 - ( -sum(p * log(p)) / (N * log(G)) )
+entropy
 ```
 
 ## Adding covariates to the latent class structure
@@ -647,8 +712,134 @@ $$
 
 -   $86\%$ have posterior probabilities over 0.70, $77\%$ over 0.80 and $65 - 67 \%$ have over 0.90.
 
+-   plots of the posterior probabilities show most values clustered at either 0 or 1, lower density closer to 0.5
+
 ```{r}
 postprob(hlme_m1)
+```
+
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
+
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
+
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
+```
+
+### Entropy
+
+-   $0.64$, moderate classification with two latent classes. Could this motivate testing more latent classes?
+
+```{r}
+p <- as.matrix(pp[, grep("prob", names(pp))])  # extract prob columns
+N <- nrow(p)
+G <- ncol(p)
+
+entropy <- 1 - ( -sum(p * log(p)) / (N * log(G)) )
+entropy
+```
+
+### Spaghetti plots
+
+-   Can we do this? Individual level data... ?
+
+<https://stats.oarc.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/>
+
+<https://www.cararthompson.com/posts/2025-01-14-optimising-colours-in-a-spaghetti-plot/>
+
+```{r}
+# predictions by RID for each measurement time
+pred_RID <- predictY(hlme_m1, jlcmm_data_test, var.time = "time_years_z")
+
+# extracting the posterior probabilities from the 2 class model
+pp <- hlme_m1$pprob
+
+# selecting which class each individual is assigned to based on which class has the highest posterior probability
+assigned_class <- apply(pp[ ,c("prob1","prob2")], 1, which.max)
+```
+
+```{r}
+ggplot(data = jlcmm_data_test, aes(x = time_years_z, y = ln_PLASMA_NFL, group = genotype)) +
+  geom_line() +
+#   to visualise by gender level 
+  facet_grid(. ~ PTGENDER) +
+#   for loewess smoother
+  # stat_smooth(aes(group = 1)) +
+#   for avergae among group
+  stat_summary(aes(group = 1), geom = "point", fun = mean) +
+  theme_minimal()
+```
+
+### Plotting biomarker trajectories
+
+```{r}
+# creating a data frame for new data with the baseline levels of genotype and gender and average age: so a data frame over 100 time points, for females with e2 or e3 alleles and an average age at baseline
+newdata <- data.frame(
+  time_years_z = seq(min(jlcmm_data_test$time_years_z),
+                     max(jlcmm_data_test$time_years_z),
+                     length = 100),
+  genotype = factor("e2 e3", levels = c("e2 e3", "e4", "e4/e4")),
+  PTGENDER = factor("Female", levels = c("Female", "Male")),
+  age_at_baseline = mean(jlcmm_data_test$age_at_baseline)
+)
+```
+
+```{r}
+# checking which variables to include in new data
+hlme_m1$Xnames2
+
+# checkng how new data has been created
+str(newdata)
+```
+
+```{r}
+# predicting the longitudinal ln_PLASMA_NFL values given class for the new data
+preds <- predictY(hlme_m1, newdata, var.time = "time_years_z")
+```
+
+```{r}
+preds_df <- data.frame(
+  time = newdata$time_years_z,
+  class1 = preds$pred[,1],
+  class2 = preds$pred[,2]
+)
+
+ggplot(preds_df, aes(x = time)) +
+  geom_line(aes(y = class1, color = "Class 1")) +
+  geom_line(aes(y = class2, color = "Class 2")) +
+  labs(y = "Predicted ln(NFL)", x = "Standardized Time") +
+  theme_minimal()
+```
+
+### M2
+
+```{r}
+hlme_m2 <- hlme(
+    fixed = ln_PLASMA_NFL ~ time_years_z,
+    mixture = ~ time_years_z,
+    random = ~ time_years_z,
+    classmb = ~ genotype + age_at_baseline + PTGENDER,
+    subject = "RID",
+    ng = 2,
+    data = jlcmm_data_test,
+    B = hlme_m1
+  )
 ```
 
 # M0
