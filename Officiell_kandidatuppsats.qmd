@@ -321,13 +321,17 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ### Cox PH model using time-averaged values of each biomarker
 
-Additionally, the cumulative average observed up through each time could be used as a time-dependent covariate, particularly if that covariate is under study as a cause of mortality (Wolfe & Strawderman,1996: p.128). This average provides an unbiased estimate of the true mean, assuming no underlying trend, bias or heteroskedasticity (Sweeting et al., 2017: p.4516). The resulting time-varying predictor, called the cumulative average (CA), is defined as:
+Additionally, the cumulative average observed up through each time could be used as a time-dependent covariate, particularly if that covariate is under study as a cause of mortality (Wolfe & Strawderman, 1996, p.128). This average provides an unbiased estimate of the true mean, assuming no underlying trend, bias or heteroskedasticity (Sweeting et al., 2017, p.4516). The resulting time-varying predictor, called the cumulative average (CA), is defined as:
 
 $$
 H^{(CA)}_t(X_i) = \frac{\sum_{j=0}^{m_i} I(t_{ij} < t) X_i(t_{ij})}{\sum_{j=0}^{m_i} I(t_{ij} < t)}
 $$
 
 where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Sweeting et al., 2017, p.4516).
+
+### Cox Proportional Hazard Model with Time-Dependent Covariates
+
+The Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates, only those which are exogenous (Rizopoulos, p.51). For example, if the event is defined as death, endogenous variables can inherently only be Endogenous variables inherently carry information about survival times, and as such
 
 ## Joint Models
 
