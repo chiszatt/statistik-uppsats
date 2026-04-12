@@ -721,7 +721,7 @@ length(unique(surv_data$RID)) # survival data
 cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
 ```
 
-## We add selected demographics variables (age + gender), to later use in survival model and longitudinal model
+## We add selected demographics variables (age + gender) and APOE4 status, to later use in survival model and longitudinal model
 
 ```{r}
 # We only keep the demographics variables we need and one row per person 
@@ -811,6 +811,9 @@ hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
 # We log transform the biomarkers 
 long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
 long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
+
+surv_data$log_PLASMAPTAU181 <- log(surv_data$PLASMAPTAU181)
+surv_data$log_PLASMA_NFL <- log(surv_data$PLASMA_NFL)
 ```
 
 ```{r}
@@ -1312,35 +1315,6 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-### Removing gender from NfL LME model
-
-We see that gender is not significant in the LME model for NFL, so we remove it:
-
-```{r}
-long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
-  random = ~ time_years_nfl | RID, # random intercept + slope
-  data = long_data_nfl
-  )
-
-summary(long_model_nfl)
-```
-
-### (Removing APOE4 status from ptau LME model)
-
-(Even though APOE4 status was significant in the LME model for ptau, including it in both the LME model and the survival model led to poor MCMC convergence (high Rhat) in the joint model, probably due to difficulties in separating its direct effect on survival from its indirect effect through the biomarker. Therefore, to ensure stable estimation, we keep the APOE4 status only in the survival model, removing it from the LME modell:)
-
-```{r}
-long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER,
-  random = ~ time_years_ptau | RID,                    
-  data = long_data,
-family = students.t(df = 3, link = "identity")
-)
-
-summary(long_model_ptau)
-```
-
 ### We check the residuals
 
 ```{r}
@@ -1478,31 +1452,6 @@ surv_model_nfl <- coxph(
 summary(surv_model_nfl)
 ```
 
-### Removing gender from Cox PH models
-
-Gender is not significant in the survival models, so we remove it:
-
-```{r}
-# Cox survival-models without gender 
-# For p-tau181
-surv_model_ptau <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + APOE4_status,
-  data = surv_data_ptau,
-  x = TRUE
-)
-
-summary(surv_model_ptau)
-
-# For NfL
-surv_model_nfl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + APOE4_status,
-  data = surv_data_nfl,
-  x = TRUE
-)
-
-summary(surv_model_nfl)
-```
-
 ### Testing for the assumption of proportional hazards
 
 ```{r}
@@ -1518,7 +1467,7 @@ cox.zph(surv_model_nfl)
 ```{r}
 # Time-varying coefficient model for p-tau181
 surv_model_ptau_tv <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + tt(APOE4_status), 
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_status), 
   data = surv_data_ptau, 
   tt = function(x, t, ...) x * log(t)
   )
@@ -1527,7 +1476,7 @@ summary(surv_model_ptau_tv)
 
 # Time-varying coefficient model for NfL
 surv_model_nfl_tv <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + tt(APOE4_status), 
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_status), 
   data = surv_data_nfl, 
   tt = function(x, t, ...) x * log(t)
   )
@@ -1535,7 +1484,7 @@ surv_model_nfl_tv <- coxph(
 summary(surv_model_nfl_tv)
 ```
 
-Although the proportional hazards assumption tests indicated evidence of potential non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.157 in the p-tau181 model and p = 0.186 in the NfL model). Therefore, the standard Cox proportional hazards model will be retained for interpretation.
+Although the proportional hazards assumption tests indicated evidence of potential non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.158 in the p-tau181 model and p = 0.187 in the NfL model). Therefore, the standard Cox proportional hazards model will be retained for interpretation.
 
 ### Sensitivity analysis using stratified Cox models for APOE4 status
 
@@ -1543,12 +1492,12 @@ To assess the robustness of the results to potential non-proportional hazards fo
 
 ```{r}
 surv_model_ptau_strata <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + strata(APOE4_status), 
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + strata(APOE4_status), 
   data = surv_data_ptau
   )
 
-surv_model_ptau_nfl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + strata(APOE4_status), 
+surv_model_nfl_strata <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + strata(APOE4_status), 
   data = surv_data_nfl
   )
 
@@ -1598,22 +1547,63 @@ surv_model_multi <- coxph(
 summary(surv_model_multi)
 ```
 
-### Removing gender from Cox PH model with global survival object
-
-```{r}
-surv_model_multi <- coxph(
-  surv_object_multi ~ age_at_baseline + APOE4_status,
-  data = surv_data_multi
-)
-
-summary(surv_model_multi)
-```
-
 ### Testing for the assumption of proportional hazards
 
 ```{r}
 # For the Cox PH model with global survival object
 cox.zph(surv_model_multi)
+```
+
+## For Cox PH model with time-averaged values of each biomarker
+
+### Creating time-average values of each biomarker 
+
+```{r}
+# Creating time-average values of each biomarker 
+biomarker_avg <- surv_data %>%
+  group_by(RID) %>%
+  summarise(
+    ptau_mean = mean(log_PLASMAPTAU181, na.rm = TRUE),
+    nfl_mean = mean(log_PLASMA_NFL, na.rm = TRUE)
+  )
+
+# Merging the time-average values of each biomarker with each survival dataset 
+surv_data_ptau <- surv_data_ptau %>%
+  left_join(biomarker_avg, by = "RID")
+
+surv_data_nfl <- surv_data_nfl %>%
+  left_join(biomarker_avg, by = "RID")
+```
+
+### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker 
+
+```{r}
+# Cox survival-models, with covariates including time-averaged values of each biomarker 
+# For p-tau181
+surv_model_ptau_tau <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
+  data = surv_data_ptau
+)
+
+summary(surv_model_ptau_tau)
+
+# For NfL
+surv_model_nfl_ta <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
+  data = surv_data_nfl
+)
+
+summary(surv_model_nfl_ta)
+```
+
+### Testing for the assumption of proportional hazards
+
+```{r}
+# For the Cox PH model for p-tau181 
+cox.zph(surv_model_ptau)
+
+# For the Cox PH model for NfL
+cox.zph(surv_model_nfl)
 ```
 
 # Two separate joint models
