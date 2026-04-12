@@ -759,7 +759,7 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## Titel? 
+## Titel?
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -842,7 +842,7 @@ large_outliers_nfl
 small_outliers_nfl
 ```
 
-## Preparing for two separate joint models 
+## Preparing for two separate joint models
 
 ### Two separate baseline, age_at_baseline and time_to_event (one for p-tau181, one for NfL)
 
@@ -1263,7 +1263,7 @@ testResiduals(student_residuals_nfl)
 AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
 ```
 
-## For separate joint models 
+## For separate joint models
 
 ### Fitted LME models (one for p-tau181, one for NfL)
 
@@ -1279,7 +1279,7 @@ summary(long_model_ptau)
 
 # Longitudinal model for NfL with normal distribution 
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years_nfl + APOE4_status, 
+  log_PLASMA_NFL ~ time_years_nfl + PTGENDER + APOE4_status, 
   random = ~ time_years_nfl | RID, # random intercept + slope
   data = long_data_nfl
   )
@@ -1361,7 +1361,7 @@ plot(fitted_vals_nfl, res_nfl,
 abline(h = 0, col = "red", lty = 2)
 ```
 
-### QQ plots (one 
+### QQ plots (one
 
 ```{r}
 # For P-tau
@@ -1400,7 +1400,7 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 # Survival models
 
-## For separate joint models 
+## For separate joint models
 
 ### We create survival objects (one for p-tau181, one for NfL)
 
@@ -1507,12 +1507,12 @@ cox.zph(surv_model_nfl)
 
 ```{r}
 surv_object_multi <- Surv(
-  time = surv_data_global$time_to_event, 
-  event = surv_data_global$event
+  time = surv_data_multi$time_to_event, 
+  event = surv_data_multi$event
   )
 ```
 
-### Kaplan-Meier curve for global version of survival object 
+### Kaplan-Meier curve for global version of survival object
 
 ```{r}
 # We fit Kaplan-Meier curve for global version of survival object
@@ -1555,7 +1555,7 @@ summary(surv_model_multi)
 cox.zph(surv_model_multi)
 ```
 
-# Two separate joint models 
+# Two separate joint models
 
 ## Fitted joint model for p-tau181
 
@@ -1580,6 +1580,23 @@ joint_model_ptau <- jm(
   time_var = "time_years_ptau",
   n_chains = 3L, 
   n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+summary(joint_model_ptau)
+```
+
+Rhat-värden lite för höga för time_years_ptau –\> Vi provar med 20000 iterations istället:
+
+```{r}
+library(JMbayes2)
+# Joint model for NfL using package JMbayes2 (bayesian approach)
+joint_model_ptau <- jm(
+  surv_model_ptau,
+  long_model_ptau,
+  time_var = "time_years_ptau",
+  n_chains = 3L, 
+  n_iter = 20000L, 
   n_burnin = 1000L
   )
 
@@ -1611,6 +1628,39 @@ joint_model_nfl <- jm(
   )
 
 summary(joint_model_nfl)
+```
+
+### Comparing fitted models using DIC and WAIC
+
+```{r}
+cmp <- compare_jm(joint_model_ptau, joint_model_nfl)
+print(cmp)
+```
+
+### Traceplots
+
+```{r}
+# traceplot(joint_model_ptau)
+# traceplot(joint_model_nfl)
+```
+
+```{r}
+traceplot(joint_model_ptau, parm = "betas")
+traceplot(joint_model_ptau, parm = "alphas")
+traceplot(joint_model_ptau, parm = "sigmas")
+```
+
+### Density plots 
+
+```{r}
+densplot(joint_model_ptau)
+densplot(joint_model_nfl)
+```
+
+```{r}
+densplot(joint_model_ptau, parm = "betas")
+densplot(joint_model_ptau, parm = "alphas")
+densplot(joint_model_ptau, parm = "sigmas")
 ```
 
 # Multivariate joint model
