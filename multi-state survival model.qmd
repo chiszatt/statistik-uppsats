@@ -299,6 +299,8 @@ merged_data <- na.omit(merged_data)
 #   )
 ```
 
+# ----------------------------------------
+
 # Multi-State Survival
 
 ## Survival data
@@ -375,7 +377,7 @@ dx_times_short <- dx_times %>%
   arrange(RID, EXAMDATE) %>%
   group_by(RID) %>%
   summarise(
-    t_CN  = first(EXAMDATE[DIAGNOSIS == "CN"]),
+    t_CN = first(EXAMDATE[DIAGNOSIS == "CN"]),
     
     t_MCI = case_when(
 # for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE 
@@ -385,12 +387,67 @@ dx_times_short <- dx_times %>%
       ),
 
 # there are no reversions from AD dx, so we just take the first AD dx date
-    t_AD  = first(EXAMDATE[DIAGNOSIS == "Dementia"]),
+    t_AD = first(EXAMDATE[DIAGNOSIS == "Dementia"]),
     censor_time = max(EXAMDATE)
   ) %>% ungroup()
 ```
 
-OLD
+# SurvData
+
+-   From dx_times_short: how do we get ONE data frame with unique obs per RID and measurement event, with the survival data for CN -\> MCI and from MCI -\> AD?
+
+-   
+
+```{r}
+multistate_data_test <- dx_times_short %>%
+  mutate(
+    CN_MCI_event = case_when(
+      (is.na(t_CN) == FALSE & is.na(t_MCI) == FALSE) ~ 1,
+      (is.na(t_CN) == TRUE | is.na(t_MCI) == TRUE) ~ 0),
+    
+    MCI_AD_event = case_when(
+      (is.na(t_MCI) == FALSE & is.na(t_AD) == FALSE) ~ 1,
+      (is.na(t_MCI) == TRUE | is.na(t_AD) == TRUE) ~ 0),
+    
+    t_CN_MCI = case_when(
+      CN_MCI_event == 1 ~ as.numeric(t_MCI - t_CN) / 365.25,
+      TRUE ~ as.numeric(censor_time - t_CN) / 365.25),
+    
+    t_MCI_AD = case_when(
+      MCI_AD_event == 1 ~ as.numeric(t_AD - t_MCI) / 365.25,
+      (MCI_AD_event == 0 & is.na(t_MCI) == FALSE) ~ as.numeric(censor_time - t_MCI) / 365.25,
+      TRUE ~ NA)
+    )
+```
+
+```{r}
+
+# final version
+multistate_data <- dx_times_short %>%
+  mutate(
+# CN to MCI event variable 
+    CN_MCI_event = ifelse(!is.na(t_CN) & !is.na(t_MCI), 1, 0),
+# survival time for CN to MCI event
+    t_CN_MCI = case_when(
+      CN_MCI_event == 1 ~ as.numeric(t_MCI - t_CN) / 365.25,
+      CN_MCI_event == 0 ~ as.numeric(censor_time - t_CN) / 365.25
+    ),
+# MCI to AD event variable
+    MCI_AD_event = case_when(
+      !is.na(t_MCI) & !is.na(t_AD) ~ 1,
+      !is.na(t_MCI) &  is.na(t_AD) ~ 0,
+      TRUE ~ NA
+    ),
+# survival time for MCI to AD event 
+    t_MCI_AD = case_when(
+      MCI_AD_event == 1 ~ as.numeric(t_AD - t_MCI) / 365.25,
+      MCI_AD_event == 0 ~ as.numeric(censor_time - t_MCI) / 365.25,
+      TRUE ~ NA
+    )
+  ) %>% relocate(MCI_AD_event, .after = CN_MCI_event)
+```
+
+# ----------------------------------------
 
 ### Transition times
 
@@ -577,10 +634,6 @@ surv_data <- merged_data %>%
 -   event time
 
 ```{r}
-# jlcmm_data = nfl_ptau %>% merge(AD_transitions, by = "RID")
-```
-
-```{r}
 nfl_ptau <- nfl_ptau %>% arrange(RID, time_years)
 ```
 
@@ -593,19 +646,6 @@ nfl_ptau <- nfl_ptau %>% arrange(RID, time_years)
 #                     max(time_years)),
 #     event = ifelse(any(DIAGNOSIS_dx == "Dementia"), 1, 0)
 #   )
-```
-
-```{r}
-# Jointlcmm(
-#   fixed = PLASMA_NFL ~ time_years,
-#   random = ~ RID,
-#   mixture = ~ time_years,
-#   classmb = ~ 1,
-#   subject = "RID",
-#   survival = Surv(Tstop, event) ~ age_at_baseline,
-#   data = jlcmm_data,
-#   ng = 3
-# )
 ```
 
 ## Survival data (CN/MCI -\> AD only)
