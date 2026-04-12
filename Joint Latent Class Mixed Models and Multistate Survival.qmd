@@ -565,6 +565,7 @@ hlme_m1 <- hlme(
     mixture = ~ time_years_z,
     random = ~ time_years_z,
     subject = "RID",
+    classmb = ~ 1,
     ng = 2,
     data = jlcmm_data_test,
     B = random(hlme_m0)
@@ -617,6 +618,16 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
+### Comparing ng = 1 and ng = 2
+
+-   $BIC$ lower in the 1 class model
+
+-   Entropy very low in the 2 class model
+
+```{r}
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
 ### Shannon Entropy
 
 -   Uncertainty of the variable itself
@@ -665,6 +676,10 @@ entropy
 ```
 
 ## Adding covariates to the latent class structure
+
+-   The lcmm without class membership covariates was not significant, meaning that the longitudinal biomarker trajectories alone do not predict latent class membership, the latent classes are predicted by covariates NOT biomarker trajectories
+
+-   Biomarker trajectories alone do not distinguish clusters, hence there is no latent class structure based solely on NfL or ptau trajectories. Demographic covariates explain the heterogenity in disease progression.
 
 ### M0 (1 latent class) same as before
 
@@ -1164,6 +1179,10 @@ summary(mlcmm_m1)
 postprob(mlcmm_m1)
 ```
 
+```{r}
+plot(mlcmm_m1, var.time = "time_years_z", which = "fit")
+```
+
 # ..........................................................................................................
 
 # JLCMM: NFL
@@ -1242,7 +1261,15 @@ summary(m0)
 plot(m0)
 ```
 
-## Multivariate latent class model with new genotype levels
+# ..........................................................................................................
+
+# GENOTYPE 3 LEVELS:
+
+# ..........................................................................................................
+
+# NFL & PTAU: mlcmm 3 genotype levels
+
+### With baseline age, PTGENDER and genotype
 
 -   $AIC: 6740.57 \to 6738.58$
 
@@ -1278,6 +1305,58 @@ postprob(mlcmm_m1)
 ```{r}
 plot(mlcmm_m1)
 ```
+
+```{r}
+plot(mlcmm_m1, var.time = "time_years_z", which = "fit")
+
+```
+
+### Trying with no classmb covariates
+
+-   Evidence again for disease trajectories being described by covariates as opposed to a true latent class
+
+-   No significant covariates
+
+-   Posterior probabilities show bad classification, random class structure
+
+```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ time_years_z,
+  mixture = ~ time_years_z,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = jlcmm_data_test,
+  B = random(mlcmm_m0)
+)
+```
+
+```{r}
+summary(mlcmm_m1)
+```
+
+```{r}
+postprob(mlcmm_m1)
+```
+
+### Checking results with ng = 1 and ng = 2 model comparison
+
+-   $BIC$ lower in the 1 class model
+
+-   Entropy extremely low in the 2 class model
+
+```{r}
+summarytable(mlcmm_m0, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+```{r}
+plot(mlcmm_m1, var.time = "time_years_z", which = "fit", bty = "l")
+```
+
+### ..........................................................................................................
+
+# JLCMM: NFL
 
 ### Try with only random intercept
 
@@ -1777,5 +1856,5 @@ plot(m1_splines)
 -   Survival handles right censoring and LEFT TRUNCATION (should we consider left truncation, how is this defined, does it apply to us?)
 
 ```{r}
-
+mpjlcmm()
 ```
