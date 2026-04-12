@@ -728,6 +728,14 @@ demographics_small <- demographics %>%
 # We create a variable for apoe4 status
 apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
 
+# We define APOE4 status based on number of E4 alleles
+#apoe$APOE4_status <- ifelse(apoe$GENOTYPE == "4/4", 2,
+                           #ifelse(apoe$GENOTYPE %in% c("2/4", "3/4"), 1, 0))
+#apoe$APOE4_status <- factor(apoe$APOE4_status,
+                           #levels = c(0,1,2),
+                           #labels = c("0 alleles", "1 allele", "2 alleles"))
+
+
 # We merge gender with merged_data and surv_data
 long_data <- long_data %>%
   left_join(demographics_small, by = "RID")
@@ -1501,6 +1509,55 @@ cox.zph(surv_model_ptau)
 cox.zph(surv_model_nfl)
 ```
 
+### Trying time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
+
+```{r}
+# Time-varying coefficient model for p-tau181
+surv_model_ptau_tv <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + tt(APOE4_status), 
+  data = surv_data_ptau, 
+  tt = function(x, t, ...) x * log(t)
+  )
+
+summary(surv_model_ptau_tv)
+
+# Time-varying coefficient model for NfL
+surv_model_nfl_tv <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + tt(APOE4_status), 
+  data = surv_data_nfl, 
+  tt = function(x, t, ...) x * log(t)
+  )
+
+summary(surv_model_nfl_tv)
+```
+
+Although the proportional hazards assumption tests indicated evidence of potential non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.157 in the p-tau181 model and p = 0.186 in the NfL model). Therefore, the standard Cox proportional hazards model will be retained for interpretation.
+
+### Sensitivity analysis using stratified Cox models for APOE4 status
+
+To assess the robustness of the results to potential non-proportional hazards for APOE4 status, which is still accounted for through stratification.
+
+```{r}
+surv_model_ptau_strata <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + strata(APOE4_status), 
+  data = surv_data_ptau
+  )
+
+surv_model_ptau_nfl <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + strata(APOE4_status), 
+  data = surv_data_nfl
+  )
+
+# Re-testing for the assumption of proportional hazards
+# For the Cox PH model for p-tau181 with stratified APOE4-status 
+cox.zph(surv_model_ptau_strata)
+
+# For the Cox PH model for NfL with stratified APOE4-status
+cox.zph(surv_model_nfl_strata)
+```
+
+We observe that the apparent violation of the proportional hazards assumption is attributable to APOE4 status, since after stratification no further evidence of non-proportional hazards is observed. Therefore, the standard Cox proportional hazards model, including APOE4 status as a significant covariate, will be used.
+
 ## For multivariate joint model
 
 ### Survival object with global event, time_to_event and age_at_baseline
@@ -1650,7 +1707,7 @@ traceplot(joint_model_ptau, parm = "alphas")
 traceplot(joint_model_ptau, parm = "sigmas")
 ```
 
-### Density plots 
+### Density plots
 
 ```{r}
 densplot(joint_model_ptau)
