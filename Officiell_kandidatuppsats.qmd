@@ -650,7 +650,7 @@ ptau_data <- ptau_data %>%
 grep("381_S_10###", diagnosis_data$PTID)
 ```
 
-## We select only the required variables and merge them
+## Selection and merging of required variables
 
 ```{r, warning=FALSE}
 # We select the required nfl variables
@@ -679,7 +679,7 @@ surv_data <- nfl_data %>%
   left_join(diagnosis_data_dx, by = c("RID"))
 ```
 
-## We check for missing values in both merged_data and long_data
+## Count of missing values
 
 ```{r}
 # We count missing values per column in long_data: all these are variables we will use in the model, so we can remove with na.omit()
@@ -706,7 +706,7 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## We check the length of longitudinal data and survival data
+## Length check of longitudinal and survival data
 
 ```{r}
 # We check the length of each dataset 
@@ -714,14 +714,14 @@ length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-## We check the correlation between the biomarkers
+## Correlation check between biomarkers
 
 ```{r}
 # Correlation between the biomarkers 
 cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
 ```
 
-## We add selected demographics variables (age + gender) and APOE4 status, to later use in survival model and longitudinal model
+## Addition of selected demographic variables (age and gender) and APOE4 status
 
 ```{r}
 # We only keep the demographics variables we need and one row per person 
@@ -759,7 +759,7 @@ long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - lo
 surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
 ```
 
-## We filter participants with at least 3 measurements
+## Selection of participants with at least 3 measurements
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
@@ -799,7 +799,7 @@ long_data <- long_data %>%
 ungroup()
 ```
 
-## We check the distribution of each relevant variable for multivariate joint model and transform
+## Distribution check of each biomarker 
 
 ```{r}
 # We check the distribution of each biomarker
@@ -834,7 +834,7 @@ ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
   theme_classic()
 ```
 
-## We check for outliers
+## Check for outliers
 
 We still keep them, as we assume they are correct observations.
 
@@ -857,9 +857,9 @@ large_outliers_nfl
 small_outliers_nfl
 ```
 
-## Preparing for two separate joint models
+## Preparation for Cox PH models and separate joint models
 
-### Two separate baseline, age_at_baseline and time_to_event (one for p-tau181, one for NfL)
+### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
 
 ```{r}
 ##### We prepare survival data for ptau
@@ -1016,7 +1016,7 @@ table(surv_data_nfl$event_nfl)
   #arrange(EXAMDATE_dx)
 ```
 
-### Two separate time_years (one for p-tau181, one for NfL)
+### Construction of biomarker-specific variables indicating years since baseline
 
 ```{r}
 # We compute baseline date and time since baseline for pTau in the longitudinal form
@@ -1049,9 +1049,28 @@ long_data_nfl <- long_data %>%
   ungroup()
 ```
 
-## Preparing for one multivariate joint model
+### Construction of time-averaged values of each biomarker
 
-### Global/common version of baseline, age_at_baseline and time_to_event
+```{r}
+# Creating time-average values of each biomarker 
+biomarker_avg <- surv_data %>%
+  group_by(RID) %>%
+  summarise(
+    ptau_mean = mean(log_PLASMAPTAU181, na.rm = TRUE),
+    nfl_mean = mean(log_PLASMA_NFL, na.rm = TRUE)
+  )
+
+# Merging the time-average values of each biomarker with each survival dataset 
+surv_data_ptau <- surv_data_ptau %>%
+  left_join(biomarker_avg, by = "RID")
+
+surv_data_nfl <- surv_data_nfl %>%
+  left_join(biomarker_avg, by = "RID")
+```
+
+## Preparation for the multivariate joint model
+
+### Construction of global (common) baseline, age at baseline, event and time-to-event variables
 
 ```{r}
 # We construct a unified survival dataset with a single event and time-to-event definition
@@ -1118,7 +1137,7 @@ surv_data_multi <- surv_data %>%
 table(surv_data_multi$event)
 ```
 
-### Global version of time_years
+### Construction of global version of variable indicating years since baseline 
 
 ```{r}
 long_data_multi <- long_data %>%
@@ -1137,7 +1156,7 @@ long_data_multi <- long_data %>%
   ungroup()
 ```
 
-## We re-count missing values after pre-processing
+## Missing value recount after pre-processing
 
 ```{r}
 # We re-count missing values after pre-processing
@@ -1145,7 +1164,7 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## We make sure that longitudinal data and survival data have the same length (for the joint model)
+## Recheck of longitudinal and survival data lengths
 
 ```{r}
 # We check the length of each dataset 
@@ -1280,7 +1299,7 @@ AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_st
 
 ## For separate joint models
 
-### Fitted LME models (one for p-tau181, one for NfL)
+### Fitted LME models 
 
 ```{r}
 # Longitudinal model for p-tau181 with normal distribution 
@@ -1315,7 +1334,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-### We check the residuals
+### Residual check 
 
 ```{r}
 # residuals of the p-tau181 LME model
@@ -1347,7 +1366,7 @@ plot(fitted_vals_nfl, res_nfl,
 abline(h = 0, col = "red", lty = 2)
 ```
 
-### QQ plots (one
+### QQ plots
 
 ```{r}
 # For P-tau
@@ -1359,9 +1378,9 @@ qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
 
-## For multivariate joint model
+## For the multivariate joint model
 
-### Fitted longitudinal models (one for p-tau181, one for NfL) with global time_years, that we then create mixed object for
+### Combination of fitted longitudinal models with global years-since-baseline variable
 
 ```{r}
 # Longitudinal model for p-tau181 with normal distribution and global time_years
@@ -1386,9 +1405,9 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 # Survival models
 
-## For separate joint models
+## For the different cox PH models and the separate joint models
 
-### We create survival objects (one for p-tau181, one for NfL)
+### Construction of survival objects 
 
 ```{r}
 # We create a Surv object: time and event
@@ -1405,7 +1424,7 @@ surv_object_nfl <- Surv(
 )
 ```
 
-### Kaplan-Meier curves (one for p-tau181, one for NfL)
+### Construction of Kaplan-Meier curves 
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
@@ -1429,7 +1448,7 @@ plot(
 )
 ```
 
-### Fitted Cox PH models (one for p-tau181, one for NfL)
+### Fitted standard Cox PH models 
 
 ```{r}
 # Cox survival-models, with covariates
@@ -1452,17 +1471,52 @@ surv_model_nfl <- coxph(
 summary(surv_model_nfl)
 ```
 
-### Testing for the assumption of proportional hazards
+### Fitted Cox PH models with time-averaged values of each biomarker
 
 ```{r}
-# For the Cox PH model for p-tau181 
-cox.zph(surv_model_ptau)
+# Cox survival-models, with covariates including time-averaged values of each biomarker 
+# For p-tau181
+surv_model_ptau_ta <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
+  data = surv_data_ptau
+)
 
-# For the Cox PH model for NfL
-cox.zph(surv_model_nfl)
+summary(surv_model_ptau_ta)
+
+# For NfL
+surv_model_nfl_ta <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
+  data = surv_data_nfl
+)
+
+summary(surv_model_nfl_ta)
 ```
 
-### Trying time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
+### Fitted Cox PH Model with time-dependent covariates
+
+### Test of the assumption of proportional hazards
+
+```{r}
+##### 1. For the standard Cox PH models 
+# For p-tau181 
+cox.zph(surv_model_ptau)
+# For NfL
+cox.zph(surv_model_nfl)
+
+##### 2. For the Cox PH models with time-averaged values of each biomarker 
+# For p-tau181
+cox.zph(surv_model_ptau_ta)
+# For NfL
+cox.zph(surv_model_nfl_ta)
+
+##### 3. For the Cox PH models with time-dependent covariates
+# For p-tau181
+cox.zph(surv_model_ptau_ta)
+# For NfL
+cox.zph(surv_model_nfl_ta)
+```
+
+### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ```{r}
 # Time-varying coefficient model for p-tau181
@@ -1511,7 +1565,7 @@ cox.zph(surv_model_nfl_strata)
 
 We observe that the apparent violation of the proportional hazards assumption is attributable to APOE4 status, since after stratification no further evidence of non-proportional hazards is observed. Therefore, the standard Cox proportional hazards model, including APOE4 status as a significant covariate, will be used.
 
-## For multivariate joint model
+## For the multivariate joint model
 
 ### Survival object with global event, time_to_event and age_at_baseline
 
@@ -1547,66 +1601,14 @@ surv_model_multi <- coxph(
 summary(surv_model_multi)
 ```
 
-### Testing for the assumption of proportional hazards
+### Test of the assumption of proportional hazards
 
 ```{r}
 # For the Cox PH model with global survival object
 cox.zph(surv_model_multi)
 ```
 
-## For Cox PH model with time-averaged values of each biomarker
-
-### Creating time-average values of each biomarker
-
-```{r}
-# Creating time-average values of each biomarker 
-biomarker_avg <- surv_data %>%
-  group_by(RID) %>%
-  summarise(
-    ptau_mean = mean(log_PLASMAPTAU181, na.rm = TRUE),
-    nfl_mean = mean(log_PLASMA_NFL, na.rm = TRUE)
-  )
-
-# Merging the time-average values of each biomarker with each survival dataset 
-surv_data_ptau <- surv_data_ptau %>%
-  left_join(biomarker_avg, by = "RID")
-
-surv_data_nfl <- surv_data_nfl %>%
-  left_join(biomarker_avg, by = "RID")
-```
-
-### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker
-
-```{r}
-# Cox survival-models, with covariates including time-averaged values of each biomarker 
-# For p-tau181
-surv_model_ptau_tau <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
-  data = surv_data_ptau
-)
-
-summary(surv_model_ptau_tau)
-
-# For NfL
-surv_model_nfl_ta <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
-  data = surv_data_nfl
-)
-
-summary(surv_model_nfl_ta)
-```
-
-### Testing for the assumption of proportional hazards
-
-```{r}
-# For the Cox PH model for p-tau181 
-cox.zph(surv_model_ptau)
-
-# For the Cox PH model for NfL
-cox.zph(surv_model_nfl)
-```
-
-# Two separate joint models
+## Two separate joint models
 
 ## Fitted joint model for p-tau181
 
@@ -1681,7 +1683,7 @@ joint_model_nfl <- jm(
 summary(joint_model_nfl)
 ```
 
-### Comparing fitted models using DIC and WAIC
+### Comparison of fitted models using DIC and WAIC
 
 ```{r}
 cmp <- compare_jm(joint_model_ptau, joint_model_nfl)
@@ -1716,7 +1718,7 @@ densplot(joint_model_ptau, parm = "sigmas")
 
 # Multivariate joint model
 
-## We check whether the models have stable random slopes
+## To check if the models have stable random slopes
 
 ```{r}
 summary(long_model_ptau)
@@ -1753,10 +1755,10 @@ summary <- summary(multi_joint_model)
 summary$Survival
 ```
 
-# To see individuals transitions 
+# To see individuals transitions
 
 ```{r}
-# 1. Förbereder data + identifierar transitions
+# Förbereder data + identifierar transitions
 diagnosis_long <- diagnosis_data %>%
   arrange(RID, EXAMDATE) %>%
   group_by(RID) %>%
@@ -1767,17 +1769,17 @@ diagnosis_long <- diagnosis_data %>%
   ) %>%
   ungroup()
 
-# 2. Antal transitions per individ
+# Antal transitions per individ
 transition_counts <- diagnosis_long %>%
   group_by(RID) %>%
   summarise(n_transitions = sum(transition, na.rm = TRUE), .groups = "drop")
 
-# 3. Vanliga transitionstyper
+# Vanliga transitionstyper
 transition_summary <- diagnosis_long %>%
   filter(transition) %>%
   count(transition_type, sort = TRUE)
 
-# 4. Övergångar mellan diagnoser (individ + frekvens)
+# Övergångar mellan diagnoser (individ + frekvens)
 transition_both <- diagnosis_long %>%
   filter(transition) %>%
   group_by(prev_diag, DIAGNOSIS) %>%
@@ -1788,7 +1790,7 @@ transition_both <- diagnosis_long %>%
   ) %>%
   arrange(desc(n_events))
 
-# 5. Viktiga transitions
+# Viktiga transitions
 progression <- transition_both %>%
   filter(prev_diag == "MCI" & DIAGNOSIS == "Dementia")
 
@@ -1798,12 +1800,12 @@ reversals <- transition_both %>%
 early <- transition_both %>%
   filter(prev_diag == "CN" & DIAGNOSIS == "MCI")
 
-# 6. Individuella sekvenser (valfritt)
+# Individuella sekvenser (valfritt)
 individual_sequences <- diagnosis_long %>%
   group_by(RID) %>%
   summarise(sequence = paste(DIAGNOSIS, collapse = " → "), .groups = "drop")
 
-# 7. Monotona (CN → MCI → Dementia utan baksteg)
+# Monotona (CN → MCI → Dementia utan baksteg)
 monotonic_ids <- diagnosis_long %>%
   group_by(RID) %>%
   summarise(
@@ -1815,7 +1817,7 @@ monotonic_ids <- diagnosis_long %>%
   filter(valid) %>%
   pull(RID)
 
-# 8. Exempel på CN → MCI → Dementia-fall
+# Exempel på CN → MCI → Dementia-fall
 cn_mci_dem <- diagnosis_long %>%
   group_by(RID) %>%
   summarise(
@@ -1827,4 +1829,10 @@ cn_mci_dem <- diagnosis_long %>%
     .groups = "drop"
   ) %>%
   filter(has_CN & has_MCI_after_CN & has_Dem_after_MCI)
+```
+
+```{r}
+# För att ta t.ex. jämföra med cn_mci_dem original-data - t.ex. 
+diagnosis_data %>%
+  filter(RID == 61)
 ```
