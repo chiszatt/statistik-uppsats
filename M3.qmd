@@ -250,55 +250,96 @@ long_data <- long_data %>%
 
 # M3 - Time-dependent Cox PH model
 
-Merging of longitudinal data and survival information
+Construction of start–stop time intervals and event indicators
 
 ```{r}
-long_data <- long_data %>%
+td_data <- long_data %>%
+  
+  # We add survival information to each longitudinal record
   left_join(
-    surv_data %>% select(RID, event, time_to_event),
+    surv_data %>%
+      select(RID, event, time_to_event),
     by = "RID"
-  )
-```
-
-Construction of start–stop time intervals
-
-```{r}
-long_data <- long_data %>%
-  arrange(RID, time_years_ptau) %>% 
-  # We sort observations within each individual by time 
-
-  group_by(RID) %>% 
-  # Group by individual so all transformations are done within each subject
-
+  ) %>%
+  
+  # We sort observations within each individual by time
+  arrange(RID, time_years_ptau) %>%
+  group_by(RID) %>%
+  
+  # We define start–stop intervals based on visit times
   mutate(
     time_start = lag(time_years_ptau, default = 0),
-    # Start of the interval = previous visit time
-    # For the first observation, start is set to 0 (baseline)
-
-    time_end   = time_years_ptau,
-    # End of the interval = current visit time
-
-    event_interval = as.integer(event == 1 & time_end >= time_to_event)
-    # Indicates whether the dementia event has occurred by this time point
+    time_end   = time_years_ptau
   ) %>%
-  ungroup() %>%
   
-  filter(time_end > time_start)
-  # We remove invalid intervals (for example zero-length intervals at baseline)
+  # We remove invalid (zero-length) intervals
+  filter(time_end > time_start) %>%
   
-# Checking event_interval distribution
-table(long_data$event_interval)
+  # We define the event as occurring in the interval that contains the event time
+  mutate(
+    event_interval = as.integer(
+      event == 1 &
+      time_to_event > time_start &
+      time_to_event <= time_end
+    )
+  ) %>%
+  
+  ungroup()
+
+# Checking event interval distribution
+table(td_data$event_interval)
 ```
 
 Fitted time-dependent Cox PH model
 
 ```{r}
-cox_td <- coxph(
-  Surv(time_start, time_end, event_interval) ~
-    log_PLASMAPTAU181 + log_PLASMA_NFL +
-    age_at_visit + PTGENDER + APOE4_status,
-  data = long_data
+# Fitted Cox PH model with time-dependent covariates using p-tau181
+surv_model_ptau_td <- coxph(
+  Surv(time_start, time_end, event_interval) ~ 
+    log_PLASMAPTAU181 + age_at_visit + PTGENDER + APOE4_status,
+  data = td_data
 )
 
-summary(cox_td)
+summary(surv_model_ptau_td)
+```
+
+```{r}
+# Fitted Cox PH model with time-dependent covariates using NfL 
+surv_model_nfl_td <- coxph(
+  Surv(time_start, time_end, event_interval) ~ 
+    log_PLASMA_NFL +
+    age_at_visit +
+    PTGENDER +
+    APOE4_status,
+  data = td_data
+)
+
+summary(surv_model_nfl_td)
+```
+
+```{r}
+# Fitted Cox PH model with time-dependent covariates using both p-tau181 and NfL 
+surv_model_both_td <- coxph(
+  Surv(time_start, time_end, event_interval) ~ 
+    log_PLASMAPTAU181 +
+    log_PLASMA_NFL +
+    age_at_visit +
+    PTGENDER +
+    APOE4_status,
+  data = td_data
+)
+
+summary(surv_model_both_td)
+```
+
+```{r}
+##### 3. For the Cox PH models with time-dependent covariates
+# For model with p-tau181
+cox.zph(surv_model_ptau_td)
+
+# For model with NfL
+cox.zph(surv_model_nfl_td)
+
+# For model with both
+cox.zph(surv_model_both_td)
 ```
