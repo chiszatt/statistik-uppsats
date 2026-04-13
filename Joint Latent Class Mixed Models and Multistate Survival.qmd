@@ -2057,6 +2057,9 @@ dx_times_short <- dx_times %>%
     t_CN = first(EXAMDATE[DIAGNOSIS == "CN"]),
     
     t_MCI = case_when(
+      
+# THE PROBLEM ARISES HERE, asssumes that there is only one MCI dx before reversion back to CN
+      
 # for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE 
       unique(backwards_MCI) == TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"][-1]),
 # otherwise, we take the first EXAMDATE where dx = MCI
@@ -2132,11 +2135,15 @@ multistate_data_test <- multistate_data %>%
 
 -   66 unique RID with negative time to event: check if these are MCI -\> CN reversions
 
+-   **PROBLEM:** Code which checks for MCI -\> CN reversions assumes the next MCI event is AFTER the CN reversion
+
+-   **SOLUTION:**
+
 ```{r}
 # checking which individuals have negative time to event
 CN_reversions <- unique((multistate_data_test %>% filter(ms_time_to_event < 0))$RID)
 
-diagnosis_data %>%
+negative_event_times <- diagnosis_data %>%
   arrange(RID, EXAMDATE) %>%
   filter(RID %in% CN_reversions) %>%
   group_by(RID) %>%
@@ -2145,7 +2152,8 @@ diagnosis_data %>%
       case_when(
         (DIAGNOSIS[EXAMDATE == min(EXAMDATE)] == "MCI" &
            DIAGNOSIS[EXAMDATE == max(EXAMDATE)] == "CN") ~ FALSE,
-        TRUE ~ TRUE))
+        TRUE ~ TRUE)) %>%
+  merge(multistate_data %>% select(RID, ms_time_to_event, ms_event), by = "RID")
 ```
 
 ```{r}
