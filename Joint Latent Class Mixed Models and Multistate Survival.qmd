@@ -410,14 +410,14 @@ lme(ln_PLASMA_NFL ~ time_years_z, random = ~ time_years_z | RID, data = jlcmm_da
 ```
 
 ```{r}
-jlcmm(
-  fixed = ln_PLASMA_NFL ~ time_years_z,
-  random = ~ time_years_z,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data,
-  maxiter = 500
-)
+# jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ time_years_z,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data,
+#   maxiter = 500
+# )
 ```
 
 ## Try again with time_years_z and ln_NFL_z
@@ -433,14 +433,14 @@ lme(ln_PLASMA_NFL_z ~ time_years_z, random = ~ time_years_z | RID, data = jlcmm_
 ```
 
 ```{r}
-jlcmm(
-  fixed = ln_PLASMA_NFL_z ~ time_years_z,
-  random = ~ time_years_z,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data,
-  maxiter = 500
-)
+# jlcmm(
+#   fixed = ln_PLASMA_NFL_z ~ time_years_z,
+#   random = ~ time_years_z,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data,
+#   maxiter = 500
+# )
 ```
 
 ## jlcmm_data_test: try again with only time_to_event \> 0
@@ -597,7 +597,9 @@ postprob(hlme_m1)
 ```{r}
 # saving the posterior probabilities into a data frame
 pp <- hlme_m1$pprob
+```
 
+```{r}
 # plotting posterior probabilities for class 1
 ggplot(pp, aes(x = prob1)) + 
   geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
@@ -863,16 +865,16 @@ ggplot(preds_df, aes(x = time)) +
 ### M2 (3 latent classes)
 
 ```{r}
-hlme_m2 <- hlme(
-    fixed = ln_PLASMA_NFL ~ time_years_z,
-    mixture = ~ time_years_z,
-    random = ~ time_years_z,
-    classmb = ~ genotype + age_at_baseline + PTGENDER,
-    subject = "RID",
-    ng = 2,
-    data = jlcmm_data_test,
-    B = hlme_m1
-  )
+# hlme_m2 <- hlme(
+#     fixed = ln_PLASMA_NFL ~ time_years_z,
+#     mixture = ~ time_years_z,
+#     random = ~ time_years_z,
+#     classmb = ~ genotype + age_at_baseline + PTGENDER,
+#     subject = "RID",
+#     ng = 2,
+#     data = jlcmm_data_test,
+#     B = hlme_m1
+#   )
 ```
 
 # PTAU: Latent class model (intercept and slope)
@@ -1055,6 +1057,8 @@ postprob(hlme_m1)
 
 ### M1 (2 latent classes) with ln_PLASMANFL as covariate!
 
+-   **RETHINK HERE: check that it is significant when genotype is collapsed down to 3 levels, i think it will be so this can be ignored...**
+
 -   This is significant!
 
 -   What does this tell us? NfL classifies better than ptau181. ptau improves only when nfl is included as a covariate. NfL may give a better indication of disease severity/progression than ptau181, despite ptau181 being the disease specific biomarker - in fact, i think this comes up in the literature, that NfL is better for tracking disease when disease after diagnosis **\*\*SOURCE\*\***
@@ -1131,10 +1135,6 @@ summary(hlme_m1)
 
 -   reduced classification accuracy for class 2
 
-$$
-P(C_1 |C_1) = 0.82 \quad P(C_1 |C_2) = 0.14 \quad P(C_2 |C_1) = 0.18 \quad P(C_2 |C_2) = 0.86
-$$
-
 ```{r}
 postprob(hlme_m1)
 ```
@@ -1144,10 +1144,6 @@ postprob(hlme_m1)
 -   Significant coefficients, except genotype e3/e3 (collapse further down to e2 e3, e4, and e4/e4)
 
 -   Converges in 29 iterations, posterior probabilities good
-
-$$
-P(C_1 |C_1) = 0.89 \quad P(C_1 |C_2) = 0.11 \quad P(C_2 |C_1) = 0.11 \quad P(C_2 |C_2) = 0.89
-$$
 
 ```{r}
 mlcmm_m0 <- multlcmm(
@@ -1354,6 +1350,40 @@ summarytable(mlcmm_m0, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 plot(mlcmm_m1, var.time = "time_years_z", which = "fit", bty = "l")
 ```
 
+### Intercept only and no classmb covariates
+
+-   NO separation at all
+
+```{r}
+mlcmm_m0 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ 1,
+  subject = "RID",
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = jlcmm_data_test,
+  B = random(mlcmm_m0)
+)
+```
+
+```{r}
+summary(mlcmm_m1)
+```
+
+```{r}
+postprob(mlcmm_m1)
+```
+
 ### ..........................................................................................................
 
 # JLCMM: NFL
@@ -1425,6 +1455,8 @@ plot(m0)
 
 -   Start values from m0
 
+-   Intercept not significant at the 0.05 level
+
 -   Score test statistic no longer significant, conditional independence assumption is met: is this evidence for 2 latent classes as opposed to 3? Is that why the joint latent class model with ng = 3 does not converge?
 
 -   $AIC = 3145$
@@ -1451,6 +1483,16 @@ summary(m1)
 
 ```{r}
 plot(m1)
+```
+
+### Posterior probabilities
+
+-   Good classification
+
+-   Differences between classification based on longitudinal only and longitudinal and time to event data
+
+```{r}
+postprob(m1)
 ```
 
 ### Random start values
@@ -1615,24 +1657,24 @@ summary(m0)
 ### M1 (2 latent classes)
 
 ```{r}
-m1 <- jlcmm(
-  fixed = ln_PLASMAPTAU181 ~ time_years_z,
-  random = ~ 1 + time_years_z,
-  mixed = ~ time_years_z,
-  classmb = ~ genotype + age_at_baseline + PTGENDER,
-  ng = 2,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data_test
-)
+# m1 <- jlcmm(
+#   fixed = ln_PLASMAPTAU181 ~ time_years_z,
+#   random = ~ time_years_z,
+#   mixed = ~ time_years_z,
+#   classmb = ~ genotype + age_at_baseline + PTGENDER,
+#   ng = 2,
+#   subject = "RID",
+#   survival = Surv(time_to_event, event) ~ genotype,
+#   data = jlcmm_data_test
+# )
 ```
 
 ```{r}
-summary(m1)
+# summary(m1)
 ```
 
 ```{r}
-postprob(m1)
+# postprob(m1)
 ```
 
 # ..........................................................................................................
@@ -1855,6 +1897,426 @@ plot(m1_splines)
 
 -   Survival handles right censoring and LEFT TRUNCATION (should we consider left truncation, how is this defined, does it apply to us?)
 
+### Fitting multlcmm: M0 (1 latent class)
+
 ```{r}
-mpjlcmm()
+mlcmm_m0 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  data = jlcmm_data_test
+)
+```
+
+### Fitting multlcmm: M1 (2 latent class)
+
+```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ time_years_z,
+  mixture = ~ time_years_z,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = jlcmm_data_test,
+  B = random(mlcmm_m0)
+)
+```
+
+### M0 (1 latent class)
+
+-   $AIC = 8769$
+
+-   $BIC = 8829$
+
+-   $log-likelihood = -4374$
+
+```{r}
+mult_jlcmm_m0 <- mpjlcmm(
+  longitudinal = list(mlcmm_m0),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 1,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(mult_jlcmm_m0)
+```
+
+### M1 (2 latent classes)
+
+-   $AIC = 8670$
+
+-   $BIC = 8743$
+
+-   $log-likelihood = -4320$
+
+-   Model with 2 latent classes, NO class membership covariates, NO survival covariates
+
+-   All coefficients significant **(why is intercept not estimated for class1????)**
+
+-   $AIC$ and $BIC$ both decrease, and $log-likelihood$ increases
+
+```{r}
+mult_jlcmm_m1 <- mpjlcmm(
+  longitudinal = list(mlcmm_m1),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 2,
+  data = jlcmm_data_test,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m1)
+```
+
+### Posterior probabilities
+
+-   Good classification
+
+```{r}
+postprob(mult_jlcmm_m1)
+```
+
+# ...................................................................................................
+
+# MULTISTATE multivariate JLCMM (mpjlcmm)
+
+## Multistate data
+
+### Diagnosis times
+
+-   MCI dx, calculates the time from first EXAMDATE of MCI dx from current EXAMDATE if CN
+
+-   AD dx, calculates the time from first EXAMDATE of AD dx from current EXAMDATE if MCI
+
+-   AD dx, calculates the time from first EXAMDATE of AD dx from current EXAMDATE if CN
+
+```{r}
+# creating a data frame with diagnosis times: CN -> MCI, MCI -> AD
+dx_times <- diagnosis_data %>%
+  arrange(RID, EXAMDATE) %>%
+  group_by(RID) %>%
+  mutate(
+# creating a variable for the time from first MCI dx to every CN dx
+    t_CN_MCI = ifelse(DIAGNOSIS == "CN",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "MCI"]) - EXAMDATE) / 365.25,
+                      NA),
+# creating a variable for the time from first AD dx to every MCI dx
+    t_MCI_AD = ifelse(DIAGNOSIS == "MCI",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
+                      NA),
+
+    t_CN_AD = ifelse(DIAGNOSIS == "CN",
+                      as.numeric(first(EXAMDATE[DIAGNOSIS == "Dementia"]) - EXAMDATE) / 365.25,
+                      NA),
+# 
+  ) %>% ungroup()
+
+```
+
+-   Creating a variable which tells us if the MCI dx reverts back to CN, and same from AD to MCI
+
+```{r}
+# adding a variable to the dx times data frame which tells us whether an individual goes "backwards" from MCI -> CN or from AD -> MCI
+dx_times <- dx_times %>%
+  arrange(RID, t_CN_MCI) %>%
+  group_by(RID) %>% 
+  mutate(backwards_MCI = case_when(
+    (any(DIAGNOSIS == "CN") & any(DIAGNOSIS == "MCI")) == TRUE ~
+      # (ifelse(is.na(t_CN_MCI) == TRUE,
+      #         NA,
+              first(t_CN_MCI) < 0),
+    
+    backwards_AD = ifelse(is.na(t_MCI_AD) == TRUE,
+                          NA,
+                          first(t_MCI_AD) < 0))
+
+# number of individuals which move backwards from MCI -> CN
+sum(na.omit((dx_times %>% select(backwards_MCI, RID) %>% distinct())$backwards_MCI))
+
+# number of individuals which move backwards from MCI -> CN = 0
+sum(na.omit((dx_times %>% select(backwards_AD, RID) %>% distinct())$backwards_AD))
+```
+
+```{r}
+# removing the backwards_AD variable as there are 0 cases
+dx_times <- dx_times %>% select(!backwards_AD)
+```
+
+```{r}
+# creating a shorter version of dx_times where the t_MCI takes the first MCI dx which does not revert to CN dx
+dx_times_short <- dx_times %>%
+  arrange(RID, EXAMDATE) %>%
+  group_by(RID) %>%
+  summarise(
+    t_CN = first(EXAMDATE[DIAGNOSIS == "CN"]),
+    
+    t_MCI = case_when(
+# for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE 
+      unique(backwards_MCI) == TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"][-1]),
+# otherwise, we take the first EXAMDATE where dx = MCI
+      TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"])
+      ),
+
+# there are no reversions from AD dx, so we just take the first AD dx date
+    t_AD = first(EXAMDATE[DIAGNOSIS == "Dementia"]),
+    censor_time = max(EXAMDATE)
+  ) %>% ungroup()
+```
+
+## Multistate data
+
+Multistates
+
+1.  CN
+
+2.  MCI
+
+3.  AD
+
+```{r}
+multistate_data <- dx_times_short %>%
+  mutate(
+# CN to MCI event variable 
+    CN_MCI_event = ifelse(!is.na(t_CN) & !is.na(t_MCI), 1, 0),
+# survival time for CN to MCI event
+    t_CN_MCI = case_when(
+      CN_MCI_event == 1 ~ as.numeric(t_MCI - t_CN) / 365.25,
+      CN_MCI_event == 0 ~ as.numeric(censor_time - t_CN) / 365.25
+    ),
+# MCI to AD event variable
+    MCI_AD_event = case_when(
+      !is.na(t_MCI) & !is.na(t_AD) ~ 1,
+      !is.na(t_MCI) &  is.na(t_AD) ~ 0,
+      TRUE ~ NA
+    ),
+# survival time for MCI to AD event 
+    t_MCI_AD = case_when(
+      MCI_AD_event == 1 ~ as.numeric(t_AD - t_MCI) / 365.25,
+      MCI_AD_event == 0 ~ as.numeric(censor_time - t_MCI) / 365.25,
+      TRUE ~ NA
+    )
+  ) %>% relocate(MCI_AD_event, .after = CN_MCI_event)
+```
+
+```{r}
+# recoding the event and time_to_event variables for multistate jlcmm
+multistate_data <- multistate_data %>%
+  mutate(
+    ms_event = case_when(
+      (CN_MCI_event == 0 & is.na(t_CN_MCI) == FALSE) ~ 1,
+      (CN_MCI_event == 1 & MCI_AD_event == 0) ~ 2,
+      (is.na(t_CN_MCI) == TRUE & is.na(t_MCI_AD) == FALSE) ~ 2,
+      (CN_MCI_event == 1 & MCI_AD_event == 1) ~ 3,
+      (is.na(t_CN_MCI) == TRUE & is.na(t_MCI_AD) == TRUE) ~ 3),
+    ms_time_to_event = case_when(
+      event == 1 ~ t_CN_MCI,
+      event == 2 ~ ifelse(!is.na(t_CN_MCI), t_CN_MCI, t_MCI_AD),
+      event == 3 ~ ifelse(!is.na(t_MCI_AD), t_CN_MCI, 0),
+    ))
+```
+
+```{r}
+# merging the multistate event and time to event data with the jlcmm data set
+multistate_data_test <- multistate_data %>%
+  select(RID, ms_event, ms_time_to_event) %>%
+  merge(jlcmm_data_test, by = "RID")
+```
+
+-   There are negative time to event, the mpjlcmm does not converge
+
+-   66 unique RID with negative time to event: check if these are MCI -\> CN reversions
+
+```{r}
+# checking which individuals have negative time to event
+CN_reversions <- unique((multistate_data_test %>% filter(ms_time_to_event < 0))$RID)
+
+diagnosis_data %>%
+  arrange(RID, EXAMDATE) %>%
+  filter(RID %in% CN_reversions) %>%
+  group_by(RID) %>%
+  mutate(
+    no_reversion =
+      case_when(
+        (DIAGNOSIS[EXAMDATE == min(EXAMDATE)] == "MCI" &
+           DIAGNOSIS[EXAMDATE == max(EXAMDATE)] == "CN") ~ FALSE,
+        TRUE ~ TRUE))
+```
+
+```{r}
+# final version
+multistate_data <- dx_times_short %>%
+  mutate(
+# CN to MCI event variable 
+    CN_MCI_event = ifelse(!is.na(t_CN) & !is.na(t_MCI), 1, 0),
+# survival time for CN to MCI event
+    t_CN_MCI = case_when(
+      CN_MCI_event == 1 ~ as.numeric(t_MCI - t_CN) / 365.25,
+      CN_MCI_event == 0 ~ as.numeric(censor_time - t_CN) / 365.25
+    ),
+# MCI to AD event variable
+    MCI_AD_event = case_when(
+      !is.na(t_MCI) & !is.na(t_AD) ~ 1,
+      !is.na(t_MCI) &  is.na(t_AD) ~ 0,
+      TRUE ~ NA
+    ),
+# survival time for MCI to AD event 
+    t_MCI_AD = case_when(
+      MCI_AD_event == 1 ~ as.numeric(t_AD - t_MCI) / 365.25,
+      MCI_AD_event == 0 ~ as.numeric(censor_time - t_MCI) / 365.25,
+      TRUE ~ NA
+    )
+  ) %>% relocate(MCI_AD_event, .after = CN_MCI_event)
+```
+
+## JLCMM DATA
+
+-   same number of rows - good
+
+```{r}
+jlcmm_data_test_multi <- jlcmm_data_test %>%
+  merge(
+    multistate_data %>%
+      select(RID, censor_time, CN_MCI_event, MCI_AD_event, t_CN_MCI, t_MCI_AD))
+```
+
+```{r}
+?mpjlcmm
+```
+
+# ...................................................................................................
+
+# MULTISTATE model fitting
+
+### Fitting multlcmm: M0 (1 latent class)
+
+-   multivariate latent class mixed model with 1 class
+
+```{r}
+mlcmm_m0 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  data = df_test
+)
+```
+
+```{r}
+summary(mlcmm_m0)
+```
+
+### M0 (1 latent class) mpjlcmm
+
+-   multistate multivariate joint latent class mixed model with 1 class
+
+-   infinite parameters
+
+```{r}
+ms_mjlcmm_m0 <- mpjlcmm(
+  longitudinal = list(ms_mlcmm_m0),
+  subject = "RID",
+  survival = time_event + state ~ 1,
+  data = df_test,
+  ng = 1
+)
+```
+
+#### Checking time_to_event variable
+
+```{r}
+sum(df_test$time_event == 0)
+range(df_test$time_event)
+```
+
+### Fitting multlcmm: M1 (2 latent classes)
+
+-   multistate multivariate latent class mixed model
+
+```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = ln_PLASMA_NFL + ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ time_years_z,
+  mixture = ~ time_years_z,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = df_test,
+  B = random(mlcmm_m0)
+)
+```
+
+```{r}
+summary(mlcmm_m1)
+```
+
+### M1 (2 latent classes)
+
+-   multistate multivariate joint latent class mixed model
+
+```{r}
+ms_mjlcmm_m1 <- mpjlcmm(
+  longitudinal = list(mlcmm_m1),
+  subject = "RID",
+  survival = time_event + state ~ 1,
+  ng = 2,
+  data = df_test,
+  B = random(ms_mjlcmm_m0)
+)
+```
+
+-   Remove NA values
+
+```{r}
+jlcmm_data_test_multi_short <- na.omit(jlcmm_data_test_multi)
+```
+
+```{r}
+is.numeric(jlcmm_data_test_multi_short$t_CN_MCI)
+is.numeric(jlcmm_data_test_multi_short$t_MCI_AD)
+```
+
+```{r}
+# m0 <- jlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ 1 + time_years_z,
+#   subject = "RID",
+#   survival = Surv(time = t_CN_MCI, event = CN_MCI_event) +
+#     Surv(time = t_MCI_AD, event = MCI_AD_event) ~ genotype,
+#   data = jlcmm_data_test_multi
+# )
+```
+
+```{r}
+# hlme_m1 <- hlme(
+#     fixed = ln_PLASMA_NFL ~ time_years_z,
+#     mixture = ~ time_years_z,
+#     random = ~ time_years_z,
+#     classmb = ~ 1,
+#     subject = "RID",
+#     ng = 2,
+#     data = jlcmm_data_test,
+#     B = random(hlme_m0)
+#   )
+```
+
+```{r}
+# model_multistate <- Jointlcmm(
+#   fixed = ln_PLASMA_NFL ~ time_years_z,
+#   random = ~ time_years_z,
+#   mixture = ~ time_years_z,
+#   classmb = ~ 1,
+#   ng = 2,
+#   subject = "RID",
+#   
+#   survival = Surv(time1, event1) + Surv(time2, event2),
+#   hazard = c("Weibull", "Weibull"),
+#   
+#   data = jlcmm_data_test_multi,
+#   B = hlme_m1
+# )
 ```
