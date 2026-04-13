@@ -1556,7 +1556,7 @@ cox.zph(surv_model_multi)
 
 ## For Cox PH model with time-averaged values of each biomarker
 
-### Creating time-average values of each biomarker 
+### Creating time-average values of each biomarker
 
 ```{r}
 # Creating time-average values of each biomarker 
@@ -1575,7 +1575,7 @@ surv_data_nfl <- surv_data_nfl %>%
   left_join(biomarker_avg, by = "RID")
 ```
 
-### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker 
+### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker
 
 ```{r}
 # Cox survival-models, with covariates including time-averaged values of each biomarker 
@@ -1751,4 +1751,80 @@ summary(multi_joint_model)
 ```{r}
 summary <- summary(multi_joint_model)
 summary$Survival
+```
+
+# To see individuals transitions 
+
+```{r}
+# 1. Förbereder data + identifierar transitions
+diagnosis_long <- diagnosis_data %>%
+  arrange(RID, EXAMDATE) %>%
+  group_by(RID) %>%
+  mutate(
+    prev_diag = lag(DIAGNOSIS),
+    transition = DIAGNOSIS != prev_diag & !is.na(prev_diag),
+    transition_type = paste(prev_diag, "→", DIAGNOSIS)
+  ) %>%
+  ungroup()
+
+# 2. Antal transitions per individ
+transition_counts <- diagnosis_long %>%
+  group_by(RID) %>%
+  summarise(n_transitions = sum(transition, na.rm = TRUE), .groups = "drop")
+
+# 3. Vanliga transitionstyper
+transition_summary <- diagnosis_long %>%
+  filter(transition) %>%
+  count(transition_type, sort = TRUE)
+
+# 4. Övergångar mellan diagnoser (individ + frekvens)
+transition_both <- diagnosis_long %>%
+  filter(transition) %>%
+  group_by(prev_diag, DIAGNOSIS) %>%
+  summarise(
+    n_events = n(),
+    n_individuals = n_distinct(RID),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(n_events))
+
+# 5. Viktiga transitions
+progression <- transition_both %>%
+  filter(prev_diag == "MCI" & DIAGNOSIS == "Dementia")
+
+reversals <- transition_both %>%
+  filter(prev_diag == "Dementia" & DIAGNOSIS == "MCI")
+
+early <- transition_both %>%
+  filter(prev_diag == "CN" & DIAGNOSIS == "MCI")
+
+# 6. Individuella sekvenser (valfritt)
+individual_sequences <- diagnosis_long %>%
+  group_by(RID) %>%
+  summarise(sequence = paste(DIAGNOSIS, collapse = " → "), .groups = "drop")
+
+# 7. Monotona (CN → MCI → Dementia utan baksteg)
+monotonic_ids <- diagnosis_long %>%
+  group_by(RID) %>%
+  summarise(
+    valid = all(diff(as.numeric(factor(DIAGNOSIS,
+      levels = c("CN", "MCI", "Dementia")
+    ))) >= 0),
+    .groups = "drop"
+  ) %>%
+  filter(valid) %>%
+  pull(RID)
+
+# 8. Exempel på CN → MCI → Dementia-fall
+cn_mci_dem <- diagnosis_long %>%
+  group_by(RID) %>%
+  summarise(
+    has_CN = any(DIAGNOSIS == "CN"),
+    has_MCI_after_CN = any(DIAGNOSIS == "MCI" &
+                             EXAMDATE > min(EXAMDATE[DIAGNOSIS == "CN"])),
+    has_Dem_after_MCI = any(DIAGNOSIS == "Dementia" &
+                              EXAMDATE > min(EXAMDATE[DIAGNOSIS == "MCI"])),
+    .groups = "drop"
+  ) %>%
+  filter(has_CN & has_MCI_after_CN & has_Dem_after_MCI)
 ```
