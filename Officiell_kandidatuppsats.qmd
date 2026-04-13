@@ -729,15 +729,13 @@ demographics_small <- demographics %>%
   select(RID, PTDOBYY, PTGENDER) %>%
   distinct(RID, .keep_all = TRUE)
 
-# We create a variable for apoe4 status
-apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
-
 # We define APOE4 status based on number of E4 alleles
-#apoe$APOE4_status <- ifelse(apoe$GENOTYPE == "4/4", 2,
-                           #ifelse(apoe$GENOTYPE %in% c("2/4", "3/4"), 1, 0))
-#apoe$APOE4_status <- factor(apoe$APOE4_status,
-                           #levels = c(0,1,2),
-                           #labels = c("0 alleles", "1 allele", "2 alleles"))
+apoe <- apoe %>%
+  mutate(APOE4_status = case_when(
+    GENOTYPE == "4/4" ~ "2 alleles",
+    GENOTYPE %in% c("2/4", "3/4") ~ "1 allele",
+    TRUE ~ "0 alleles"
+  ))
 
 
 # We merge gender with merged_data and surv_data
@@ -746,13 +744,17 @@ long_data <- long_data %>%
 surv_data <- surv_data %>%
   left_join(demographics_small, by = "RID")
 
-# We make sure that gender is a factor 
-long_data$PTGENDER <- as.factor(long_data$PTGENDER)
-surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
-
 # We merge apoe with merged_data and surv_data
 long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
 surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
+
+# We make sure that gender and apoe4-status are factors
+long_data$PTGENDER <- as.factor(long_data$PTGENDER)
+surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
+long_data$APOE4_status <- factor(long_data$APOE4_status,
+                            levels = c("0 alleles", "1 allele", "2 alleles"))
+surv_data$APOE4_status <- factor(surv_data$APOE4_status,
+                            levels = c("0 alleles", "1 allele", "2 alleles"))
 
 # We create age_at_visit 
 long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
@@ -1407,7 +1409,7 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 ## For the different cox PH models and the separate joint models
 
-### Construction of survival objects 
+### Survival objects 
 
 ```{r}
 # We create a Surv object: time and event
@@ -1832,7 +1834,7 @@ cn_mci_dem <- diagnosis_long %>%
 ```
 
 ```{r}
-# För att ta t.ex. jämföra med cn_mci_dem original-data - t.ex. 
+# För att t.ex. jämföra med cn_mci_dem original-data - t.ex. 
 diagnosis_data %>%
   filter(RID == 61)
 ```
