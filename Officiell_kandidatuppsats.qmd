@@ -287,6 +287,14 @@ $$
 
 -   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
 
+## Survival analysis
+
+Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025: p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse, recovery or other outcomes depending on the research question. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, 2025: p. ?)
+
+With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring. Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, 2012: p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
+
+However, when longitudinal data are collected at different time points, issues such as left truncation (also referred to as delayed entry) may arise. Left truncation occurs when individuals enter the study after the origin of the underlying time scale, meaning that only individuals who have survived or remained event-free up to the point of entry are included in the analysis (källa?).
+
 ## Proportional Hazard Model
 
 **Theory about the model... (specifically why we should use it)**
@@ -556,7 +564,7 @@ What we conclude based on our findings.
 
 # Bibliography
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.). "About ADNI". URL: <https://adni.loni.usc.edu/about/>
+Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.). "About ADNI". URL: <https://adni.loni.usc.edu/about/>
 
 Andrinopoulou, E. R., & Rizopoulos, D. (2016). "Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures". *Statistics in medicine*, 35(26), 4813-4823. DOI: <https://doi.org/10.1002/sim.7027>
 
@@ -578,9 +586,13 @@ Kyheng, M., Babykina, G., & Duhamel, A. (2025). "Joint Latent Class Models: A Tu
 
 Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019). Association Between Longitudinal Plasma Neurofilament Light and Neurodegeneration in Patients With Alzheimer Disease. *JAMA neurology*, 76(7), 791-799. DOI: <https://doi.org/10.1001/jamaneurol.2019.0765>
 
-Peng, R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\].
+National Cancer Institute (NCI) (n.d.). "baseline". URL: <https://www.cancer.gov/publications/dictionaries/cancer-terms/def/baseline>
 
-Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. DOI: <https://doi.org/10.1201/b12208>.'
+Peng, R.E. (2022). "Advanced Statistical Computing". Chapter 7.4.2: Gelman-Rubin Statistic. URL: <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic> \[Last updated 27 may 2022\]
+
+Ranganathan, P., Deo, V., & Pramesh, C. S. (2025). "Time-to-event analysis". *Perspectives in clinical research*, 16(2), 102-105. <https://doi.org/10.4103/picr.picr_52_25>
+
+Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. DOI: <https://doi.org/10.1201/b12208>
 
 Sweeting, M. J., Barrett, J. K., Thompson, S. G., & Wood, A. M. (2017). "The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study". *Statistics in medicine*, 36(28), 4514-4528. <https://doi.org/10.1002/sim.7144>
 
@@ -592,9 +604,9 @@ Wolfe, R. A., & Strawderman, R. L. (1996). "Logical and statistical fallacies in
 
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
-World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\].
+World Health Organization (2025). "Dementia". URL: [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia) \[Last updated 31 march 2025\]
 
--   (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>.
+-   (2024). "Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease". URL: <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
 Xu, L. (2021). "Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data". *USF Tampa Graduate Theses and Dissertations*. URL: <https://digitalcommons.usf.edu/etd/9268>
 
@@ -756,9 +768,9 @@ surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
 long_data$PTGENDER <- as.factor(long_data$PTGENDER)
 surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
 long_data$APOE4_status <- factor(long_data$APOE4_status,
-                            levels = c("0 alleles", "1 allele", "2 alleles"))
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
 surv_data$APOE4_status <- factor(surv_data$APOE4_status,
-                            levels = c("0 alleles", "1 allele", "2 alleles"))
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
 
 # We create age_at_visit 
 long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
@@ -778,6 +790,9 @@ length(keep)
 ```
 
 ## Titel? - Här skapade jag en gemensam baseline datum utifrån nfl och ptau
+
+## Checking the observations with different biomarker examdates
+
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -864,6 +879,18 @@ small_outliers_nfl
 ```
 
 ## Preparation for Cox PH models and separate joint models
+
+Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.
+
+-   Bättre alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau)
+
+-   Varför första biomarkörs-värden och inte första diagnos-besöket? = För att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!
+
+-   Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!
+
+-   --\> Frågan är:
+
+    -   Baseline = första biomarkörs-värden eller första diagnos-besöket?
 
 ### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
 
