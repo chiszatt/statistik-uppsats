@@ -1556,7 +1556,7 @@ cox.zph(surv_model_multi)
 
 ## For Cox PH model with time-averaged values of each biomarker
 
-### Creating time-average values of each biomarker 
+### Creating time-average values of each biomarker
 
 ```{r}
 # Creating time-average values of each biomarker 
@@ -1575,7 +1575,7 @@ surv_data_nfl <- surv_data_nfl %>%
   left_join(biomarker_avg, by = "RID")
 ```
 
-### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker 
+### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker
 
 ```{r}
 # Cox survival-models, with covariates including time-averaged values of each biomarker 
