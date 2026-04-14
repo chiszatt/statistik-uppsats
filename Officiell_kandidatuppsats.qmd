@@ -610,7 +610,11 @@ Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimagi
 
 -   How should we deal with these? Average the measurements? Remove the observations?
 
+1.  Describe the measurements, their differences and averages
+
 -   Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?
+
+2.  Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)
 
 -   For now, remove them:
 
@@ -738,13 +742,13 @@ apoe <- apoe %>%
   ))
 
 
-# We merge gender with merged_data and surv_data
+# We merge gender with long_data and surv_data
 long_data <- long_data %>%
   left_join(demographics_small, by = "RID")
 surv_data <- surv_data %>%
   left_join(demographics_small, by = "RID")
 
-# We merge apoe with merged_data and surv_data
+# We merge apoe with long_data and surv_data
 long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
 surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
 
@@ -773,7 +777,7 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## Titel?
+## Titel? - Här skapade jag en gemensam baseline datum utifrån nfl och ptau
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -869,7 +873,7 @@ ptau_core <- surv_data %>%
   
   mutate(
     EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
-    EXAMDATE_dx   = as.Date(EXAMDATE_dx)
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
   ) %>%
   
   group_by(RID) %>%
@@ -939,7 +943,7 @@ nfl_core <- surv_data %>%
   
   mutate(
     EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
-    EXAMDATE_dx  = as.Date(EXAMDATE_dx)
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
   ) %>%
   
   group_by(RID) %>%
@@ -1080,8 +1084,8 @@ surv_core <- surv_data %>%
   
   mutate(
     EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
-    EXAMDATE_nfl  = as.Date(EXAMDATE_nfl),
-    EXAMDATE_dx   = as.Date(EXAMDATE_dx)
+    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
   ) %>%
   
   group_by(RID) %>%
@@ -1096,7 +1100,7 @@ surv_core <- surv_data %>%
     # We define age at baseline (closest visit conceptually)
     age_at_baseline = age_at_visit[
       EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
-      EXAMDATE_nfl  == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
     ][1],
     
     # We define first dementia event AFTER baseline
@@ -1810,6 +1814,380 @@ summary(multi_joint_model)
 summary <- summary(multi_joint_model)
 summary$Survival
 ```
+
+# ...
+
+# Latent Class Mixed Models
+
+# LCMM: NFL
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M2 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# LCMM: PTAU
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M2 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# LCMM: NFL (including classmb covariates)
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M2 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# LCMM: PTAU (including classmb covariates)
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M2 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# MLCMM: NFL & PTAU
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M2 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# JLCMM: NFL
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M1 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# JLCMM: PTAU
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M1 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# MJLCMM: NFL & PTAU
+
+## M0 (1 latent class)
+
+```{r}
+
+```
+
+## M1 (2 latent classes)
+
+```{r}
+
+```
+
+### Posterior probabilities
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+## Comparing M0 and M1
+
+```{r}
+
+```
+
+# ...
 
 # To see individuals transitions
 
