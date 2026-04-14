@@ -614,6 +614,8 @@ Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimagi
 
 # Appendix
 
+# ...
+
 # Pre-processing
 
 ## Checking RID with more than one measurement recorded on the same exam date
@@ -725,7 +727,7 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ## Length check of longitudinal and survival data
 
 ```{r}
-# We check the length of each dataset 
+# We check the number of individuals in each dataset 
 length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
@@ -789,38 +791,113 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## Titel? - Här skapade jag en gemensam baseline datum utifrån nfl och ptau
+# ...
 
-## Checking the observations with different biomarker examdates
+# EXAMDATES / BASELINE DATES: need to choose how this is done.
 
+### Checking the observations with different biomarker examdates
+
+-   67 observations where the EXAMDATE_nfl != EXAMDATE_ptau
+
+-   19 observations with a baseline VISCODE2
 
 ```{r}
-# checking which observations have the same examdate for nfl and ptau
-common = which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
+# checking how many observations where the EXAMDATE is different for nfl and ptau
+diff <- long_data %>% mutate(diff = EXAMDATE_nfl != EXAMDATE_ptau)
+sum(diff$diff)
 
-# checking the observations with different exam dates
-long_data[-common, ]
+# filtering out the observations with different EXAMDATE
+diff <- diff %>% filter(diff == TRUE)
 
-# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-merged_data <- long_data %>%
-  group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-  ungroup()
+# checking how many of these are baseline visits
+table(diff$VISCODE2)
 
-# checking which observations have the same examdate for nfl and ptau
-common = which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
+# # checking which observations have the same examdate for nfl and ptau
+# common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 
-# checking the observations with different exam dates (9 obs)
-long_data[-common, ]
-
-# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-long_data <- long_data %>%
-  group_by(RID) %>%
-  mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-ungroup()
+# # checking the observations with different exam dates
+# long_data[-common, ]
 ```
 
-## Distribution check of each biomarker
+### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
+
+-   There are 6 observations with time differences greater than 15 days
+
+-   Some of these are large: 387 days, 115 days: clearly we can't say these are the same date
+
+-   Less clear what the case is with a time difference of 31 days, even 49 days
+
+```{r}
+# calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
+diff <- diff %>% mutate(time_diff = EXAMDATE_nfl - EXAMDATE_ptau)
+
+# fetching the time differences
+diff$time_diff 
+
+# checking how many observations have a time difference over 30 days (1 month)
+diff %>% filter(abs(time_diff) > 30) %>% select(time_diff)
+```
+
+-   Can create a new variable for a common EXAMDATE in order to define the baseline date from this
+
+```{r}
+# testing the method
+long_data_test <- long_data %>%
+  mutate(
+    time_diff = (long_data$EXAMDATE_nfl - long_data$EXAMDATE_ptau),
+    EXAMDATE_new = case_when(
+      time_diff == 0 ~ EXAMDATE_nfl,
+      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff,
+      )
+  )
+
+# checking the results with all obs that had a time diff != 0
+long_data_test <- long_data_test %>%
+  filter(time_diff != 0) %>%
+  relocate(where(is.Date), time_diff, .after = EXAMDATE_new)
+```
+
+```{r}
+# creating a common EXAMDATE from two cases
+# 1: EXAMDATE_nfl == EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl
+# 2: EXAMDATE_nfl != EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl + the difference between the two dates
+# then defining the baseline date from the earliest EXAMDATE 
+long_data <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau),
+    baseline_date = min(EXAMDATE)) %>%
+  ungroup()
+```
+
+### Baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
+
+-   Or the baseline date can be defined as the earliest of the two EXAMDATEs
+
+```{r}
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+# long_data <- long_data %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+#   ungroup()
+```
+
+JLCMM data
+
+```{r}
+# merging longitudinal and survival data by RID only not VISCODE
+jlcmm_data <- long_data %>%
+  merge(surv_data, by = "RID") %>%
+  relocate(c(event, time_to_event), .after = time_years)
+```
+
+# ...
+
+# Distribution check of each biomarker
+
+1.  **Since cube root transform gives a better Gaussian approximation for ptau, should we consider using this? The downside is that values cannot take negative values, which is possible with the natural logarithm transformation: is this true though - sqrt(4) = +- 2 ... but how does this work in practice?**
+
+# ...
 
 ```{r}
 # We check the distribution of each biomarker
@@ -862,18 +939,14 @@ We still keep them, as we assume they are correct observations.
 -   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
 
 ```{r}
-# Scaling before 
-long_data$ptau_z <- scale(long_data$PLASMAPTAU181)
-long_data$nfl_z <- scale(long_data$PLASMA_NFL)
-
 # We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
-large_outliers_ptau <- long_data[long_data$ptau_z > 3, ]
-small_outliers_ptau <- long_data[long_data$ptau_z < -3, ]
+large_outliers_ptau <- long_data[scale(long_data$PLASMAPTAU181) > 3, ]
+small_outliers_ptau <- long_data[scale(long_data$PLASMAPTAU181) < -3, ]
 large_outliers_ptau
 small_outliers_ptau
 
-large_outliers_nfl <- long_data[long_data$nfl_z > 3, ]
-small_outliers_nfl <- long_data[long_data$nfl_z < -3, ]
+large_outliers_nfl <- long_data[scale(long_data$PLASMA_NFL) > 3, ]
+small_outliers_nfl <- long_data[scale(long_data$PLASMA_NFL) < -3, ]
 large_outliers_nfl
 small_outliers_nfl
 ```
@@ -1283,8 +1356,8 @@ AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fi
 
 ```{r}
 # checking the mean and variance for nfl
-mean(merged_data$PLASMA_NFL)
-var(merged_data$PLASMA_NFL)
+mean(long_data$PLASMA_NFL)
+var(long_data$PLASMA_NFL)
 ```
 
 ```{r}
@@ -1848,6 +1921,8 @@ summary$Survival
 
 # LCMM: NFL
 
+Latent class mixed models for NFL
+
 ## M0 (1 latent class)
 
 ```{r}
@@ -1893,6 +1968,8 @@ summary$Survival
 ```
 
 # LCMM: PTAU
+
+Latent class mixed models for PTAU
 
 ## M0 (1 latent class)
 
@@ -1940,6 +2017,8 @@ summary$Survival
 
 # LCMM: NFL (including classmb covariates)
 
+Latent class mixed models for NFL including covariates in the class model
+
 ## M0 (1 latent class)
 
 ```{r}
@@ -1985,6 +2064,8 @@ summary$Survival
 ```
 
 # LCMM: PTAU (including classmb covariates)
+
+Latent class mixed models for PTAU including covariates in the class model
 
 ## M0 (1 latent class)
 
@@ -2032,6 +2113,8 @@ summary$Survival
 
 # MLCMM: NFL & PTAU
 
+Multivariate latent class mixed models with both NFL and PTAU
+
 ## M0 (1 latent class)
 
 ```{r}
@@ -2077,6 +2160,14 @@ summary$Survival
 ```
 
 # JLCMM: NFL
+
+Joint latent class mixed models for NFL
+
+-   Multinomial logistic submodel
+
+-   Linear mixed effects submodel
+
+-   Survival submodel
 
 ## M0 (1 latent class)
 
@@ -2124,6 +2215,14 @@ summary$Survival
 
 # JLCMM: PTAU
 
+Joint latent class mixed models for NFL
+
+-   Multinomial logistic submodel
+
+-   Linear mixed effects submodel
+
+-   Survival submodel
+
 ## M0 (1 latent class)
 
 ```{r}
@@ -2169,6 +2268,14 @@ summary$Survival
 ```
 
 # MJLCMM: NFL & PTAU
+
+Joint latent class mixed models for NFL
+
+-   Multinomial logistic submodel
+
+-   Multivariate mixed effects submodel
+
+-   Survival submodel
 
 ## M0 (1 latent class)
 
