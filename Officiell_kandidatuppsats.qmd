@@ -752,9 +752,9 @@ surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
 long_data$PTGENDER <- as.factor(long_data$PTGENDER)
 surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
 long_data$APOE4_status <- factor(long_data$APOE4_status,
-                            levels = c("0 alleles", "1 allele", "2 alleles"))
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
 surv_data$APOE4_status <- factor(surv_data$APOE4_status,
-                            levels = c("0 alleles", "1 allele", "2 alleles"))
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
 
 # We create age_at_visit 
 long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
@@ -773,7 +773,7 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
-## Titel?
+## Checking the observations with different biomarker examdates 
 
 ```{r}
 # checking which observations have the same examdate for nfl and ptau
@@ -801,7 +801,7 @@ long_data <- long_data %>%
 ungroup()
 ```
 
-## Distribution check of each biomarker 
+## Distribution check of each biomarker
 
 ```{r}
 # We check the distribution of each biomarker
@@ -860,6 +860,18 @@ small_outliers_nfl
 ```
 
 ## Preparation for Cox PH models and separate joint models
+
+Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.
+
+-   Bättre alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau)
+
+-   Varför första biomarkörs-värden och inte första diagnos-besöket? = För att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!
+
+-   Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!
+
+-   --\> Frågan är:
+
+    -   Baseline = första biomarkörs-värden eller första diagnos-besöket?
 
 ### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
 
@@ -1139,7 +1151,7 @@ surv_data_multi <- surv_data %>%
 table(surv_data_multi$event)
 ```
 
-### Construction of global version of variable indicating years since baseline 
+### Construction of global version of variable indicating years since baseline
 
 ```{r}
 long_data_multi <- long_data %>%
@@ -1301,7 +1313,7 @@ AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_st
 
 ## For separate joint models
 
-### Fitted LME models 
+### Fitted LME models
 
 ```{r}
 # Longitudinal model for p-tau181 with normal distribution 
@@ -1336,7 +1348,7 @@ family = students.t(df = 3, link = "identity")
 summary(long_model_ptau)
 ```
 
-### Residual check 
+### Residual check
 
 ```{r}
 # residuals of the p-tau181 LME model
@@ -1409,7 +1421,7 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 ## For the different cox PH models and the separate joint models
 
-### Survival objects 
+### Survival objects
 
 ```{r}
 # We create a Surv object: time and event
@@ -1426,7 +1438,7 @@ surv_object_nfl <- Surv(
 )
 ```
 
-### Construction of Kaplan-Meier curves 
+### Construction of Kaplan-Meier curves
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
@@ -1450,7 +1462,7 @@ plot(
 )
 ```
 
-### Fitted standard Cox PH models 
+### Fitted standard Cox PH models
 
 ```{r}
 # Cox survival-models, with covariates
