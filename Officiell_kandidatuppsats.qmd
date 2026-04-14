@@ -793,7 +793,7 @@ length(keep)
 
 # ...
 
-# EXAMDATES / BASELINE DATES: need to choose how this is done.
+# EXAMDATES / BASELINE DATES: need to choose how this is done for the global data set
 
 ### Checking the observations with different biomarker examdates
 
@@ -880,15 +880,6 @@ long_data <- long_data %>%
 #   group_by(RID) %>%
 #   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
 #   ungroup()
-```
-
-JLCMM data
-
-```{r}
-# merging longitudinal and survival data by RID only not VISCODE
-jlcmm_data <- long_data %>%
-  merge(surv_data, by = "RID") %>%
-  relocate(c(event, time_to_event), .after = time_years)
 ```
 
 # ...
@@ -1273,7 +1264,7 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ## Recheck of longitudinal and survival data lengths
 
 ```{r}
-# We check the length of each dataset 
+# We check the number of individuals in each dataset 
 length(unique(long_data_ptau$RID)) # longitudinal data for ptau
 length(unique(long_data_nfl$RID)) # longitudinal data for nfl
 length(unique(long_data_multi$RID)) # longitudinal data, global version
@@ -1281,6 +1272,19 @@ length(unique(long_data_multi$RID)) # longitudinal data, global version
 length(unique(surv_data_ptau$RID)) # survival data for ptau
 length(unique(surv_data_nfl$RID)) # survival data for nfl
 length(unique(surv_data_multi$RID)) # survival data, global version
+```
+
+## Reordering data frames
+
+```{r}
+# moving all date variables together and biomarker variables together
+surv_data_nfl <- surv_data_nfl %>%
+  relocate(where(is.Date)) %>%
+  relocate(c(ptau_mean, nfl_mean), .after = PLASMAPTAU181)
+
+surv_data_ptau <- surv_data_ptau %>%
+  relocate(where(is.Date)) %>%
+  relocate(c(ptau_mean, nfl_mean), .after = PLASMAPTAU181)
 ```
 
 # Longitudinal models
@@ -1310,25 +1314,25 @@ var(long_data$PLASMAPTAU181)
 ```{r}
 # GLMM
 fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
-                   data = long_data,
+                   data = long_data_ptau,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
 fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
-                data = long_data)
+                data = long_data_ptau)
 
 # LME approach with log transformed data
 fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
-                           data = long_data)
+                           data = long_data_ptau)
 
 # Lognormal - similar to log-transforming then fitting LME
 fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                              data = long_data,
+                              data = long_data_ptau,
                               family = lognormal(link = "log"))
 
 # Student-t
 fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                            data = long_data,
+                            data = long_data_ptau,
                             family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -1363,25 +1367,25 @@ var(long_data$PLASMA_NFL)
 ```{r}
 # GLMM
 fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
-                   data = long_data,
+                   data = long_data_nfl,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
 fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
-                data = long_data)
+                data = long_data_nfl)
 
 # LME approach with log transformed data
 fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
-                          data = long_data)
+                          data = long_data_nfl)
 
 # Lognormal - similar to log-transforming then fitting LME
 fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                             data = long_data,
+                             data = long_data_nfl,
                              family = lognormal(link = "log"))
 
 # Student-t
 fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                           data = long_data,
+                           data = long_data_nfl,
                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -1444,7 +1448,7 @@ summary(long_model_ptau)
 
 ```{r}
 # residuals of the p-tau181 LME model
-res_ptau <- residuals(long_model_ptau, type = "pearson")
+res_ptau <- residuals(long_model_ptau, type = "subject_specific")
 
 # fitted values of the p-tau181 LME model
 fitted_vals_ptau <- fitted(long_model_ptau)  
@@ -1519,7 +1523,7 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 # We create a Surv object: time and event
 # For p-tau181
 surv_object_ptau <- Surv(
-  time = surv_data_ptau$time_to_event_ptau, 
+  time = surv_data_ptau$time_to_event_ptau,
   event = surv_data_ptau$event_ptau
 )
 
@@ -1534,21 +1538,21 @@ surv_object_nfl <- Surv(
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
-km_fit_ptau <- survfit(surv_object_ptau ~ 1, data = surv_data)
+km_fit_ptau <- survfit(surv_object_ptau ~ 1, data = surv_data_ptau)
 # Plot
 plot(
   km_fit_ptau, 
-  xlab = "Days since p-tau181 baseline", 
+  xlab = "Years since p-tau181 baseline", 
   ylab = "Survival probability (no dementia)", 
   main = "Kaplan-Meier Curve for Dementia (p-tau181 baseline)"
 )
 
 # We fit Kaplan-Meier curve for NfL
-km_fit_nfl <- survfit(surv_object_nfl ~ 1, data = surv_data)
+km_fit_nfl <- survfit(surv_object_nfl ~ 1, data = surv_data_nfl)
 # Plot
 plot(
   km_fit_nfl, 
-  xlab = "Days since NfL baseline", 
+  xlab = "Years since NfL baseline", 
   ylab = "Survival probability (no dementia)", 
   main = "Kaplan-Meier Curve for Dementia (NfL baseline)"
 )
@@ -1579,23 +1583,43 @@ summary(surv_model_nfl)
 
 ### Fitted Cox PH models with time-averaged values of each biomarker
 
+###### INCLUDED BOTH BIOMARKER MEANS IN BOTH MODELS
+
 ```{r}
 # Cox survival-models, with covariates including time-averaged values of each biomarker 
 # For p-tau181
-surv_model_ptau_ta <- coxph(
+surv_model_ptau_ta_1 <- coxph(
   surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
   data = surv_data_ptau
 )
 
-summary(surv_model_ptau_ta)
+summary(surv_model_ptau_ta_1)
+
+# inclusion of nfl_mean
+surv_model_ptau_ta_2 <- coxph(
+  surv_object_ptau ~
+    age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean + nfl_mean,
+  data = surv_data_ptau
+)
+
+summary(surv_model_ptau_ta_2)
 
 # For NfL
-surv_model_nfl_ta <- coxph(
+surv_model_nfl_ta_1 <- coxph(
   surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
   data = surv_data_nfl
 )
 
-summary(surv_model_nfl_ta)
+summary(surv_model_nfl_ta_1)
+
+# inclusion of ptau_mean
+surv_model_nfl_ta_2 <- coxph(
+  surv_object_nfl ~
+    age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean + ptau_mean,
+  data = surv_data_nfl
+)
+
+summary(surv_model_nfl_ta_2)
 ```
 
 ### Fitted Cox PH Model with time-dependent covariates
@@ -1617,12 +1641,19 @@ cox.zph(surv_model_nfl_ta)
 
 ##### 3. For the Cox PH models with time-dependent covariates
 # For p-tau181
-cox.zph(surv_model_ptau_ta)
+cox.zph(surv_model_ptau_ta_1)
 # For NfL
-cox.zph(surv_model_nfl_ta)
+cox.zph(surv_model_nfl_ta_1)
+# For p-tau181 with both biomarker means
+cox.zph(surv_model_ptau_ta_2)
+# For NfL with both biomarker means
+cox.zph(surv_model_nfl_ta_2)
 ```
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
+
+###### Error in survival::coxph(formula = surv_object_ptau \~ age_at_baseline_ptau + :
+data contains an infinite predictor
 
 ```{r}
 # Time-varying coefficient model for p-tau181
@@ -1919,26 +1950,55 @@ summary$Survival
 
 # Latent Class Mixed Models
 
+```{r}
+# IF THE MODELS DON'T WORK but it seems there are no 0 time_to_event now...
+# jlcmm_data_nfl <- surv_data_nfl %>% filter(time_to_event_nfl > 0)
+```
+
 # LCMM: NFL
 
 Latent class mixed models for NFL
 
+-   First using the NFL specific data set
+
 ## M0 (1 latent class)
 
 ```{r}
+hlme_m0 <- hlme(
+  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  random = ~ time_years_nfl,
+  subject = "RID",
+  data = long_data_nfl
+)
+```
 
+```{r}
+summary(hlme_m0)
 ```
 
 ## M2 (2 latent classes)
 
 ```{r}
+hlme_m1 <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years_nfl,
+    mixture = ~ time_years_nfl,
+    random = ~ time_years_nfl,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 2,
+    data = long_data_nfl,
+    B = random(hlme_m0)
+  )
+```
 
+```{r}
+summary(hlme_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(hlme_m1)
 ```
 
 ## Visualisation
@@ -1946,25 +2006,43 @@ Latent class mixed models for NFL
 ### Distribution of posterior probabilities (class 1)
 
 ```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+```
 
+```{r}
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # LCMM: PTAU
@@ -1974,45 +2052,85 @@ Latent class mixed models for PTAU
 ## M0 (1 latent class)
 
 ```{r}
+hlme_m0 <- hlme(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ time_years_ptau,
+  subject = "RID",
+  data = long_data_ptau
+)
+```
 
+```{r}
+summary(hlme_m0)
 ```
 
 ## M2 (2 latent classes)
 
 ```{r}
+hlme_m1 <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+    mixture = ~ time_years_ptau,
+    random = ~ time_years_ptau,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 2,
+    data = long_data_ptau,
+    B = random(hlme_m0)
+  )
+```
 
+```{r}
+summary(hlme_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(hlme_m1)
 ```
 
 ## Visualisation
 
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+```
+
 ### Distribution of posterior probabilities (class 1)
 
 ```{r}
-
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # LCMM: NFL (including classmb covariates)
@@ -2022,45 +2140,82 @@ Latent class mixed models for NFL including covariates in the class model
 ## M0 (1 latent class)
 
 ```{r}
-
+# updating the 1 class model
+hlme_m0 <- hlme(
+  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  random = ~ time_years_nfl,
+  subject = "RID",
+  data = long_data_nfl
+)
 ```
 
 ## M2 (2 latent classes)
 
 ```{r}
+hlme_m1 <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years_nfl,
+    mixture = ~ time_years_nfl,
+    random = ~ time_years_nfl,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
+    ng = 2,
+    data = long_data_nfl,
+    B = random(hlme_m0)
+  )
+```
 
+```{r}
+summary(hlme_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(hlme_m1)
 ```
 
 ## Visualisation
 
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+```
+
 ### Distribution of posterior probabilities (class 1)
 
 ```{r}
-
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # LCMM: PTAU (including classmb covariates)
@@ -2070,45 +2225,82 @@ Latent class mixed models for PTAU including covariates in the class model
 ## M0 (1 latent class)
 
 ```{r}
-
+# updating the 1 class model
+hlme_m0 <- hlme(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ time_years_ptau,
+  subject = "RID",
+  data = long_data_ptau
+)
 ```
 
 ## M2 (2 latent classes)
 
 ```{r}
+hlme_m1 <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+    mixture = ~ time_years_ptau,
+    random = ~ time_years_ptau,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
+    ng = 2,
+    data = long_data_ptau,
+    B = random(hlme_m0)
+  )
+```
 
+```{r}
+summary(hlme_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(hlme_m1)
 ```
 
 ## Visualisation
 
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- hlme_m1$pprob
+```
+
 ### Distribution of posterior probabilities (class 1)
 
 ```{r}
-
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 2") +
+  theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # MLCMM: NFL & PTAU
@@ -2118,19 +2310,62 @@ Multivariate latent class mixed models with both NFL and PTAU
 ## M0 (1 latent class)
 
 ```{r}
-
+mlcmm_m0 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  subject = "RID",
+  data = long_data_multi
+)
 ```
 
 ## M2 (2 latent classes)
 
 ```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  mixture = ~ time_years,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = long_data_multi,
+  B = random(mlcmm_m0)
+)
+```
 
+```{r}
+summary(mlcmm_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
+postprob(mlcmm_m1)
+```
 
+## M2 (2 latent classes) (including class covariates)
+
+```{r}
+mlcmm_m1 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  mixture = ~ time_years,
+  subject = "RID",
+  classmb = ~ APOE4_status + age_at_visit + PTGENDER,
+  ng = 2,
+  data = long_data_multi,
+  B = random(mlcmm_m0)
+)
+```
+
+```{r}
+summary(mlcmm_m1)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(mlcmm_m1)
 ```
 
 ## Visualisation
@@ -2156,7 +2391,7 @@ Multivariate latent class mixed models with both NFL and PTAU
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # JLCMM: NFL
@@ -2172,7 +2407,13 @@ Joint latent class mixed models for NFL
 ## M0 (1 latent class)
 
 ```{r}
-
+m0 <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ genotype,
+  data = jlcmm_data_test
+)
 ```
 
 ## M1 (2 latent classes)
