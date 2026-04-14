@@ -486,7 +486,11 @@ An advantage of this formulation of the latent class joint model is that the log
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which states that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
+The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database, which include various datasets all containting different variables related to the study of Alzheimer's.
+
 Inclusion/exclusion criteria
+
+The inclusion criteria required participants to have all recorded diagnostic visits and all biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
 
 ## ADNI
 
@@ -520,7 +524,49 @@ Introducing the study, it's aims and the type of information gathered.
 
 ## Introducing variables... biomarkers
 
-Information about the variables we will use and why, what they can show, how are they recorded
+*Information about the variables we will use and why, what they can show, how are they recorded*
+
+Under this section, all variables used in the analysis will be described, along with the reasons for their importance.
+
+### Diagnosis status 
+
+The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: NC, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
+
+To investigate progression to dementia, the first recorded diagnosis of dementia for each participant is used to define the event of interest. Accordingly, the study focuses on time to incident dementia, where participants are classified as either non-demented or demented. Participants without a dementia diagnosis are censored at their last available follow-up visit.
+
+The variable was retrieved from the dataset "DXSUM" in ADNIMERGE2, for which the data was collected by ???. Across the 1190 included participants, there are 29743, of which 10812 observations are of CN, 4282 of Dementia and 14649 of MCI. They are all ranging from 29 September 2005 to 7 November 2025. Per individual, the number of observed diagnosis visits range from one to 95.
+
+Kanske skriva något om hur regelbundna besöken är?
+
+Lägga till om hur värdena ändras när man sedan reducerar till de individer med 3 eller fler mätningar?
+
+### P-tau181
+
+P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was collected by ????. In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements.
+
+The biomarker measurements are recorded on a scale of ??? and are observed 3647 times across the 1,190 included participants. Values range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. Overall, the distribution of the variable is highly right-skewed and not normally distributed.
+
+### NfL 
+
+NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by ???.
+
+Similarly to the previous biomarker, there are 3647 measurements across the 1191 included individuals, ranging from 1 February 2007 to 6 June 2016.
+
+The values are on the scale ??? and range from a minimum value of 6.4 to a maximum value of 408. The median is 37.9, with the first quartile at 27.8 and the third quartile at 52.5. Overall, both p-tau181 and NfL exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed.
+
+### Age 
+
+Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG, for which the data was collected by ???.
+
+The variable is initially coded numerically as the year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants, and is then transformed into age at visit and age at baseline visit, which are more suitable for use in the analyses.
+
+### Gender 
+
+Another covariate of interest when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This variable is binary, with two categories: male and female. Among the 1190 participants, 543 were female and 647 were male. Including this variable allows for the examination of whether progression to dementia differs by sex.
+
+### APOE4-status 
+
+Finally, APOE ε4 status is another covariate used to explain progression to dementia. Retrieved from the GENOTYPE dataset, the variable was initially coded numerically based on the number of ε4 alleles and was then recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). This allows the examination of whether the number of ε4 alleles is associated with the risk of progression to dementia. Consequently, there are 672 participants without any ε4 alleles, 417 participants with one allele, and 101 participants with two alleles among the 1190 included participants.
 
 # Pre-processing
 
@@ -542,25 +588,25 @@ Some bullet points to add to the final paper about things we thought about/did:
 
 # Results
 
-Present the results from our analyses. Do not interpret results here! That should be done in the discussion.
+*Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
 
 # Discussion
 
 ## Main findings/summary
 
-Interpret the results. What did we find?
+*Summarise the results.*
+
+## Conclusions
+
+*Interpret the results. What did we find?*
 
 ## Discussion - Relating to the research question(s)/previous literature
 
-How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?
+*How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?*
 
 ## Further research
 
-Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?
-
-# Conclusions
-
-What we conclude based on our findings.
+*Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?*
 
 # Bibliography
 
