@@ -4,6 +4,10 @@ format: pdf
 editor: visual
 ---
 
+# Pre-processing först
+
+(Baseline här = första biomarkörs-datumet (oavsett ptau eller nfl), INTE första diagnosstatus-datumet, som vi har i officiella dokumentet)
+
 ```{r}
 library(dplyr)
 library(JMbayes2)
@@ -192,13 +196,12 @@ core <- surv_data %>%
   summarise(
     
     # Baseline = first observed contact across all sources
-    baseline = min(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    baseline = min(c(EXAMDATE_ptau, EXAMDATE_nfl), na.rm = TRUE),
     
     # Age at baseline 
     age_at_baseline = age_at_visit[
       EXAMDATE_ptau == baseline |
-      EXAMDATE_nfl  == baseline |
-      EXAMDATE_dx   == baseline
+      EXAMDATE_nfl  == baseline 
     ][1],
     
     # First dementia diagnosis after baseline
