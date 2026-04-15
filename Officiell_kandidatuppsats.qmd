@@ -66,6 +66,7 @@ knitr::opts_chunk$set(echo = FALSE, output = TRUE)
 ```{r, warning=FALSE}
 # loading libraries
 library(dplyr)
+library(tidyr)
 library(JMbayes2)
 library(lme4) # decide which package will we use for lme
 library(nlme) # decide which package will we use for lme
