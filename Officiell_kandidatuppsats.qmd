@@ -475,7 +475,7 @@ $$
 
 An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
 
-### AUC 
+### AUC
 
 # Data
 
@@ -1188,7 +1188,7 @@ long_data_nfl <- long_data %>%
   ungroup()
 ```
 
-### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates  
+### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
 # P-tau181 baseline 
@@ -1600,7 +1600,7 @@ surv_object_nfl <- Surv(
 )
 ```
 
-### Construction of Kaplan-Meier curves, just to look 
+### Construction of Kaplan-Meier curves, just to look
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
@@ -1706,56 +1706,31 @@ cox.zph(surv_model_both2_bl)
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
-###### Error in survival::coxph(formula = surv_object_ptau \~ age_at_baseline_ptau + :
-
-data contains an infinite predictor
-
 ```{r}
-# Time-varying coefficient model for p-tau181
+# We recode APOE4 status (0, 1, 2 alleles) into a numeric variable (APOE4_num)
+surv_data_ptau$APOE4_num <- as.numeric(surv_data_ptau$APOE4_status) - 1
+surv_data_nfl$APOE4_num <- as.numeric(surv_data_nfl$APOE4_status) - 1
+
+# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying (tt term)
 surv_model_ptau_tv <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_status), 
-  data = surv_data_ptau, 
-  tt = function(x, t, ...) x * log(t+1)
-  )
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_num),
+  data = surv_data_ptau,
+  tt = function(x, t, ...) x * log(t)
+)
 
-summary(surv_model_ptau_tv)
+#summary(surv_model_ptau_tv)
 
-# Time-varying coefficient model for NfL
+# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying (tt term)
 surv_model_nfl_tv <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_status), 
-  data = surv_data_nfl, 
-  tt = function(x, t, ...) x * log(t+1)
-  )
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_num),
+  data = surv_data_nfl,
+  tt = function(x, t, ...) x * log(t)
+)
 
-summary(surv_model_nfl_tv)
+#summary(surv_model_nfl_tv)
 ```
 
-Although the proportional hazards assumption tests indicated evidence of potential non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.158 in the p-tau181 model and p = 0.187 in the NfL model). Therefore, the standard Cox proportional hazards model will be retained for interpretation.
-
-### Sensitivity analysis using stratified Cox models for APOE4 status
-
-To assess the robustness of the results to potential non-proportional hazards for APOE4 status, which is still accounted for through stratification.
-
-```{r}
-surv_model_ptau_strata <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + strata(APOE4_status), 
-  data = surv_data_ptau
-  )
-
-surv_model_nfl_strata <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + strata(APOE4_status), 
-  data = surv_data_nfl
-  )
-
-# Re-testing for the assumption of proportional hazards
-# For the Cox PH model for p-tau181 with stratified APOE4-status 
-cox.zph(surv_model_ptau_strata)
-
-# For the Cox PH model for NfL with stratified APOE4-status
-cox.zph(surv_model_nfl_strata)
-```
-
-We observe that the apparent violation of the proportional hazards assumption is attributable to APOE4 status, since after stratification no further evidence of non-proportional hazards is observed. Therefore, the standard Cox proportional hazards model, including APOE4 status as a significant covariate, will be used.
+Although tests of the proportional hazards assumption indicated evidence of non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.168 in the p-tau181 model and p = 0.189 in the NfL model). Therefore, the standard Cox proportional hazards model is retained for primary interpretation.
 
 ## For the multivariate joint model
 
