@@ -128,7 +128,7 @@ WHO published in 2024 a report highlighting the promising progress made in recen
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
-Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112> –\> kanske hitta bättre, mer konkreta källor för infon, men bra info?
+Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
 
 Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in cerebrospinal fluid (CSF) and plasma. According to the NIA-AA, there are several core biomarkers to be used in the diagnosis and staging of AD (Ghahremani et al., 2022). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). **MORE ON p-tau181 here...**
 
@@ -148,7 +148,7 @@ Recent research has applied a range of prognostic models to estimate disease pro
 
 incorporated the longitudinal values of each biomarker as time-varying covariates
 
-Another article from 2024 further extencded the approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Yuan et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). In fact, several studies have examined these biomarkers using only a longitudinal model (Mattsson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Yuan et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Yuan et al., 2024: p. 1, 3).
+Another article from 2024 further extencded the approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Yuan et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). Several studies have examined these biomarkers using only a longitudinal model (Mattsson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Yuan et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Yuan et al., 2024: p. 1, 3).
 
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information.
 
@@ -474,6 +474,8 @@ Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol
 $$
 
 An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
+
+### AUC 
 
 # Data
 
@@ -950,6 +952,8 @@ hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
+The distribution of p-tau181 could still be considered a bit skewed after log transformation –\> We try cube-root transforming:
+
 ```{r}
 # cube-root transformed
 ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
@@ -985,15 +989,15 @@ small_outliers_nfl
 
 Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.
 
--   Bättre alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau)
+-   Annat alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau) - Kanske krävs för att kunna jämföra de två joint-modellerna?
 
--   Varför första biomarkörs-värden och inte första diagnos-besöket? = För att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!
+-   Varför första biomarkörs-värden och inte första diagnos-besöket? = Kanske för att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!
 
 -   Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!
 
 -   --\> Frågan är:
 
-    -   Baseline = första biomarkörs-värden eller första diagnos-besöket?
+    -   Baseline = första biomarkörs-värden eller första diagnos-besöke?
 
 ### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
 
@@ -1184,6 +1188,42 @@ long_data_nfl <- long_data %>%
   ungroup()
 ```
 
+### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates  
+
+```{r}
+# P-tau181 baseline 
+long_data_ptau <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+
+baseline_ptau <- long_data_ptau[!duplicated(long_data_ptau$RID),
+                                c("RID",
+                                  "log_PLASMAPTAU181")]
+
+names(baseline_ptau)[2] <- "baseline_value_ptau"
+
+# NfL baseline
+long_data_nfl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
+
+baseline_nfl <- long_data_nfl[!duplicated(long_data_nfl$RID),
+                              c("RID",
+                                "log_PLASMA_NFL")]
+
+names(baseline_nfl)[2] <- "baseline_value_nfl"
+
+# We merge the two variables into a baseline table 
+baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
+
+# We merge the baseline table with the p-tau181 survival dataset 
+surv_data_ptau <- merge(surv_data_ptau,
+                        baseline,
+                        by="RID"
+                        )
+
+surv_data_nfl <- merge(surv_data_nfl,
+                       baseline,
+                       by="RID"
+                       )
+```
+
 ## Preparation for the multivariate joint model
 
 ### Construction of global (common) baseline, age at baseline, event and time-to-event variables
@@ -1293,8 +1333,10 @@ long_data_multi <- long_data %>%
 
 ```{r}
 # We re-count missing values after pre-processing
-sapply(long_data, function(x) sum(is.na(x)))
-sapply(surv_data, function(x) sum(is.na(x)))
+#sapply(long_data_ptau, function(x) sum(is.na(x)))
+#sapply(long_data_nfl, function(x) sum(is.na(x)))
+#sapply(surv_data_ptau, function(x) sum(is.na(x)))
+#sapply(surv_data_nfl, function(x) sum(is.na(x)))
 ```
 
 ## Recheck of longitudinal and survival data lengths
@@ -1442,7 +1484,7 @@ long_model_ptau <- lme(
   data = long_data_ptau
 )
 
-summary(long_model_ptau)
+#summary(long_model_ptau)
 
 # Longitudinal model for NfL with normal distribution 
 long_model_nfl <- lme(
@@ -1451,7 +1493,7 @@ long_model_nfl <- lme(
   data = long_data_nfl
   )
 
-summary(long_model_nfl)
+#summary(long_model_nfl)
 ```
 
 ```{r}
@@ -1465,7 +1507,7 @@ long_model_ptau <- mixed_model(
 family = students.t(df = 3, link = "identity")
 )
 
-summary(long_model_ptau)
+#summary(long_model_ptau)
 ```
 
 ### Residual check
@@ -1523,7 +1565,7 @@ long_model_ptau_multi <- lme(
   random = ~ time_years | RID,                    
   data = long_data_multi
 )
-summary(long_model_ptau_multi)
+#summary(long_model_ptau_multi)
 
 # Longitudinal model for p-tau181 with normal distribution and global time_years
 long_model_nfl_multi <- lme(
@@ -1531,7 +1573,7 @@ long_model_nfl_multi <- lme(
   random = ~ time_years | RID, 
   data = long_data_multi
   )
-summary(long_model_nfl_multi)
+#summary(long_model_nfl_multi)
 
 # Mixed object 
 mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
@@ -1558,7 +1600,7 @@ surv_object_nfl <- Surv(
 )
 ```
 
-### Construction of Kaplan-Meier curves
+### Construction of Kaplan-Meier curves, just to look 
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
@@ -1593,7 +1635,7 @@ surv_model_ptau <- coxph(
   x = TRUE
 )
 
-summary(surv_model_ptau)
+#summary(surv_model_ptau)
 
 # For NfL
 surv_model_nfl <- coxph(
@@ -1602,7 +1644,7 @@ surv_model_nfl <- coxph(
   x = TRUE
 )
 
-summary(surv_model_nfl)
+#summary(surv_model_nfl)
 ```
 
 ### Fitted Cox PH models using baseline values of each biomarker
@@ -1611,19 +1653,35 @@ summary(surv_model_nfl)
 # Cox survival-models, with covariates including baseline values of each biomarker 
 # For p-tau181
 surv_model_ptau_bl <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + log_PLASMATAU181,
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau,
   data = surv_data_ptau
 )
 
-summary(surv_model_ptau_bl)
+#summary(surv_model_ptau_bl)
 
 # For NfL
 surv_model_nfl_bl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + log_PLASMA_NFL,
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl,
   data = surv_data_nfl
 )
 
-summary(surv_model_nfl_bl)
+#summary(surv_model_nfl_bl)
+
+# For p-tau181 including NfL 
+surv_model_both1_bl <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data_ptau
+)
+
+#summary(surv_model_both1_bl)
+
+# For NfL including p-tau181 
+surv_model_both2_bl <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl + baseline_value_ptau,
+  data = surv_data_nfl
+)
+
+#summary(surv_model_both2_bl)
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1637,10 +1695,13 @@ cox.zph(surv_model_nfl)
 
 ##### For the Cox PH models with baseline values of each biomarker 
 # For p-tau181
-
 cox.zph(surv_model_ptau_bl)
 # For NfL
 cox.zph(surv_model_nfl_bl)
+# For p-tau181 including NfL 
+cox.zph(surv_model_both1_bl)
+# For NfL including p-tau181 
+cox.zph(surv_model_both2_bl)
 ```
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
@@ -1654,7 +1715,7 @@ data contains an infinite predictor
 surv_model_ptau_tv <- coxph(
   surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_status), 
   data = surv_data_ptau, 
-  tt = function(x, t, ...) x * log(t)
+  tt = function(x, t, ...) x * log(t+1)
   )
 
 summary(surv_model_ptau_tv)
@@ -1663,7 +1724,7 @@ summary(surv_model_ptau_tv)
 surv_model_nfl_tv <- coxph(
   surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_status), 
   data = surv_data_nfl, 
-  tt = function(x, t, ...) x * log(t)
+  tt = function(x, t, ...) x * log(t+1)
   )
 
 summary(surv_model_nfl_tv)
