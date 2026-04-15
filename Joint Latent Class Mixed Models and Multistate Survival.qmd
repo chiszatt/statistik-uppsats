@@ -8,6 +8,7 @@ editor: visual
 # loading the packages
 library(lcmm)
 library(dplyr)
+library(tidyr)
 library(survival)
 library(ADNIMERGE2)
 library(nlme)
@@ -53,15 +54,12 @@ diagnosis_data <- diagnosis_data %>%
 # adding a suffix to the dx data
 diagnosis_data_dx <- diagnosis_data %>%
   rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
-
-# merging only nfl and ptau
-nfl_ptau <- nfl_data %>%
-  merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
 ```
 
 ```{r}
 # removing missing values
-nfl_ptau <- na.omit(nfl_ptau)
+nfl_data <- na.omit(nfl_data)
+ptau_data <- na.omit(ptau_data)
 diagnosis_data <- na.omit(diagnosis_data)
 ```
 
@@ -104,6 +102,12 @@ ptau_data <- ptau_data %>%
   group_by(RID, EXAMDATE) %>%
   filter(n() == 1) %>%
   ungroup()
+```
+
+```{r}
+# merging only nfl and ptau
+nfl_ptau <- nfl_data %>%
+  merge(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
 ```
 
 ### Baseline date in nfl_ptau
@@ -1495,6 +1499,44 @@ plot(m1)
 postprob(m1)
 ```
 
+# THIS WORKS!!!!! WITHOUT COVARIATE IN SURVIVAL MODEL
+
+```{r}
+m0 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data_test
+)
+```
+
+```{r}
+summary(m0)
+```
+
+```{r}
+m1 <- jlcmm(
+  fixed = ln_PLASMA_NFL ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data_test,
+  B = m0
+)
+```
+
+```{r}
+summary(m1)
+```
+
+```{r}
+postprob(m1)
+```
+
 ### Random start values
 
 -   Score test statistic no longer significant, conditional independence assumption is met
@@ -1645,7 +1687,7 @@ m0 <- jlcmm(
   fixed = ln_PLASMAPTAU181 ~ time_years_z,
   random = ~ 1 + time_years_z,
   subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
+  survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data_test
 )
 ```
@@ -1657,24 +1699,26 @@ summary(m0)
 ### M1 (2 latent classes)
 
 ```{r}
-# m1 <- jlcmm(
-#   fixed = ln_PLASMAPTAU181 ~ time_years_z,
-#   random = ~ time_years_z,
-#   mixed = ~ time_years_z,
-#   classmb = ~ genotype + age_at_baseline + PTGENDER,
-#   ng = 2,
-#   subject = "RID",
-#   survival = Surv(time_to_event, event) ~ genotype,
-#   data = jlcmm_data_test
-# )
+
+m1 <- jlcmm(
+  fixed = ln_PLASMAPTAU181 ~ time_years_z,
+  random = ~ 1 + time_years_z,
+  mixture = ~ time_years_z,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data_test,
+  B = m0
+)
 ```
 
 ```{r}
-# summary(m1)
+summary(m1)
 ```
 
 ```{r}
-# postprob(m1)
+postprob(m1)
 ```
 
 # ..........................................................................................................
@@ -1986,15 +2030,295 @@ postprob(mult_jlcmm_m1)
 
 # MULTISTATE multivariate JLCMM (mpjlcmm)
 
-## Multistate data
+## Data
 
-### Diagnosis times
+-   Define current state, next state, transition (current state -\> next state),
 
--   MCI dx, calculates the time from first EXAMDATE of MCI dx from current EXAMDATE if CN
+-   In order to work with the diagnosis data and the biomarker data, the diagnosis data before the first biomarker data need to be removed
 
--   AD dx, calculates the time from first EXAMDATE of AD dx from current EXAMDATE if MCI
+```{r}
+# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
+cognitive_states <- diagnosis_data %>%
+  merge(
+    nfl_ptau %>% select(RID, baseline_date), by = "RID") %>%
+  filter(EXAMDATE - baseline_date >= -50) %>%
+  distinct()
+```
 
--   AD dx, calculates the time from first EXAMDATE of AD dx from current EXAMDATE if CN
+-   In order to correctly merge the biomarker and event data, dx data with a later VISCODE than biomarker data will be given the same VISCDE as the last biomarker VISCODE
+
+-   So they can be compare with a logical expression, both are transformed to a numerical class
+
+First, for the bimarker data
+
+```{r}
+# creating a VISCODE_last variable in order to merge later diagnosis data with the last biomaker measurements, stripping "m" from the start of VISCODE2 and changing to numeric class
+nfl_ptau <- nfl_ptau %>% 
+  group_by(RID) %>%
+  mutate(
+    VISCODE2 = as.numeric(gsub("\\D", "", VISCODE2)),
+    VISCODE_last = last(VISCODE2)
+  )
+```
+
+Then, for the diagnosis data
+
+-   Additionally, a stat variable is created, the biomarker and dx data are merged and VISCODE2 for dx data is changed to VISCODE_last if a later VISCODE than the final biomarker data
+
+```{r}
+# creating a new data frame for multistate survial data
+# state variable
+# transforming VISCODE2 into a numeric variable, merging with VISCODE_last from nfl_ptau data, changing VISCODE2 to VISCODE_last if VISCODE2 > VISCODE_last
+cognitive_states <- cognitive_states %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    state_current = case_when(
+      DIAGNOSIS == "CN" ~ 1,
+      DIAGNOSIS == "MCI" ~ 2,
+      DIAGNOSIS == "Dementia" ~ 3
+    ),
+    VISCODE2 = as.numeric(gsub("\\D", "", VISCODE2))
+  ) %>%
+  merge(
+    nfl_ptau %>% select(RID, VISCODE_last)
+    ) %>%
+  mutate(
+    VISCODE2 = ifelse(VISCODE2 > VISCODE_last, VISCODE_last, VISCODE2)
+  ) %>%
+  distinct()
+```
+
+-   Time from current EXAMDATE and baseline EXAMDATE, time from EXAMDATE_next and baseline EXAMDATE are created
+
+-   Transition variable created: state_current -\> state_next
+
+```{r}
+episodes <- cognitive_states %>%
+  group_by(RID) %>%
+  mutate(
+    state_next = lead(state_current),
+    EXAMDATE_next = lead(EXAMDATE)
+  ) %>%
+  filter(!is.na(state_next)) %>%
+  mutate(
+    time_start = as.numeric(EXAMDATE - first(EXAMDATE)) / 365.25,
+    time_stop = as.numeric(EXAMDATE_next - first(EXAMDATE)) / 365.25,
+    transition = paste0(state_current, "->", state_next)
+  ) %>%
+  ungroup()
+```
+
+# HERE
+
+Defining the transitions we want to model, where:
+
+-   1 -\> 2 : CN -\> MCI
+
+-   1 -\> 3 : CN -\> Dementia
+
+-   2 -\> 3: MCI -\> Demenetia
+
+-   2 -\> 1 : MCI -\> CN
+
+Filtering by the transitions of interest or a valid at risk state.
+
+```{r}
+# defining the transitions we want to account for
+transitions_of_interest <- c("1->2", "1->3", "2->3", "2->1")  # CN->MCI, CN->AD, MCI->AD, MCI->CN
+
+# all valid "at risk" states for each transition
+at_risk_state <- c("1->2" = 1, "2->3" = 2, "1->3" = 1, "2->1" = 2)
+
+episodes_expanded <- episodes %>%
+  filter(transition %in% transitions_of_interest | 
+         state_current %in% at_risk_state) %>%
+  # For each interval, create one row per transition the person is at risk for
+  rowwise() %>%
+  mutate(
+    at_risk_for = list(names(at_risk_state)[at_risk_state == state_current])
+  ) %>%
+  unnest(at_risk_for) %>%
+  mutate(
+    event = as.integer(transition == at_risk_for),
+    trans = at_risk_for
+  ) %>%
+  select(RID, EXAMDATE, VISCODE2, EXAMDATE_next, baseline_date, time_start, time_stop,
+         trans, event, state_current)
+```
+
+-   TRansforming the event variable to a multistate event variable
+
+```{r}
+# creating a multistate event variable
+episodes_expanded <- episodes_expanded %>%
+  mutate(
+    event_multi = case_when(
+      event == 1 & trans == "1->2" ~ 1,
+      event == 1 & trans == "1->3" ~ 2,
+      event == 1 & trans == "2->3" ~ 3,
+      event == 1 & trans == "2->1" ~ 4,
+      event == 0 ~ 0),
+    event_multi = factor(event_multi, 
+                         levels = c(0, 1, 2, 3, 4),
+                         labels = c("censored", "CN->MCI", "CN->AD", "MCI->AD", "MCI->CN")))
+```
+
+```{r}
+# filtering out obserations where there is no transition (last observation)
+episodes_expanded <- episodes_expanded %>%
+  filter(EXAMDATE_next > EXAMDATE)
+```
+
+```{r}
+# selecting necessary variables
+episodes_expanded <- episodes_expanded %>%
+  select(RID, VISCODE2, time_start, time_stop, trans, event, event_multi, state_current)
+```
+
+```{r}
+# merging biomarker, demographic, genotype data with event data
+ms_joint_data <- nfl_ptau %>%
+  select(
+    RID, VISCODE2, PLASMAPTAU181, PLASMA_NFL, PTDOBYY, PTGENDER, age_at_baseline
+    ) %>%
+  merge(episodes_expanded, by = c("RID","VISCODE2")) %>%
+  merge(apoe, by = "RID") %>%
+  distinct()
+```
+
+```{r}
+class(ms_joint_data$event_multi)
+levels(ms_joint_data$event_multi)
+```
+
+```{r}
+ms_joint_data %>%
+  group_by(RID, trans) %>%
+  arrange(time_start) %>%
+  mutate(gap = time_start - lag(time_stop)) %>%
+  filter(!is.na(gap) & gap < 0)
+```
+
+```{r}
+ms_joint_data <- ms_joint_data %>% filter(RID != 4499)
+```
+
+```{r}
+# Verify after merge
+class(ms_joint_data$event_multi)
+levels(ms_joint_data$event_multi)
+table(ms_joint_data$event_multi)
+```
+
+```{r}
+summary(coxph(
+  Surv(time_start, time_stop, event_multi) ~
+    age_at_baseline + genotype + strata(trans),
+  data = ms_joint_data,
+  id = interaction(RID, trans),
+  cluster = RID))
+```
+
+```{r}
+ms_joint_data %>%
+  filter(trans == "2->3") %>%
+  group_by(genotype, event) %>%
+  summarise(n = n())
+```
+
+```{r}
+ms_joint_data %>%
+  group_by(RID, trans) %>%
+  arrange(time_start) %>%
+  mutate(overlap = time_start < lag(time_stop)) %>%
+  filter(overlap == TRUE) %>%
+  select(RID, trans, time_start, time_stop)
+```
+
+```{r}
+ms_joint_data <- nfl_ptau %>%
+  left_join(episodes_expanded, by = "RID","VISCODE2")
+# %>%
+#   filter(time_years >= time_start & time_years < time_stop)
+```
+
+```{r}
+# defining the transitions we want to account for
+# CN - > MCI    MCI -> AD   CN -> AD    MCI -> CN
+valid_transitions <- c("1->2", "2->3", "1->3", "2->1")
+
+# lead() to compare with NEXT values, lag() to compare with PREVIOUS values
+# creating a new varible for the next dx in order to assign transition 
+ms_surv_data <- ms_surv_data %>%
+  group_by(RID) %>%
+  mutate(
+    state_next = lead(state_current),
+    EXAMDATE_next = lead(EXAMDATE)
+  ) %>%
+  filter(!is.na(state_next)) %>%
+  ungroup()
+
+# creating a transition variable: current state -> next state
+ms_surv_data <- ms_surv_data %>%
+  mutate(
+    transition = paste0(state_current, "->", state_next)
+    ) %>%
+  filter(transition %in% valid_transitions) %>%
+  mutate(
+    time_to_event = as.numeric(EXAMDATE_next - EXAMDATE) / 365.25)
+```
+
+```{r}
+# checking number of individuals after removing not allowed states: n = 706
+length(unique(ms_surv_data$RID))
+```
+
+```{r}
+# checking number of transitions for each transition state: n = 11 for CN -> AD
+table(ms_surv_data$transition)
+```
+
+### Wide survival data
+
+-   Needed to merge longitudinal data with survival data
+
+-   Gives unique rows for the longitudinal data with repeated rows for the survival data
+
+-   Looking at the data sets in JMBAYES, this is fine
+
+```{r}
+
+wide_ms_surv_data <- ms_surv_data %>%
+  group_by(RID) %>%
+  summarise(
+# Time to first MCI (from CN)
+    time_CN_MCI = min(time_to_event[transition == "1->2"], na.rm = TRUE),
+    event_CN_MCI = any(transition == "1->2"),
+    
+# Time to AD (from MCI)
+    time_MCI_AD = min(time_to_event[transition == "2->3"], na.rm = TRUE),
+    event_MCI_AD = any(transition == "2->3"),
+    
+# Time to AD direct (from CN)
+    time_CN_AD = min(time_to_event[transition == "1->3"], na.rm = TRUE),
+    event_CN_AD = any(transition == "1->3"),
+    
+# Backward transition MCI -> CN
+    time_MCI_CN = min(time_to_event[transition == "2->1"], na.rm = TRUE),
+    event_MCI_CN = any(transition == "2->1")
+  ) %>%
+
+# Replace Inf (from min of empty set) with NA
+# Coerce event flags to 0/1
+  mutate(
+    across(starts_with("time_"), ~ ifelse(is.infinite(.x), NA, .x)),
+    across(starts_with("event_"), ~ as.integer(.x)))
+
+```
+
+```{r}
+ms_surv_data_test <- wide_ms_surv_data %>% merge(nfl_ptau, by = "RID")
+```
 
 ```{r}
 # creating a data frame with diagnosis times: CN -> MCI, MCI -> AD
@@ -2060,8 +2384,8 @@ dx_times_short <- dx_times %>%
       
 # THE PROBLEM ARISES HERE, asssumes that there is only one MCI dx before reversion back to CN
       
-# for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE 
-      unique(backwards_MCI) == TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"][-1]),
+# for cases where the individual converts back to CN, we remove the first EXAMDATE were dx = MCI and take the next earliest EXAMDATE
+      unique(backwards_MCI) == TRUE ~ as.Date(0),
 # otherwise, we take the first EXAMDATE where dx = MCI
       TRUE ~ first(EXAMDATE[DIAGNOSIS == "MCI"])
       ),
@@ -2070,6 +2394,10 @@ dx_times_short <- dx_times %>%
     t_AD = first(EXAMDATE[DIAGNOSIS == "Dementia"]),
     censor_time = max(EXAMDATE)
   ) %>% ungroup()
+```
+
+```{r}
+dx_times %>% filter(backwards_MCI == TRUE) %>% arrange(RID, EXAMDATE)
 ```
 
 ## Multistate data
