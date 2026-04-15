@@ -188,3 +188,71 @@ cox_model_bio2 <- coxph(
 
 summary(cox_model_bio2)
 ```
+
+# Test av Cox PH med time-averaged values of each biomarker 
+
+### Cox PH model using time-averaged values of each biomarker
+
+Additionally, the cumulative average observed up through each time could be used as a time-dependent covariate, particularly if that covariate is under study as a cause of mortality (Wolfe & Strawderman, 1996, p.128). This average provides an unbiased estimate of the true mean, assuming no underlying trend, bias or heteroskedasticity (Sweeting et al., 2017, p.4516). The resulting time-varying predictor, called the cumulative average (CA), is defined as:
+
+$$ H^{(CA)}_t(X_i) = \frac{\sum_{j=0}^{m_i} I(t_{ij} < t) X_i(t_{ij})}{\sum_{j=0}^{m_i} I(t_{ij} < t)} $$
+
+where $I(\cdot)$ is an indicator function equal to 1 if the measurement occurred before time $t$ and 0 otherwise. It can replace the original predictor in the model (Sweeting et al., 2017, p.4516).
+
+```{r}
+# Creating time-average values of each biomarker 
+biomarker_avg <- surv_data %>%
+  group_by(RID) %>%
+  summarise(
+    ptau_mean = mean(log_PLASMAPTAU181, na.rm = TRUE),
+    nfl_mean = mean(log_PLASMA_NFL, na.rm = TRUE)
+  )
+
+# Merging the time-average values of each biomarker with each survival dataset 
+surv_data_ptau <- surv_data_ptau %>%
+  left_join(biomarker_avg, by = "RID")
+
+surv_data_nfl <- surv_data_nfl %>%
+  left_join(biomarker_avg, by = "RID")
+```
+
+### Fitted Cox PH models with time-averaged values of each biomarker
+
+###### INCLUDED BOTH BIOMARKER MEANS IN BOTH MODELS
+
+```{r}
+# Cox survival-models, with covariates including time-averaged values of each biomarker 
+# For p-tau181
+surv_model_ptau_ta_1 <- coxph(
+  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
+  data = surv_data_ptau
+)
+
+summary(surv_model_ptau_ta_1)
+
+# inclusion of nfl_mean
+surv_model_ptau_ta_2 <- coxph(
+  surv_object_ptau ~
+    age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean + nfl_mean,
+  data = surv_data_ptau
+)
+
+summary(surv_model_ptau_ta_2)
+
+# For NfL
+surv_model_nfl_ta_1 <- coxph(
+  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
+  data = surv_data_nfl
+)
+
+summary(surv_model_nfl_ta_1)
+
+# inclusion of ptau_mean
+surv_model_nfl_ta_2 <- coxph(
+  surv_object_nfl ~
+    age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean + ptau_mean,
+  data = surv_data_nfl
+)
+
+summary(surv_model_nfl_ta_2)
+```
