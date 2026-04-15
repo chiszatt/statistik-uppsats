@@ -1236,10 +1236,10 @@ Suggestion of how to deal with early dx from latent class file:
 
 ```{r}
 # filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
-# cognitive_states <- diagnosis_data %>%
+# test <- surv_data %>%
 #   merge(
-#     nfl_ptau %>% select(RID, baseline_date), by = "RID") %>%
-#   filter(EXAMDATE - baseline_date >= -50) %>%
+#     long_data %>% select(RID, baseline_date), by = "RID") %>%
+#   filter(EXAMDATE_dx - baseline_date >= -50) %>%
 #   distinct()
 ```
 
@@ -2420,41 +2420,58 @@ postprob(mlcmm_m1)
 
 ## Visualisation
 
+```{r}
+# saving the posterior probabilities into a data frame
+pp <- mlcmm_m1$pprob
+```
+
 ### Distribution of posterior probabilities (class 1)
 
 ```{r}
-
+# plotting posterior probabilities for class 1
+ggplot(pp, aes(x = prob1)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 1") +
+  theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 2
+ggplot(pp, aes(x = prob2)) + 
+  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+  labs(title = "Posterior Probabilities for Class 2") +
+  theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+ggplot(pp, aes(prob1, prob2)) +
+  geom_point(alpha = .8) +
+  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+  labs(x = "P(Class 1)", y = "P(Class 2)") +
+  theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(mlcmm_m0, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # JLCMM: NFL
 
-Joint latent class mixed models for NFL
+1.  Posterier probabilities show good classification
 
--   Multinomial logistic submodel
+2.  Score test statistic for conditional independence is significant with 1 class and not significant with 2 classes: evidence for 2 classes
 
--   Linear mixed effects submodel
-
--   Survival submodel
+3.  No covariates in the survival model OR the class membership model, evidence for latent classes?
 
 ```{r}
+# merging the longitudinal and survival data for NfL
 jlcmm_data_nfl <- surv_data_nfl %>%
   select(RID, event_nfl, time_to_event_nfl) %>%
   merge(long_data_nfl, by = "RID")
@@ -2463,79 +2480,144 @@ jlcmm_data_nfl <- surv_data_nfl %>%
 ## M0 (1 latent class)
 
 ```{r}
-m0 <- jlcmm(
+jlcmm_m0 <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years_nfl,
   random = ~ 1 + time_years_nfl,
   subject = "RID",
-  survival = Surv(time_to_event, event) ~ APOE4_status,
-  data = long_data_nfl
+  survival = Surv(time_to_event_nfl, event_nfl) ~ 1,
+  data = jlcmm_data_nfl
 )
+```
+
+```{r}
+summary(jlcmm_m0)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
+jlcmm_m1 <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  random = ~ 1 + time_years_nfl,
+  mixture = ~ time_years_nfl,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event_nfl, event_nfl) ~ 1,
+  data = jlcmm_data_nfl,
+  B = random(jlcmm_m0)
+)
+```
 
+```{r}
+summary(jlcmm_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(jlcmm_m1)
 ```
 
 ## Visualisation
 
-### Distribution of posterior probabilities (class 1)
+1.  Need to check probYT1 and probYT2
 
 ```{r}
+# saving the posterior probabilities into a data frame
+# pp <- jlcmm_m1$pprob
+# pp1 <- pp %>% filter(class == 1)
+# pp2 <- pp %>% filter(class == 2)
+```
 
+### Distribution of posterior probabilities (class 1)
+
+1.  Check that YT1 is for the joint model, not the longitudinal model only
+
+```{r}
+# plotting posterior probabilities for class 1
+# ggplot(pp1, aes(x = probYT1)) + 
+#   geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+#   labs(title = "Posterior Probabilities for Class 1") +
+#   theme_classic()
 ```
 
 ### Distribution of posterior probabilities (class 2)
 
 ```{r}
-
+# plotting posterior probabilities for class 2
+# ggplot(pp2, aes(x = probYT1)) + 
+#   geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
+#   labs(title = "Posterior Probabilities for Class 2") +
+#   theme_classic()
 ```
 
 ### Class certainty scatterplot
 
 ```{r}
-
+# scatterplot of class certainty
+# ggplot(pp, aes(prob1, prob2)) +
+#   geom_point(alpha = .8) +
+#   geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
+#   labs(x = "P(Class 1)", y = "P(Class 2)") +
+#   theme_classic()
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # JLCMM: PTAU
 
-Joint latent class mixed models for NFL
-
--   Multinomial logistic submodel
-
--   Linear mixed effects submodel
-
--   Survival submodel
+```{r}
+# merging the longitudinal and survival data for PTAU
+jlcmm_data_ptau <- surv_data_ptau %>%
+  select(RID, event_ptau, time_to_event_ptau) %>%
+  merge(long_data_ptau, by = "RID")
+```
 
 ## M0 (1 latent class)
 
 ```{r}
+jlcmm_m0 <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ 1 + time_years_ptau,
+  subject = "RID",
+  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+  data = jlcmm_data_ptau
+)
+```
 
+```{r}
+summary(jlcmm_m0)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
+jlcmm_m1 <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ 1 + time_years_ptau,
+  mixture = ~ time_years_ptau,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+  data = jlcmm_data_ptau,
+  B = random(jlcmm_m0)
+)
+```
 
+```{r}
+summary(jlcmm_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(jlcmm_m1)
 ```
 
 ## Visualisation
@@ -2561,35 +2643,151 @@ Joint latent class mixed models for NFL
 ## Comparing M0 and M1
 
 ```{r}
+summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
 
+## M2 (3 latent classes)
+
+Things to assess:
+
+1.  Fit 4 class model -\> does BIC improve any more or plateau?
+
+2.  Score test now not significant compared with the two class model
+
+3.  VERY small class 1
+
+4.  CLass 2 and 3 are not cleanly separated (look at posterior probabilities)
+
+5.  Plot survival curves (how?)
+
+### gridsearch()
+
+```{r}
+# gridsearch(m = jlcmm(
+#   fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+#   random = ~ 1 + time_years_ptau,
+#   mixture = ~ time_years_ptau,
+#   classmb = ~ 1,
+#   ng = 2,
+#   subject = "RID",
+#   survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+#   data = jlcmm_data_ptau,
+#   B = random(jlcmm_m0)),
+#   minit = jlcmm_m1,
+#   rep = 50,
+#   maxiter = 30)
+
+```
+
+```{r}
+jlcmm_m2 <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ 1 + time_years_ptau,
+  mixture = ~ time_years_ptau,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+  data = jlcmm_data_ptau,
+  B = random(jlcmm_m0)
+)
+```
+
+```{r}
+summary(jlcmm_m2)
+```
+
+```{r}
+postprob(jlcmm_m2)
+```
+
+## Comparing M0, M1, M3
+
+```{r}
+summarytable(jlcmm_m0, jlcmm_m1, jlcmm_m2,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+```{r}
+# saving which class each individual was predicted to be in
+class_preds <- jlcmm_m2$pprobY
+
+# merging with genotype data
+class_preds <- class_preds %>%
+  merge(apoe %>% select(RID, APOE4_status), by = "RID")
+
+# checking the distribution of genotype by class
+table(class_preds$class, class_preds$APOE4_status)
 ```
 
 # MJLCMM: NFL & PTAU
 
-Joint latent class mixed models for NFL
+```{r}
+# merging the longitudinal and survival data for NfL
+jlcmm_data_multi <- surv_data_multi %>%
+  select(RID, event, time_to_event) %>%
+  merge(long_data_multi, by = "RID")
+```
 
--   Multinomial logistic submodel
+```{r}
+# fitting multivariate latent class model with 1 class and 2 classes with jlcmm_data_multi
 
--   Multivariate mixed effects submodel
+mlcmm_m0 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  subject = "RID",
+  data = jlcmm_data_multi
+)
 
--   Survival submodel
+mlcmm_m1 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  mixture = ~ time_years,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = jlcmm_data_multi,
+  B = random(mlcmm_m0)
+)
+```
 
 ## M0 (1 latent class)
 
 ```{r}
+mult_jlcmm_m0 <- mpjlcmm(
+  longitudinal = list(mlcmm_m0),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 1,
+  data = jlcmm_data_multi
+)
+```
 
+```{r}
+summary(mult_jlcmm_m0)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
+mult_jlcmm_m1 <- mpjlcmm(
+  longitudinal = list(mlcmm_m1),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 2,
+  data = jlcmm_data_multi,
+  B = random(mult_jlcmm_m0)
+)
+```
 
+```{r}
+summary(mult_jlcmm_m1)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-
+postprob(mult_jlcmm_m1)
 ```
 
 ## Visualisation
@@ -2615,7 +2813,7 @@ Joint latent class mixed models for NFL
 ## Comparing M0 and M1
 
 ```{r}
-
+summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # ...
