@@ -193,7 +193,11 @@ Why did we only choose to look at p-tau181 and NfL and not other biomarkers? - F
 
 Varför inte mer aktuell data? För det inte finns tillräckligt många individer med 3 eller fler mätningar i aktuella än, skulle ha gett för litet stickprovsstorlek om vi valde det och därmed stor osäkerhet i skattningarna.
 
-Varför just ADNI data? Inte lika relevant för oss som är i Sverige. - För det är den enda data som vi fick tillgång tid på så kort tid, vi hade tidsbegränsning, och i Sverige är det svårt generellt att få tillgång på individ-hälsodata på grund av regler.
+Varför just ADNI data? - För det är den enda Alzheimer's data som vi fick tillgång tid på så kort tid, vi hade tidsbegränsning, och i Sverige är det svårt generellt att få tillgång på individ-hälsodata på grund av regler.
+
+The Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates, only those which are exogenous (Rizopoulos, p.51). For example, if the event is defined as death, endogenous variables can inherently only be Endogenous variables inherently carry information about survival times........
+
+That is why we choose not to do this model.
 
 # Statistical theory
 
@@ -328,10 +332,6 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 -   Proportionality
 
 ### Cox PH model using baseline values of each biomarker
-
-### Cox Proportional Hazard Model with Time-Dependent Covariates
-
-The Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates, only those which are exogenous (Rizopoulos, p.51). For example, if the event is defined as death, endogenous variables can inherently only be Endogenous variables inherently carry information about survival times, and as such
 
 ## Joint Models
 
