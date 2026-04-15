@@ -528,7 +528,7 @@ Introducing the study, it's aims and the type of information gathered.
 
 Under this section, all variables used in the analysis will be described, along with the reasons for their importance.
 
-### Diagnosis status 
+### Diagnosis status
 
 The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: NC, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
 
@@ -546,7 +546,7 @@ P-tau181 is a continuous numerical variable representing one of the two plasma b
 
 The biomarker measurements are recorded on a scale of ??? and are observed 3647 times across the 1,190 included participants. Values range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. Overall, the distribution of the variable is highly right-skewed and not normally distributed.
 
-### NfL 
+### NfL
 
 NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by ???.
 
@@ -554,17 +554,17 @@ Similarly to the previous biomarker, there are 3647 measurements across the 1191
 
 The values are on the scale ??? and range from a minimum value of 6.4 to a maximum value of 408. The median is 37.9, with the first quartile at 27.8 and the third quartile at 52.5. Overall, both p-tau181 and NfL exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed.
 
-### Age 
+### Age
 
 Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG, for which the data was collected by ???.
 
 The variable is initially coded numerically as the year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants, and is then transformed into age at visit and age at baseline visit, which are more suitable for use in the analyses.
 
-### Gender 
+### Gender
 
 Another covariate of interest when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This variable is binary, with two categories: male and female. Among the 1190 participants, 543 were female and 647 were male. Including this variable allows for the examination of whether progression to dementia differs by sex.
 
-### APOE4-status 
+### APOE4-status
 
 Finally, APOE ε4 status is another covariate used to explain progression to dementia. Retrieved from the GENOTYPE dataset, the variable was initially coded numerically based on the number of ε4 alleles and was then recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). This allows the examination of whether the number of ε4 alleles is associated with the risk of progression to dementia. Consequently, there are 672 participants without any ε4 alleles, 417 participants with one allele, and 101 participants with two alleles among the 1190 included participants.
 
@@ -867,7 +867,7 @@ table(diff$VISCODE2)
 
 ### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
 
--   There are 6 observations with time differences greater than 15 days
+-   There are 6 observations with time differences greater than 30 days
 
 -   Some of these are large: 387 days, 115 days: clearly we can't say these are the same date
 
@@ -1215,6 +1215,23 @@ surv_data_nfl <- surv_data_nfl %>%
 
 ### Construction of global (common) baseline, age at baseline, event and time-to-event variables
 
+# ---
+
+Suggestion of how to deal with early dx from latent class file:
+
+-   if the dx EXAMDATE is 50 days before the biomarker baseline_date then we remove these observations
+
+```{r}
+# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
+# cognitive_states <- diagnosis_data %>%
+#   merge(
+#     nfl_ptau %>% select(RID, baseline_date), by = "RID") %>%
+#   filter(EXAMDATE - baseline_date >= -50) %>%
+#   distinct()
+```
+
+# ---
+
 ```{r}
 # We construct a unified survival dataset with a single event and time-to-event definition
 surv_core <- surv_data %>%
@@ -1318,19 +1335,6 @@ length(unique(long_data_multi$RID)) # longitudinal data, global version
 length(unique(surv_data_ptau$RID)) # survival data for ptau
 length(unique(surv_data_nfl$RID)) # survival data for nfl
 length(unique(surv_data_multi$RID)) # survival data, global version
-```
-
-## Reordering data frames
-
-```{r}
-# moving all date variables together and biomarker variables together
-surv_data_nfl <- surv_data_nfl %>%
-  relocate(where(is.Date)) %>%
-  relocate(c(ptau_mean, nfl_mean), .after = PLASMAPTAU181)
-
-surv_data_ptau <- surv_data_ptau %>%
-  relocate(where(is.Date)) %>%
-  relocate(c(ptau_mean, nfl_mean), .after = PLASMAPTAU181)
 ```
 
 # Longitudinal models
@@ -1484,6 +1488,7 @@ long_model_ptau <- mixed_model(
   fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
   random = ~ time_years_ptau | RID,                    
   data = long_data_ptau,
+      
 family = students.t(df = 3, link = "identity")
 )
 
@@ -1681,9 +1686,9 @@ cox.zph(surv_model_nfl)
 
 ##### 2. For the Cox PH models with time-averaged values of each biomarker 
 # For p-tau181
-cox.zph(surv_model_ptau_ta)
+cox.zph(surv_model_ptau_ta_1)
 # For NfL
-cox.zph(surv_model_nfl_ta)
+cox.zph(surv_model_nfl_ta_1)
 
 ##### 3. For the Cox PH models with time-dependent covariates
 # For p-tau181
@@ -1699,6 +1704,7 @@ cox.zph(surv_model_nfl_ta_2)
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ###### Error in survival::coxph(formula = surv_object_ptau \~ age_at_baseline_ptau + :
+
 data contains an infinite predictor
 
 ```{r}
@@ -1852,28 +1858,28 @@ cox.zph(surv_model_nfl)
 ```{r}
 library(JM)
 # Joint model for p-tau181 using package JM (frequentist approach)
-joint_model_ptau <- jointModel(
-  long_model_ptau,   
-  surv_model_ptau,  
-  timeVar = "time_years_ptau"
-)
-
-summary(joint_model_ptau)
+# joint_model_ptau <- jointModel(
+#   long_model_ptau,   
+#   surv_model_ptau,  
+#   timeVar = "time_years_ptau"
+# )
+# 
+# summary(joint_model_ptau)
 ```
 
 ```{r}
 library(JMbayes2)
 # Joint model for NfL using package JMbayes2 (bayesian approach)
-joint_model_ptau <- jm(
-  surv_model_ptau,
-  long_model_ptau,
-  time_var = "time_years_ptau",
-  n_chains = 3L, 
-  n_iter = 11000L, 
-  n_burnin = 1000L
-  )
-
-summary(joint_model_ptau)
+# joint_model_ptau <- jm(
+#   surv_model_ptau,
+#   long_model_ptau,
+#   time_var = "time_years_ptau",
+#   n_chains = 3L, 
+#   n_iter = 11000L, 
+#   n_burnin = 1000L
+#   )
+# 
+# summary(joint_model_ptau)
 ```
 
 Rhat-värden lite för höga för time_years_ptau –\> Vi provar med 20000 iterations istället:
@@ -1881,50 +1887,50 @@ Rhat-värden lite för höga för time_years_ptau –\> Vi provar med 20000 iter
 ```{r}
 library(JMbayes2)
 # Joint model for NfL using package JMbayes2 (bayesian approach)
-joint_model_ptau <- jm(
-  surv_model_ptau,
-  long_model_ptau,
-  time_var = "time_years_ptau",
-  n_chains = 3L, 
-  n_iter = 20000L, 
-  n_burnin = 1000L
-  )
-
-summary(joint_model_ptau)
+# joint_model_ptau <- jm(
+#   surv_model_ptau,
+#   long_model_ptau,
+#   time_var = "time_years_ptau",
+#   n_chains = 3L, 
+#   n_iter = 20000L, 
+#   n_burnin = 1000L
+#   )
+# 
+# summary(joint_model_ptau)
 ```
 
 ## Fitted joint model for NfL
 
 ```{r}
 # Joint model for NfL using package JM (frequentist approach)
-joint_model_nfl <- jointModel(
-  long_model_nfl,   
-  surv_model_nfl, 
-  timeVar = "time_years_nfl"
-)
-
-summary(joint_model_nfl)
+# joint_model_nfl <- jointModel(
+#   long_model_nfl,   
+#   surv_model_nfl, 
+#   timeVar = "time_years_nfl"
+# )
+# 
+# summary(joint_model_nfl)
 ```
 
 ```{r}
 # Joint model for NfL using package JMbayes2 (bayesian approach)
-joint_model_nfl <- jm(
-  surv_model_nfl,
-  long_model_nfl,
-  time_var = "time_years_nfl",
-  n_chains = 3L, 
-  n_iter = 11000L, 
-  n_burnin = 1000L
-  )
-
-summary(joint_model_nfl)
+# joint_model_nfl <- jm(
+#   surv_model_nfl,
+#   long_model_nfl,
+#   time_var = "time_years_nfl",
+#   n_chains = 3L, 
+#   n_iter = 11000L, 
+#   n_burnin = 1000L
+#   )
+# 
+# summary(joint_model_nfl)
 ```
 
 ### Comparison of fitted models using DIC and WAIC
 
 ```{r}
-cmp <- compare_jm(joint_model_ptau, joint_model_nfl)
-print(cmp)
+# cmp <- compare_jm(joint_model_ptau, joint_model_nfl)
+# print(cmp)
 ```
 
 ### Traceplots
@@ -1935,22 +1941,22 @@ print(cmp)
 ```
 
 ```{r}
-traceplot(joint_model_ptau, parm = "betas")
-traceplot(joint_model_ptau, parm = "alphas")
-traceplot(joint_model_ptau, parm = "sigmas")
+# traceplot(joint_model_ptau, parm = "betas")
+# traceplot(joint_model_ptau, parm = "alphas")
+# traceplot(joint_model_ptau, parm = "sigmas")
 ```
 
 ### Density plots
 
 ```{r}
-densplot(joint_model_ptau)
-densplot(joint_model_nfl)
+# densplot(joint_model_ptau)
+# densplot(joint_model_nfl)
 ```
 
 ```{r}
-densplot(joint_model_ptau, parm = "betas")
-densplot(joint_model_ptau, parm = "alphas")
-densplot(joint_model_ptau, parm = "sigmas")
+# densplot(joint_model_ptau, parm = "betas")
+# densplot(joint_model_ptau, parm = "alphas")
+# densplot(joint_model_ptau, parm = "sigmas")
 ```
 
 # Multivariate joint model
@@ -1976,30 +1982,25 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-multi_joint_model <- jm(surv_model_multi, mixed ,
-                        time_var = "time_years",
-                        functional_forms = fForms,
-                        n_chains = 3L,    
-                        n_iter = 20000L,
-                        n_burnin = 2000L
-                        )
-
-summary(multi_joint_model)
+# multi_joint_model <- jm(surv_model_multi, mixed ,
+#                         time_var = "time_years",
+#                         functional_forms = fForms,
+#                         n_chains = 3L,    
+#                         n_iter = 20000L,
+#                         n_burnin = 2000L
+#                         )
+# 
+# summary(multi_joint_model)
 ```
 
 ```{r}
-summary <- summary(multi_joint_model)
-summary$Survival
+# summary <- summary(multi_joint_model)
+# summary$Survival
 ```
 
 # ...
 
 # Latent Class Mixed Models
-
-```{r}
-# IF THE MODELS DON'T WORK but it seems there are no 0 time_to_event now...
-# jlcmm_data_nfl <- surv_data_nfl %>% filter(time_to_event_nfl > 0)
-```
 
 # LCMM: NFL
 
@@ -2450,15 +2451,21 @@ Joint latent class mixed models for NFL
 
 -   Survival submodel
 
+```{r}
+jlcmm_data_nfl <- surv_data_nfl %>%
+  select(RID, event_nfl, time_to_event_nfl) %>%
+  merge(long_data_nfl, by = "RID")
+```
+
 ## M0 (1 latent class)
 
 ```{r}
 m0 <- jlcmm(
-  fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1 + time_years,
+  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  random = ~ 1 + time_years_nfl,
   subject = "RID",
-  survival = Surv(time_to_event, event) ~ genotype,
-  data = jlcmm_data_test
+  survival = Surv(time_to_event, event) ~ APOE4_status,
+  data = long_data_nfl
 )
 ```
 
