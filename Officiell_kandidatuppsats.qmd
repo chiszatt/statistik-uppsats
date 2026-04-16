@@ -98,16 +98,16 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
 
-ptau_data = UGOTPTAU181
+#ptau_data = UGOTPTAU181
 
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
-demographics = PTDEMOG
+#demographics = PTDEMOG
 
-apoe = APOERES
+#apoe = APOERES
 ```
 
 # Introduction
@@ -146,25 +146,21 @@ These two biomarkers, along with various other biomarkers and clinical measures 
 
 Recent research has applied a range of prognostic models to estimate disease progression and related adverse outcomes in Alzheimer’s disease using biomarker data. One example is an article from 2020, in which the researchers used baseline plasma p-tau181 as a continuous predictor in a Cox proportional hazards model (Janelidze et al., 2020: 388) the most widely used procedure for modeling survival outcomes in relation to covariates (Therneau & Grambsch, 2000: p. 39). Additionally, they covaried for other plasma biomarkers, among which NfL. While adjusting the models for age, sex and education, the study found that higher baseline plasma P-tau181 levels were strongly associated with increased risk of progression to Alzheimer’s dementia, with hazard ratios around 3-4 per standard deviation increase. In the model including only P-tau181, it was a strong predictor of conversion across groups, with hazard ratios ranging from approximately 2.5 to 3.8 depending on cognitive status. When additional plasma biomarkers were included in the multivariate model, P-tau181 remained significant with only a slight reduction in effect size, whereas NfL showed no independent association with disease progression, with hazard ratios close to 1, indicating no meaningful contribution to risk prediction (Janelidze et al., 2020: 385, 388).
 
-incorporated the longitudinal values of each biomarker as time-varying covariates
-
 Another article from 2024 further extencded the approach by using a joint modeling framework to analyze multiple longitudinal biomarkers, including plasma p-tau181 and NfL (Yuan et al., 2024: p. 1). The joint model distinguishes itself from other models focusing on survival outcome by accounting for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012: p. vii). More precisely, it couples the survival model, which is of primary interest, with an appropriate model for the repeated measurements of the endogenous covariate, thereby accounting for its specific characteristics (Rizopoulos, 2012: p. 51-52). Several studies have examined these biomarkers using only a longitudinal model (Mattsson et al., 2019; Chen et al., 2021). The study using a joint model found that higher longitudinal p-tau181 levels were associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Yuan et al., 2024: p. 1). Additionally, the two biomarkers were combined into a multivariate joint model, leading to improved performance (Yuan et al., 2024: p. 1, 3).
 
-Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information.
+Additionally, there are so called latent class joint models:
+
+Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information. There are few studies that have compared the mentioned models above all together.
 
 Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021: p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker. This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., 2024: p. 591-592).
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
-Inför en källa som säger att individerna borde ha 3 eller fler mätningar
-
-**Behövs källa** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
+**Behöver inför källan** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
 
 ## Research Aims
 
-What are our research questions?
-
-Förslag 1.
+*What are our research questions?*
 
 This study investigates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches. More precisely, the research questions are:
 
@@ -172,37 +168,31 @@ This study investigates the prediction of Alzheimer’s disease/dementia progres
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
 
-Förslag 2.
-
-1.  How do longitudinal changes in plasma biomarker levels over time relate to the risk of progression to dementia? (Joint modeling)
-
-2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
-
-3.  How does the precision change for the estimated longitudinal trajectories and survival associations to the inclusion of individuals with different numbers of repeated measurements? (Precision analysis)
-
-Sensitivity → how do the estimates of the the joint model parameters change when excluding sparce individuals with only one biomarker measurement?
-
-Why is this research relevant to the existing body of literature? What does it add? Gaps in previous literature which we outline in above \^\^.
+Maybe sensitivity → how do the estimates of the the joint model parameters change when excluding sparce individuals with only one biomarker measurement?
 
 # Methodology
 
-How will we accomplish this? –\> Introduce the methods we will use.
+*How will we accomplish this? –\> Introduce the methods we will use.*
 
-Why did we choose this method to answer the research question? Why not other methods, such as cox models with time-dependent covariates - just den anses inte som lämplig för vår data, bara lämpligt för viss typ av data. Dessutom har vi begränsad tid och utrymme, så om vi hade valt fler modeller hade vi inte kunnat utforska respektive en lika mycket på djupet, vi valde de vi ansåg som viktigast och som skiljer sig mest från varandra, för att verkligen kunna se bredden/variationen av modeller som finns.
+To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to Alzheimer’s disease/dementia. Second, single-biomarker joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker and their association with the time-to-event outcome. Third, multivariate joint models will be used to jointly analyse multiple biomarkers, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying distinct subgroups. All models will be adjusted for relevant covariates.
 
-Why did we only choose to look at p-tau181 and NfL and not other biomarkers? - För att vi har begränsad tid och begränsat utrymme att skriva på, och två är tillräckligt för att vi ska kunna jämföra mellan biomarkörer. Om vi hade valt fler hade vi inte kunnat utforska vardera biomarkör på djupet lika mycket. Dessa två dataset hade även väldigt många individer med samma RID, så det var väldigt lämpligt. Många individer med många mätningar i båda dataseten.
+To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Model performance will be evaluated using time-dependent AUC for dynamic prediction. The significance level will be set at 0.05 for all analyses.
 
-Varför inte mer aktuell data? För det inte finns tillräckligt många individer med 3 eller fler mätningar i aktuella än, skulle ha gett för litet stickprovsstorlek om vi valde det och därmed stor osäkerhet i skattningarna.
+In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
-Varför just ADNI data? - För det är den enda Alzheimer's data som vi fick tillgång tid på så kort tid, vi hade tidsbegränsning, och i Sverige är det svårt generellt att få tillgång på individ-hälsodata på grund av regler.
+Only two biomarkers will be included in the analyses, namely p-tau181 and neurofilament light chain (NfL). These biomarkers were selected due to their established relevance in the prediction of dementia and Alzheimer’s disease progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. Although other clinically relevant biomarkers are available, they were not included due to limited availability of sufficiently large longitudinal datasets with repeated measurements. In this study, priority was given to data quality and longitudinal depth rather than the number of biomarkers considered. In addition, the selected biomarkers represent biologically distinct processes. p-tau181 is more specifically associated with Alzheimer’s disease pathology, whereas NfL reflects more general neuroaxonal damage and is not disease-specific. This contrast makes them particularly informative for comparative analyses of biomarker behaviour and predictive performance in dementia progression.
 
-The Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates, only those which are exogenous (Rizopoulos, p.51). For example, if the event is defined as death, endogenous variables can inherently only be Endogenous variables inherently carry information about survival times........
+Additional modelling approaches could have been considered given the aims of the study. For instance, the Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates such as biomarkers, only those which are exogenous (Rizopoulos, 2012: p.51). For example, if the event is defined as death, endogenous variables can inherently only be Endogenous variables inherently carry information about survival times........
 
-That is why we choose not to do this model.
+Consequently, this approach is not included in the present study.
+
+In addition, given the limited time and scope of this thesis, including a larger number of modelling frameworks would have reduced the ability to investigate each approach in sufficient depth. Therefore, a smaller set of models was selected in order to allow for a more detailed and meaningful comparison. The chosen models were selected based on their methodological relevance and their ability to capture different aspects of the data, thereby providing a broad overview of alternative approaches for modelling longitudinal biomarker data and survival outcomes.
+
+The modelling approaches will be applied to data obtained from the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI) and handled in accordance with their data use and access policies. In this context, it is also worth noting the limited availability of Alzheimer’s disease data in Sweden due to legal and regulatory constraints governing access to health data. This limitation further increases the importance of utilizing well-characterized international datasets such as ADNI, as they provide the necessary longitudinal and high-quality data required to conduct the types of analyses performed in this study.
 
 # Statistical theory
 
-Describe the statistical theories behind the chosen methods
+*Describe the statistical theories behind the chosen methods*
 
 ## Longitudinal Data
 
@@ -376,11 +366,9 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### Frequentist vs Bayesian approach
+### Multivariate Joint Model - A bayesian approach
 
 However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022: p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016: p.?).
-
-### Multivariate Joint Model
 
 The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
 
@@ -475,7 +463,9 @@ $$
 
 An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
 
-### AUC
+### ROC-AUC
+
+...
 
 # Data
 
@@ -485,7 +475,7 @@ The variables of interest were all retrieved from the ADNIMERGE2 package, found 
 
 Inclusion/exclusion criteria
 
-The inclusion criteria required participants to have all recorded diagnostic visits and all biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
+The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
 
 ## ADNI
 
@@ -531,11 +521,11 @@ To investigate progression to dementia, the first recorded diagnosis of dementia
 
 The variable was retrieved from the dataset "DXSUM" in ADNIMERGE2, for which the data was collected by ???. Across the 1190 included participants, there are 29743, of which 10812 observations are of CN, 4282 of Dementia and 14649 of MCI. They are all ranging from 29 September 2005 to 7 November 2025. Per individual, the number of observed diagnosis visits range from one to 95.
 
-Kanske skriva något om hur regelbundna besöken är.
+*Skriva något om hur regelbundna besöken är.*
 
-Lägga till om hur värdena ändras när man sedan reducerar till de individer med 3 eller fler mätningar.
+*Lägga till om värdena när man sedan reducerar till de individer med 3 eller fler mätningar.*
 
-Lägga till om hur vi kommer använda de i våra modeller exakt.
+*Lägga till om hur vi kommer använda variablerna i våra modeller exakt.*
 
 ### P-tau181
 
@@ -567,21 +557,21 @@ Finally, APOE ε4 status is another covariate used to explain progression to dem
 
 # Pre-processing
 
-ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>
+*ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
-Some bullet points to add to the final paper about things we thought about/did:
+*Some bullet points to add to the final paper about things we thought about/did:*
 
--   Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)
+-   *Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)*
 
--   Selecting relevant variables from diagnosis and biomarker/amyloid data set
+-   *Selecting relevant variables from diagnosis and biomarker/amyloid data set*
 
--   What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)
+-   *What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)*
 
--   What variables do we need for survival sub-model? (Event, time followed?)
+-   *What variables do we need for survival sub-model? (Event, time followed?)*
 
--   Joint model: time-var: a character string indicating the time variable in the mixed-effects model
+-   *Joint model: time-var: a character string indicating the time variable in the mixed-effects model*
 
--   How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?
+-   *How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?*
 
 # Results
 
@@ -661,17 +651,17 @@ Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimagi
 
 ## Checking RID with more than one measurement recorded on the same exam date
 
--   There are 52 individuals with two measurements recorded on the same exam date.
+-   *There are 52 individuals with two measurements recorded on the same exam date.*
 
--   How should we deal with these? Average the measurements? Remove the observations?
+-   *How should we deal with these? Average the measurements? Remove the observations?*
 
-1.  Describe the measurements, their differences and averages
+1.  *Describe the measurements, their differences and averages*
 
--   Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?
+-   *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
 
-2.  Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)
+2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
 
--   For now, remove them:
+-   *For now, remove them:*
 
 ```{r}
 # checking observations with more than one measurement recorded on the same exam date for nfl
@@ -987,17 +977,17 @@ small_outliers_nfl
 
 ## Preparation for Cox PH models and separate joint models
 
-Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.
+*Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.*
 
--   Annat alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau) - Kanske krävs för att kunna jämföra de två joint-modellerna?
+-   *Annat alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau) - Kanske krävs för att kunna jämföra de två joint-modellerna?*
 
--   Varför första biomarkörs-värden och inte första diagnos-besöket? = Kanske för att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!
+-   *Varför första biomarkörs-värden och inte första diagnos-besöket? = Kanske för att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!*
 
--   Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!
+-   *Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!*
 
--   --\> Frågan är:
+-   *--\> Frågan är:*
 
-    -   Baseline = första biomarkörs-värden eller första diagnos-besöke?
+    -   *Baseline = första biomarkörs-värden eller första diagnos-besöke?*
 
 ### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
 
@@ -1329,16 +1319,6 @@ long_data_multi <- long_data %>%
   ungroup()
 ```
 
-## Missing value recount after pre-processing
-
-```{r}
-# We re-count missing values after pre-processing
-#sapply(long_data_ptau, function(x) sum(is.na(x)))
-#sapply(long_data_nfl, function(x) sum(is.na(x)))
-#sapply(surv_data_ptau, function(x) sum(is.na(x)))
-#sapply(surv_data_nfl, function(x) sum(is.na(x)))
-```
-
 ## Recheck of longitudinal and survival data lengths
 
 ```{r}
@@ -1624,7 +1604,7 @@ plot(
 )
 ```
 
-### Fitted standard Cox PH models
+### Fitted standard Cox PH models (for the joint models)
 
 ```{r}
 # Cox survival-models, with covariates
@@ -1707,11 +1687,11 @@ cox.zph(surv_model_both2_bl)
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ```{r}
-# We recode APOE4 status (0, 1, 2 alleles) into a numeric variable (APOE4_num)
+# We recode APOE4 status (0, 1, 2 alleles) into a numeric variable 
 surv_data_ptau$APOE4_num <- as.numeric(surv_data_ptau$APOE4_status) - 1
 surv_data_nfl$APOE4_num <- as.numeric(surv_data_nfl$APOE4_status) - 1
 
-# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying (tt term)
+# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
 surv_model_ptau_tv <- coxph(
   surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_num),
   data = surv_data_ptau,
@@ -1720,7 +1700,7 @@ surv_model_ptau_tv <- coxph(
 
 #summary(surv_model_ptau_tv)
 
-# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying (tt term)
+# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
 surv_model_nfl_tv <- coxph(
   surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_num),
   data = surv_data_nfl,
@@ -1775,61 +1755,7 @@ summary(surv_model_multi)
 cox.zph(surv_model_multi)
 ```
 
-## For Cox PH model with time-averaged values of each biomarker
-
-### Creating time-average values of each biomarker
-
-```{r}
-# Creating time-average values of each biomarker 
-biomarker_avg <- surv_data %>%
-  group_by(RID) %>%
-  summarise(
-    ptau_mean = mean(log_PLASMAPTAU181, na.rm = TRUE),
-    nfl_mean = mean(log_PLASMA_NFL, na.rm = TRUE)
-  )
-
-# Merging the time-average values of each biomarker with each survival dataset 
-surv_data_ptau <- surv_data_ptau %>%
-  left_join(biomarker_avg, by = "RID")
-
-surv_data_nfl <- surv_data_nfl %>%
-  left_join(biomarker_avg, by = "RID")
-```
-
-### Fitted Cox PH models (one for p-tau181, one for NfL) with time-averaged values of each biomarker
-
-```{r}
-# Cox survival-models, with covariates including time-averaged values of each biomarker 
-# For p-tau181
-surv_model_ptau_tau <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + ptau_mean,
-  data = surv_data_ptau
-)
-
-summary(surv_model_ptau_tau)
-
-# For NfL
-surv_model_nfl_ta <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + nfl_mean,
-  data = surv_data_nfl
-)
-
-summary(surv_model_nfl_ta)
-```
-
-### Testing for the assumption of proportional hazards
-
-```{r}
-# For the Cox PH model for p-tau181 
-cox.zph(surv_model_ptau)
-
-# For the Cox PH model for NfL
-cox.zph(surv_model_nfl)
-```
-
 # Two separate joint models
-
-## Two separate joint models
 
 ## Fitted joint model for p-tau181
 
@@ -1847,7 +1773,7 @@ library(JM)
 
 ```{r}
 library(JMbayes2)
-# Joint model for NfL using package JMbayes2 (bayesian approach)
+# Joint model for p-tau181 using package JMbayes2 (bayesian approach)
 # joint_model_ptau <- jm(
 #   surv_model_ptau,
 #   long_model_ptau,
@@ -1860,11 +1786,11 @@ library(JMbayes2)
 # summary(joint_model_ptau)
 ```
 
-Rhat-värden lite för höga för time_years_ptau –\> Vi provar med 20000 iterations istället:
+Rhat-values a bit too high for time_years_ptau –\> Let's try with 20000 iterations instead:
 
 ```{r}
 library(JMbayes2)
-# Joint model for NfL using package JMbayes2 (bayesian approach)
+# Joint model for p-tau181 using package JMbayes2 (bayesian approach) - 20000 iterations
 # joint_model_ptau <- jm(
 #   surv_model_ptau,
 #   long_model_ptau,
@@ -1902,13 +1828,6 @@ library(JMbayes2)
 #   )
 # 
 # summary(joint_model_nfl)
-```
-
-### Comparison of fitted models using DIC and WAIC
-
-```{r}
-# cmp <- compare_jm(joint_model_ptau, joint_model_nfl)
-# print(cmp)
 ```
 
 ### Traceplots
@@ -2791,86 +2710,4 @@ postprob(mult_jlcmm_m1)
 summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-# ...
-
-# To see individuals transitions
-
-```{r}
-# Förbereder data + identifierar transitions
-diagnosis_long <- diagnosis_data %>%
-  arrange(RID, EXAMDATE) %>%
-  group_by(RID) %>%
-  mutate(
-    prev_diag = lag(DIAGNOSIS),
-    transition = DIAGNOSIS != prev_diag & !is.na(prev_diag),
-    transition_type = paste(prev_diag, "→", DIAGNOSIS)
-  ) %>%
-  ungroup()
-
-# Antal transitions per individ
-transition_counts <- diagnosis_long %>%
-  group_by(RID) %>%
-  summarise(n_transitions = sum(transition, na.rm = TRUE), .groups = "drop")
-
-# Vanliga transitionstyper
-transition_summary <- diagnosis_long %>%
-  filter(transition) %>%
-  count(transition_type, sort = TRUE)
-
-# Övergångar mellan diagnoser (individ + frekvens)
-transition_both <- diagnosis_long %>%
-  filter(transition) %>%
-  group_by(prev_diag, DIAGNOSIS) %>%
-  summarise(
-    n_events = n(),
-    n_individuals = n_distinct(RID),
-    .groups = "drop"
-  ) %>%
-  arrange(desc(n_events))
-
-# Viktiga transitions
-progression <- transition_both %>%
-  filter(prev_diag == "MCI" & DIAGNOSIS == "Dementia")
-
-reversals <- transition_both %>%
-  filter(prev_diag == "Dementia" & DIAGNOSIS == "MCI")
-
-early <- transition_both %>%
-  filter(prev_diag == "CN" & DIAGNOSIS == "MCI")
-
-# Individuella sekvenser (valfritt)
-individual_sequences <- diagnosis_long %>%
-  group_by(RID) %>%
-  summarise(sequence = paste(DIAGNOSIS, collapse = " → "), .groups = "drop")
-
-# Monotona (CN → MCI → Dementia utan baksteg)
-monotonic_ids <- diagnosis_long %>%
-  group_by(RID) %>%
-  summarise(
-    valid = all(diff(as.numeric(factor(DIAGNOSIS,
-      levels = c("CN", "MCI", "Dementia")
-    ))) >= 0),
-    .groups = "drop"
-  ) %>%
-  filter(valid) %>%
-  pull(RID)
-
-# Exempel på CN → MCI → Dementia-fall
-cn_mci_dem <- diagnosis_long %>%
-  group_by(RID) %>%
-  summarise(
-    has_CN = any(DIAGNOSIS == "CN"),
-    has_MCI_after_CN = any(DIAGNOSIS == "MCI" &
-                             EXAMDATE > min(EXAMDATE[DIAGNOSIS == "CN"])),
-    has_Dem_after_MCI = any(DIAGNOSIS == "Dementia" &
-                              EXAMDATE > min(EXAMDATE[DIAGNOSIS == "MCI"])),
-    .groups = "drop"
-  ) %>%
-  filter(has_CN & has_MCI_after_CN & has_Dem_after_MCI)
-```
-
-```{r}
-# För att t.ex. jämföra med cn_mci_dem original-data - t.ex. 
-diagnosis_data %>%
-  filter(RID == 61)
-```
+## Comparing models
