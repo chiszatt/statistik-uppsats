@@ -532,9 +532,13 @@ get_cox_auc <- function(model, data, times) {
 ```
 
 ```{r}
-# We compute time-dependent AUC for Cox models (p-tau and NfL)
+# We compute time-dependent AUC for Cox model with p-tau181
 auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, surv_data, times)
+
+# We compute time-dependent AUC for Cox model with NfL
 auc_nfl_bl  <- get_cox_auc(surv_model_nfl_bl, surv_data, times)
+
+# We compute time-dependent AUC for Cox model with p-tau181 and NfL (combined model)
 auc_both_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
 ```
 
@@ -616,7 +620,7 @@ get_jm_auc <- function(model, newdata, times) {
 ```
 
 ```{r}
-# We compute joint model time-dependent AUC for p-tau181 using tvAUC
+# We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
 auc_ptau_jm <- get_jm_auc(
   joint_model_ptau,
   newdata_ptau,
@@ -625,7 +629,7 @@ auc_ptau_jm <- get_jm_auc(
 ```
 
 ```{r}
-# We compute joint model time-dependent AUC for NfL using tvAUC
+# We compute time-dependent AUC for the joint model including NfL using tvAUC
 auc_nfl_jm <- get_jm_auc(
   joint_model_nfl,
   newdata_nfl,
@@ -634,6 +638,7 @@ auc_nfl_jm <- get_jm_auc(
 ```
 
 ```{r}
+# We compute time-dependent AUC for the multivariate joint model using tvAUC
 auc_multi_jm <- get_jm_auc(
   multi_joint_model,
   newdata_multi,
@@ -644,6 +649,7 @@ auc_multi_jm <- get_jm_auc(
 # Results
 
 ```{r}
+# We summarize time-dependent AUC (3, 5, and 10 years) for Cox and joint models in a single results table
 results <- data.frame(
   Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL", "JM both"),
   
@@ -656,3 +662,5 @@ results[, -1] <- round(results[, -1], 3)
 
 results
 ```
+
+Behövs även för latent class joint models
