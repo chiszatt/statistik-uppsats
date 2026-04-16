@@ -251,6 +251,144 @@ long_data <- long_data %>%
   )
 ```
 
+# Models
+
+```{r}
+# P-tau181 baseline 
+long_data_ptau <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+
+baseline_ptau <- long_data[!duplicated(long_data$RID),
+                                c("RID",
+                                  "log_PLASMAPTAU181")]
+
+names(baseline_ptau)[2] <- "baseline_value_ptau"
+
+# NfL baseline
+long_data <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
+
+baseline_nfl <- long_data[!duplicated(long_data$RID),
+                              c("RID",
+                                "log_PLASMA_NFL")]
+
+names(baseline_nfl)[2] <- "baseline_value_nfl"
+
+# We merge the two variables into a baseline table 
+baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
+
+# We merge the baseline table with the p-tau181 survival dataset 
+surv_data <- merge(surv_data,
+                        baseline,
+                        by="RID"
+                        )
+```
+
+```{r}
+# Cox survival-models, with covariates
+surv_model <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
+  data = surv_data,
+  x = TRUE
+)
+
+```
+
+```{r}
+# For p-tau181
+surv_model_ptau_bl <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data
+)
+
+summary(surv_model_ptau_bl)
+
+# For NfL
+surv_model_nfl_bl <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data
+)
+
+summary(surv_model_nfl_bl)
+
+# For p-tau181 including NfL 
+surv_model_both_bl <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data
+)
+
+summary(surv_model_both_bl)
+
+```
+
+```{r}
+# Longitudinal model for p-tau181 with normal distribution 
+long_model_ptau <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
+  random = ~ time_years_ptau | RID,                    
+  data = long_data
+)
+
+#summary(long_model_ptau)
+
+# Longitudinal model for NfL with normal distribution 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years_nfl + PTGENDER + APOE4_status, 
+  random = ~ time_years_nfl | RID, # random intercept + slope
+  data = long_data
+  )
+
+#summary(long_model_nfl)
+```
+
+```{r}
+library(JMbayes2)
+# Joint model for p-tau181 using package JMbayes2 (bayesian approach)
+joint_model_ptau <- jm(
+  surv_model,
+  long_model_ptau,
+  time_var = "time_years_ptau",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+ 
+summary(joint_model_ptau)
+```
+
+```{r}
+# Joint model for NfL using package JMbayes2 (bayesian approach)
+joint_model_nfl <- jm(
+  surv_model,
+  long_model_nfl,
+  time_var = "time_years_nfl",
+  n_chains = 3L, 
+  n_iter = 11000L, 
+  n_burnin = 1000L
+  )
+
+# summary(joint_model_nfl)
+```
+
+```{r}
+mixed <- list(long_model_ptau, long_model_nfl)
+
+fForms <- list(
+  "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) 
+  )    
+```
+
+```{r}
+multi_joint_model <- jm(surv_model, mixed ,
+                         time_var = "time_years_ptau",
+                         functional_forms = fForms,
+                         n_chains = 3L,    
+                         n_iter = 20000L,
+                         n_burnin = 2000L
+                         )
+ 
+# summary(multi_joint_model)
+```
+
 # M3 - Time-dependent Cox PH model
 
 Construction of start–stop time intervals and event indicators
@@ -345,4 +483,160 @@ cox.zph(surv_model_nfl_td)
 
 # For model with both
 cox.zph(surv_model_both_td)
+```
+
+# Test of AUC comparing
+
+```{r}
+library(timeROC)
+library(JMbayes2)
+```
+
+```{r}
+# We define evaluation time points for time-dependent AUC comparison
+times <- c(3, 5, 10)
+```
+
+## For the Cox PH models
+
+```{r}
+# We define a function to compute time-dependent AUC for Cox models using timeROC
+# We use the linear predictor as the risk score and survival outcome from the dataset
+get_cox_auc <- function(model, data, times) {
+  
+  # We extract survival outcome variables
+  T <- data$time_to_event
+  delta <- data$event
+  
+  # We compute the linear predictor from the Cox model
+  lp <- predict(model, newdata = data, type = "lp")
+  
+  # We compute time-dependent AUC using timeROC
+  auc <- timeROC::timeROC(
+    T = T,
+    delta = delta,
+    marker = lp,
+    cause = 1,
+    times = times,
+    iid = TRUE
+  )$AUC
+  
+  return(auc)
+}
+```
+
+```{r}
+# We compute time-dependent AUC for Cox models (p-tau and NfL)
+auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, surv_data, times)
+auc_nfl_bl  <- get_cox_auc(surv_model_nfl_bl, surv_data, times)
+auc_both1_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
+```
+
+## For the joint models
+
+"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."
+
+```{r}
+# We create a unified longitudinal + survival dataset for prediction
+newdata <- long_data %>%
+  left_join(
+    surv_data %>% select(RID, age_at_baseline, time_to_event, event),
+    by = "RID"
+  )
+
+# We create the p-tau181 specific prediction dataset 
+newdata_ptau <- newdata %>%
+  select(
+    RID,
+    time_years_ptau,
+    log_PLASMAPTAU181,
+    PTGENDER,
+    APOE4_status,
+    age_at_baseline,
+    time_to_event,
+    event
+  )
+
+# We create the NfL specific prediction dataset 
+newdata_nfl <- newdata %>%
+  select(
+    RID,
+    time_years_nfl,
+    log_PLASMA_NFL,
+    PTGENDER,
+    APOE4_status,
+    age_at_baseline,
+    time_to_event,
+    event
+  )
+
+# We create a combined prediction dataset for a multivariate joint model
+newdata_multi <- newdata %>%
+  select(
+    RID,
+    time_years_ptau,
+    log_PLASMAPTAU181,
+    time_years_nfl,
+    log_PLASMA_NFL,
+    PTGENDER,
+    APOE4_status,
+    age_at_baseline,
+    time_to_event,
+    event
+  )
+```
+
+```{r}
+# We define a function to compute time-dependent AUC for joint models using tvAUC
+# We extract the AUC value from the tvAUC output for each horizon time point
+get_jm_auc <- function(model, newdata, times) {
+  
+  aucs <- sapply(times, function(t) {
+    
+    tmp <- tvAUC(
+      model,
+      newdata = newdata,
+      Tstart = 0,
+      Thoriz = t
+    )
+    
+    tmp$auc   
+  })
+  
+  return(as.numeric(aucs))
+}
+```
+
+```{r}
+# We compute joint model time-dependent AUC for p-tau181 using tvAUC
+auc_ptau_jm <- get_jm_auc(
+  joint_model_ptau,
+  newdata_ptau,
+  times
+)
+```
+
+```{r}
+# We compute joint model time-dependent AUC for NfL using tvAUC
+auc_nfl_jm <- get_jm_auc(
+  joint_model_nfl,
+  newdata_nfl,
+  times
+)
+```
+
+# Results
+
+```{r}
+results <- data.frame(
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL"),
+  
+  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], surv_model_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1]),
+  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], surv_model_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2]),
+  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], surv_model_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3])
+)
+
+results[, -1] <- round(results[, -1], 3)
+
+results
 ```
