@@ -487,6 +487,12 @@ cox.zph(surv_model_both_td)
 
 # Test of AUC comparing
 
+We evaluated predictive performance using time-dependent AUC based on incident/dynamic ROC curves at 3-, 5-, and 10-year horizons.
+
+For the Cox PH models = using timeROC, from the package timeROC
+
+For the joint models = using tvAUC, from the package JMbayes2
+
 ```{r}
 library(timeROC)
 library(JMbayes2)
@@ -529,12 +535,14 @@ get_cox_auc <- function(model, data, times) {
 # We compute time-dependent AUC for Cox models (p-tau and NfL)
 auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, surv_data, times)
 auc_nfl_bl  <- get_cox_auc(surv_model_nfl_bl, surv_data, times)
-auc_both1_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
+auc_both_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
 ```
 
 ## For the joint models
 
-"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."
+Från: <https://cloud.r-project.org/web/packages/JMbayes2/JMbayes2.pdf>
+
+The funcition tvAUC requires "newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."
 
 ```{r}
 # We create a unified longitudinal + survival dataset for prediction
@@ -631,9 +639,9 @@ auc_nfl_jm <- get_jm_auc(
 results <- data.frame(
   Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL"),
   
-  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], surv_model_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1]),
-  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], surv_model_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2]),
-  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], surv_model_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3])
+  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1]),
+  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2]),
+  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3])
 )
 
 results[, -1] <- round(results[, -1], 3)
