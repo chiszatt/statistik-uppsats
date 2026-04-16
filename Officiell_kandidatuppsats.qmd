@@ -60,10 +60,10 @@ editor: visual
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, output = TRUE)
+knitr::opts_chunk$set(echo = TRUE, output = TRUE)
 ```
 
-```{r, warning=FALSE}
+```{r, warning=TRUE}
 # loading libraries
 library(dplyr)
 library(tidyr)
@@ -74,6 +74,7 @@ library(survival)
 library(ggplot2)
 library(glmmTMB)
 library(DHARMa) # for running residual diagnostics on GLMM
+library(lcmm)
 ```
 
 ```{r}
@@ -156,7 +157,7 @@ Additionally, an important consideration is whether to include all participants 
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
-**Behöver inför källan** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
+**Behöver införa källan** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
 
 ## Research Aims
 
@@ -193,6 +194,8 @@ The modelling approaches will be applied to data obtained from the *Alzheimer’
 # Statistical theory
 
 *Describe the statistical theories behind the chosen methods*
+
+*Måste förkortas och göras mer sammanhängande*
 
 ## Longitudinal Data
 
@@ -875,17 +878,17 @@ diff %>% filter(abs(time_diff) > 30) %>% select(time_diff)
 # testing the method
 long_data_test <- long_data %>%
   mutate(
-    time_diff = (long_data$EXAMDATE_nfl - long_data$EXAMDATE_ptau),
+    time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
     EXAMDATE_new = case_when(
       time_diff == 0 ~ EXAMDATE_nfl,
-      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff,
-      )
-  )
-
-# checking the results with all obs that had a time diff != 0
-long_data_test <- long_data_test %>%
+      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff
+    )
+  ) %>%
   filter(time_diff != 0) %>%
-  relocate(where(is.Date), time_diff, .after = EXAMDATE_new)
+  relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
+
+# Checking the first observations of time_diff (non-zero differences)
+head(long_data_test$time_diff)
 ```
 
 ```{r}
@@ -1176,24 +1179,25 @@ long_data_nfl <- long_data %>%
     
   ) %>%
   ungroup()
+
 ```
 
 ### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
 # P-tau181 baseline 
-long_data_ptau <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+long_data_ptau_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
 
-baseline_ptau <- long_data_ptau[!duplicated(long_data_ptau$RID),
+baseline_ptau <- long_data_ptau_bl[!duplicated(long_data_ptau$RID),
                                 c("RID",
                                   "log_PLASMAPTAU181")]
 
 names(baseline_ptau)[2] <- "baseline_value_ptau"
 
 # NfL baseline
-long_data_nfl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
+long_data_nfl_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
 
-baseline_nfl <- long_data_nfl[!duplicated(long_data_nfl$RID),
+baseline_nfl <- long_data_nfl_bl[!duplicated(long_data_nfl$RID),
                               c("RID",
                                 "log_PLASMA_NFL")]
 
@@ -1358,45 +1362,45 @@ var(long_data$PLASMAPTAU181)
 
 ```{r}
 # GLMM
-fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
-                   data = long_data_ptau,
-                   family = Gamma(link = "log"))
+#fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
+                   #data = long_data_ptau,
+                   #family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
-                data = long_data_ptau)
+#fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
+                #data = long_data_ptau)
 
 # LME approach with log transformed data
-fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
-                           data = long_data_ptau)
+#fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
+                           #data = long_data_ptau)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                              data = long_data_ptau,
-                              family = lognormal(link = "log"))
+#fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                             # data = long_data_ptau,
+                              #family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                            data = long_data_ptau,
-                            family = students.t(df = 3, link = "identity"))
+#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                            #data = long_data_ptau,
+                            #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
-gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
-testResiduals(gamma_residuals_ptau)
+#gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
+#testResiduals(gamma_residuals_ptau)
 
-lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
-testResiduals(lme_residuals_log_ptau)
+#lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
+#testResiduals(lme_residuals_log_ptau)
 
-lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
-testResiduals(lme_residuals_cubed_ptau)
+#lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
+#testResiduals(lme_residuals_cubed_ptau)
 
-lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
-testResiduals(lognormal_residuals_ptau)
+#lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
+#testResiduals(lognormal_residuals_ptau)
 
-student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-testResiduals(student_residuals_ptau)
+#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+#testResiduals(student_residuals_ptau)
 
-AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+#AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau)
 ```
 
 ### NfL
@@ -1411,45 +1415,45 @@ var(long_data$PLASMA_NFL)
 
 ```{r}
 # GLMM
-fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
-                   data = long_data_nfl,
-                   family = Gamma(link = "log"))
+#fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
+                   #data = long_data_nfl,
+                   #family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
-                data = long_data_nfl)
+#fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
+                #data = long_data_nfl)
 
 # LME approach with log transformed data
-fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
-                          data = long_data_nfl)
+#fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
+                          #data = long_data_nfl)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                             data = long_data_nfl,
-                             family = lognormal(link = "log"))
+#fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                             #data = long_data_nfl,
+                             #family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                           data = long_data_nfl,
-                           family = students.t(df = 3, link = "identity"))
+#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                           #data = long_data_nfl,
+                           #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
-gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
-testResiduals(gamma_residuals_nfl)
+#gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
+#testResiduals(gamma_residuals_nfl)
 
-lme_residuals_log_nfl <- simulateResiduals(fit_lme_log_nfl)
-testResiduals(lme_residuals_log_nfl)
+#lme_residuals_log_nfl <- simulateResiduals(fit_lme_log_nfl)
+#testResiduals(lme_residuals_log_nfl)
 
-lme_residuals_cubed_nfl <- simulateResiduals(fit_lme_cubed_nfl)
-testResiduals(lme_residuals_cubed_nfl)
+#lme_residuals_cubed_nfl <- simulateResiduals(fit_lme_cubed_nfl)
+#testResiduals(lme_residuals_cubed_nfl)
 
-lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
-testResiduals(lognormal_residuals_nfl)
+#lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
+#testResiduals(lognormal_residuals_nfl)
 
-student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-testResiduals(student_residuals_nfl)
+#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+#testResiduals(student_residuals_nfl)
 
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
+#AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
 ```
 
 ## For separate joint models
@@ -1464,7 +1468,7 @@ long_model_ptau <- lme(
   data = long_data_ptau
 )
 
-#summary(long_model_ptau)
+summary(long_model_ptau)
 
 # Longitudinal model for NfL with normal distribution 
 long_model_nfl <- lme(
@@ -1473,19 +1477,19 @@ long_model_nfl <- lme(
   data = long_data_nfl
   )
 
-#summary(long_model_nfl)
+summary(long_model_nfl)
 ```
 
 ```{r}
-# Longitudinal model for p-tau181 with t-distribution (identity link) 
-library(GLMMadaptive)
-long_model_ptau <- mixed_model(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
-  random = ~ time_years_ptau | RID,                    
-  data = long_data_ptau,
+# Longitudinal model for p-tau181 with t-distribution (identity link)
+#library(GLMMadaptive)
+#long_model_ptau <- mixed_model(
+  #fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
+  #random = ~ time_years_ptau | RID,                    
+  #data = long_data_ptau,
       
-family = students.t(df = 3, link = "identity")
-)
+#family = students.t(df = 3, link = "identity")
+#)
 
 #summary(long_model_ptau)
 ```
@@ -1494,7 +1498,7 @@ family = students.t(df = 3, link = "identity")
 
 ```{r}
 # residuals of the p-tau181 LME model
-res_ptau <- residuals(long_model_ptau, type = "subject_specific")
+res_ptau <- residuals(long_model_ptau, type = "pearson")  
 
 # fitted values of the p-tau181 LME model
 fitted_vals_ptau <- fitted(long_model_ptau)  
@@ -1503,7 +1507,7 @@ fitted_vals_ptau <- fitted(long_model_ptau)
 plot(fitted_vals_ptau, res_ptau,
      xlab = "Fitted values",
      ylab = "Residuals",
-     main = "Residuals vs Fitted for P-TAU")
+     main = "Residuals vs Fitted for p-tau181")
 abline(h = 0, col = "red", lty = 2)
 ```
 
@@ -1615,7 +1619,7 @@ surv_model_ptau <- coxph(
   x = TRUE
 )
 
-#summary(surv_model_ptau)
+summary(surv_model_ptau)
 
 # For NfL
 surv_model_nfl <- coxph(
@@ -1624,7 +1628,7 @@ surv_model_nfl <- coxph(
   x = TRUE
 )
 
-#summary(surv_model_nfl)
+summary(surv_model_nfl)
 ```
 
 ### Fitted Cox PH models using baseline values of each biomarker
@@ -1637,7 +1641,7 @@ surv_model_ptau_bl <- coxph(
   data = surv_data_ptau
 )
 
-#summary(surv_model_ptau_bl)
+summary(surv_model_ptau_bl)
 
 # For NfL
 surv_model_nfl_bl <- coxph(
@@ -1933,9 +1937,7 @@ hlme_m1 <- hlme(
     data = long_data_nfl,
     B = random(hlme_m0)
   )
-```
 
-```{r}
 summary(hlme_m1)
 ```
 
@@ -2358,7 +2360,7 @@ summarytable(mlcmm_m0, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 
 # JLCMM: NFL
 
-1.  Posterier probabilities show good classification
+1.  Posterior probabilities show good classification
 
 2.  Score test statistic for conditional independence is significant with 1 class and not significant with 2 classes: evidence for 2 classes
 
@@ -2367,8 +2369,8 @@ summarytable(mlcmm_m0, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```{r}
 # merging the longitudinal and survival data for NfL
 jlcmm_data_nfl <- surv_data_nfl %>%
-  select(RID, event_nfl, time_to_event_nfl) %>%
-  merge(long_data_nfl, by = "RID")
+select(RID, event_nfl, time_to_event_nfl) %>%
+  left_join(long_data_nfl, by = "RID")
 ```
 
 ## M0 (1 latent class)
@@ -2460,7 +2462,7 @@ postprob(jlcmm_m1)
 ## Comparing M0 and M1
 
 ```{r}
-summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+#summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # JLCMM: PTAU
@@ -2542,17 +2544,17 @@ summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 
 ## M2 (3 latent classes)
 
-Things to assess:
+*Things to assess:*
 
-1.  Fit 4 class model -\> does BIC improve any more or plateau?
+1.  *Fit 4 class model -\> does BIC improve any more or plateau?*
 
-2.  Score test now not significant compared with the two class model
+2.  *Score test now not significant compared with the two class model*
 
-3.  VERY small class 1
+3.  *VERY small class 1*
 
-4.  CLass 2 and 3 are not cleanly separated (look at posterior probabilities)
+4.  *CLass 2 and 3 are not cleanly separated (look at posterior probabilities)*
 
-5.  Plot survival curves (how?)
+5.  *Plot survival curves (how?)*
 
 ### gridsearch()
 
@@ -2574,25 +2576,25 @@ Things to assess:
 ```
 
 ```{r}
-jlcmm_m2 <- jlcmm(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
-  random = ~ 1 + time_years_ptau,
-  mixture = ~ time_years_ptau,
-  classmb = ~ 1,
-  ng = 3,
-  subject = "RID",
-  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-  data = jlcmm_data_ptau,
-  B = random(jlcmm_m0)
-)
+#jlcmm_m2 <- jlcmm(
+  #fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  #random = ~ 1 + time_years_ptau,
+  #mixture = ~ time_years_ptau,
+  #classmb = ~ 1,
+  #ng = 3,
+  #subject = "RID",
+  #survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+  #data = jlcmm_data_ptau,
+  #B = random(jlcmm_m0)
+#)
 ```
 
 ```{r}
-summary(jlcmm_m2)
+#summary(jlcmm_m2)
 ```
 
 ```{r}
-postprob(jlcmm_m2)
+#postprob(jlcmm_m2)
 ```
 
 ## Comparing M0, M1, M3
