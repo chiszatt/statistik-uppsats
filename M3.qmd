@@ -633,15 +633,23 @@ auc_nfl_jm <- get_jm_auc(
 )
 ```
 
+```{r}
+auc_multi_jm <- get_jm_auc(
+  multi_joint_model,
+  newdata_multi,
+  times
+)
+```
+
 # Results
 
 ```{r}
 results <- data.frame(
-  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL"),
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL", "JM both"),
   
-  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1]),
-  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2]),
-  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3])
+  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1], auc_multi_jm[1]),
+  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2], auc_multi_jm[2]),
+  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3], auc_multi_jm[3])
 )
 
 results[, -1] <- round(results[, -1], 3)
