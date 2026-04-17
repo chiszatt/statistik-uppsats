@@ -1457,45 +1457,45 @@ var(long_data$PLASMAPTAU181)
 
 ```{r}
 # GLMM
-#fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
-                   #data = long_data_ptau,
-                   #family = Gamma(link = "log"))
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
+                   data = long_data_ptau,
+                   family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-#fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
-                #data = long_data_ptau)
+fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
+                data = long_data_ptau)
 
 # LME approach with log transformed data
-#fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
-                           #data = long_data_ptau)
+fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
+                           data = long_data_ptau)
 
 # Lognormal - similar to log-transforming then fitting LME
-#fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                             # data = long_data_ptau,
-                              #family = lognormal(link = "log"))
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                             data = long_data_ptau,
+                             family = lognormal(link = "log"))
 
 # Student-t
-#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                            #data = long_data_ptau,
-                            #family = students.t(df = 3, link = "identity"))
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
+                            data = long_data_ptau,
+                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
-#gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
-#testResiduals(gamma_residuals_ptau)
+gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
+testResiduals(gamma_residuals_ptau)
 
-#lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
-#testResiduals(lme_residuals_log_ptau)
+lme_residuals_log_ptau <- simulateResiduals(fit_lme_log_ptau)
+testResiduals(lme_residuals_log_ptau)
 
-#lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
-#testResiduals(lme_residuals_cubed_ptau)
+lme_residuals_cubed_ptau <- simulateResiduals(fit_lme_cubed_ptau)
+testResiduals(lme_residuals_cubed_ptau)
 
-#lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
-#testResiduals(lognormal_residuals_ptau)
+lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
+testResiduals(lognormal_residuals_ptau)
 
-#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-#testResiduals(student_residuals_ptau)
+student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+testResiduals(student_residuals_ptau)
 
-#AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau)
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
 ```
 
 ### NfL
@@ -1510,45 +1510,45 @@ var(long_data$PLASMA_NFL)
 
 ```{r}
 # GLMM
-#fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
-                   #data = long_data_nfl,
-                   #family = Gamma(link = "log"))
+fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
+                   data = long_data_nfl,
+                   family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-#fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
-                #data = long_data_nfl)
+fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
+                data = long_data_nfl)
 
 # LME approach with log transformed data
-#fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
-                          #data = long_data_nfl)
+fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
+                          data = long_data_nfl)
 
 # Lognormal - similar to log-transforming then fitting LME
-#fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                             #data = long_data_nfl,
-                             #family = lognormal(link = "log"))
+fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                             data = long_data_nfl,
+                             family = lognormal(link = "log"))
 
 # Student-t
-#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                           #data = long_data_nfl,
-                           #family = students.t(df = 3, link = "identity"))
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
+                           data = long_data_nfl,
+                           family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
-#gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
-#testResiduals(gamma_residuals_nfl)
+gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
+testResiduals(gamma_residuals_nfl)
 
-#lme_residuals_log_nfl <- simulateResiduals(fit_lme_log_nfl)
-#testResiduals(lme_residuals_log_nfl)
+lme_residuals_log_nfl <- simulateResiduals(fit_lme_log_nfl)
+testResiduals(lme_residuals_log_nfl)
 
-#lme_residuals_cubed_nfl <- simulateResiduals(fit_lme_cubed_nfl)
-#testResiduals(lme_residuals_cubed_nfl)
+lme_residuals_cubed_nfl <- simulateResiduals(fit_lme_cubed_nfl)
+testResiduals(lme_residuals_cubed_nfl)
 
-#lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
-#testResiduals(lognormal_residuals_nfl)
+lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
+testResiduals(lognormal_residuals_nfl)
 
-#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-#testResiduals(student_residuals_nfl)
+student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+testResiduals(student_residuals_nfl)
 
-#AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
 ```
 
 ## For separate joint models
