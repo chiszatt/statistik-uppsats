@@ -3318,7 +3318,7 @@ Bootstrap LRT???
 ## Table of the results
 
 ```{r}
-# We summarize time-dependent AUC (3, 5, and 10 years) for Cox and joint models in a single results table
+# We summarize time-dependent AUC for Cox and joint models in a single results table
 #results <- data.frame(
 #  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL", "JM both"),
 #  
@@ -3337,18 +3337,18 @@ Bootstrap LRT???
 ```{r}
 # We reshape AUC results into long format for plotting
 #plot_data <- data.frame(
-#  Time = rep(times, times = 5),
-#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL"), each = length(times)),
+#  Time = rep(times, times = 6),
+#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM both"), each = length(times)),
 #  AUC = c(
 #    auc_ptau_bl,   
 #    auc_nfl_bl,    
 #    auc_both_bl,
 #    auc_ptau_jm,
-#    auc_nfl_jm
+#    auc_nfl_jm,
+#    auc_multi_jm
 #  )
 #)
 #
-# Plot
 #ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
 #  geom_line(linewidth = 1) +
 #  geom_point(size = 2) +
