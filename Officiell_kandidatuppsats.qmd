@@ -909,6 +909,8 @@ long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - lo
 surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
 ```
 
+### Checking individuals final diagnoses for the full data set
+
 ```{r}
 # final diagnoses for the full sample size
 table((surv_data %>% group_by(RID) %>% filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>% dplyr::select(DIAGNOSIS_dx) %>% distinct())$DIAGNOSIS_dx)
@@ -925,6 +927,8 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 3 measurements 
 length(keep)
 ```
+
+### Checking individuals final diagnoses for the reduced data set
 
 ```{r}
 # final diagnoses for the reduced sample size
@@ -961,9 +965,9 @@ table(diff$VISCODE2)
 
 ### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
 
--   There are 6 observations with time differences greater than 30 days
+-   There are 4 observations with time differences greater than 30 days
 
--   Some of these are large: 387 days, 115 days: clearly we can't say these are the same date
+-   115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
 
 -   Less clear what the case is with a time difference of 31 days, even 49 days
 
@@ -1403,6 +1407,14 @@ surv_test <- test %>%
 # extracting number of events with time_to_event != 0
 table((surv_test %>% filter(time_to_event > 0))$event)
 table((surv_test %>% filter(time_to_event == 0))$event)
+```
+
+```{r}
+# merging the longitudinal data
+surv_test_1 <- surv_test %>%
+  merge(demographics_small, by = "RID") %>% 
+  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID") %>%
+  merge(baseline, by = "RID")
 ```
 
 # ---
