@@ -466,9 +466,35 @@ $$
 
 An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
 
-### ROC-AUC
+### ROC analysis
 
-...
+ROC analysis is a valuable method for assessing how well diagnostic tests perform, and more generally for measuring the accuracy of statistical models, such as logistic regression and discriminant analysis, that assign individuals to one of two groups, typically classified as diseased or not diseased. Earlier research on ROC methods mainly focused on ordinal rating data, where responses take a limited set of ordered categories reflecting levels of confidence about disease status. More recently, ROC techniques have increasingly been used with continuous data as well (Zou et al., 2012: p. 3)
+
+The traditional ROC curve method assumes that both the disease status and the marker value for each individual remain constant over time. In real-world settings, however, this is often not the case. A person who is disease-free at an earlier stage of a study may develop the disease later as the follow-up period continues, and the value of their diagnostic marker can also change from its baseline measurement during this time. Because of this, it can be more appropriate to use a time-dependent ROC curve that accounts for changes over time (Kamarudin et al., 2017: p. 1).
+
+When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017: p. 2).
+
+The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017: p. 2).
+
+In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017: p. 2).
+
+For a given threshold $c$, the time-dependent sensitivity and specificity are defined as:
+
+$$
+Se(c,t) = P(X_i > c \mid D_i(t) = 1)
+$$
+
+$$
+Sp(c,t) = P(X_i \le c \mid D_i(t) = 0)
+$$
+
+Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting the time-dependent sensitivity $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds $c$ (Kamarudin et al., 2017: p. 2).
+
+The time-dependent area under the curve (AUC) is then defined as:
+
+$$
+AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)]
+$$
 
 # Data
 
@@ -616,6 +642,8 @@ Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z
 
 Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Frontiers in big data*, 5(1), 812725. <https://doi.org/10.3389/fdata.2022.812725>
 
+Kamarudin, A. N., Cox, T., & Kolamunnage-Dona, R. (2017). Time-dependent ROC curve analysis in medical research: Current methods and applications. BMC Medical Research Methodology, 17, 53. <https://doi.org/10.1186/s12874-017-0332-6>
+
 Kyheng, M., Babykina, G., & Duhamel, A. (2025). Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research. *Stat Med*, 44(8-9):e70047. [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.
 
 Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019). Association Between Longitudinal Plasma Neurofilament Light and Neurodegeneration in Patients With Alzheimer Disease. *JAMA neurology*, 76(7), 791-799. <https://doi.org/10.1001/jamaneurol.2019.0765>
@@ -645,6 +673,8 @@ World Health Organization (2025). *Dementia*. [https://www.who.int/news-room/fac
 Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
 
 Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
+
+Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). Statistical evaluation of diagnostic performance: Topics in ROC analysis (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b11031>
 
 # Appendix
 
@@ -2712,4 +2742,211 @@ postprob(mult_jlcmm_m1)
 summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-## Comparing models
+# Comparing models
+
+*For the Cox PH models = using timeROC, from the package timeROC*
+
+*For the joint models = using tvAUC, from the package JMbayes2*
+
+*OBS! För att detta ska funka verkar det krävas att alla modeller skapas utifrån samma surv_data och long_data (inte separata surv_data_ptau, surv_data_nfl, osv.), med samma baseline, så koden är ur-hashtaggad sålänge! Funkar då i alla fall*
+
+-   *--\> Ett tecken på att vi inte borde ha 3 separata surv_data, att det är fel –\> vi borde ha en enda baseline*
+
+```{r}
+#library(timeROC)
+#library(JMbayes2)
+#library(ggplot2)
+```
+
+## Defining evaluation time points for time-dependent AUC comparison
+
+```{r}
+# We define evaluation time points for time-dependent AUC comparison
+# times <- seq(1, 10, by = 0.5)
+```
+
+## Time-dependent AUC for fitted Cox PH models 
+
+```{r}
+# We define a function to compute time-dependent AUC for Cox models using timeROC
+# We use the linear predictor as the risk score and survival outcome from the dataset
+#get_cox_auc <- function(model, data, times) {
+#  
+#  # We extract survival outcome variables
+#  T <- data$time_to_event
+#  delta <- data$event
+#  
+#  # We compute the linear predictor from the Cox model
+#  lp <- predict(model, newdata = data, type = "lp")
+#  
+#  # We compute time-dependent AUC using timeROC
+#  auc <- timeROC(
+#    T = T,
+#    delta = delta,
+#    marker = lp,
+#    cause = 1,
+#    times = times,
+#    iid = TRUE
+#  )$AUC
+#  
+#  return(auc)
+#}
+```
+
+```{r}
+# We compute time-dependent AUC for Cox model with p-tau181
+#auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, surv_data, times)
+#
+# We compute time-dependent AUC for Cox model with NfL
+#auc_nfl_bl  <- get_cox_auc(surv_model_nfl_bl, surv_data, times)
+#
+# We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
+#auc_both_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
+```
+
+## Time-dependent AUC for fitted joint models 
+
+*From: <https://cloud.r-project.org/web/packages/JMbayes2/JMbayes2.pdf>*
+
+*The function tvAUC requires the following:*
+
+-   *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
+
+```{r}
+# We create a unified longitudinal + survival dataset for prediction
+#newdata <- long_data %>%
+#  left_join(
+#    surv_data %>% select(RID, age_at_baseline, time_to_event, event),
+#    by = "RID"
+#  )
+
+# We create the p-tau181 specific prediction dataset 
+#newdata_ptau <- newdata %>%
+#  select(
+#    RID,
+#    time_years_ptau,
+#    log_PLASMAPTAU181,
+#    PTGENDER,
+#    APOE4_status,
+#    age_at_baseline,
+#    time_to_event,
+#    event
+#  )
+
+# We create the NfL specific prediction dataset 
+#newdata_nfl <- newdata %>%
+#  select(
+#    RID,
+#    time_years_nfl,
+#    log_PLASMA_NFL,
+#    PTGENDER,
+#    APOE4_status,
+#    age_at_baseline,
+#    time_to_event,
+#    event
+#  )
+
+# We create a combined prediction dataset for a multivariate joint model
+#newdata_multi <- newdata %>%
+#  select(
+#    RID,
+#    time_years_ptau,
+#    log_PLASMAPTAU181,
+#    time_years_nfl,
+#    log_PLASMA_NFL,
+#    PTGENDER,
+#    APOE4_status,
+#    age_at_baseline,
+#    time_to_event,
+#    event
+#  )
+```
+
+```{r}
+# We define a function to compute time-dependent AUC for joint models using tvAUC
+# We extract the AUC value from the tvAUC output for each horizon time point
+#get_jm_auc <- function(model, newdata, times) {
+#  
+#  aucs <- sapply(times, function(t) {
+#    
+#    tmp <- tvAUC(
+#      model,
+#      newdata = newdata,
+#      Tstart = 0,
+#      Thoriz = t
+#    )
+#    
+#    tmp$auc   
+#  })
+#  
+#  return(as.numeric(aucs))
+#}
+```
+
+```{r}
+# We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
+#auc_ptau_jm <- get_jm_auc(
+#  joint_model_ptau,
+#  newdata_ptau,
+#  times
+#)
+#
+# We compute time-dependent AUC for the joint model including NfL using tvAUC
+#auc_nfl_jm <- get_jm_auc(
+#  joint_model_nfl,
+#  newdata_nfl,
+#  times
+#)
+#
+# We compute time-dependent AUC for the multivariate joint model using tvAUC
+#auc_multi_jm <- get_jm_auc(
+#  multi_joint_model,
+#  newdata_multi,
+#  times
+#)
+```
+
+## Table of the results 
+
+```{r}
+# We summarize time-dependent AUC (3, 5, and 10 years) for Cox and joint models in a single results table
+#results <- data.frame(
+#  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL", "JM both"),
+#  
+#  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1], auc_multi_jm[1]),
+#  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2], auc_multi_jm[2]),
+#  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3], auc_multi_jm[3])
+#)
+#
+#results[, -1] <- round(results[, -1], 3)
+#
+#results
+```
+
+## Plot of the results 
+
+```{r}
+# We reshape AUC results into long format for plotting
+#plot_data <- data.frame(
+#  Time = rep(times, times = 5),
+#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL"), each = length(times)),
+#  AUC = c(
+#    auc_ptau_bl,   
+#    auc_nfl_bl,    
+#    auc_both_bl,
+#    auc_ptau_jm,
+#    auc_nfl_jm
+#  )
+#)
+#
+# Plot
+#ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+#  geom_line(linewidth = 1) +
+#  geom_point(size = 2) +
+#  ylim(0, 1) +
+#  labs(
+#    title = "Time-dependent AUC comparison",
+#    x = "Time (years)",
+#    y = "AUC"
+#  )
+```
