@@ -529,7 +529,7 @@ The variables of interest were all retrieved from the ADNIMERGE2 package, found 
 
 Inclusion/exclusion criteria
 
-The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals with three cohorts with a final diagnosis of cognitively normal (CN) participants (n = 358), participants with mild cogntive impairment (MCI, n = 421) and with dementia due to AD (n = 411). Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768 with final diagnoses of CN (n = 241), MCI (290) or AD dementia (n = 237).
+The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals with three cohorts with a final diagnosis of cognitively normal (CN) participants (n = 358), participants with mild cogntive impairment (MCI, n = 421) and with dementia due to AD (n = 411). Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768 with final diagnoses of CN (n = 241), MCI (290) or AD dementia (n = 237). In the reduced sample size, 67 individuals were included who had dementia diagnoses at baseline and 178 individuals transitioned from either CN or MCI to AD dementia.
 
 **REPORT ON TRANSITIONS...**
 
@@ -877,7 +877,7 @@ table((surv_data %>% group_by(RID) %>% filter(EXAMDATE_dx == last(EXAMDATE_dx)) 
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
 long_data <- long_data %>% filter(RID %in% keep)
 surv_data <- surv_data %>% filter(RID %in% keep)
 
@@ -979,6 +979,36 @@ long_data <- long_data %>%
 #   group_by(RID) %>%
 #   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
 #   ungroup()
+```
+
+### Filtering observations from diagnosis data which occur before biomarker baseline for survival data
+
+-   if the dx EXAMDATE is 50 days before the biomarker baseline_date then we remove these observations
+-   create a baseline_dx variable to time_to_event is 0 for those with a prior dementia dx
+
+```{r}
+# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
+# creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
+test <- diagnosis_data %>%
+  merge(
+    long_data %>% dplyr::select(RID, baseline_date), by = "RID") %>%
+  filter(EXAMDATE - baseline_date >= -50) %>%
+  distinct() %>%
+  group_by(RID) %>%
+  arrange(EXAMDATE) %>%
+  mutate(
+    baseline_dx = first(DIAGNOSIS),
+    last_dx = last(DIAGNOSIS)
+  ) %>%
+  dplyr::select(!baseline_date)
+```
+
+```{r}
+# We add _dx on the diagnosis variables 
+test <- test %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, baseline_dx, last_dx, DIAGNOSIS))
+
+test <- test %>% merge(long_data, by = c("RID"))
 ```
 
 # ...
@@ -1293,17 +1323,45 @@ surv_data_nfl <- merge(surv_data_nfl,
 
 # ---
 
-Suggestion of how to deal with early dx from latent class file:
+```{r}
+surv_test <- test %>%
+  group_by(RID) %>%
+  summarise(
+#     carrying these forward to check events and event times are coded correctly
+    baseline_dx = unique(baseline_dx),
+    last_dx = unique(last_dx),
+    
+#     baseline EXAMDATE defined as the earlier biomarker EXAMDATE (nfl or ptau)
+    baseline = min(c(
+      min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+      min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])),
+      na.rm = TRUE),
+    
+#     age at baseline visit
+    age_at_baseline = age_at_visit[
+      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
+      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      ][1],
 
--   if the dx EXAMDATE is 50 days before the biomarker baseline_date then we remove these observations
+#     last dx/nfl/ptau exam
+      last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+
+#     1 = dementia, 0 = otherwise
+      event = as.integer(any(DIAGNOSIS == "Dementia")),
+
+#     0 if dementia dx at baseline, otherwise time to dementia dx or date of censuring
+      time_to_event = case_when(
+        event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
+        event == 1 & unique(baseline_dx) != "Dementia" ~
+          as.numeric(min(EXAMDATE_dx[DIAGNOSIS == "Dementia"]) - baseline)/365,
+        TRUE ~
+          as.numeric(last_followup - baseline)/365))
+```
 
 ```{r}
-# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
-# test <- surv_data %>%
-#   merge(
-#     long_data %>% dplyr::select(RID, baseline_date), by = "RID") %>%
-#   filter(EXAMDATE_dx - baseline_date >= -50) %>%
-#   distinct()
+# extracting number of events with time_to_event != 0
+table((surv_test %>% filter(time_to_event > 0))$event)
+table((surv_test %>% filter(time_to_event == 0))$event)
 ```
 
 # ---
