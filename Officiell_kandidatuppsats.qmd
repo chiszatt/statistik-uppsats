@@ -783,6 +783,21 @@ ptau_data <- ptau_data %>%
 grep("381_S_10###", diagnosis_data$PTID)
 ```
 
+## Checking which obs have double VISCODE2 codes
+
+```{r}
+# for ptau data
+ptau_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
+
+# for nfl data
+nfl_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
+
+# changing VISCODE2 for RID 1097 to m60_1 and m60_2
+ptau_data[ptau_data$RID == 1097, "VISCODE2"] <- c("m48", "m60_2", "m60_1")
+
+nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
+```
+
 ## Selection and merging of required variables
 
 ```{r, warning=FALSE}
@@ -990,7 +1005,7 @@ head(long_data_test$time_diff)
 long_data <- long_data %>%
   group_by(RID) %>%
   mutate(
-    EXAMDATE = EXAMDATE_nfl + (EXAMDATE_nfl - EXAMDATE_ptau),
+    EXAMDATE = EXAMDATE_ptau + 0.5 * (EXAMDATE_nfl - EXAMDATE_ptau),
     baseline_date = min(EXAMDATE)) %>%
   ungroup()
 ```
