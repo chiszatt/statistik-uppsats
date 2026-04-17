@@ -8,7 +8,7 @@ editor: visual
 
 (Baseline här = första biomarkörs-datumet (oavsett ptau eller nfl), INTE första diagnosstatus-datumet, som vi har i officiella dokumentet)
 
-```{r}
+```{r, warning=FALSE}
 library(dplyr)
 library(JMbayes2)
 library(lme4) # decide which package will we use for lme
@@ -500,7 +500,9 @@ library(JMbayes2)
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
-times <- c(3, 5, 10)
+#times <- c(1, 3, 5, 7, 10)
+
+times <- seq(1, 10, by = 0.5)
 ```
 
 ## For the Cox PH models
@@ -544,9 +546,11 @@ auc_both_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
 
 ## For the joint models
 
-Från: <https://cloud.r-project.org/web/packages/JMbayes2/JMbayes2.pdf>
+From: <https://cloud.r-project.org/web/packages/JMbayes2/JMbayes2.pdf>
 
-The funcition tvAUC requires "newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."
+The funcition tvAUC requires the following:
+
+-   "newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."
 
 ```{r}
 # We create a unified longitudinal + survival dataset for prediction
@@ -664,3 +668,30 @@ results
 ```
 
 Behövs även för latent class joint models
+
+```{r}
+library(ggplot2)
+
+# We reshape AUC results into long format for plotting
+plot_data <- data.frame(
+  Time = rep(times, times = 5),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL"), each = length(times)),
+  AUC = c(
+    auc_ptau_bl,   
+    auc_nfl_bl,    
+    auc_both_bl,
+    auc_ptau_jm,
+    auc_nfl_jm
+  )
+)
+
+ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
+```
