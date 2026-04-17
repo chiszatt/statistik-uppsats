@@ -667,21 +667,20 @@ results[, -1] <- round(results[, -1], 3)
 results
 ```
 
-Behövs även för latent class joint models
-
 ```{r}
 library(ggplot2)
 
 # We reshape AUC results into long format for plotting
 plot_data <- data.frame(
-  Time = rep(times, times = 5),
-  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL"), each = length(times)),
+  Time = rep(times, times = 6),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM both"), each = length(times)),
   AUC = c(
     auc_ptau_bl,   
     auc_nfl_bl,    
     auc_both_bl,
     auc_ptau_jm,
-    auc_nfl_jm
+    auc_nfl_jm,
+    auc_multi_jm
   )
 )
 
@@ -695,3 +694,5 @@ ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
     y = "AUC"
   )
 ```
+
+Behövs även för latent class joint models
