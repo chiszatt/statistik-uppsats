@@ -2353,7 +2353,7 @@ ggplot(pp, aes(prob1, prob2)) +
 ## Comparing M0 and M1
 
 ```{r}
-summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(hlme_m0_2, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # LCMM: PTAU
@@ -2484,7 +2484,7 @@ ggplot(pp, aes(prob1, prob2)) +
 summarytable(hlme_m0_1, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
@@ -2621,7 +2621,7 @@ ggplot(pp, aes(prob1, prob2)) +
 summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
@@ -2743,7 +2743,7 @@ ggplot(pp, aes(prob1, prob2)) +
 summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
@@ -2940,7 +2940,7 @@ cannot run LT tests on different class models (1 class vs 2 class) as they are n
 summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
@@ -3102,7 +3102,7 @@ plot(jlcmm_m1, var.time = "time_years_nfl", which = "fit")
 summarytable(jlcmm_m0_2, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
@@ -3199,7 +3199,7 @@ plot(jlcmm_m1, var.time = "time_years_ptau", which = "fit")
 summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
-### Adjusted LRT 
+### Adjusted LRT
 
 ```{r}
 
