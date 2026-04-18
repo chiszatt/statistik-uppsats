@@ -783,9 +783,8 @@ ptau_data <- ptau_data %>%
 grep("381_S_10###", diagnosis_data$PTID)
 ```
 
-## Checking which obs have double VISCODE2 codes
-
 ```{r}
+## Checking which obs have double VISCODE2 codes
 # for ptau data
 ptau_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
 
@@ -796,6 +795,145 @@ nfl_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
 ptau_data[ptau_data$RID == 1097, "VISCODE2"] <- c("m48", "m60_2", "m60_1")
 
 nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
+```
+
+Replacing visits with double measurements with visits with mean-value of the measurements
+
+```{r}
+# We check how many individuals have more than one measurement at a single visit 
+# For p-tau181 
+ptau_data %>%
+  summarise(n_obs = n(), .by = c(RID, EXAMDATE)) %>%
+  count(n_obs)
+
+# For NfL
+nfl_data %>%
+  summarise(n_obs = n(), .by = c(RID, EXAMDATE)) %>%
+  count(n_obs)
+```
+
+```{r}
+# We extract visits with duplicate measurements 
+# For p-tau181 visits
+ptau_two <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() > 1) %>%   
+  arrange(RID, EXAMDATE) %>%
+  mutate(row_in_pair = row_number()) %>%
+  ungroup()
+
+# For NfL visits
+nfl_two <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  filter(n() > 1) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(row_in_pair = row_number()) %>%
+  ungroup()
+
+```
+
+```{r}
+# We extract the first measurement within each visit 
+# For p-tau181 visits
+ptau_first <- ptau_two %>%
+  filter(row_in_pair == 1)
+
+# For NfL visits
+nfl_first <- nfl_two %>%
+  filter(row_in_pair == 1)
+```
+
+```{r}
+# We extract the last measurement within each visit 
+# For p-tau181 visits
+ptau_last <- ptau_two %>%
+  filter(row_in_pair == 2)
+
+# For NfL visits
+nfl_last <- nfl_two %>%
+  filter(row_in_pair == 2)
+```
+
+```{r}
+# We compute the mean value per visit for p-tau181
+ptau_mean <- ptau_two %>%
+  group_by(RID, EXAMDATE) %>%
+  summarise(
+    PLASMAPTAU181 = mean(PLASMAPTAU181, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# We compute the mean value per visit for NfL
+nfl_mean <- nfl_two %>%
+  group_by(RID, EXAMDATE) %>%
+  summarise(
+    PLASMA_NFL = mean(PLASMA_NFL, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r}
+# We compare different handling methods (first, mean, last) of duplicate measurements for p-tau181 for a single individual (RID = 31)
+ptau_compare_31 <- bind_rows(
+  ptau_first %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
+    mutate(version = "first"),
+
+  ptau_mean %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
+    mutate(version = "mean"),
+
+  ptau_last %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
+    mutate(version = "last")
+) %>%
+  arrange(EXAMDATE, version)
+
+ptau_compare_31
+```
+
+```{r}
+# We compare different handling methods (first, mean, last) of duplicate measurements for NfL for a single individual (RID = 31)
+nfl_compare_31 <- bind_rows(
+  nfl_first %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
+    mutate(version = "first"),
+
+  nfl_mean %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
+    mutate(version = "mean"),
+
+  nfl_last %>% 
+    filter(RID == 31) %>% 
+    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
+    mutate(version = "last")
+) %>%
+  arrange(EXAMDATE, version)
+
+nfl_compare_31
+```
+
+For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses will be performed to evaluate the robustness of the findings.
+
+```{r}
+# We remove duplicate visits (those identified in ptau_two) from the original dataset
+ptau_no_dups <- ptau_data %>%
+  anti_join(ptau_two %>% distinct(RID, EXAMDATE),
+            by = c("RID", "EXAMDATE"))
+
+# We remove duplicate visits (those identified in nfl_two) from the original dataset
+nfl_no_dups <- nfl_data %>%
+  anti_join(nfl_two %>% distinct(RID, EXAMDATE),
+            by = c("RID", "EXAMDATE"))
+
+# We add back mean values for previously duplicated visits
+ptau_data <- bind_rows(ptau_no_dups, ptau_mean)
+nfl_data <- bind_rows(nfl_no_dups, nfl_mean)
 ```
 
 ## Selection and merging of required variables
@@ -1635,7 +1773,7 @@ testResiduals(lognormal_residuals_nfl)
 student_residuals_nfl <- simulateResiduals(fit_student_nfl)
 testResiduals(student_residuals_nfl)
 
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
 ```
 
 ## For separate joint models
