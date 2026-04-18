@@ -1887,28 +1887,11 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 ## For the different cox PH models and the separate joint models
 
-### Survival objects
-
-```{r}
-# We create a Surv object: time and event
-# For p-tau181
-surv_object_ptau <- Surv(
-  time = surv_data_ptau$time_to_event_ptau,
-  event = surv_data_ptau$event_ptau
-)
-
-# For NfL
-surv_object_nfl <- Surv(
-  time = surv_data_nfl$time_to_event_nfl, 
-  event = surv_data_nfl$event_nfl
-)
-```
-
 ### Construction of Kaplan-Meier curves, just to look
 
 ```{r}
 # We fit Kaplan-Meier curve for p-tau181
-km_fit_ptau <- survfit(surv_object_ptau ~ 1, data = surv_data_ptau)
+km_fit_ptau <- survfit(Surv(time_to_event_ptau, event_ptau) ~ 1, data = surv_data_ptau)
 # Plot
 plot(
   km_fit_ptau, 
@@ -1918,7 +1901,7 @@ plot(
 )
 
 # We fit Kaplan-Meier curve for NfL
-km_fit_nfl <- survfit(surv_object_nfl ~ 1, data = surv_data_nfl)
+km_fit_nfl <- survfit(Surv(time_to_event_nfl, event_nfl) ~ 1, data = surv_data_nfl)
 # Plot
 plot(
   km_fit_nfl, 
@@ -1957,7 +1940,7 @@ summary(surv_model_nfl)
 # Cox survival-models, with covariates including baseline values of each biomarker 
 # For p-tau181
 surv_model_ptau_bl <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau,
+  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau,
   data = surv_data_ptau
 )
 
@@ -1965,7 +1948,7 @@ summary(surv_model_ptau_bl)
 
 # For NfL
 surv_model_nfl_bl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl,
+  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl,
   data = surv_data_nfl
 )
 
@@ -1973,7 +1956,7 @@ surv_model_nfl_bl <- coxph(
 
 # For p-tau181 including NfL 
 surv_model_both1_bl <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
   data = surv_data_ptau
 )
 
@@ -1981,7 +1964,7 @@ surv_model_both1_bl <- coxph(
 
 # For NfL including p-tau181 
 surv_model_both2_bl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl + baseline_value_ptau,
+  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl + baseline_value_ptau,
   data = surv_data_nfl
 )
 
@@ -2017,7 +2000,7 @@ surv_data_nfl$APOE4_num <- as.numeric(surv_data_nfl$APOE4_status) - 1
 
 # We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
 surv_model_ptau_tv <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_num),
+  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_num),
   data = surv_data_ptau,
   tt = function(x, t, ...) x * log(t)
 )
@@ -2026,7 +2009,7 @@ surv_model_ptau_tv <- coxph(
 
 # We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
 surv_model_nfl_tv <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_num),
+  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_num),
   data = surv_data_nfl,
   tt = function(x, t, ...) x * log(t)
 )
@@ -2038,20 +2021,11 @@ Although tests of the proportional hazards assumption indicated evidence of non-
 
 ## For the multivariate joint model
 
-### Survival object with global event, time_to_event and age_at_baseline
-
-```{r}
-surv_object_multi <- Surv(
-  time = surv_data_multi$time_to_event, 
-  event = surv_data_multi$event
-  )
-```
-
 ### Kaplan-Meier curve for global version of survival object
 
 ```{r}
 # We fit Kaplan-Meier curve for global version of survival object
-km_fit_multi <- survfit(surv_object_multi ~ 1, data = surv_data)
+km_fit_multi <- survfit(Surv(time_to_event, event) ~ 1, data = surv_data)
 # Plot
 plot(
   km_fit_multi, 
@@ -2065,7 +2039,7 @@ plot(
 
 ```{r}
 surv_model_multi <- coxph(
-  surv_object_multi ~ age_at_baseline + PTGENDER + APOE4_status,
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
   data = surv_data_multi
 )
 
