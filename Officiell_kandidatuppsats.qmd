@@ -82,20 +82,20 @@ library(lcmm)
 # Loading data
 #Milou
 # # NfL data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
-# P-tau181 data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
-# Diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-# Demographics data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-# Apoe data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe <- APOERES
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+# # Diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# # Demographics data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+# # Apoe data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe <- APOERES
 ```
 
 ```{r}
@@ -1368,6 +1368,8 @@ surv_data_nfl <- merge(surv_data_nfl,
 
 # ---
 
+Test for survival data without earl diagnosis data and setting time to event = 0 if indivdual had dementia at start
+
 ```{r}
 surv_test <- test %>%
   group_by(RID) %>%
@@ -2160,7 +2162,7 @@ hlme_m1 <- hlme(
     classmb = ~ 1,
     ng = 2,
     data = long_data_nfl,
-    B = random(hlme_m0)
+    B = random(hlme_m0_2)
   )
 
 summary(hlme_m1)
@@ -2344,6 +2346,12 @@ ggplot(pp, aes(prob1, prob2)) +
 summarytable(hlme_m0_1, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
+### Adjusted LRT 
+
+```{r}
+
+```
+
 # LCMM: NFL (including classmb covariates)
 
 Latent class mixed models for NFL including covariates in the class model
@@ -2475,19 +2483,10 @@ ggplot(pp, aes(prob1, prob2)) +
 summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
+### Adjusted LRT 
+
 ```{r}
-# log likelihood for the full model
-l = hlme_m1$loglik
 
-# log likelihood for the reduced model
-l_0 = hlme_m0$loglik
-
-# computing the LR test statistic
-LR = - 2 * (l_0 - l)
-
-# computing the p-value given the null hypothesis is true (the reduced model is the true model)
-pchisq(LR, 2, lower.tail = FALSE)
-LR
 ```
 
 # LCMM: PTAU (including classmb covariates)
@@ -2604,6 +2603,12 @@ ggplot(pp, aes(prob1, prob2)) +
 
 ```{r}
 summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT 
+
+```{r}
+
 ```
 
 # MLCMM: NFL & PTAU
@@ -2797,6 +2802,12 @@ cannot run LT tests on different class models (1 class vs 2 class) as they are n
 summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
+### Adjusted LRT 
+
+```{r}
+
+```
+
 # JLCMM: NFL
 
 1.  Posterior probabilities show good classification
@@ -2953,6 +2964,12 @@ plot(jlcmm_m1, var.time = "time_years_nfl", which = "fit")
 summarytable(jlcmm_m0_2, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
+### Adjusted LRT 
+
+```{r}
+
+```
+
 # JLCMM: PTAU
 
 ```{r}
@@ -3034,7 +3051,7 @@ plot(jlcmm_m1, which = "survival")
 ### Longitudinal trajectories by class
 
 ```{r}
-# survival curves by class
+# longitudnal trajectories by class
 plot(jlcmm_m1, var.time = "time_years_ptau", which = "fit")
 ```
 
@@ -3042,6 +3059,12 @@ plot(jlcmm_m1, var.time = "time_years_ptau", which = "fit")
 
 ```{r}
 summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT 
+
+```{r}
+
 ```
 
 ## M2 (3 latent classes)
@@ -3056,7 +3079,9 @@ summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 
 4.  *CLass 2 and 3 are not cleanly separated (look at posterior probabilities)*
 
-5.  *Plot survival curves (how?)*
+5.  Weibull class 3 parameters not significant at 0.05 level
+
+6.  *Plot survival curves (how?)*
 
 ### gridsearch()
 
@@ -3078,25 +3103,41 @@ summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 ```{r}
-#jlcmm_m2 <- jlcmm(
-  #fixed = log_PLASMAPTAU181 ~ time_years_ptau,
-  #random = ~ 1,
-  #mixture = ~ 1,
-  #classmb = ~ 1,
-  #ng = 3,
-  #subject = "RID",
-  #survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-  #data = jlcmm_data_ptau,
-  #B = random(jlcmm_m0)
-#)
+jlcmm_m2 <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  random = ~ 1,
+  mixture = ~ 1,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
+  data = jlcmm_data_ptau,
+  B = random(jlcmm_m0)
+  )
 ```
 
 ```{r}
-#summary(jlcmm_m2)
+summary(jlcmm_m2)
 ```
 
 ```{r}
-#postprob(jlcmm_m2)
+postprob(jlcmm_m2)
+```
+
+## Visualisation
+
+### Survival curves by class
+
+```{r}
+# survival curves by class
+plot(jlcmm_m2, which = "survival")
+```
+
+### Longitudinal trajectories by class
+
+```{r}
+# longitudnal trajectories by class
+plot(jlcmm_m2, var.time = "time_years_ptau", which = "fit")
 ```
 
 ## Comparing M0, M1, M3
@@ -3146,6 +3187,17 @@ mlcmm_m1 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
+  data = jlcmm_data_multi,
+  B = random(mlcmm_m0)
+)
+
+mlcmm_m2 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  mixture = ~ time_years,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 3,
   data = jlcmm_data_multi,
   B = random(mlcmm_m0)
 )
@@ -3224,6 +3276,43 @@ plot(mult_jlcmm_m1, which = "survival")
 
 ```{r}
 summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+## M2 (3 latent classes)
+
+```{r}
+mult_jlcmm_m2 <- mpjlcmm(
+  longitudinal = list(mlcmm_m2),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 3,
+  data = jlcmm_data_multi,
+  B = random(mult_jlcmm_m0)
+  )
+```
+
+```{r}
+summary(mult_jlcmm_m2)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(mult_jlcmm_m2)
+```
+
+## Visualisation
+
+### Survival curves by class
+
+```{r}
+# survival curves by class
+plot(mult_jlcmm_m2, which = "survival")
+```
+
+```{r}
+# # longitudnal trajectories by class
+# plot(mult_jlcmm_m2, var.time = "time_years", which = "fit")
 ```
 
 ## TO DO
