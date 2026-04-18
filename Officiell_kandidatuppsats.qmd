@@ -1932,7 +1932,7 @@ plot(
 # Cox survival-models, with covariates
 # For p-tau181
 surv_model_ptau <- coxph(
-  surv_object_ptau ~ age_at_baseline_ptau + PTGENDER + APOE4_status,
+  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status,
   data = surv_data_ptau,
   x = TRUE
 )
@@ -1941,7 +1941,7 @@ summary(surv_model_ptau)
 
 # For NfL
 surv_model_nfl <- coxph(
-  surv_object_nfl ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
+  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
   data = surv_data_nfl,
   x = TRUE
 )
@@ -3385,16 +3385,16 @@ Bootstrap LRT???
 -   *--\> Ett tecken på att vi inte borde ha 3 separata surv_data, att det är fel –\> vi borde ha en enda baseline*
 
 ```{r}
-#library(timeROC)
-#library(JMbayes2)
-#library(ggplot2)
+library(timeROC)
+library(JMbayes2)
+library(ggplot2)
 ```
 
 ## Defining evaluation time points for time-dependent AUC comparison
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
-# times <- seq(1, 10, by = 0.5)
+#times <- seq(1, 10, by = 0.5)
 ```
 
 ## Time-dependent AUC for fitted Cox PH models
@@ -3402,38 +3402,64 @@ Bootstrap LRT???
 ```{r}
 # We define a function to compute time-dependent AUC for Cox models using timeROC
 # We use the linear predictor as the risk score and survival outcome from the dataset
-#get_cox_auc <- function(model, data, times) {
-#  
-#  # We extract survival outcome variables
-#  T <- data$time_to_event
-#  delta <- data$event
-#  
-#  # We compute the linear predictor from the Cox model
-#  lp <- predict(model, newdata = data, type = "lp")
-#  
-#  # We compute time-dependent AUC using timeROC
-#  auc <- timeROC(
-#    T = T,
-#    delta = delta,
-#    marker = lp,
-#    cause = 1,
-#    times = times,
-#    iid = TRUE
-#  )$AUC
-#  
-#  return(auc)
-#}
+get_cox_auc <- function(model, data, times, time_var, event_var) {
+  
+  # Extracting survival outcome variables dynamically
+  T <- data[[time_var]]
+  delta <- data[[event_var]]
+  
+  # Linear predictor
+  lp <- predict(model, newdata = data, type = "lp")
+  
+  # Time-dependent AUC
+  auc <- timeROC(
+    T = T,
+    delta = delta,
+    marker = lp,
+    cause = 1,
+    times = times,
+    iid = TRUE
+  )$AUC
+  
+  return(auc)
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for Cox model with p-tau181
-#auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, surv_data, times)
-#
+auc_ptau_bl <- get_cox_auc(
+  surv_model_ptau_bl,
+  surv_data_ptau,
+  times,
+  time_var = "time_to_event_ptau",
+  event_var = "event_ptau"
+)
+
 # We compute time-dependent AUC for Cox model with NfL
-#auc_nfl_bl  <- get_cox_auc(surv_model_nfl_bl, surv_data, times)
-#
+auc_nfl_bl <- get_cox_auc(
+  surv_model_nfl_bl,
+  surv_data_nfl,
+  times,
+  time_var = "time_to_event_nfl",
+  event_var = "event_nfl"
+)
+
 # We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
-#auc_both_bl  <- get_cox_auc(surv_model_both_bl, surv_data, times)
+auc_both1_bl <- get_cox_auc(
+  surv_model_both1_bl,
+  surv_data_ptau,
+  times,
+  time_var = "time_to_event_ptau",
+  event_var = "event_ptau"
+)
+
+auc_both2_bl <- get_cox_auc(
+  surv_model_both2_bl,
+  surv_data_nfl,
+  times,
+  time_var = "time_to_event_nfl",
+  event_var = "event_nfl"
+)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -3445,97 +3471,71 @@ Bootstrap LRT???
 -   *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
 
 ```{r}
-# We create a unified longitudinal + survival dataset for prediction
-#newdata <- long_data %>%
-#  left_join(
-#    surv_data %>% select(RID, age_at_baseline, time_to_event, event),
-#    by = "RID"
-#  )
+# We construct prediction datasets for each joint model by merging the corresponding longitudinal and survival data
+newdata_ptau <- long_data_ptau %>%
+  left_join(
+    surv_data_ptau %>%
+      dplyr::select(RID, age_at_baseline_ptau, time_to_event_ptau, event_ptau),
+    by = "RID"
+  )
 
-# We create the p-tau181 specific prediction dataset 
-#newdata_ptau <- newdata %>%
-#  select(
-#    RID,
-#    time_years_ptau,
-#    log_PLASMAPTAU181,
-#    PTGENDER,
-#    APOE4_status,
-#    age_at_baseline,
-#    time_to_event,
-#    event
-#  )
+newdata_nfl <- long_data_nfl %>%
+  dplyr::left_join(
+    surv_data_nfl %>%
+      dplyr::select(RID, age_at_baseline_nfl, time_to_event_nfl, event_nfl),
+    by = "RID"
+  )
 
-# We create the NfL specific prediction dataset 
-#newdata_nfl <- newdata %>%
-#  select(
-#    RID,
-#    time_years_nfl,
-#    log_PLASMA_NFL,
-#    PTGENDER,
-#    APOE4_status,
-#    age_at_baseline,
-#    time_to_event,
-#    event
-#  )
-
-# We create a combined prediction dataset for a multivariate joint model
-#newdata_multi <- newdata %>%
-#  select(
-#    RID,
-#    time_years_ptau,
-#    log_PLASMAPTAU181,
-#    time_years_nfl,
-#    log_PLASMA_NFL,
-#    PTGENDER,
-#    APOE4_status,
-#    age_at_baseline,
-#    time_to_event,
-#    event
-#  )
+newdata_multi <- long_data_multi %>%
+  dplyr::left_join(
+    surv_data_multi %>%
+      dplyr::select(RID, age_at_baseline, time_to_event, event),
+    by = "RID"
+  )
 ```
 
 ```{r}
 # We define a function to compute time-dependent AUC for joint models using tvAUC
-# We extract the AUC value from the tvAUC output for each horizon time point
-#get_jm_auc <- function(model, newdata, times) {
-#  
-#  aucs <- sapply(times, function(t) {
-#    
-#    tmp <- tvAUC(
-#      model,
-#      newdata = newdata,
-#      Tstart = 0,
-#      Thoriz = t
-#    )
-#    
-#    tmp$auc   
-#  })
-#  
-#  return(as.numeric(aucs))
-#}
+#We extract the AUC value from the tvAUC output for each horizon time point
+get_jm_auc <- function(model, newdata, times) {
+  
+  aucs <- sapply(times, function(t) {
+    
+    tmp <- tvAUC(
+      model,
+      newdata = newdata,
+      Tstart = 0,
+      Thoriz = t
+    )
+    
+    tmp$auc   
+  })
+  
+  return(as.numeric(aucs))
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
-#auc_ptau_jm <- get_jm_auc(
-#  joint_model_ptau,
-#  newdata_ptau,
-#  times
-#)
+auc_ptau_jm <- get_jm_auc(
+  joint_model_ptau,
+  newdata_ptau,
+  times
+)
 #
 # We compute time-dependent AUC for the joint model including NfL using tvAUC
-#auc_nfl_jm <- get_jm_auc(
-#  joint_model_nfl,
-#  newdata_nfl,
-#  times
-#)
-#
+auc_nfl_jm <- get_jm_auc(
+  joint_model_nfl,
+  newdata_nfl,
+  times
+)
+
 # We compute time-dependent AUC for the multivariate joint model using tvAUC
-#auc_multi_jm <- get_jm_auc(
-#  multi_joint_model,
-#  newdata_multi,
-#  times
-#)
+auc_multi_jm <- get_jm_auc(
+  multi_joint_model,
+  newdata_multi,
+  times
+)
 ```
 
 ## Table of the results
@@ -3543,11 +3543,11 @@ Bootstrap LRT???
 ```{r}
 # We summarize time-dependent AUC for Cox and joint models in a single results table
 #results <- data.frame(
-#  Model = c("Cox p-tau181", "Cox NfL", "Cox both", "JM p-tau181", "JM NfL", "JM both"),
+#  Model = c("Cox p-tau181", "Cox NfL", "Cox both1", "Cox both1", "JM p-tau181", "JM NfL", "JM both"),
 #  
-#  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both_bl[1], auc_ptau_jm[1], auc_nfl_jm[1], auc_multi_jm[1]),
-#  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both_bl[2], auc_ptau_jm[2], auc_nfl_jm[2], auc_multi_jm[2]),
-#  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both_bl[3], auc_ptau_jm[3], auc_nfl_jm[3], auc_multi_jm[3])
+#  AUC_3y  = c(auc_ptau_bl[1], auc_nfl_bl[1], auc_both1_bl[1], auc_both2_bl[1], auc_ptau_jm[1], auc_nfl_jm[1], auc_multi_jm[1]),
+#  AUC_5y  = c(auc_ptau_bl[2], auc_nfl_bl[2], auc_both1_bl[2], auc_both2_bl[2], auc_ptau_jm[2], auc_nfl_jm[2], auc_multi_jm[2]),
+#  AUC_10y = c(auc_ptau_bl[3], auc_nfl_bl[3], auc_both1_bl[3], auc_both2_bl[3], auc_ptau_jm[3], auc_nfl_jm[3], auc_multi_jm[3])
 #)
 #
 #results[, -1] <- round(results[, -1], 3)
@@ -3559,26 +3559,27 @@ Bootstrap LRT???
 
 ```{r}
 # We reshape AUC results into long format for plotting
-#plot_data <- data.frame(
-#  Time = rep(times, times = 6),
-#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM both"), each = length(times)),
-#  AUC = c(
-#    auc_ptau_bl,   
-#    auc_nfl_bl,    
-#    auc_both_bl,
-#    auc_ptau_jm,
-#    auc_nfl_jm,
-#    auc_multi_jm
-#  )
-#)
-#
-#ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
-#  geom_line(linewidth = 1) +
-#  geom_point(size = 2) +
-#  ylim(0, 1) +
-#  labs(
-#    title = "Time-dependent AUC comparison",
-#    x = "Time (years)",
-#    y = "AUC"
-#  )
+plot_data <- data.frame(
+  Time = rep(times, times = 7),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both1", "Cox both2", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
+  AUC = c(
+    auc_ptau_bl,   
+    auc_nfl_bl,    
+    auc_both1_bl,
+    auc_both2_bl,
+    auc_ptau_jm,
+    auc_ptau_jm,
+    auc_ptau_jm
+  )
+)
+
+ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
 ```
