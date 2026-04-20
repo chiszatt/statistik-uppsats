@@ -1037,9 +1037,6 @@ diff_examdate <- long_data %>%
   ) %>%
   filter(time_diff != 0) %>%
   relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
-
-# Checking the first observations
-head(diff_examdate)
 ```
 
 ```{r}
@@ -1369,26 +1366,37 @@ long_data_nfl <- long_data %>%
 ### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
-# P-tau181 baseline 
-long_data_ptau_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+# # P-tau181 baseline 
+# long_data_ptau_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+# 
+# baseline_ptau <- long_data_ptau_bl[!duplicated(long_data_ptau$RID),
+#                                 c("RID",
+#                                   "log_PLASMAPTAU181")]
+# 
+# names(baseline_ptau)[2] <- "baseline_value_ptau"
+# 
+# # NfL baseline
+# long_data_nfl_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
+# 
+# baseline_nfl <- long_data_nfl_bl[!duplicated(long_data_nfl$RID),
+#                               c("RID",
+#                                 "log_PLASMA_NFL")]
+# 
+# names(baseline_nfl)[2] <- "baseline_value_nfl"
+# 
+# # We merge the two variables into a baseline table 
+# baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
 
-baseline_ptau <- long_data_ptau_bl[!duplicated(long_data_ptau$RID),
-                                c("RID",
-                                  "log_PLASMAPTAU181")]
-
-names(baseline_ptau)[2] <- "baseline_value_ptau"
-
-# NfL baseline
-long_data_nfl_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
-
-baseline_nfl <- long_data_nfl_bl[!duplicated(long_data_nfl$RID),
-                              c("RID",
-                                "log_PLASMA_NFL")]
-
-names(baseline_nfl)[2] <- "baseline_value_nfl"
-
-# We merge the two variables into a baseline table 
-baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
+# Creating a data frame with the first biomarker measurements
+baseline <- long_data %>% 
+  group_by(RID) %>%
+  arrange(RID, EXAMDATE_nfl) %>% 
+  mutate(baseline_value_nfl = first(log_PLASMA_NFL)) %>%
+  arrange(RID, EXAMDATE_ptau) %>%
+  mutate(baseline_value_ptau = first(log_PLASMAPTAU181)) %>%
+  dplyr::select(RID, baseline_value_ptau, baseline_value_nfl) %>%
+  ungroup() %>%
+  distinct()
 
 # We merge the baseline table with the p-tau181 survival dataset 
 surv_data_ptau <- merge(surv_data_ptau,
@@ -1434,13 +1442,13 @@ surv_data_test <- surv_data_test %>%
       last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
 
 #     1 = dementia, 0 = otherwise
-      event = as.integer(any(DIAGNOSIS == "Dementia")),
+      event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
 
 #     0 if dementia dx at baseline, otherwise time to dementia dx or date of censuring
       time_to_event = case_when(
         event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
         event == 1 & unique(baseline_dx) != "Dementia" ~
-          as.numeric(min(EXAMDATE_dx[DIAGNOSIS == "Dementia"]) - EXAMDATE_baseline)/365,
+          as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - EXAMDATE_baseline)/365,
         TRUE ~
           as.numeric(last_followup - EXAMDATE_baseline)/365))
 ```
