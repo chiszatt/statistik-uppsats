@@ -76,6 +76,7 @@ library(ggplot2)
 library(glmmTMB)
 library(DHARMa) # for running residual diagnostics on GLMM
 library(lcmm)
+library(timeROC)
 ```
 
 ```{r}
@@ -733,8 +734,6 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Pre-processing
 
-## Checking RID with more than one measurement recorded on the same exam date
-
 -   *There are 52 individuals with two measurements recorded on the same exam date.*
 
 -   *How should we deal with these? Average the measurements? Remove the observations?*
@@ -744,44 +743,36 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 -   *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
 
 2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
-
--   *For now, remove them:*
-
-```{r}
-# checking observations with more than one measurement recorded on the same exam date for nfl
-nfl_double <- nfl_data %>%
-  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
-  filter(n > 1L) %>%
-  dplyr::select(RID, EXAMDATE)
-
-# removing the doubled observations
-nfl_data <- nfl_data %>%
-  group_by(RID, EXAMDATE) %>%
-  filter(n() == 1) %>%
-  ungroup()
-
-# checking observations with more than one measurement recorded on the same exam date for ptau
-ptau_double <- ptau_data %>%
-  summarise(n = n(), .by = c(RID, EXAMDATE)) %>%
-  filter(n > 1L)  %>%
-  dplyr::select(RID, EXAMDATE)
-
-# extracting the doubled observations
-# ptau_data %>%
-#    filter(RID %in% ptau_double$RID) %>% 
-#    filter(EXAMDATE %in% ptau_double$EXAMDATE)
-
-# removing the doubled observations
-ptau_data <- ptau_data %>%
-  group_by(RID, EXAMDATE) %>%
-  filter(n() == 1) %>%
-  ungroup()
-```
+3.  
 
 ```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
 grep("381_S_10###", diagnosis_data$PTID)
 ```
+
+## Selection of required variables
+
+```{r, warning=FALSE}
+# We select the required nfl variables
+nfl_data <- nfl_data %>%
+  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+# We select the required ptau variables
+ptau_data <- ptau_data %>%
+  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required diagnosis variables
+diagnosis_data <- diagnosis_data %>%
+  dplyr::select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# We add _dx on the diagnosis variables 
+diagnosis_data <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+```
+
+## Checking RID with more than one measurement recorded on the same exam date
+
+For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses will be performed to evaluate the robustness of the findings.
 
 ```{r}
 ## Checking which obs have double VISCODE2 codes
@@ -800,161 +791,51 @@ nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
 Replacing visits with double measurements with visits with mean-value of the measurements
 
 ```{r}
-# We check how many individuals have more than one measurement at a single visit 
-# For p-tau181 
-ptau_data %>%
-  summarise(n_obs = n(), .by = c(RID, EXAMDATE)) %>%
-  count(n_obs)
+# Naming the mean as the original variable to do analysis first with this method and then sensitivity analysis with the first and last measurements
 
-# For NfL
-nfl_data %>%
-  summarise(n_obs = n(), .by = c(RID, EXAMDATE)) %>%
-  count(n_obs)
-```
-
-```{r}
-# We extract visits with duplicate measurements 
-# For p-tau181 visits
-ptau_two <- ptau_data %>%
-  group_by(RID, EXAMDATE) %>%
-  filter(n() > 1) %>%   
-  arrange(RID, EXAMDATE) %>%
-  mutate(row_in_pair = row_number()) %>%
-  ungroup()
-
-# For NfL visits
-nfl_two <- nfl_data %>%
-  group_by(RID, EXAMDATE) %>%
-  filter(n() > 1) %>%
-  arrange(RID, EXAMDATE) %>%
-  mutate(row_in_pair = row_number()) %>%
-  ungroup()
-
-```
-
-```{r}
-# We extract the first measurement within each visit 
-# For p-tau181 visits
-ptau_first <- ptau_two %>%
-  filter(row_in_pair == 1)
-
-# For NfL visits
-nfl_first <- nfl_two %>%
-  filter(row_in_pair == 1)
-```
-
-```{r}
-# We extract the last measurement within each visit 
-# For p-tau181 visits
-ptau_last <- ptau_two %>%
-  filter(row_in_pair == 2)
-
-# For NfL visits
-nfl_last <- nfl_two %>%
-  filter(row_in_pair == 2)
-```
-
-```{r}
-# We compute the mean value per visit for p-tau181
-ptau_mean <- ptau_two %>%
-  group_by(RID, EXAMDATE) %>%
-  summarise(
-    PLASMAPTAU181 = mean(PLASMAPTAU181, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# We compute the mean value per visit for NfL
-nfl_mean <- nfl_two %>%
-  group_by(RID, EXAMDATE) %>%
-  summarise(
-    PLASMA_NFL = mean(PLASMA_NFL, na.rm = TRUE),
-    .groups = "drop"
-  )
-```
-
-```{r}
-# We compare different handling methods (first, mean, last) of duplicate measurements for p-tau181 for a single individual (RID = 31)
-ptau_compare_31 <- bind_rows(
-  ptau_first %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
-    mutate(version = "first"),
-
-  ptau_mean %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
-    mutate(version = "mean"),
-
-  ptau_last %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMAPTAU181) %>% 
-    mutate(version = "last")
-) %>%
-  arrange(EXAMDATE, version)
-
-ptau_compare_31
-```
-
-```{r}
-# We compare different handling methods (first, mean, last) of duplicate measurements for NfL for a single individual (RID = 31)
-nfl_compare_31 <- bind_rows(
-  nfl_first %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
-    mutate(version = "first"),
-
-  nfl_mean %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
-    mutate(version = "mean"),
-
-  nfl_last %>% 
-    filter(RID == 31) %>% 
-    dplyr::select(RID, EXAMDATE, PLASMA_NFL) %>% 
-    mutate(version = "last")
-) %>%
-  arrange(EXAMDATE, version)
-
-nfl_compare_31
-```
-
-For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses will be performed to evaluate the robustness of the findings.
-
-```{r}
-# We remove duplicate visits (those identified in ptau_two) from the original dataset
-ptau_no_dups <- ptau_data %>%
-  anti_join(ptau_two %>% distinct(RID, EXAMDATE),
-            by = c("RID", "EXAMDATE"))
-
-# We remove duplicate visits (those identified in nfl_two) from the original dataset
-nfl_no_dups <- nfl_data %>%
-  anti_join(nfl_two %>% distinct(RID, EXAMDATE),
-            by = c("RID", "EXAMDATE"))
-
-# We add back mean values for previously duplicated visits
-ptau_data <- bind_rows(ptau_no_dups, ptau_mean)
-nfl_data <- bind_rows(nfl_no_dups, nfl_mean)
-```
-
-## Selection and merging of required variables
-
-```{r, warning=FALSE}
-# We select the required nfl variables
-nfl_data <- nfl_data %>%
-  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
-
-# We select the required ptau variables
+# Adding columns for each ptau measurement and their mean and then collapsing down to unique RID and EXAMDATE
 ptau_data <- ptau_data %>%
-  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    first_ptau = first(PLASMAPTAU181),
+    last_ptau = last(PLASMAPTAU181),
+    PLASMAPTAU181 = mean(PLASMAPTAU181),
+    ) %>%
+  ungroup() %>%
+  distinct()
 
-# We select the required diagnosis variables
-diagnosis_data <- diagnosis_data %>%
-  dplyr::select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+# Adding columns for each nfl measurement and their mean and then collapsing down to unique RID and EXAMDATE
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    first_nfl = first(PLASMA_NFL),
+    last_nfl = last(PLASMA_NFL),
+    PLASMA_NFL = mean(PLASMA_NFL)
+    ) %>%
+  ungroup() %>%
+  distinct()
+```
 
-# We add _dx on the diagnosis variables 
-diagnosis_data_dx <- diagnosis_data %>%
-  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+```{r}
+# checking the difference in method for those with 2 obs on the same examdate
+# for ptau
+head(ptau_data %>%
+       filter(PLASMAPTAU181 != first_ptau) %>%
+       dplyr::select(PLASMAPTAU181, first_ptau, last_ptau)
+     )
 
+# for nfl
+head(nfl_data %>%
+       filter(PLASMA_NFL != first_nfl) %>%
+       dplyr::select(PLASMA_NFL, first_nfl, last_nfl)
+     )
+```
+
+## Merging data sets
+
+```{r}
 # We merge NFL and ptau data for longitudinal data by RID and VISCODE2
 long_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
@@ -962,7 +843,7 @@ long_data <- nfl_data %>%
 # We merge NFL, ptau and diagnosis data for survival data, only by RID 
 surv_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
-  left_join(diagnosis_data_dx, by = c("RID"))
+  left_join(diagnosis_data, by = c("RID"))
 ```
 
 ## Count of missing values
@@ -978,7 +859,7 @@ sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
 ```{r}
-# no rows with missing VISCODE2.y with full data for the model variables, so we can remove all with na.omit()
+# There are no rows with missing VISCODE2.y with full data for the model variables, so we can remove all with na.omit()
 surv_data %>% filter(is.na(VISCODE2.y))
 ```
 
@@ -1124,7 +1005,7 @@ diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
 
 ```{r}
 # testing the method
-long_data_test <- long_data %>%
+diff_examdate <- long_data %>%
   mutate(
     time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
     EXAMDATE_new = case_when(
@@ -1135,8 +1016,8 @@ long_data_test <- long_data %>%
   filter(time_diff != 0) %>%
   relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
 
-# Checking the first observations of time_diff (non-zero differences)
-head(long_data_test$time_diff)
+# Checking the first observations
+head(diff_examdate)
 ```
 
 ```{r}
@@ -1187,11 +1068,8 @@ test <- diagnosis_data %>%
 ```
 
 ```{r}
-# We add _dx on the diagnosis variables 
-test <- test %>%
-  rename_with(~paste0(.x, "_dx"), -c(RID, baseline_dx, last_dx, DIAGNOSIS))
-
-test <- test %>% merge(long_data, by = c("RID"))
+# merging the diagnosis data with the longitudinal data in order to get the survival data
+surv_data_test <- long_data %>% left_join(test, by = "RID")
 ```
 
 # ...
@@ -1509,7 +1387,7 @@ surv_data_nfl <- merge(surv_data_nfl,
 Test for survival data without earl diagnosis data and setting time to event = 0 if indivdual had dementia at start
 
 ```{r}
-surv_test <- test %>%
+surv_data_test <- surv_data_test %>%
   group_by(RID) %>%
   summarise(
 #     carrying these forward to check events and event times are coded correctly
@@ -1517,7 +1395,7 @@ surv_test <- test %>%
     last_dx = unique(last_dx),
     
 #     baseline EXAMDATE defined as the earlier biomarker EXAMDATE (nfl or ptau)
-    baseline = min(c(
+    EXAMDATE_baseline = min(c(
       min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
       min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])),
       na.rm = TRUE),
@@ -1538,20 +1416,20 @@ surv_test <- test %>%
       time_to_event = case_when(
         event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
         event == 1 & unique(baseline_dx) != "Dementia" ~
-          as.numeric(min(EXAMDATE_dx[DIAGNOSIS == "Dementia"]) - baseline)/365,
+          as.numeric(min(EXAMDATE_dx[DIAGNOSIS == "Dementia"]) - EXAMDATE_baseline)/365,
         TRUE ~
-          as.numeric(last_followup - baseline)/365))
+          as.numeric(last_followup - EXAMDATE_baseline)/365))
 ```
 
 ```{r}
 # extracting number of events with time_to_event != 0
-table((surv_test %>% filter(time_to_event > 0))$event)
-table((surv_test %>% filter(time_to_event == 0))$event)
+table((surv_data_test %>% filter(time_to_event > 0))$event)
+table((surv_data_test %>% filter(time_to_event == 0))$event)
 ```
 
 ```{r}
-# merging the longitudinal data
-surv_test_1 <- surv_test %>%
+# merging the survival data with demographics and the baseline biomarker values
+surv_data_test <- surv_data_test %>%
   merge(demographics_small, by = "RID") %>% 
   merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID") %>%
   merge(baseline, by = "RID")
@@ -1643,6 +1521,24 @@ long_data_multi <- long_data %>%
   ungroup()
 ```
 
+```{r}
+# longitudinal data with time_years as time since baseline where baseline takes mid oint between exams if EXAMDATE_nfl and EXAMDATE_ptau are not the same
+long_data_test <- long_data %>%
+  group_by(RID) %>%
+  
+  # We define a single baseline per participant across biomarkers
+  mutate(
+    global_baseline = min(EXAMDATE, na.rm = TRUE)
+  ) %>%
+  
+  # We compute time from global baseline for all biomarker observations
+  mutate(
+    time_years = as.numeric(EXAMDATE - global_baseline) / 365.25
+  ) %>%
+  
+  ungroup()
+```
+
 ## Recheck of longitudinal and survival data lengths
 
 ```{r}
@@ -1650,10 +1546,12 @@ long_data_multi <- long_data %>%
 length(unique(long_data_ptau$RID)) # longitudinal data for ptau
 length(unique(long_data_nfl$RID)) # longitudinal data for nfl
 length(unique(long_data_multi$RID)) # longitudinal data, global version
+length(unique(long_data_test$RID)) # longitudinal data, global test version
 
 length(unique(surv_data_ptau$RID)) # survival data for ptau
 length(unique(surv_data_nfl$RID)) # survival data for nfl
 length(unique(surv_data_multi$RID)) # survival data, global version
+length(unique(surv_test$RID)) # survival data, global test version
 ```
 
 # Longitudinal models
@@ -1869,7 +1767,7 @@ long_model_ptau_multi <- lme(
   random = ~ time_years | RID,                    
   data = long_data_multi
 )
-#summary(long_model_ptau_multi)
+summary(long_model_ptau_multi)
 
 # Longitudinal model for p-tau181 with normal distribution and global time_years
 long_model_nfl_multi <- lme(
@@ -1877,7 +1775,7 @@ long_model_nfl_multi <- lme(
   random = ~ time_years | RID, 
   data = long_data_multi
   )
-#summary(long_model_nfl_multi)
+summary(long_model_nfl_multi)
 
 # Mixed object 
 mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
@@ -2025,7 +1923,7 @@ Although tests of the proportional hazards assumption indicated evidence of non-
 
 ```{r}
 # We fit Kaplan-Meier curve for global version of survival object
-km_fit_multi <- survfit(Surv(time_to_event, event) ~ 1, data = surv_data)
+km_fit_multi <- survfit(Surv(time_to_event, event) ~ 1, data = surv_data_multi)
 # Plot
 plot(
   km_fit_multi, 
@@ -2051,6 +1949,11 @@ summary(surv_model_multi)
 ```{r}
 # For the Cox PH model with global survival object
 cox.zph(surv_model_multi)
+```
+
+```{r}
+summary(long_model_multi)
+VarCorr(long_model_multi)
 ```
 
 # Two separate joint models
@@ -2494,7 +2397,7 @@ summary(hlme_m1_PTGENDER)
 ### Excluding PTGENDER
 
 ```{r}
-hlme_m1 <- hlme(
+hlme_m1_nfl_classmb <- hlme(
     fixed = log_PLASMA_NFL ~ time_years_nfl,
     mixture = ~ time_years_nfl,
     random = ~ time_years_nfl,
@@ -2507,7 +2410,7 @@ hlme_m1 <- hlme(
 ```
 
 ```{r}
-summary(hlme_m1)
+summary(hlme_m1_nfl_classmb)
 ```
 
 ### Assessment of covariate PTGENDER
@@ -2519,7 +2422,7 @@ A likelihood ratio test for the two models shows that there is a statistically s
 l = hlme_m1_PTGENDER$loglik
 
 # log likelihood for the reduced model
-l_0 = hlme_m1$loglik
+l_0 = hlme_m1_nfl_classmb$loglik
 
 # computing the LR test statistic
 LR = - 2 * (l_0 - l)
@@ -2532,14 +2435,14 @@ LR
 ### Posterior probabilities
 
 ```{r}
-postprob(hlme_m1)
+postprob(hlme_m1_nfl_classmb)
 ```
 
 ## Visualisation
 
 ```{r}
 # saving the posterior probabilities into a data frame
-pp <- hlme_m1$pprob
+pp <- hlme_m1_nfl_classmb$pprob
 ```
 
 ### Distribution of posterior probabilities (class 1)
@@ -2576,7 +2479,7 @@ ggplot(pp, aes(prob1, prob2)) +
 ## Comparing M0 and M1
 
 ```{r}
-summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(hlme_m0, hlme_m1_nfl_classmb, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 ### Adjusted LRT
@@ -2973,7 +2876,7 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
-jlcmm_m1 <- jlcmm(
+jlcmm_m1_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years_nfl,
   random = ~ 1 + time_years_nfl,
   mixture = ~ time_years_nfl,
@@ -2987,13 +2890,13 @@ jlcmm_m1 <- jlcmm(
 ```
 
 ```{r}
-summary(jlcmm_m1)
+summary(jlcmm_m1_nfl)
 ```
 
 ### Posterior probabilities
 
 ```{r}
-postprob(jlcmm_m1)
+postprob(jlcmm_m1_nfl)
 ```
 
 ## Visualisation
@@ -3044,20 +2947,20 @@ postprob(jlcmm_m1)
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m1, which = "survival")
+plot(jlcmm_m1_nfl, which = "survival")
 ```
 
 ### Survival curves by class
 
 ```{r}
 # longitudinal trajectory by class
-plot(jlcmm_m1, var.time = "time_years_nfl", which = "fit")
+plot(jlcmm_m1_nfl, var.time = "time_years_nfl", which = "fit")
 ```
 
 ## Comparing M0 and M1
 
 ```{r}
-summarytable(jlcmm_m0_2, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(jlcmm_m0_2, jlcmm_m1_nfl, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 ### Adjusted LRT
@@ -3261,9 +3164,10 @@ TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
 
 ```{r}
 # merging the longitudinal and survival data for NfL
-jlcmm_data_multi <- surv_data_multi %>%
+jlcmm_data_multi <- surv_test_1 %>%
   dplyr::select(RID, event, time_to_event) %>%
-  merge(long_data_multi, by = "RID")
+  merge(long_data_multi, by = "RID") %>%
+  filter(time_to_event != 0)
 ```
 
 ```{r}
@@ -3408,7 +3312,7 @@ plot(mult_jlcmm_m2, which = "survival")
 
 ```{r}
 # # longitudnal trajectories by class
-# plot(mult_jlcmm_m2, var.time = "time_years", which = "fit")
+# plot(mult_jlcmm_m2, outcome = 1, which = "fit")
 ```
 
 ## TO DO
@@ -3427,17 +3331,11 @@ Bootstrap LRT???
 
 *For the joint models = using tvAUC, from the package JMbayes2*
 
-```{r}
-#library(timeROC)
-#library(JMbayes2)
-#library(ggplot2)
-```
-
 ## Defining evaluation time points for time-dependent AUC comparison
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
-#times <- seq(1, 10, by = 0.5)
+times <- seq(1, 10, by = 0.5)
 ```
 
 ## Time-dependent AUC for fitted Cox PH models
@@ -3581,6 +3479,30 @@ Bootstrap LRT???
 #)
 ```
 
+## Time dependent AUC for latent class joint models
+
+Landmark: the time at which predictions are made
+
+Horizon: the predict event within $h$ years
+
+Threshold: e.g if risk \> 0.5 -\> conversion
+
+ROC evaluates the model (sensitivity and specificity) at all possible thresholds, plotting sensitivity (y axis) vs 1 - specificity (x axis)
+
+We can fix the landmark, or the horizon
+
+Fixing the landmark, varying the horizon: how well does the model predict over different horizons? Does prediction accuracy change with horizon, e.g model predicts well over short horizons but not long.
+
+Fiing the horizon, varying the landmark: how well does the model predict conversion within $h$ years as more longitudinal data is gathered?
+
+#### Function for extracting time-dependent AUC
+
+1.  Confidence intervals
+
+2.  Overall model discrimination
+
+3.  Class specific discrimination
+
 ## Table of the results
 
 ```{r}
@@ -3643,13 +3565,13 @@ Bootstrap LRT???
 #  Time = rep(times, times = 7),
 #  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both1", "Cox both2", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
 #  AUC = c(
-#    auc_ptau_bl,   
-#    auc_nfl_bl,    
+#    auc_ptau_bl,
+#    auc_nfl_bl,
 #    auc_both1_bl,
 #    auc_both2_bl,
 #    auc_ptau_jm,
-#    auc_ptau_jm,
-#    auc_ptau_jm
+#    auc_nfl_jm,
+#    auc_multi_jm
 #  )
 #)
 #
