@@ -748,6 +748,7 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 ```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
 grep("381_S_10###", diagnosis_data$PTID)
+grep("381_S_10###", apoe$PTID)
 ```
 
 ## Selection of required variables
@@ -760,6 +761,10 @@ nfl_data <- nfl_data %>%
 # We select the required ptau variables
 ptau_data <- ptau_data %>%
   dplyr::select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required genotype variables
+apoe <- apoe %>%
+  dplyr::select(RID, GENOTYPE)
 
 # We select the required diagnosis variables
 diagnosis_data <- diagnosis_data %>%
@@ -902,9 +907,12 @@ apoe <- apoe %>%
     GENOTYPE == "4/4" ~ "2 alleles",
     GENOTYPE %in% c("2/4", "3/4") ~ "1 allele",
     TRUE ~ "0 alleles"
-  ))
+  ),
+  genotype = as.factor(GENOTYPE)
+  )
+```
 
-
+```{r}
 # We merge gender with long_data and surv_data
 long_data <- long_data %>%
   left_join(demographics_small, by = "RID")
@@ -912,8 +920,8 @@ surv_data <- surv_data %>%
   left_join(demographics_small, by = "RID")
 
 # We merge apoe with long_data and surv_data
-long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
-surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
+long_data <- merge(long_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
+surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
 
 # We make sure that gender and apoe4-status are factors
 long_data$PTGENDER <- as.factor(long_data$PTGENDER)
@@ -932,7 +940,14 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # final diagnoses for the full sample size
-table((surv_data %>% group_by(RID) %>% filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>% dplyr::select(DIAGNOSIS_dx) %>% distinct())$DIAGNOSIS_dx)
+table(
+  (surv_data %>%
+     group_by(RID) %>%
+     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
+     dplyr::select(DIAGNOSIS_dx) %>%
+     distinct()
+   )$DIAGNOSIS_dx
+  )
 ```
 
 ## Selection of participants with at least 3 measurements
@@ -951,7 +966,14 @@ length(keep)
 
 ```{r}
 # final diagnoses for the reduced sample size
-table((surv_data %>% group_by(RID) %>% filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>% dplyr::select(DIAGNOSIS_dx) %>% distinct())$DIAGNOSIS_dx)
+table(
+  (surv_data %>%
+     group_by(RID) %>%
+     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
+     dplyr::select(DIAGNOSIS_dx) %>%
+     distinct()
+   )$DIAGNOSIS_dx
+  )
 ```
 
 # ...
@@ -1055,14 +1077,15 @@ long_data <- long_data %>%
 # creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
 test <- diagnosis_data %>%
   merge(
-    long_data %>% dplyr::select(RID, baseline_date), by = "RID") %>%
-  filter(EXAMDATE - baseline_date >= -50) %>%
+    long_data %>% dplyr::select(RID, baseline_date), by = "RID"
+    ) %>%
+  filter(EXAMDATE_dx - baseline_date >= -50) %>%
   distinct() %>%
   group_by(RID) %>%
-  arrange(EXAMDATE) %>%
+  arrange(EXAMDATE_dx) %>%
   mutate(
-    baseline_dx = first(DIAGNOSIS),
-    last_dx = last(DIAGNOSIS)
+    baseline_dx = first(DIAGNOSIS_dx),
+    last_dx = last(DIAGNOSIS_dx)
   ) %>%
   dplyr::select(!baseline_date)
 ```
@@ -1122,16 +1145,17 @@ We still keep them, as we assume they are correct observations.
 -   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
 
 ```{r}
-# We identify observations that are 3 standard deviations above or below the mean (z > 3 or < -3)
-large_outliers_ptau <- long_data[scale(long_data$PLASMAPTAU181) > 3, ]
-small_outliers_ptau <- long_data[scale(long_data$PLASMAPTAU181) < -3, ]
-large_outliers_ptau
-small_outliers_ptau
+# We identify "extreme" values
 
-large_outliers_nfl <- long_data[scale(long_data$PLASMA_NFL) > 3, ]
-small_outliers_nfl <- long_data[scale(long_data$PLASMA_NFL) < -3, ]
-large_outliers_nfl
-small_outliers_nfl
+# Values greater than 3 sd above ptau mean
+long_data[scale(long_data$PLASMAPTAU181) > 3, ]
+# Values smaller than 3 sd below ptau mean
+long_data[scale(long_data$PLASMAPTAU181) < -3, ]
+
+# Values greater than 3 sd above nfl mean
+long_data[scale(long_data$PLASMA_NFL) > 3, ]
+# Values smaller than 3 sd below nfl mean
+long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
 
 ## Preparation for Cox PH models and separate joint models
