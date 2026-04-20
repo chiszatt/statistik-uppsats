@@ -128,7 +128,7 @@ In the context of Alzheimer's disease, as well as diseases in general, the term 
 
 **AD and BIOMARKERS**
 
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Recent advances in research have made it possible to replace these invasive procedures with blood tests. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis.
+AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Recent advances in research have made it possible to replace these invasive procedures with blood tests. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis. **\*\*Behövs källa i parentes väl**
 
 **SPECIFIC AD BIOMARKERS**
 
@@ -138,9 +138,9 @@ The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and s
 
 Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
 
-Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in CSF and plasma.
+Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in CSF and plasma
 
-Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7). **\*\*good source but feel like this info is repeated?\*\***
+Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7). **\*\*good source but feel like this info is repeated?\*\* - Känner att det viktigaste att säga om p-tau och nfl är att de är plasma-biomarkörer, något som nyligen har börjat undersökas inom alzheimers liksom, och att ena är mer alzheimer-specifik (p-tau181) och andra inte. Det räcker nog - Som Hans skrev, vi ska fokusera på statistiken**
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
