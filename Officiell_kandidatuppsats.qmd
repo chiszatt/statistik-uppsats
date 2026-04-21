@@ -173,7 +173,7 @@ Similarly, in an article from 2026, researchers applied a multi-dimensional join
 
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in Alzheimer’s disease, specifically focusing on plasma biomarkers such as NfL and p-tau.
 
-Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker. This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., 2024: p. 591-592).
+Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592). This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., p. 591).
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
@@ -217,9 +217,9 @@ The modelling approaches will be applied to data obtained from the *Alzheimer’
 
 ## Survival analysis
 
-Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025: p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse, recovery or other outcomes depending on the research question. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, 2025: p. ?)
+Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse, recovery or other outcomes depending on the research question. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
 
-With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring. Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, 2012: p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
+With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring (Rizopoulos, 2012, p. 36). Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
 
 However, when longitudinal data are collected at different time points, issues such as left truncation (also referred to as delayed entry) may arise. Left truncation occurs when individuals enter the study after the origin of the underlying time scale, meaning that only individuals who have survived or remained event-free up to the point of entry are included in the analysis (källa?).
 
@@ -385,15 +385,15 @@ Joint-model options:
 
 ### Multivariate Joint Model 
 
-However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022: p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016: p.?).
+However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022, p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016, p.?).
 
-The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022: p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016: p.?).
+The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022, p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016, p.?).
 
 #### The Gelman-Rubin statistic
 
-According to Peng (2022), convergence can be evaluated by running multiple chains from different starting values. All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar.
+Convergence can be evaluated by running multiple chains from different starting values (Peng, 2022). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng).
 
-Peng (2022) further explains that the Gelman-Rubin statistic R formalizes this idea. Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
+The Gelman-Rubin statistic R formalizes this idea (Peng). Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
 Then calculate the chain mean for each chain,
 
@@ -431,7 +431,7 @@ $$
 R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}
 $$
 
-As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
+As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng).
 
 ### Latent Class Joint Models
 
@@ -457,7 +457,7 @@ $$
 
 -   Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
 
-Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, pg 122).
+Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
 -   Correlations between observations (biomarker measurements) are modelled by the random effects, $b_i$, in the longitudinal model
 
@@ -478,7 +478,7 @@ $$
 Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
 $$
 
-An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, pg. 123) ... **MORE, WHY, SHOW**
+An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, p. 123) ... **MORE, WHY, SHOW**
 
 ### Information criterion, entropy
 
@@ -522,15 +522,15 @@ $$
 
 ### ROC analysis
 
-ROC analysis is a valuable method for assessing how well diagnostic tests perform, and more generally for measuring the accuracy of statistical models, such as logistic regression and discriminant analysis, that assign individuals to one of two groups, typically classified as diseased or not diseased. Earlier research on ROC methods mainly focused on ordinal rating data, where responses take a limited set of ordered categories reflecting levels of confidence about disease status. More recently, ROC techniques have increasingly been used with continuous data as well (Zou et al., 2012: p. 3)
+ROC analysis is a valuable method for assessing how well diagnostic tests perform, and more generally for measuring the accuracy of statistical models, such as logistic regression and discriminant analysis, that assign individuals to one of two groups, typically classified as diseased or not diseased. Earlier research on ROC methods mainly focused on ordinal rating data, where responses take a limited set of ordered categories reflecting levels of confidence about disease status. More recently, ROC techniques have increasingly been used with continuous data as well (Zou et al., 2012, p. 3)
 
-The traditional ROC curve method assumes that both the disease status and the marker value for each individual remain constant over time. In real-world settings, however, this assumption is often violated. Individuals who are disease-free at baseline may develop the disease during follow-up, and their diagnostic marker values may also change over time. To address this limitation, time-dependent ROC curves have been developed to incorporate the temporal nature of event occurrence and the presence of censored survival data, making them more appropriate for evaluating prognostic accuracy in survival settings (Kamarudin et al., 2017: p. 1).
+The traditional ROC curve method assumes that both the disease status and the marker value for each individual remain constant over time. In real-world settings, however, this assumption is often violated. Individuals who are disease-free at baseline may develop the disease during follow-up, and their diagnostic marker values may also change over time. To address this limitation, time-dependent ROC curves have been developed to incorporate the temporal nature of event occurrence and the presence of censored survival data, making them more appropriate for evaluating prognostic accuracy in survival settings (Kamarudin et al., 2017, p. 1).
 
-When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017: p. 2).
+When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., p. 2).
 
-The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017: p. 2).
+The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., p. 2).
 
-In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017: p. 2).
+In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017, p. 2).
 
 For a given threshold $c$, the time-dependent sensitivity and specificity are defined as:
 
@@ -538,7 +538,7 @@ $$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
 
 $$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
 
-Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting the time-dependent sensitivity $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds $c$ (Kamarudin et al., 2017: p. 2).
+Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting the time-dependent sensitivity $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds $c$ (Kamarudin et al., p. 2).
 
 The time-dependent area under the curve (AUC) is then defined as:
 
@@ -549,8 +549,6 @@ $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
 The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database, which include various datasets all containing different variables related to the study of Alzheimer's.
-
-Inclusion/exclusion criteria
 
 The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals with three cohorts with a final diagnosis of cognitively normal (CN) participants (n = 358), participants with mild cogntive impairment (MCI, n = 421) and with dementia due to AD (n = 411). Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768 with final diagnoses of CN (n = 241), MCI (290) or AD dementia (n = 237). In the reduced sample size, 67 individuals were included who had dementia diagnoses at baseline and 178 individuals transitioned from either CN or MCI to AD dementia.
 
