@@ -1468,7 +1468,7 @@ summary(surv_model_nfl_bl)
 ```
 
 ```{r}
-# For p-tau181 including NfL 
+# Inlcuding both p-tau181 and NfL
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
@@ -1486,11 +1486,11 @@ cox.zph(surv_model)
 
 
 ##### For the Cox PH models with baseline values of each biomarker 
-# For p-tau181 baseline
+# With p-tau181 baseline values
 cox.zph(surv_model_ptau_bl)
-# For NfL baseline
+# With NfL baseline values
 cox.zph(surv_model_nfl_bl)
-# For both p-tau181 and NfL baseline
+# With both p-tau181 and NfL baseline values
 cox.zph(surv_model_both_bl)
 
 ```
@@ -1498,30 +1498,23 @@ cox.zph(surv_model_both_bl)
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ```{r}
-# We recode APOE4 status (0, 1, 2 alleles) into a numeric variable 
-surv_data_ptau$APOE4_num <- as.numeric(surv_data_ptau$APOE4_status) - 1
-surv_data_nfl$APOE4_num <- as.numeric(surv_data_nfl$APOE4_status) - 1
-
-# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
-surv_model_ptau_tv <- coxph(
-  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + tt(APOE4_num),
-  data = surv_data_ptau,
-  tt = function(x, t, ...) x * log(t)
+surv_data$APOE4_num <- dplyr::recode(
+  surv_data$APOE4_status,
+  "0 alleles" = 0,
+  "1 allele"  = 1,
+  "2 alleles" = 2
 )
 
-#summary(surv_model_ptau_tv)
-
 # We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
-surv_model_nfl_tv <- coxph(
-  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + tt(APOE4_num),
-  data = surv_data_nfl,
-  tt = function(x, t, ...) x * log(t)
+surv_model_tv <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + 
+    APOE4_num + tt(APOE4_num),
+  data = surv_data,
+  tt = function(x, t, ...) x * log(t + 1)
 )
 
-#summary(surv_model_nfl_tv)
+summary(surv_model_tv)
 ```
-
-Although tests of the proportional hazards assumption indicated evidence of non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.168 in the p-tau181 model and p = 0.189 in the NfL model). Therefore, the standard Cox proportional hazards model is retained for primary interpretation.
 
 # Two separate joint models
 
@@ -1531,8 +1524,8 @@ Although tests of the proportional hazards assumption indicated evidence of non-
 # Joint model for p-tau181 using package JM (frequentist approach)
 joint_model_ptau <- jointModel(
   long_model_ptau,
-  surv_model_ptau,
-  timeVar = "time_years_ptau"
+  surv_model,
+  timeVar = "time_years"
 )
 
 summary(joint_model_ptau)
@@ -1541,9 +1534,9 @@ summary(joint_model_ptau)
 ```{r}
 # Joint model for p-tau181 using package JMbayes2 (bayesian approach)
 joint_model_ptau <- jm(
-  surv_model_ptau,
+  surv_model,
   long_model_ptau,
-  time_var = "time_years_ptau",
+  time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
   n_burnin = 1000L
@@ -1558,8 +1551,8 @@ summary(joint_model_ptau)
 # Joint model for NfL using package JM (frequentist approach)
 joint_model_nfl <- jointModel(
   long_model_nfl,
-  surv_model_nfl,
-  timeVar = "time_years_nfl"
+  surv_model,
+  timeVar = "time_years"
 )
 
 summary(joint_model_nfl)
@@ -1568,9 +1561,9 @@ summary(joint_model_nfl)
 ```{r}
 # Joint model for NfL using package JMbayes2 (bayesian approach)
 joint_model_nfl <- jm(
-  surv_model_nfl,
+  surv_model,
   long_model_nfl,
-  time_var = "time_years_nfl",
+  time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
   n_burnin = 1000L
@@ -1628,7 +1621,7 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-multi_joint_model <- jm(surv_model_multi, mixed ,
+multi_joint_model <- jm(surv_model, mixed ,
                         time_var = "time_years",
                         functional_forms = fForms,
                         n_chains = 3L,
@@ -3153,4 +3146,4 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 #  )
 ```
 
-Sensitivity anaysis: how does
+Sensitivity anaysis: how does including those with only one measurement affect the precision?
