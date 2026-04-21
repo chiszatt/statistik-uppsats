@@ -169,7 +169,7 @@ Another article from 2024 further extended the approach by using a joint modelin
 
 Additionally, for understanding the natural history of a disease, researchers in an article from 2023 describe it as crucial to simultaneously account for the assessment of multivariate markers over time, the occurrence of clinical endpoints, and a highly suspected heterogeneity between patients (Proust-Lima et al., p. 3996). Subsequently, they proposed a latent class approach modeling multiple repeated markers to help describe complex disease progression and identify subphenotypes for exploring new pathological hypotheses; in other terms, a joint latent class model. Through the example of progression to multiple system atrophy (MSA), characterized by various combinations of progressive autonomic failure and motor dysfunction, the researchers identified five subphenotypes of MSA that differ by the sequence and shape of marker degradation, as well as the associated risk of death (Proust-Lima et al., p. ?).
 
-Similarly, in an article from 2026, researchers applied a multi-dimensional joint latent class model to capture heterogeneity in the trajectories of three cognitive domains from the time of Alzheimer’s dementia diagnosis: memory, language, and executive functioning (Scollard et al., p. 383). They identified five latent classes differentiated by overall level of impairment, ranging from high to low, and rate of decline, from slow to fast. Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in Alzheimer’s disease research.
+Similarly, in an article from 2026, researchers applied a multi-dimensional joint latent class model to capture heterogeneity in the trajectories of three cognitive domains from the time of Alzheimer’s dementia diagnosis: memory, language, and executive functioning (Scollard et al.: p. 383). They identified five latent classes differentiated by overall level of impairment, ranging from high to low, and rate of decline, from slow to fast. Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., 2026: p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in Alzheimer’s disease research. Since there is evidence to support AD as a heterogeneous disease with differing disease trajectories (**SOURCE**), a latent class joint model could be employed to assess whether individuals can be categorised into meaningful classes based on NfL and ptau-181 trajectories alongside survival data.
 
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in Alzheimer’s disease, specifically focusing on plasma biomarkers such as NfL and p-tau.
 
@@ -193,7 +193,7 @@ This study investigates the prediction of Alzheimer’s disease/dementia progres
 
 *How will we accomplish this? –\> Introduce the methods we will use.*
 
-To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to Alzheimer’s disease/dementia. Second, single-biomarker joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker and their association with the time-to-event outcome. Third, multivariate joint models will be used to jointly analyse multiple biomarkers, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying distinct subgroups. All models will be adjusted for relevant covariates.
+To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to Alzheimer’s disease/dementia. Second, single-biomarker joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker and their association with the time-to-event outcome. Third, multivariate joint models will be used to jointly analyse multiple biomarkers, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying distinct subgroups. A univariate joint latent class model will be fit for NfL and ptau-181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and ptau-181 simultaneously. All models will be adjusted for relevant covariates.
 
 To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Model performance will be evaluated using time-dependent AUC for dynamic prediction. The significance level will be set at 0.05 for all analyses.
 
@@ -433,15 +433,9 @@ $$
 
 As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng).
 
-### Latent Class Joint Models
+### Joint Latent Class Model
 
-The joint latent class model assumes that the study population is heterogeneous and that within these subgroups, the observations have the same distribution (Kyheng, 2025, p.2).
-
--   Useful for modelling the relationship between longitudinal data and survival data when the population is thought to be heterogeneous
-
--   Disease trajectories assumed to differ between these different sub-groups
-
--   Composed of 3 models: multinomial logistic submodel (latent class model), the linear mixed submodel (biomarker trajectory), and the survival submodel
+The joint latent class model assumes that the study population is heterogeneous and that within these subgroups, the observations have the same distribution (Kyheng, 2025, p.2). Therefore, this model is useful for studying the relationship between longitudinal data and survival data when there is suspected heterogeneity in the population.
 
 -   Assume that the study population, $N$, is made up of $G$ homogenous, unobservable classes
 
@@ -795,9 +789,8 @@ ptau_data[ptau_data$RID == 1097, "VISCODE2"] <- c("m48", "m60_2", "m60_1")
 nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
 ```
 
-Replacing visits with double measurements with visits with mean-value of the measurements
-
 ```{r}
+# Replacing visits with double measurements with visits with mean-value of the measurements as well as saving both measurements for future sensitivity analysis
 # Naming the mean as the original variable to do analysis first with this method and then sensitivity analysis with the first and last measurements
 
 # Adding columns for each ptau measurement and their mean and then collapsing down to unique RID and EXAMDATE
@@ -840,17 +833,126 @@ head(nfl_data %>%
      )
 ```
 
-## Merging data sets
+## Merging nfl and ptau data for longitudinal data set
 
 ```{r}
 # We merge NFL and ptau data for longitudinal data by RID and VISCODE2
 long_data <- nfl_data %>%
   left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+```
 
+## Creating a common EXAMDATE and EXAMDATE_baseline variable
+
+-   Do this now in order to remove observations from diagnosis data which occur long before first biomarker measurements
+
+```{r}
+# checking how many observations where the EXAMDATE is different for nfl and ptau
+diff <- long_data %>% mutate(diff = as.numeric(EXAMDATE_nfl != EXAMDATE_ptau))
+table(diff$diff)
+```
+
+```{r}
+# filtering out the observations with different EXAMDATE
+diff <- diff %>% filter(diff == TRUE)
+
+# checking how many of these are baseline visits
+table(diff$VISCODE2)
+
+# # checking which observations have the same examdate for nfl and ptau
+# common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
+
+# # checking the observations with different exam dates
+# long_data[-common, ]
+```
+
+-   There are 5 observations with time differences greater than 30 days
+
+-   231/115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
+
+-   Less clear what the case is with a time difference of 31 days, even 49 days
+
+```{r}
+# calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
+diff <- diff %>% mutate(time_diff = EXAMDATE_nfl - EXAMDATE_ptau)
+
+# fetching the time differences
+diff$time_diff 
+
+# checking how many observations have a time difference over 30 days (1 month)
+diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
+```
+
+### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
+
+-   Can create a new variable for a common EXAMDATE in order to define the baseline date from this
+
+```{r}
+# testing the method
+diff_examdate <- long_data %>%
+  mutate(
+    time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
+    EXAMDATE_new = case_when(
+      time_diff == 0 ~ EXAMDATE_nfl,
+      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff
+    )
+  ) %>%
+  filter(time_diff != 0) %>%
+  relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
+```
+
+```{r}
+# creating a common EXAMDATE from two cases
+# 1: EXAMDATE_nfl == EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl
+# 2: EXAMDATE_nfl != EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl + the difference between the two dates
+# then defining the baseline date from the earliest EXAMDATE 
+long_data <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    EXAMDATE = EXAMDATE_ptau + 0.5 * (EXAMDATE_nfl - EXAMDATE_ptau),
+    EXAMDATE_baseline = min(EXAMDATE),
+    time_years = as.numeric(EXAMDATE - EXAMDATE_baseline) / 365.25) %>%
+  ungroup()
+
+
+```
+
+### Baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
+
+```{r}
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+# long_data <- long_data %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+#   ungroup()
+```
+
+## Removing diagnosis observations before biomarker measurements
+
+1.  Use diagnosis observations no longer than 50 days before first biomarker measurements – we can change this number and see what difference it makes
+
+```{r}
+# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
+# creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
+diagnosis_data <- diagnosis_data %>%
+  merge(
+    long_data %>% dplyr::select(RID, EXAMDATE_baseline), by = "RID"
+    ) %>%
+  filter(EXAMDATE_dx - EXAMDATE_baseline >= -50) %>%
+  distinct() %>%
+  group_by(RID) %>%
+  arrange(EXAMDATE_dx) %>%
+  mutate(
+    baseline_dx = first(DIAGNOSIS_dx),
+    last_dx = last(DIAGNOSIS_dx)
+  ) %>%
+  dplyr::select(!EXAMDATE_baseline)
+```
+
+## Merging longitudinal and diagnosis data for survival data set
+
+```{r}
 # We merge NFL, ptau and diagnosis data for survival data, only by RID 
-surv_data <- nfl_data %>%
-  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
-  left_join(diagnosis_data, by = c("RID"))
+surv_data <- long_data %>% left_join(diagnosis_data, by = c("RID"))
 ```
 
 ## Count of missing values
@@ -884,6 +986,13 @@ sapply(surv_data, function(x) sum(is.na(x)))
 
 ```{r}
 # We check the number of individuals in each dataset 
+length(unique(long_data$RID)) # longitudinal data
+length(unique(surv_data$RID)) # survival data
+
+# # removing the two individuals who are not in the survival data set from the longitudinal data set
+long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
+
+# Rechecking the number of individuals in each dataset 
 length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
@@ -978,450 +1087,12 @@ table(
   )
 ```
 
-# ...
-
-# EXAMDATES / BASELINE DATES: need to choose how this is done for the global data set
-
-### Checking the observations with different biomarker examdates
-
--   67 observations where the EXAMDATE_nfl != EXAMDATE_ptau
-
--   19 observations with a baseline VISCODE2
-
-```{r}
-# checking how many observations where the EXAMDATE is different for nfl and ptau
-diff <- long_data %>% mutate(diff = EXAMDATE_nfl != EXAMDATE_ptau)
-sum(diff$diff)
-
-# filtering out the observations with different EXAMDATE
-diff <- diff %>% filter(diff == TRUE)
-
-# checking how many of these are baseline visits
-table(diff$VISCODE2)
-
-# # checking which observations have the same examdate for nfl and ptau
-# common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
-
-# # checking the observations with different exam dates
-# long_data[-common, ]
-```
-
-### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
-
--   There are 4 observations with time differences greater than 30 days
-
--   115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
-
--   Less clear what the case is with a time difference of 31 days, even 49 days
-
-```{r}
-# calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
-diff <- diff %>% mutate(time_diff = EXAMDATE_nfl - EXAMDATE_ptau)
-
-# fetching the time differences
-diff$time_diff 
-
-# checking how many observations have a time difference over 30 days (1 month)
-diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
-```
-
--   Can create a new variable for a common EXAMDATE in order to define the baseline date from this
-
-```{r}
-# testing the method
-diff_examdate <- long_data %>%
-  mutate(
-    time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
-    EXAMDATE_new = case_when(
-      time_diff == 0 ~ EXAMDATE_nfl,
-      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff
-    )
-  ) %>%
-  filter(time_diff != 0) %>%
-  relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
-```
-
-```{r}
-# creating a common EXAMDATE from two cases
-# 1: EXAMDATE_nfl == EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl
-# 2: EXAMDATE_nfl != EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl + the difference between the two dates
-# then defining the baseline date from the earliest EXAMDATE 
-long_data <- long_data %>%
-  group_by(RID) %>%
-  mutate(
-    EXAMDATE = EXAMDATE_ptau + 0.5 * (EXAMDATE_nfl - EXAMDATE_ptau),
-    baseline_date = min(EXAMDATE)) %>%
-  ungroup()
-```
-
-### Baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
-
--   Or the baseline date can be defined as the earliest of the two EXAMDATEs
-
-```{r}
-# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-# long_data <- long_data %>%
-#   group_by(RID) %>%
-#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-#   ungroup()
-```
-
-### Filtering observations from diagnosis data which occur before biomarker baseline for survival data
-
--   if the dx EXAMDATE is 50 days before the biomarker baseline_date then we remove these observations
--   create a baseline_dx variable to time_to_event is 0 for those with a prior dementia dx
-
-```{r}
-# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
-# creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
-test <- diagnosis_data %>%
-  merge(
-    long_data %>% dplyr::select(RID, baseline_date), by = "RID"
-    ) %>%
-  filter(EXAMDATE_dx - baseline_date >= -50) %>%
-  distinct() %>%
-  group_by(RID) %>%
-  arrange(EXAMDATE_dx) %>%
-  mutate(
-    baseline_dx = first(DIAGNOSIS_dx),
-    last_dx = last(DIAGNOSIS_dx)
-  ) %>%
-  dplyr::select(!baseline_date)
-```
-
-```{r}
-# merging the diagnosis data with the longitudinal data in order to get the survival data
-surv_data_test <- long_data %>% left_join(test, by = "RID")
-```
-
-# ...
-
-# Distribution check of each biomarker
-
-1.  **Since cube root transform gives a better Gaussian approximation for ptau, should we consider using this? The downside is that values cannot take negative values, which is possible with the natural logarithm transformation: is this true though - sqrt(4) = +- 2 ... but how does this work in practice?**
-
-# ...
-
-```{r}
-# We check the distribution of each biomarker
-hist(long_data$PLASMAPTAU181, main="PLASMAPTAU181")
-hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
-```
-
-```{r}
-# We log transform the biomarkers 
-long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
-long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
-
-surv_data$log_PLASMAPTAU181 <- log(surv_data$PLASMAPTAU181)
-surv_data$log_PLASMA_NFL <- log(surv_data$PLASMA_NFL)
-```
-
-```{r}
-# We re-check the distribution of each biomarker  
-hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
-hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
-```
-
-The distribution of p-tau181 could still be considered a bit skewed after log transformation –\> We try cube-root transforming:
-
-```{r}
-# cube-root transformed
-ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
-  geom_histogram(binwidth = 0.1, colour = "white") +
-  theme_classic()
-
-# cube-root transformed
-ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
-  geom_histogram(binwidth = 0.1, colour = "white") +
-  theme_classic()
-```
-
-## Check for outliers
-
-We still keep them, as we assume they are correct observations.
-
--   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
-
-```{r}
-# We identify "extreme" values
-
-# Values greater than 3 sd above ptau mean
-long_data[scale(long_data$PLASMAPTAU181) > 3, ]
-# Values smaller than 3 sd below ptau mean
-long_data[scale(long_data$PLASMAPTAU181) < -3, ]
-
-# Values greater than 3 sd above nfl mean
-long_data[scale(long_data$PLASMA_NFL) > 3, ]
-# Values smaller than 3 sd below nfl mean
-long_data[scale(long_data$PLASMA_NFL) < -3, ]
-```
-
-## Preparation for Cox PH models and separate joint models
-
-#### time_to_event problem
-
-time_to_event not allowed to be negative BUT take RID 887: first dementia dx 2008, but happens to have 2010 dx 1 day after biomarker measurement, so we have a positive time_to_event when actually they have dementia diagnosis for 2 years prior.
-
-*Just nu är baseline1 = första pt-tau181-värdet, baseline2 = första nfl-värdet –\> Man tar hänsyn till alla första biomarkörs-datum, inte bara ena.*
-
--   *Annat alternativ = Första biomarkörs-värdet (oavsett nfl eller p-tau) - Kanske krävs för att kunna jämföra de två joint-modellerna?*
-
--   *Varför första biomarkörs-värden och inte första diagnos-besöket? = Kanske för att de första diagnos-besöken sker flera år innan de första biomarkörs-värdena –\> Tiderna matchar inte!*
-
--   *Problem då = Inte sanna baseline, man ignorerar alla tidigare diagnosbesök!*
-
--   *--\> Frågan är:*
-
-    -   *Baseline = första biomarkörs-värden eller första diagnos-besöke?*
-
-### Construction of separate baselines with age-at-baseline, event, and time-to-event variables for each biomarker
-
-```{r}
-##### We prepare survival data for ptau
-ptau_core <- surv_data %>%
-  
-  mutate(
-    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
-    EXAMDATE_dx = as.Date(EXAMDATE_dx)
-  ) %>%
-  
-  group_by(RID) %>%
-  summarise(
-    
-    # We define baseline as the first valid pTau measurement date per individual
-    baseline_ptau = min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
-    
-    # We define age at baseline pTau visit
-    age_at_baseline_ptau = age_at_visit[
-      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
-    ][1],
-    
-    # We define the event date as the first dementia diagnosis after baseline
-    event_date = {
-      
-      # We extract baseline for filtering
-      base <- min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
-      
-      # We extract all dementia diagnosis dates
-      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
-      
-      # We restrict events to those occurring strictly after baseline
-      dx_dates <- dx_dates[dx_dates > base]
-      
-      # We assign NA if no dementia event occurs after baseline
-      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
-    },
-    
-    # We define last follow-up as the maximum observed visit across all data sources
-    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_dx), na.rm = TRUE),
-    
-    .groups = "drop"
-  ) %>%
-  
-  mutate(
-    
-    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
-    event_ptau = as.integer(!is.na(event_date)),
-    
-    # We compute time-to-event in years from baseline to event or censoring
-    time_to_event_ptau = if_else(
-      
-      # We use event date if dementia occurred
-      event_ptau == 1,
-      
-      # We calculate time difference in years between event and baseline
-      as.numeric(event_date - baseline_ptau) / 365.25,
-      
-      # We calculate time difference in years between last follow-up and baseline
-      as.numeric(last_followup - baseline_ptau) / 365.25
-    )
-  )
-
-# We keep one row per participant and attach all original variables
-surv_data_ptau <- surv_data %>%
-  distinct(RID, .keep_all = TRUE) %>%
-  left_join(ptau_core, by = "RID")
-
-# We tabulate the ptau event indicator (1 = dementia, 0 = censored)
-table(surv_data_ptau$event_ptau)
-```
-
-```{r}
-##### We prepare survival data for ptau
-nfl_core <- surv_data %>%
-  
-  mutate(
-    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
-    EXAMDATE_dx = as.Date(EXAMDATE_dx)
-  ) %>%
-  
-  group_by(RID) %>%
-  summarise(
-    
-    # We define baseline as the first valid NFL measurement date per individual
-    baseline_nfl = min(EXAMDATE_nfl[!is.na(PLASMA_NFL)]),
-    
-    # We define age at baseline NFL visit
-    age_at_baseline_nfl = age_at_visit[
-      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-    ][1],
-    
-    # We define the event date as the first dementia diagnosis after baseline
-    event_date = {
-      
-      # We extract baseline for filtering
-      base <- min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-      
-      # We extract all dementia diagnosis dates
-      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
-      
-      # We restrict events to those occurring strictly after baseline
-      dx_dates <- dx_dates[dx_dates > base]
-      
-      # We assign NA if no dementia event occurs after baseline
-      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
-    },
-    
-    # We define last follow-up as the maximum observed visit across all data sources
-    last_followup = max(c(EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
-    
-    .groups = "drop"
-  ) %>%
-  
-  mutate(
-    
-    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
-    event_nfl = as.integer(!is.na(event_date)),
-    
-    # We compute time-to-event in years from baseline to event or censoring
-    time_to_event_nfl = if_else(
-      
-      # We use event date if dementia occurred
-      event_nfl == 1,
-      
-      # We calculate time difference in years between event and baseline
-      as.numeric(event_date - baseline_nfl) / 365.25,
-      
-      # We calculate time difference in years between last follow-up and baseline
-      as.numeric(last_followup - baseline_nfl) / 365.25
-    )
-  )
-
-# We keep one row per participant and attach all original variables
-surv_data_nfl <- surv_data %>%
-  distinct(RID, .keep_all = TRUE) %>%
-  left_join(nfl_core, by = "RID")
-
-# We tabulate the nfl event indicator (1 = dementia, 0 = censored)
-table(surv_data_nfl$event_nfl)
-```
-
-```{r}
-# We inspect all pTau survival data for a specific participant (RID = 61)
-#ptau_core %>%
-  #filter(RID == 61)
-
-# We inspect all NFL survival data for a specific participant (RID = 61)
-#nfl_core %>%
-  #filter(RID == 61)
-
-# We compare with original, longitudinal data, to see if it's correct
-#surv_data %>%
-  #filter(RID == 61) %>%
-  #arrange(EXAMDATE_dx)
-```
-
-### Construction of biomarker-specific variables indicating years since baseline
-
-```{r}
-# We compute baseline date and time since baseline for pTau in the longitudinal form
-long_data_ptau <- long_data %>%
-  group_by(RID) %>%
-  mutate(
-    
-    # We define baseline as the earliest available pTau measurement date per individual
-    baseline_date_ptau = min(EXAMDATE_ptau, na.rm = TRUE),
-    
-    # We compute time in years since pTau baseline for each visit
-    time_years_ptau = as.numeric(EXAMDATE_ptau - baseline_date_ptau) / 365.25
-    
-  ) %>%
-  ungroup()
-
-# We compute baseline date and time since baseline for NFL in the longitudinal form
-long_data_nfl <- long_data %>%
-  group_by(RID) %>%
-  mutate(
-    
-    # We define baseline as the earliest available NFL measurement date per individual
-    baseline_date_nfl = min(EXAMDATE_nfl, na.rm = TRUE),
-    
-    # We compute time in years since NFL baseline for each visit
-    time_years_nfl = as.numeric(EXAMDATE_nfl - baseline_date_nfl) / 365.25
-    
-  ) %>%
-  ungroup()
-
-```
-
-### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
-
-```{r}
-# # P-tau181 baseline 
-# long_data_ptau_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
-# 
-# baseline_ptau <- long_data_ptau_bl[!duplicated(long_data_ptau$RID),
-#                                 c("RID",
-#                                   "log_PLASMAPTAU181")]
-# 
-# names(baseline_ptau)[2] <- "baseline_value_ptau"
-# 
-# # NfL baseline
-# long_data_nfl_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
-# 
-# baseline_nfl <- long_data_nfl_bl[!duplicated(long_data_nfl$RID),
-#                               c("RID",
-#                                 "log_PLASMA_NFL")]
-# 
-# names(baseline_nfl)[2] <- "baseline_value_nfl"
-# 
-# # We merge the two variables into a baseline table 
-# baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
-
-# Creating a data frame with the first biomarker measurements
-baseline <- long_data %>% 
-  group_by(RID) %>%
-  arrange(RID, EXAMDATE_nfl) %>% 
-  mutate(baseline_value_nfl = first(log_PLASMA_NFL)) %>%
-  arrange(RID, EXAMDATE_ptau) %>%
-  mutate(baseline_value_ptau = first(log_PLASMAPTAU181)) %>%
-  dplyr::select(RID, baseline_value_ptau, baseline_value_nfl) %>%
-  ungroup() %>%
-  distinct()
-
-# We merge the baseline table with the p-tau181 survival dataset 
-surv_data_ptau <- merge(surv_data_ptau,
-                        baseline,
-                        by="RID"
-                        )
-
-surv_data_nfl <- merge(surv_data_nfl,
-                       baseline,
-                       by="RID"
-                       )
-```
-
-## Preparation for the multivariate joint model
+## Preparation for Cox PH model
 
 ### Construction of global (common) baseline, age at baseline, event and time-to-event variables
 
-# ---
-
-Test for survival data without earl diagnosis data and setting time to event = 0 if indivdual had dementia at start
-
 ```{r}
-surv_data_test <- surv_data_test %>%
+surv_data <- surv_data %>%
   group_by(RID) %>%
   summarise(
 #     carrying these forward to check events and event times are coded correctly
@@ -1429,10 +1100,7 @@ surv_data_test <- surv_data_test %>%
     last_dx = unique(last_dx),
     
 #     baseline EXAMDATE defined as the earlier biomarker EXAMDATE (nfl or ptau)
-    EXAMDATE_baseline = min(c(
-      min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
-      min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])),
-      na.rm = TRUE),
+    EXAMDATE_baseline = min(EXAMDATE_baseline),
     
 #     age at baseline visit
     age_at_baseline = age_at_visit[
@@ -1457,135 +1125,99 @@ surv_data_test <- surv_data_test %>%
 
 ```{r}
 # extracting number of events with time_to_event != 0
-table((surv_data_test %>% filter(time_to_event > 0))$event)
-table((surv_data_test %>% filter(time_to_event == 0))$event)
+table((surv_data %>% filter(time_to_event > 0))$event)
+table((surv_data %>% filter(time_to_event == 0))$event)
+```
+
+### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
+
+```{r}
+# Creating a data frame with the first biomarker measurements
+baseline <- long_data %>% 
+  group_by(RID) %>%
+  arrange(RID, EXAMDATE_nfl) %>% 
+  mutate(baseline_value_nfl = first(PLASMA_NFL)) %>%
+  arrange(RID, EXAMDATE_ptau) %>%
+  mutate(baseline_value_ptau = first(PLASMAPTAU181)) %>%
+  dplyr::select(RID, baseline_value_ptau, baseline_value_nfl) %>%
+  ungroup() %>%
+  distinct()
 ```
 
 ```{r}
 # merging the survival data with demographics and the baseline biomarker values
-surv_data_test <- surv_data_test %>%
+surv_data <- surv_data %>%
   merge(demographics_small, by = "RID") %>% 
   merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID") %>%
   merge(baseline, by = "RID")
-```
-
-# ---
-
-```{r}
-# We construct a unified survival dataset with a single event and time-to-event definition
-surv_core <- surv_data %>%
-  
-  mutate(
-    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
-    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
-    EXAMDATE_dx = as.Date(EXAMDATE_dx)
-  ) %>%
-  
-  group_by(RID) %>%
-  summarise(
-    
-    # We define baseline as the first available biomarker measurement (ptau or nfl)
-    baseline = min(c(
-      min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
-      min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-    ), na.rm = TRUE),
-    
-    # We define age at baseline (closest visit conceptually)
-    age_at_baseline = age_at_visit[
-      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
-      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-    ][1],
-    
-    # We define first dementia event AFTER baseline
-    event_date = {
-      
-      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
-      dx_dates <- dx_dates[dx_dates > min(c(
-        min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
-        min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-      ), na.rm = TRUE)]
-      
-      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
-    },
-    
-    # We define last follow-up across all sources
-    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
-    
-    .groups = "drop"
-  ) %>%
-  
-  mutate(
-    
-    # We define event indicator
-    event = as.integer(!is.na(event_date)),
-    
-    # We define ONE shared time-to-event for all analyses
-    time_to_event = if_else(
-      event == 1,
-      as.numeric(event_date - baseline) / 365.25,
-      as.numeric(last_followup - baseline) / 365.25
-    )
-  )
-
-# We attach original data (longitudinal structure preserved)
-surv_data_multi <- surv_data %>%
-  distinct(RID, .keep_all = TRUE) %>%
-  left_join(surv_core, by = "RID")
-
-# We tabulate event distribution
-table(surv_data_multi$event)
-```
-
-### Construction of global version of variable indicating years since baseline
-
-```{r}
-long_data_multi <- long_data %>%
-  group_by(RID) %>%
-  
-  # We define a single baseline per participant across biomarkers
-  mutate(
-    global_baseline = min(c(EXAMDATE_ptau, EXAMDATE_nfl), na.rm = TRUE)
-  ) %>%
-  
-  # We compute time from global baseline for all biomarker observations
-  mutate(
-    time_years = as.numeric(coalesce(EXAMDATE_ptau, EXAMDATE_nfl) - global_baseline) / 365.25
-  ) %>%
-  
-  ungroup()
-```
-
-```{r}
-# longitudinal data with time_years as time since baseline where baseline takes mid oint between exams if EXAMDATE_nfl and EXAMDATE_ptau are not the same
-long_data_test <- long_data %>%
-  group_by(RID) %>%
-  
-  # We define a single baseline per participant across biomarkers
-  mutate(
-    global_baseline = min(EXAMDATE, na.rm = TRUE)
-  ) %>%
-  
-  # We compute time from global baseline for all biomarker observations
-  mutate(
-    time_years = as.numeric(EXAMDATE - global_baseline) / 365.25
-  ) %>%
-  
-  ungroup()
 ```
 
 ## Recheck of longitudinal and survival data lengths
 
 ```{r}
 # We check the number of individuals in each dataset 
-length(unique(long_data_ptau$RID)) # longitudinal data for ptau
-length(unique(long_data_nfl$RID)) # longitudinal data for nfl
-length(unique(long_data_multi$RID)) # longitudinal data, global version
-length(unique(long_data_test$RID)) # longitudinal data, global test version
+length(unique(long_data$RID)) # longitudinal data for ptau
+length(unique(surv_data$RID)) # survival data, global test version
+```
 
-length(unique(surv_data_ptau$RID)) # survival data for ptau
-length(unique(surv_data_nfl$RID)) # survival data for nfl
-length(unique(surv_data_multi$RID)) # survival data, global version
-length(unique(surv_test$RID)) # survival data, global test version
+# Distribution check of each biomarker
+
+1.  **Since cube root transform gives a better Gaussian approximation for ptau, should we consider using this? The downside is that values cannot take negative values, which is possible with the natural logarithm transformation: is this true though - sqrt(4) = +- 2 ... but how does this work in practice?**
+
+```{r}
+# We check the distribution of each biomarker
+hist(long_data$PLASMAPTAU181, main="PLASMAPTAU181")
+hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
+```
+
+```{r}
+# We log transform the biomarkers 
+long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
+long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
+```
+
+```{r}
+# We re-check the distribution of each biomarker  
+hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
+hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+```
+
+```{r}
+# cube-root transformed
+ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+# cube-root transformed
+ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+```
+
+```{r}
+# Transforming the baseline values in the survival data
+surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
+surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
+```
+
+## Check for outliers
+
+We still keep them, as we assume they are correct observations.
+
+-   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
+
+```{r}
+# We identify "extreme" values
+
+# Values greater than 3 sd above ptau mean
+long_data[scale(long_data$PLASMAPTAU181) > 3, ]
+# Values smaller than 3 sd below ptau mean
+long_data[scale(long_data$PLASMAPTAU181) < -3, ]
+
+# Values greater than 3 sd above nfl mean
+long_data[scale(long_data$PLASMA_NFL) > 3, ]
+# Values smaller than 3 sd below nfl mean
+long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
 
 # Longitudinal models
@@ -1614,26 +1246,26 @@ var(long_data$PLASMAPTAU181)
 
 ```{r}
 # GLMM
-fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID), 
-                   data = long_data_ptau,
+fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
+                   data = long_data,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years_ptau + (1|RID), 
-                data = long_data_ptau)
+fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
+                data = long_data)
 
 # LME approach with log transformed data
-fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years_ptau + (1|RID), 
-                           data = long_data_ptau)
+fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years + (1|RID), 
+                           data = long_data)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                             data = long_data_ptau,
+fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                             data = long_data,
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years_ptau + (1|RID),
-                            data = long_data_ptau,
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            data = long_data,
                             family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -1667,26 +1299,26 @@ var(long_data$PLASMA_NFL)
 
 ```{r}
 # GLMM
-fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID), 
-                   data = long_data_nfl,
+fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
+                   data = long_data,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
-fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years_nfl + (1|RID), 
-                data = long_data_nfl)
+fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years + (1|RID), 
+                data = long_data)
 
 # LME approach with log transformed data
-fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years_nfl + (1|RID), 
-                          data = long_data_nfl)
+fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years + (1|RID), 
+                          data = long_data)
 
 # Lognormal - similar to log-transforming then fitting LME
-fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                             data = long_data_nfl,
+fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                             data = long_data,
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years_nfl + (1|RID),
-                           data = long_data_nfl,
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           data = long_data,
                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -1715,18 +1347,18 @@ AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_st
 ```{r}
 # Longitudinal model for p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
-  random = ~ time_years_ptau | RID,                    
-  data = long_data_ptau
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  random = ~ time_years | RID,                    
+  data = long_data
 )
 
 summary(long_model_ptau)
 
 # Longitudinal model for NfL with normal distribution 
 long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years_nfl + PTGENDER + APOE4_status, 
-  random = ~ time_years_nfl | RID, # random intercept + slope
-  data = long_data_nfl
+  log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
+  random = ~ time_years | RID, # random intercept + slope
+  data = long_data
   )
 
 summary(long_model_nfl)
@@ -1824,22 +1456,22 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 ```{r}
 # Cox survival-models, with covariates
 # For p-tau181
-surv_model_ptau <- coxph(
-  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status,
-  data = surv_data_ptau,
+surv_model <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
+  data = surv_data,
   x = TRUE
 )
 
-summary(surv_model_ptau)
+summary(surv_model)
 
-# For NfL
-surv_model_nfl <- coxph(
-  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
-  data = surv_data_nfl,
-  x = TRUE
-)
-
-summary(surv_model_nfl)
+# # For NfL
+# surv_model_nfl <- coxph(
+#   Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
+#   data = surv_data,
+#   x = TRUE
+# )
+# 
+# summary(surv_model_nfl)
 ```
 
 ### Fitted Cox PH models using baseline values of each biomarker
@@ -2093,10 +1725,10 @@ Comparison of $BIC$ and the log-likelihoods of these two models show a small but
 
 ```{r}
 hlme_m0_1 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data_nfl
+  data = long_data
 )
 ```
 
@@ -2106,10 +1738,10 @@ summary(hlme_m0_1)
 
 ```{r}
 hlme_m0_2 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
-  random = ~ time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ time_years,
   subject = "RID",
-  data = long_data_nfl
+  data = long_data
 )
 ```
 
