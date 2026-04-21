@@ -1,0 +1,725 @@
+---
+title: "3 baseline-version"
+format: pdf
+editor: visual
+---
+
+# 3 baseline-version
+
+-   Med surv_data_ptau, surv_data_nfl och surv_data_multi
+
+-   Med long_data_ptau ,long_data_nfl och long_data_multi
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(JMbayes2)
+library(JM)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+library(ggplot2)
+library(glmmTMB)
+library(DHARMa) # for running residual diagnostics on GLMM
+library(lcmm)
+library(timeROC)
+```
+
+```{r}
+# # NfL data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+ nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ ptau_data <- UGOTPTAU181
+# # Diagnosis data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+ diagnosis_data <- DXSUM
+# # Demographics data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+ demographics <- PTDEMOG
+# # Apoe data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+ apoe <- APOERES
+```
+
+```{r}
+# We select the required nfl variables
+nfl_data <- nfl_data %>%
+  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+# We select the required ptau variables
+ptau_data <- ptau_data %>%
+  dplyr::select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required genotype variables
+apoe <- apoe %>%
+  dplyr::select(RID, GENOTYPE)
+
+# We select the required diagnosis variables
+diagnosis_data <- diagnosis_data %>%
+  dplyr::select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# We add _dx on the diagnosis variables 
+diagnosis_data <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+```
+
+```{r}
+## Checking which obs have double VISCODE2 codes
+# for ptau data
+ptau_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
+
+# for nfl data
+nfl_data %>% group_by(RID, VISCODE2) %>% filter(n() > 1)
+
+# changing VISCODE2 for RID 1097 to m60_1 and m60_2
+ptau_data[ptau_data$RID == 1097, "VISCODE2"] <- c("m48", "m60_2", "m60_1")
+
+nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
+```
+
+```{r}
+# Naming the mean as the original variable to do analysis first with this method and then sensitivity analysis with the first and last measurements
+
+# Adding columns for each ptau measurement and their mean and then collapsing down to unique RID and EXAMDATE
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    first_ptau = first(PLASMAPTAU181),
+    last_ptau = last(PLASMAPTAU181),
+    PLASMAPTAU181 = mean(PLASMAPTAU181),
+    ) %>%
+  ungroup() %>%
+  distinct()
+
+# Adding columns for each nfl measurement and their mean and then collapsing down to unique RID and EXAMDATE
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    first_nfl = first(PLASMA_NFL),
+    last_nfl = last(PLASMA_NFL),
+    PLASMA_NFL = mean(PLASMA_NFL)
+    ) %>%
+  ungroup() %>%
+  distinct()
+```
+
+```{r}
+# checking the difference in method for those with 2 obs on the same examdate
+# for ptau
+head(ptau_data %>%
+       filter(PLASMAPTAU181 != first_ptau) %>%
+       dplyr::select(PLASMAPTAU181, first_ptau, last_ptau)
+     )
+
+# for nfl
+head(nfl_data %>%
+       filter(PLASMA_NFL != first_nfl) %>%
+       dplyr::select(PLASMA_NFL, first_nfl, last_nfl)
+     )
+```
+
+```{r}
+# We merge NFL and ptau data for longitudinal data by RID and VISCODE2
+long_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+
+# We merge NFL, ptau and diagnosis data for survival data, only by RID 
+surv_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data, by = c("RID"))
+```
+
+```{r}
+# We count missing values per column in long_data: all these are variables we will use in the model, so we can remove with na.omit()
+sapply(long_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# We count missing values per column in surv_data: VISCODE2.y will not be used in the model, so we need to see how these observations look
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# There are no rows with missing VISCODE2.y with full data for the model variables, so we can remove all with na.omit()
+surv_data %>% filter(is.na(VISCODE2.y))
+```
+
+```{r}
+# We remove missing values 
+long_data <- na.omit(long_data)
+surv_data <- na.omit(surv_data)
+
+# We re-count missing values
+sapply(long_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# We check the number of individuals in each dataset 
+length(unique(long_data$RID)) # longitudinal data
+length(unique(surv_data$RID)) # survival data
+```
+
+```{r}
+# Correlation between the biomarkers 
+cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
+```
+
+```{r}
+# We only keep the demographics variables we need and one row per person 
+demographics_small <- demographics %>%
+  dplyr::select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# We define APOE4 status based on number of E4 alleles
+apoe <- apoe %>%
+  mutate(APOE4_status = case_when(
+    GENOTYPE == "4/4" ~ "2 alleles",
+    GENOTYPE %in% c("2/4", "3/4") ~ "1 allele",
+    TRUE ~ "0 alleles"
+  ),
+  genotype = as.factor(GENOTYPE)
+  )
+```
+
+```{r}
+# We merge gender with long_data and surv_data
+long_data <- long_data %>%
+  left_join(demographics_small, by = "RID")
+surv_data <- surv_data %>%
+  left_join(demographics_small, by = "RID")
+
+# We merge apoe with long_data and surv_data
+long_data <- merge(long_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
+surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
+
+# We make sure that gender and apoe4-status are factors
+long_data$PTGENDER <- as.factor(long_data$PTGENDER)
+surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
+long_data$APOE4_status <- factor(long_data$APOE4_status,
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
+surv_data$APOE4_status <- factor(surv_data$APOE4_status,
+                                 levels = c("0 alleles", "1 allele", "2 alleles"))
+
+# We create age_at_visit 
+long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
+surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
+```
+
+```{r}
+# final diagnoses for the full sample size
+table(
+  (surv_data %>%
+     group_by(RID) %>%
+     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
+     dplyr::select(DIAGNOSIS_dx) %>%
+     distinct()
+   )$DIAGNOSIS_dx
+  )
+```
+
+```{r}
+# We filter individuals with at least 3 measurements of ptau_data
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+```{r}
+# final diagnoses for the reduced sample size
+table(
+  (surv_data %>%
+     group_by(RID) %>%
+     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
+     dplyr::select(DIAGNOSIS_dx) %>%
+     distinct()
+   )$DIAGNOSIS_dx
+  )
+```
+
+```{r}
+# checking how many observations where the EXAMDATE is different for nfl and ptau
+diff <- long_data %>% mutate(diff = EXAMDATE_nfl != EXAMDATE_ptau)
+sum(diff$diff)
+
+# filtering out the observations with different EXAMDATE
+diff <- diff %>% filter(diff == TRUE)
+
+# checking how many of these are baseline visits
+table(diff$VISCODE2)
+
+# # checking which observations have the same examdate for nfl and ptau
+# common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
+
+# # checking the observations with different exam dates
+# long_data[-common, ]
+```
+
+```{r}
+# calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
+diff <- diff %>% mutate(time_diff = EXAMDATE_nfl - EXAMDATE_ptau)
+
+# fetching the time differences
+diff$time_diff 
+
+# checking how many observations have a time difference over 30 days (1 month)
+diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
+```
+
+```{r}
+# testing the method
+diff_examdate <- long_data %>%
+  mutate(
+    time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
+    EXAMDATE_new = case_when(
+      time_diff == 0 ~ EXAMDATE_nfl,
+      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff
+    )
+  ) %>%
+  filter(time_diff != 0) %>%
+  relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
+```
+
+```{r}
+# creating a common EXAMDATE from two cases
+# 1: EXAMDATE_nfl == EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl
+# 2: EXAMDATE_nfl != EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl + the difference between the two dates
+# then defining the baseline date from the earliest EXAMDATE 
+long_data <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    EXAMDATE = EXAMDATE_ptau + 0.5 * (EXAMDATE_nfl - EXAMDATE_ptau),
+    baseline_date = min(EXAMDATE)) %>%
+  ungroup()
+```
+
+```{r}
+# dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
+# long_data <- long_data %>%
+#   group_by(RID) %>%
+#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
+#   ungroup()
+```
+
+```{r}
+# filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
+# creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
+test <- diagnosis_data %>%
+  merge(
+    long_data %>% dplyr::select(RID, baseline_date), by = "RID"
+    ) %>%
+  filter(EXAMDATE_dx - baseline_date >= -50) %>%
+  distinct() %>%
+  group_by(RID) %>%
+  arrange(EXAMDATE_dx) %>%
+  mutate(
+    baseline_dx = first(DIAGNOSIS_dx),
+    last_dx = last(DIAGNOSIS_dx)
+  ) %>%
+  dplyr::select(!baseline_date)
+```
+
+```{r}
+# merging the diagnosis data with the longitudinal data in order to get the survival data
+surv_data_test <- long_data %>% left_join(test, by = "RID")
+```
+
+```{r}
+# We check the distribution of each biomarker
+hist(long_data$PLASMAPTAU181, main="PLASMAPTAU181")
+hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
+```
+
+```{r}
+# We log transform the biomarkers 
+long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
+long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
+
+surv_data$log_PLASMAPTAU181 <- log(surv_data$PLASMAPTAU181)
+surv_data$log_PLASMA_NFL <- log(surv_data$PLASMA_NFL)
+```
+
+```{r}
+# We re-check the distribution of each biomarker  
+hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
+hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+```
+
+```{r}
+# cube-root transformed
+ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+
+# cube-root transformed
+ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
+  geom_histogram(binwidth = 0.1, colour = "white") +
+  theme_classic()
+```
+
+```{r}
+# We identify "extreme" values
+
+# Values greater than 3 sd above ptau mean
+long_data[scale(long_data$PLASMAPTAU181) > 3, ]
+# Values smaller than 3 sd below ptau mean
+long_data[scale(long_data$PLASMAPTAU181) < -3, ]
+
+# Values greater than 3 sd above nfl mean
+long_data[scale(long_data$PLASMA_NFL) > 3, ]
+# Values smaller than 3 sd below nfl mean
+long_data[scale(long_data$PLASMA_NFL) < -3, ]
+```
+
+# Härifrån skillnaden sker - från skapandet av baseline! 
+
+```{r}
+##### We prepare survival data for ptau
+ptau_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first valid pTau measurement date per individual
+    baseline_ptau = min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+    
+    # We define age at baseline pTau visit
+    age_at_baseline_ptau = age_at_visit[
+      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
+    ][1],
+    
+    # We define the event date as the first dementia diagnosis after baseline
+    event_date = {
+      
+      # We extract baseline for filtering
+      base <- min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)])
+      
+      # We extract all dementia diagnosis dates
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      
+      # We restrict events to those occurring strictly after baseline
+      dx_dates <- dx_dates[dx_dates > base]
+      
+      # We assign NA if no dementia event occurs after baseline
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up as the maximum observed visit across all data sources
+    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
+    event_ptau = as.integer(!is.na(event_date)),
+    
+    # We compute time-to-event in years from baseline to event or censoring
+    time_to_event_ptau = if_else(
+      
+      # We use event date if dementia occurred
+      event_ptau == 1,
+      
+      # We calculate time difference in years between event and baseline
+      as.numeric(event_date - baseline_ptau) / 365.25,
+      
+      # We calculate time difference in years between last follow-up and baseline
+      as.numeric(last_followup - baseline_ptau) / 365.25
+    )
+  )
+
+# We keep one row per participant and attach all original variables
+surv_data_ptau <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(ptau_core, by = "RID")
+
+# We tabulate the ptau event indicator (1 = dementia, 0 = censored)
+table(surv_data_ptau$event_ptau)
+```
+
+```{r}
+##### We prepare survival data for ptau
+nfl_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first valid NFL measurement date per individual
+    baseline_nfl = min(EXAMDATE_nfl[!is.na(PLASMA_NFL)]),
+    
+    # We define age at baseline NFL visit
+    age_at_baseline_nfl = age_at_visit[
+      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ][1],
+    
+    # We define the event date as the first dementia diagnosis after baseline
+    event_date = {
+      
+      # We extract baseline for filtering
+      base <- min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      
+      # We extract all dementia diagnosis dates
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      
+      # We restrict events to those occurring strictly after baseline
+      dx_dates <- dx_dates[dx_dates > base]
+      
+      # We assign NA if no dementia event occurs after baseline
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up as the maximum observed visit across all data sources
+    last_followup = max(c(EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We create the event indicator (1 = dementia occurred after baseline, 0 = censored)
+    event_nfl = as.integer(!is.na(event_date)),
+    
+    # We compute time-to-event in years from baseline to event or censoring
+    time_to_event_nfl = if_else(
+      
+      # We use event date if dementia occurred
+      event_nfl == 1,
+      
+      # We calculate time difference in years between event and baseline
+      as.numeric(event_date - baseline_nfl) / 365.25,
+      
+      # We calculate time difference in years between last follow-up and baseline
+      as.numeric(last_followup - baseline_nfl) / 365.25
+    )
+  )
+
+# We keep one row per participant and attach all original variables
+surv_data_nfl <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(nfl_core, by = "RID")
+
+# We tabulate the nfl event indicator (1 = dementia, 0 = censored)
+table(surv_data_nfl$event_nfl)
+```
+
+```{r}
+# We inspect all pTau survival data for a specific participant (RID = 61)
+#ptau_core %>%
+  #filter(RID == 61)
+
+# We inspect all NFL survival data for a specific participant (RID = 61)
+#nfl_core %>%
+  #filter(RID == 61)
+
+# We compare with original, longitudinal data, to see if it's correct
+#surv_data %>%
+  #filter(RID == 61) %>%
+  #arrange(EXAMDATE_dx)
+```
+
+```{r}
+# We compute baseline date and time since baseline for pTau in the longitudinal form
+long_data_ptau <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    
+    # We define baseline as the earliest available pTau measurement date per individual
+    baseline_date_ptau = min(EXAMDATE_ptau, na.rm = TRUE),
+    
+    # We compute time in years since pTau baseline for each visit
+    time_years_ptau = as.numeric(EXAMDATE_ptau - baseline_date_ptau) / 365.25
+    
+  ) %>%
+  ungroup()
+
+# We compute baseline date and time since baseline for NFL in the longitudinal form
+long_data_nfl <- long_data %>%
+  group_by(RID) %>%
+  mutate(
+    
+    # We define baseline as the earliest available NFL measurement date per individual
+    baseline_date_nfl = min(EXAMDATE_nfl, na.rm = TRUE),
+    
+    # We compute time in years since NFL baseline for each visit
+    time_years_nfl = as.numeric(EXAMDATE_nfl - baseline_date_nfl) / 365.25
+    
+  ) %>%
+  ungroup()
+
+```
+
+```{r}
+# # P-tau181 baseline 
+# long_data_ptau_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_ptau), ]
+# 
+# baseline_ptau <- long_data_ptau_bl[!duplicated(long_data_ptau$RID),
+#                                 c("RID",
+#                                   "log_PLASMAPTAU181")]
+# 
+# names(baseline_ptau)[2] <- "baseline_value_ptau"
+# 
+# # NfL baseline
+# long_data_nfl_bl <- long_data[order(long_data$RID, long_data$EXAMDATE_nfl), ]
+# 
+# baseline_nfl <- long_data_nfl_bl[!duplicated(long_data_nfl$RID),
+#                               c("RID",
+#                                 "log_PLASMA_NFL")]
+# 
+# names(baseline_nfl)[2] <- "baseline_value_nfl"
+# 
+# # We merge the two variables into a baseline table 
+# baseline <- merge(baseline_ptau, baseline_nfl, by="RID")
+
+# Creating a data frame with the first biomarker measurements
+baseline <- long_data %>% 
+  group_by(RID) %>%
+  arrange(RID, EXAMDATE_nfl) %>% 
+  mutate(baseline_value_nfl = first(log_PLASMA_NFL)) %>%
+  arrange(RID, EXAMDATE_ptau) %>%
+  mutate(baseline_value_ptau = first(log_PLASMAPTAU181)) %>%
+  dplyr::select(RID, baseline_value_ptau, baseline_value_nfl) %>%
+  ungroup() %>%
+  distinct()
+
+# We merge the baseline table with the p-tau181 survival dataset 
+surv_data_ptau <- merge(surv_data_ptau,
+                        baseline,
+                        by="RID"
+                        )
+
+surv_data_nfl <- merge(surv_data_nfl,
+                       baseline,
+                       by="RID"
+                       )
+```
+
+```{r}
+# We construct a unified survival dataset with a single event and time-to-event definition
+surv_core <- surv_data %>%
+  
+  mutate(
+    EXAMDATE_ptau = as.Date(EXAMDATE_ptau),
+    EXAMDATE_nfl = as.Date(EXAMDATE_nfl),
+    EXAMDATE_dx = as.Date(EXAMDATE_dx)
+  ) %>%
+  
+  group_by(RID) %>%
+  summarise(
+    
+    # We define baseline as the first available biomarker measurement (ptau or nfl)
+    baseline = min(c(
+      min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+      min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ), na.rm = TRUE),
+    
+    # We define age at baseline (closest visit conceptually)
+    age_at_baseline = age_at_visit[
+      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
+      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    ][1],
+    
+    # We define first dementia event AFTER baseline
+    event_date = {
+      
+      dx_dates <- EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]
+      dx_dates <- dx_dates[dx_dates > min(c(
+        min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]),
+        min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+      ), na.rm = TRUE)]
+      
+      if(length(dx_dates) == 0) as.Date(NA) else min(dx_dates)
+    },
+    
+    # We define last follow-up across all sources
+    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  mutate(
+    
+    # We define event indicator
+    event = as.integer(!is.na(event_date)),
+    
+    # We define ONE shared time-to-event for all analyses
+    time_to_event = if_else(
+      event == 1,
+      as.numeric(event_date - baseline) / 365.25,
+      as.numeric(last_followup - baseline) / 365.25
+    )
+  )
+
+# We attach original data (longitudinal structure preserved)
+surv_data_multi <- surv_data %>%
+  distinct(RID, .keep_all = TRUE) %>%
+  left_join(surv_core, by = "RID")
+
+# We tabulate event distribution
+table(surv_data_multi$event)
+```
+
+```{r}
+long_data_multi <- long_data %>%
+  group_by(RID) %>%
+  
+  # We define a single baseline per participant across biomarkers
+  mutate(
+    global_baseline = min(c(EXAMDATE_ptau, EXAMDATE_nfl), na.rm = TRUE)
+  ) %>%
+  
+  # We compute time from global baseline for all biomarker observations
+  mutate(
+    time_years = as.numeric(coalesce(EXAMDATE_ptau, EXAMDATE_nfl) - global_baseline) / 365.25
+  ) %>%
+  
+  ungroup()
+```
+
+```{r}
+# longitudinal data with time_years as time since baseline where baseline takes mid oint between exams if EXAMDATE_nfl and EXAMDATE_ptau are not the same
+long_data_test <- long_data %>%
+  group_by(RID) %>%
+  
+  # We define a single baseline per participant across biomarkers
+  mutate(
+    global_baseline = min(EXAMDATE, na.rm = TRUE)
+  ) %>%
+  
+  # We compute time from global baseline for all biomarker observations
+  mutate(
+    time_years = as.numeric(EXAMDATE - global_baseline) / 365.25
+  ) %>%
+  
+  ungroup()
+```
+
+```{r}
+# We check the number of individuals in each dataset 
+length(unique(long_data_ptau$RID)) # longitudinal data for ptau
+length(unique(long_data_nfl$RID)) # longitudinal data for nfl
+length(unique(long_data_multi$RID)) # longitudinal data, global version
+length(unique(long_data_test$RID)) # longitudinal data, global test version
+
+length(unique(surv_data_ptau$RID)) # survival data for ptau
+length(unique(surv_data_nfl$RID)) # survival data for nfl
+length(unique(surv_data_multi$RID)) # survival data, global version
+length(unique(surv_test$RID)) # survival data, global test version
+```
