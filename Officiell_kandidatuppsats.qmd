@@ -1811,30 +1811,6 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 ## For the different cox PH models and the separate joint models
 
-### Construction of Kaplan-Meier curves, just to look
-
-```{r}
-# We fit Kaplan-Meier curve for p-tau181
-km_fit_ptau <- survfit(Surv(time_to_event_ptau, event_ptau) ~ 1, data = surv_data_ptau)
-# Plot
-plot(
-  km_fit_ptau, 
-  xlab = "Years since p-tau181 baseline", 
-  ylab = "Survival probability (no dementia)", 
-  main = "Kaplan-Meier Curve for Dementia (p-tau181 baseline)"
-)
-
-# We fit Kaplan-Meier curve for NfL
-km_fit_nfl <- survfit(Surv(time_to_event_nfl, event_nfl) ~ 1, data = surv_data_nfl)
-# Plot
-plot(
-  km_fit_nfl, 
-  xlab = "Years since NfL baseline", 
-  ylab = "Survival probability (no dementia)", 
-  main = "Kaplan-Meier Curve for Dementia (NfL baseline)"
-)
-```
-
 ### Fitted standard Cox PH models (for the joint models)
 
 ```{r}
@@ -1944,20 +1920,6 @@ surv_model_nfl_tv <- coxph(
 Although tests of the proportional hazards assumption indicated evidence of non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.168 in the p-tau181 model and p = 0.189 in the NfL model). Therefore, the standard Cox proportional hazards model is retained for primary interpretation.
 
 ## For the multivariate joint model
-
-### Kaplan-Meier curve for global version of survival object
-
-```{r}
-# We fit Kaplan-Meier curve for global version of survival object
-km_fit_multi <- survfit(Surv(time_to_event, event) ~ 1, data = surv_data_multi)
-# Plot
-plot(
-  km_fit_multi, 
-  xlab = "Days since p-tau181 baseline", 
-  ylab = "Survival probability (no dementia)", 
-  main = "Kaplan-Meier Curve for Dementia (global baseline)"
-)
-```
 
 ### Fitted Cox PH model with global survival object
 
