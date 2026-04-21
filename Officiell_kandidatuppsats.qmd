@@ -149,7 +149,9 @@ Among the ones currently being explored and used in research settings, are menti
 
 **NFL**
 
-Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al.).
+Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al.). NfL is a molecule usually present inside neurons, and therefore
+
+Analysis of the concentration of this molecule OUTSIDE of the cell (in CSF and blood) is a measure of neuronal damage.
 
 **SUMMARY**
 
@@ -219,7 +221,7 @@ Longitudinal data in this analysis is defined as $n$ repeated measurements of p-
 
 Why???
 
-We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
+We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups, that is, data collected form the same individual, to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
 
 ### Linear Mixed Effect Model
 
@@ -250,7 +252,7 @@ $\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
 The full model becomes:
 
 $$
-y_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2)
+y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2)
 $$
 
 ### Generalised Linear Mixed Effects Model
@@ -435,11 +437,11 @@ As the number of iterations L increases and the between-chain variation B decrea
 
 ### Latent Class Joint Models
 
+The joint latent class model assumes that the study population is heterogeneous and that within these subgroups, the observations have the same distribution (Kyheng, 2025, p.2).
+
 -   Useful for modelling the relationship between longitudinal data and survival data when the population is thought to be heterogeneous
 
 -   Disease trajectories assumed to differ between these different sub-groups
-
--   Not often implemented in research, as it can be difficult
 
 -   Composed of 3 models: multinomial logistic submodel (latent class model), the linear mixed submodel (biomarker trajectory), and the survival submodel
 
@@ -472,7 +474,7 @@ Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\m
 \qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}
 $$
 
-If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, 2025). This then simplifies the model to:
+If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2). This then simplifies the model to:e
 
 $$
 Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
@@ -632,7 +634,7 @@ Another covariate of interest when predicting progression to dementia is partici
 
 ### APOE4-status
 
-Finally, APOE ε4 status is another covariate used to explain progression to dementia. Retrieved from the GENOTYPE dataset, the variable was initially coded numerically based on the number of ε4 alleles and was then recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). This allows the examination of whether the number of ε4 alleles is associated with the risk of progression to dementia. Consequently, there are 672 participants without any ε4 alleles, 417 participants with one allele, and 101 participants with two alleles among the 1190 included participants.
+Finally, apolipoprotein ε4 status is another covariate used to explain progression to dementia. The ε4 apoliprotein-E (APOE) allele is a risk factor for AD, whereas the ε2 allele has been shown to have protective factor (Wong et al.). Retrieved from the APOERES dataset, the variable was initially coded numerically based on the number of ε4 alleles and was then recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). This allows the examination of whether the number of ε4 alleles is associated with the risk of progression to dementia. Consequently, there are 672 participants without any ε4 alleles, 417 participants with one allele, and 101 participants with two alleles among the 1190 included participants.
 
 # Pre-processing
 
@@ -2655,7 +2657,7 @@ mlcmm_m0_1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data_multi
+  data = long_data_test
 )
 ```
 
@@ -2668,7 +2670,7 @@ mlcmm_m0_2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = long_data_multi
+  data = long_data_test
 )
 ```
 
@@ -2707,7 +2709,7 @@ mlcmm_m1_1 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = long_data_multi,
+  data = long_data_test,
   B = random(mlcmm_m0_1)
 )
 ```
@@ -2724,7 +2726,7 @@ mlcmm_m1_2 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = long_data_multi,
+  data = long_data_test,
   B = random(mlcmm_m0_2)
 )
 ```
