@@ -383,7 +383,7 @@ Joint-model options:
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-### Multivariate Joint Model 
+### Multivariate Joint Model
 
 However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022: p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016: p.?).
 
@@ -1364,6 +1364,9 @@ long_model_nfl <- lme(
   )
 
 summary(long_model_nfl)
+
+# Mixed object for multivariate joint model
+mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
 ```{r}
@@ -1424,31 +1427,6 @@ qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
 
-## For the multivariate joint model
-
-### Combination of fitted longitudinal models with global years-since-baseline variable
-
-```{r}
-# Longitudinal model for p-tau181 with normal distribution and global time_years
-long_model_ptau_multi <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
-  random = ~ time_years | RID,                    
-  data = long_data_multi
-)
-summary(long_model_ptau_multi)
-
-# Longitudinal model for p-tau181 with normal distribution and global time_years
-long_model_nfl_multi <- lme(
-  log_PLASMA_NFL ~ time_years + APOE4_status, 
-  random = ~ time_years | RID, 
-  data = long_data_multi
-  )
-summary(long_model_nfl_multi)
-
-# Mixed object 
-mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
-```
-
 # Survival models
 
 ## For the different cox PH models and the separate joint models
@@ -1457,7 +1435,6 @@ mixed <- list(long_model_ptau_multi, long_model_nfl_multi)
 
 ```{r}
 # Cox survival-models, with covariates
-# For p-tau181
 surv_model <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
   data = surv_data,
@@ -1465,15 +1442,6 @@ surv_model <- coxph(
 )
 
 summary(surv_model)
-
-# # For NfL
-# surv_model_nfl <- coxph(
-#   Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status,
-#   data = surv_data,
-#   x = TRUE
-# )
-# 
-# summary(surv_model_nfl)
 ```
 
 ### Fitted Cox PH models using baseline values of each biomarker
@@ -1482,55 +1450,51 @@ summary(surv_model)
 # Cox survival-models, with covariates including baseline values of each biomarker 
 # For p-tau181
 surv_model_ptau_bl <- coxph(
-  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau,
-  data = surv_data_ptau
+  Surv(time_to_event, event) ~
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data
 )
 
 summary(surv_model_ptau_bl)
+```
 
+```{r}
 # For NfL
 surv_model_nfl_bl <- coxph(
-  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl,
-  data = surv_data_nfl
+  Surv(time_to_event, event) ~
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data
 )
 
-#summary(surv_model_nfl_bl)
+summary(surv_model_nfl_bl)
+```
 
+```{r}
 # For p-tau181 including NfL 
-surv_model_both1_bl <- coxph(
-  Surv(time_to_event_ptau, event_ptau) ~ age_at_baseline_ptau + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data_ptau
+surv_model_both_bl <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data
 )
 
-#summary(surv_model_both1_bl)
-
-# For NfL including p-tau181 
-surv_model_both2_bl <- coxph(
-  Surv(time_to_event_nfl, event_nfl) ~ age_at_baseline_nfl + PTGENDER + APOE4_status + baseline_value_nfl + baseline_value_ptau,
-  data = surv_data_nfl
-)
-
-#summary(surv_model_both2_bl)
+summary(surv_model_both_bl)
 ```
 
 ### Test of the assumption of proportional hazards
 
 ```{r}
-##### For the standard Cox PH models 
-# For p-tau181 
-cox.zph(surv_model_ptau)
-# For NfL
-cox.zph(surv_model_nfl)
+##### For the standard Cox PH model
+cox.zph(surv_model)
+
 
 ##### For the Cox PH models with baseline values of each biomarker 
-# For p-tau181
+# For p-tau181 baseline
 cox.zph(surv_model_ptau_bl)
-# For NfL
+# For NfL baseline
 cox.zph(surv_model_nfl_bl)
-# For p-tau181 including NfL 
-cox.zph(surv_model_both1_bl)
-# For NfL including p-tau181 
-cox.zph(surv_model_both2_bl)
+# For both p-tau181 and NfL baseline
+cox.zph(surv_model_both_bl)
+
 ```
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
@@ -1560,31 +1524,6 @@ surv_model_nfl_tv <- coxph(
 ```
 
 Although tests of the proportional hazards assumption indicated evidence of non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.168 in the p-tau181 model and p = 0.189 in the NfL model). Therefore, the standard Cox proportional hazards model is retained for primary interpretation.
-
-## For the multivariate joint model
-
-### Fitted Cox PH model with global survival object
-
-```{r}
-surv_model_multi <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
-  data = surv_data_multi
-)
-
-summary(surv_model_multi)
-```
-
-### Test of the assumption of proportional hazards
-
-```{r}
-# For the Cox PH model with global survival object
-cox.zph(surv_model_multi)
-```
-
-```{r}
-summary(long_model_multi)
-VarCorr(long_model_multi)
-```
 
 # Two separate joint models
 
