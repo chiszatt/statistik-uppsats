@@ -1230,6 +1230,12 @@ long_data[scale(long_data$PLASMA_NFL) < -3, ]
 
 # ...
 
+```{r}
+# extracting number of events with time_to_event != 0
+table((surv_data %>% filter(time_to_event > 0))$event)
+table((surv_data %>% filter(time_to_event == 0))$event)
+```
+
 # Longitudinal models
 
 ## Comparing longitudinal models
@@ -1531,6 +1537,8 @@ AIC(surv_model, surv_model_tv)
 logLik(surv_model)
 logLik(surv_model_tv)
 ```
+
+Time-varying apoe4-status is not significant in the time-varying Cox PH model (p-value = 0.105). Additionally, It barely gives better model fit (AIC values: 2077 vs 2075. Log likelihood: -1034 vs -1033) –\> Given these results, and to keep interpretation simple, we'll continue with the standard Cox PH model.
 
 # Two separate joint models
 
