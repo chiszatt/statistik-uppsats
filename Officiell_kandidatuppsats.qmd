@@ -349,20 +349,6 @@ $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bma
 
 *Skriva om MCMC och Convergence, vad det innebär inom bayesian approach, för att ens kunna prata o the Gelmain-Rubin statistic*
 
-"A simultaneous inferential method through a joint likelihood may be favorable, but the computational burden for proposed MVJ modelings can be very intensive, even sometimes infeasible, and may cause problems of algorithm convergence. (Brown et al., 2003, p. ?; Wu et al. 2010, p ?) <https://academic.oup.com/biometrics/article-abstract/59/2/221/7286178?redirectedFrom=fulltext&login=false>
-
-<https://pubmed.ncbi.nlm.nih.gov/19673859/>
-
-Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
-
-Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
-
-Bayesian joint modeling method shows the advantage. Thus, the parameters can be estimated simultaneously for the MVJ models implemented by Markov Chain Monte Carlo (MCMC) techniques for the skew-normal MVJ model. The simultaneous statistical inference on all unknown model parameters will capture the underlying association between the longitudinal exposures and the event time data.
-
-<https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
-
-Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
-
 **Theory about the model... (specifically why we should use it)**
 
 In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
@@ -400,6 +386,26 @@ Joint-model options:
 -   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+
+**Frequentist vs bayesian approach**
+
+"A simultaneous inferential method through a joint likelihood may be favorable, but the computational burden for proposed MVJ modelings can be very intensive, even sometimes infeasible, and may cause problems of algorithm convergence. (Brown et al., 2003, p. ?; Wu et al. 2010, p ?) <https://academic.oup.com/biometrics/article-abstract/59/2/221/7286178?redirectedFrom=fulltext&login=false>
+
+<https://pubmed.ncbi.nlm.nih.gov/19673859/>
+
+Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
+
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
+
+Bayesian joint modeling method shows the advantage. Thus, the parameters can be estimated simultaneously for the MVJ models implemented by Markov Chain Monte Carlo (MCMC) techniques for the skew-normal MVJ model. The simultaneous statistical inference on all unknown model parameters will capture the underlying association between the longitudinal exposures and the event time data.
+
+<https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
+
+Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
+
+**MCMC and convergence**
+
+<https://www.sciencedirect.com/topics/social-sciences/markov-chain-monte-carlo>
 
 ### Multivariate Joint Model
 
