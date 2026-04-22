@@ -141,7 +141,7 @@ Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
 
 Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in CSF and plasma
 
-Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7). **\*\*good source but feel like this info is repeated?\*\* - Känner att det viktigaste att säga om p-tau och nfl är att de är plasma-biomarkörer, något som nyligen har börjat undersökas inom alzheimers liksom, och att ena är mer alzheimer-specifik (p-tau181) och andra inte. Det räcker nog - Som Hans skrev, vi ska fokusera på statistiken**
+Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7).
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
@@ -174,6 +174,10 @@ Similarly, in an article from 2026, researchers applied a multi-dimensional join
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in Alzheimer’s disease, specifically focusing on plasma biomarkers such as NfL and p-tau.
 
 Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592). This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., p. 591).
+
+**Vet inte om detta är relevant \*\*\*\*** At the same time, this method signifies a loss of precision, as analyses restricted to subjects with complete data will generally be less efficient than methods that use all available data (Fitzmaurice, 2011, p. 491). The location of the missing data, such as missingness spread sporadically over many subjects, or concentrated at a specific set of time points in a few subjects, and how highly correlated the missing data are with the observed data, will also affect loss of precision. Finally, under certain circumstances missing data can introduce bias and thereby lead to misleading inferences about changes in the mean response. The authours of the book continues by writing: "It is this last factor, the potential for serious bias, that complicates the analysis of partially missing longitudinal data." (Fitzmaurice, p. 491). As a result, the reasons for any missing data, often referred to as the missing datamechanism, must be carefully considered (Fitzmaurice, p. 491).
+
+Fitzmaurice, G.M., u, Laird, N.M., & Ware, J.H. (2011). *Applied Longitudinal Analysis*. John Wiley & Sons, Inc. Online ISBN:9781119513469. DOI:10.1002/97811
 
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
@@ -380,6 +384,26 @@ Joint-model options:
 -   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
 
 -   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+
+**Frequentist vs bayesian approach**
+
+"A simultaneous inferential method through a joint likelihood may be favorable, but the computational burden for proposed MVJ modelings can be very intensive, even sometimes infeasible, and may cause problems of algorithm convergence. (Brown et al., 2003, p. ?; Wu et al. 2010, p ?) <https://academic.oup.com/biometrics/article-abstract/59/2/221/7286178?redirectedFrom=fulltext&login=false>
+
+<https://pubmed.ncbi.nlm.nih.gov/19673859/>
+
+Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
+
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
+
+Bayesian joint modeling method shows the advantage. Thus, the parameters can be estimated simultaneously for the MVJ models implemented by Markov Chain Monte Carlo (MCMC) techniques for the skew-normal MVJ model. The simultaneous statistical inference on all unknown model parameters will capture the underlying association between the longitudinal exposures and the event time data.
+
+<https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
+
+Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
+
+**MCMC and convergence**
+
+<https://www.sciencedirect.com/topics/social-sciences/markov-chain-monte-carlo>
 
 ### Multivariate Joint Model
 
@@ -1236,6 +1260,12 @@ long_data[scale(long_data$PLASMA_NFL) < -3, ]
 
 # ...
 
+```{r}
+# extracting number of events with time_to_event != 0
+table((surv_data %>% filter(time_to_event > 0))$event)
+table((surv_data %>% filter(time_to_event == 0))$event)
+```
+
 # Longitudinal models
 
 ## Comparing longitudinal models
@@ -1560,14 +1590,14 @@ summary(surv_model_nfl_bl)
 ```
 
 ```{r}
-# For p-tau181 including NfL 
+# Inlcuding both p-tau181 and NfL
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
   data = surv_data
 )
 
-summary(surv_model_both_bl)
+summary(surv_model_both_bl) 
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1577,31 +1607,44 @@ summary(surv_model_both_bl)
 cox.zph(surv_model)
 
 ##### For the Cox PH models with baseline values of each biomarker 
-# For p-tau181 baseline
+# With p-tau181 baseline values
 cox.zph(surv_model_ptau_bl)
-# For NfL baseline
+# With NfL baseline values
 cox.zph(surv_model_nfl_bl)
-# For both p-tau181 and NfL baseline
+# With both p-tau181 and NfL baseline values
 cox.zph(surv_model_both_bl)
 ```
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ```{r}
-# # We recode APOE4 status (0, 1, 2 alleles) into a numeric variable 
-# surv_data$APOE4_num <- as.numeric(surv_data$APOE4_status) - 1
-# 
-# # We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
-# surv_model_tv <- coxph(
-#   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + tt(APOE4_num),
-#   data = surv_data,
-#   tt = function(x, t, ...) x * log(t)
-# )
-# 
-# summary(surv_model_tv)
+# Making apoe4-status numeric
+surv_data$APOE4_num <- dplyr::recode(
+  surv_data$APOE4_status,
+  "0 alleles" = 0,
+  "1 allele"  = 1,
+  "2 alleles" = 2
+)
+
+# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
+surv_model_tv <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + 
+    APOE4_num + tt(APOE4_num),
+  data = surv_data,
+  tt = function(x, t, ...) x * log(t + 1)
+)
+
+summary(surv_model_tv)
 ```
 
-Although tests of the proportional hazards assumption indicated evidence of non-proportionality for APOE4 status, time-varying coefficient models did not provide strong evidence of a time-dependent effect (p = 0.168 in the p-tau181 model and p = 0.189 in the NfL model). Therefore, the standard Cox proportional hazards model is retained for primary interpretation.
+```{r}
+AIC(surv_model, surv_model_tv)
+
+logLik(surv_model)
+logLik(surv_model_tv)
+```
+
+Time-varying apoe4-status is not significant in the time-varying Cox PH model (p-value = 0.105). Additionally, It barely gives better model fit (AIC values: 2077 vs 2075. Log likelihood: -1034 vs -1033) –\> Given these results, and to keep interpretation simple, we'll continue with the standard Cox PH model.
 
 # Two separate joint models
 
@@ -3232,4 +3275,4 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 #  )
 ```
 
-Sensitivity anaysis: how does
+Sensitivity anaysis: how does including those with only one measurement affect the precision?
