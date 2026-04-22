@@ -1516,6 +1516,13 @@ surv_model_tv <- coxph(
 summary(surv_model_tv)
 ```
 
+```{r}
+AIC(surv_model, surv_model_tv)
+
+logLik(surv_model)
+logLik(surv_model_tv)
+```
+
 # Two separate joint models
 
 ## Fitted joint model for p-tau181
