@@ -175,6 +175,10 @@ Thus, the question arises as to which modeling approach is best suited for predi
 
 Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592). This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., p. 591).
 
+**Vet inte om detta är relevant \*\*\*\*** At the same time, this method signifies a loss of precision, as analyses restricted to subjects with complete data will generally be less efficient than methods that use all available data (Fitzmaurice, 2011, p. 491). The location of the missing data, such as missingness spread sporadically over many subjects, or concentrated at a specific set of time points in a few subjects, and how highly correlated the missing data are with the observed data, will also affect loss of precision. Finally, under certain circumstances missing data can introduce bias and thereby lead to misleading inferences about changes in the mean response. The authours of the book continues by writing: "It is this last factor, the potential for serious bias, that complicates the analysis of partially missing longitudinal data." (Fitzmaurice, p. 491). As a result, the reasons for any missing data, often referred to as the missing datamechanism, must be carefully considered (Fitzmaurice, p. 491).
+
+Fitzmaurice, G.M., u, Laird, N.M., & Ware, J.H. (2011). *Applied Longitudinal Analysis*. John Wiley & Sons, Inc. Online ISBN:9781119513469. DOI:10.1002/97811
+
 In other words, some studies include all available participants, whereas others choose to include only participants with a minimum number of measurements, meaning that those with only a single measurement are left excluded from the modeling process.
 
 **Behöver införa källan** –\> On one hand, the longitudinal effects are only estimated from participants with more than one measurement. On the other hand, the excluded ones still contribute in estimating the cross-sectional effects of covariates, such as time effects. Additionally, there is the aspect of missing data, which means that a likelihood-based repeated measurements analysis will be valid under the missing at random assumption if they are in. It is thus recommended to still include the participants with only one measurement.
@@ -344,6 +348,20 @@ $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bma
 *Viktigt att ta upp om priordelning, att det behövs för bayesiansk fördelning. Väljs det automatiskt i JM()-funktionen (någon sorts standard) eller måste man välja själv? Uitfrån vad i såna fall?*
 
 *Skriva om MCMC och Convergence, vad det innebär inom bayesian approach, för att ens kunna prata o the Gelmain-Rubin statistic*
+
+"A simultaneous inferential method through a joint likelihood may be favorable, but the computational burden for proposed MVJ modelings can be very intensive, even sometimes infeasible, and may cause problems of algorithm convergence. (Brown et al., 2003, p. ?; Wu et al. 2010, p ?) <https://academic.oup.com/biometrics/article-abstract/59/2/221/7286178?redirectedFrom=fulltext&login=false>
+
+<https://pubmed.ncbi.nlm.nih.gov/19673859/>
+
+Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
+
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
+
+Bayesian joint modeling method shows the advantage. Thus, the parameters can be estimated simultaneously for the MVJ models implemented by Markov Chain Monte Carlo (MCMC) techniques for the skew-normal MVJ model. The simultaneous statistical inference on all unknown model parameters will capture the underlying association between the longitudinal exposures and the event time data.
+
+<https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
+
+Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
 
 **Theory about the model... (specifically why we should use it)**
 
