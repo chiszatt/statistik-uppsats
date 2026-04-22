@@ -1129,6 +1129,14 @@ table((surv_data %>% filter(time_to_event > 0))$event)
 table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
+## Removing individuals with dementia at start
+
+```{r}
+# Removing individuals who had a dementia dx at time = 0
+surv_data <- surv_data %>% filter(time_to_event > 0)
+long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
+```
+
 ### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
@@ -1150,14 +1158,6 @@ surv_data <- surv_data %>%
   merge(demographics_small, by = "RID") %>% 
   merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID") %>%
   merge(baseline, by = "RID")
-```
-
-## Removing individuals with dementia at start
-
-```{r}
-# Removing individuals who had a dementia dx at time = 0
-surv_data <- surv_data %>% filter(time_to_event > 0)
-long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
 ```
 
 ## Recheck of longitudinal and survival data lengths
