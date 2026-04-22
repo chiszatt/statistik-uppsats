@@ -141,7 +141,7 @@ Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
 
 Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in CSF and plasma
 
-Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7). **\*\*good source but feel like this info is repeated?\*\* - Känner att det viktigaste att säga om p-tau och nfl är att de är plasma-biomarkörer, något som nyligen har börjat undersökas inom alzheimers liksom, och att ena är mer alzheimer-specifik (p-tau181) och andra inte. Det räcker nog - Som Hans skrev, vi ska fokusera på statistiken**
+Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7).
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
@@ -1129,6 +1129,14 @@ table((surv_data %>% filter(time_to_event > 0))$event)
 table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
+## Removing individuals with dementia at start
+
+```{r}
+# Removing individuals who had a dementia dx at time = 0
+surv_data <- surv_data %>% filter(time_to_event > 0)
+long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
+```
+
 ### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
@@ -1219,6 +1227,8 @@ long_data[scale(long_data$PLASMA_NFL) > 3, ]
 # Values smaller than 3 sd below nfl mean
 long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
+
+# ...
 
 # Longitudinal models
 
@@ -1475,7 +1485,7 @@ surv_model_both_bl <- coxph(
   data = surv_data
 )
 
-summary(surv_model_both_bl)
+summary(surv_model_both_bl) 
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1484,7 +1494,6 @@ summary(surv_model_both_bl)
 ##### For the standard Cox PH model
 cox.zph(surv_model)
 
-
 ##### For the Cox PH models with baseline values of each biomarker 
 # With p-tau181 baseline values
 cox.zph(surv_model_ptau_bl)
@@ -1492,12 +1501,12 @@ cox.zph(surv_model_ptau_bl)
 cox.zph(surv_model_nfl_bl)
 # With both p-tau181 and NfL baseline values
 cox.zph(surv_model_both_bl)
-
 ```
 
 ### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
 
 ```{r}
+# Making apoe4-status numeric
 surv_data$APOE4_num <- dplyr::recode(
   surv_data$APOE4_status,
   "0 alleles" = 0,
@@ -1554,6 +1563,10 @@ summary(joint_model_ptau)
 
 ## Fitted joint model for NfL
 
+1.  High rhat for log(shape) with JM
+
+2.  High rhat for sigma with JMBayes2
+
 ```{r}
 # Joint model for NfL using package JM (frequentist approach)
 joint_model_nfl <- jointModel(
@@ -1575,7 +1588,9 @@ joint_model_nfl <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
+```
 
+```{r}
 summary(joint_model_nfl)
 ```
 
@@ -1610,7 +1625,7 @@ densplot(joint_model_ptau, parm = "sigmas")
 ## To check if the models have stable random slopes
 
 ```{r}
-summary(long_model_ptau)
+VarCorr(long_model_ptau)
 VarCorr(long_model_nfl)
 ```
 
@@ -1721,13 +1736,13 @@ The linear mixed effects model was extended to model 2 classes with a latent cla
 
 ```{r}
 hlme_m1 <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years_nfl,
-    mixture = ~ time_years_nfl,
-    random = ~ time_years_nfl,
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
     subject = "RID",
     classmb = ~ 1,
     ng = 2,
-    data = long_data_nfl,
+    data = long_data,
     B = random(hlme_m0_2)
   )
 
@@ -1792,10 +1807,10 @@ Latent class mixed models for PTAU
 
 ```{r}
 hlme_m0_1 <- hlme(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data_ptau
+  data = long_data
 )
 ```
 
@@ -1805,10 +1820,10 @@ summary(hlme_m0_1)
 
 ```{r}
 hlme_m0_2 <- hlme(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
-  random = ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
   subject = "RID",
-  data = long_data_ptau
+  data = long_data
 )
 ```
 
@@ -1845,13 +1860,13 @@ A latent mixed effects model with 2 classes was estimated on the longitudinal pt
 
 ```{r}
 hlme_m1 <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+    fixed = log_PLASMAPTAU181 ~ time_years,
     mixture = ~ 1,
     random = ~ 1,
     subject = "RID",
     classmb = ~ 1,
     ng = 2,
-    data = long_data_ptau,
+    data = long_data,
     B = random(hlme_m0_1)
   )
 ```
@@ -1927,10 +1942,10 @@ Latent class mixed models for NFL including covariates in the class model
 ```{r}
 # updating the 1 class model
 hlme_m0 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
-  random = ~ time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ time_years,
   subject = "RID",
-  data = long_data_nfl
+  data = long_data
 )
 ```
 
@@ -1946,13 +1961,13 @@ The 2 class model with covariates $APOE4\_status$ and $age\_at\_visit$ is a sign
 
 ```{r}
 hlme_m1_PTGENDER <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years_nfl,
-    mixture = ~ time_years_nfl,
-    random = ~ time_years_nfl,
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
     subject = "RID",
     classmb = ~ APOE4_status + age_at_visit + PTGENDER,
     ng = 2,
-    data = long_data_nfl,
+    data = long_data,
     B = random(hlme_m0)
   )
 ```
@@ -1965,13 +1980,13 @@ summary(hlme_m1_PTGENDER)
 
 ```{r}
 hlme_m1_nfl_classmb <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years_nfl,
-    mixture = ~ time_years_nfl,
-    random = ~ time_years_nfl,
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
     subject = "RID",
     classmb = ~ APOE4_status + age_at_visit,
     ng = 2,
-    data = long_data_nfl,
+    data = long_data,
     B = random(hlme_m0)
   )
 ```
@@ -2064,10 +2079,10 @@ Latent class mixed models for PTAU including covariates in the class model
 ```{r}
 # updating the 1 class model
 hlme_m0 <- hlme(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data_ptau
+  data = long_data
 )
 ```
 
@@ -2080,20 +2095,20 @@ summary(hlme_m0)
 TO CHECK: difference between genotype in latent class file
 
 ```{r}
-levels(long_data_ptau$APOE4_status)
+levels(long_data$APOE4_status)
 ```
 
 ### Including PTGENDER
 
 ```{r}
 hlme_m1_PTGENDER <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+    fixed = log_PLASMAPTAU181 ~ time_years,
     mixture = ~ 1,
     random = ~ 1,
     subject = "RID",
     classmb = ~ APOE4_status + age_at_visit + PTGENDER,
     ng = 2,
-    data = long_data_ptau,
+    data = long_data,
     B = random(hlme_m0)
   )
 ```
@@ -2106,13 +2121,13 @@ summary(hlme_m1_PTGENDER)
 
 ```{r}
 hlme_m1 <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+    fixed = log_PLASMAPTAU181 ~ time_years,
     mixture = ~ 1,
     random = ~ 1,
     subject = "RID",
     classmb = ~ APOE4_status + age_at_visit,
     ng = 2,
-    data = long_data_ptau,
+    data = long_data,
     B = random(hlme_m0)
   )
 ```
@@ -2190,7 +2205,7 @@ mlcmm_m0_1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data_test
+  data = long_data
 )
 ```
 
@@ -2203,7 +2218,7 @@ mlcmm_m0_2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = long_data_test
+  data = long_data
 )
 ```
 
@@ -2242,7 +2257,7 @@ mlcmm_m1_1 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = long_data_test,
+  data = long_data,
   B = random(mlcmm_m0_1)
 )
 ```
@@ -2259,7 +2274,7 @@ mlcmm_m1_2 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = long_data_test,
+  data = long_data,
   B = random(mlcmm_m0_2)
 )
 ```
@@ -2307,7 +2322,7 @@ mlcmm_m1 <- multlcmm(
   subject = "RID",
   classmb = ~ APOE4_status + age_at_visit,
   ng = 2,
-  data = long_data_multi,
+  data = long_data,
   B = random(mlcmm_m0_1)
 )
 ```
@@ -2383,21 +2398,21 @@ summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 3.  No covariates in the survival model OR the class membership model, evidence for latent classes?
 
 ```{r}
-# merging the longitudinal and survival data for NfL
-jlcmm_data_nfl <- surv_data_nfl %>%
-  dplyr::select(RID, event_nfl, time_to_event_nfl) %>%
-  merge(long_data_nfl, by = "RID")
+# merging the longitudinal and survival data for jlcmm
+jlcmm_data <- surv_data %>%
+  dplyr::select(RID, event, time_to_event) %>%
+  merge(long_data, by = "RID")
 ```
 
 ## M0 (1 latent class)
 
 ```{r}
 jlcmm_m0_1 <- jlcmm(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
   subject = "RID",
-  survival = Surv(time_to_event_nfl, event_nfl) ~ 1,
-  data = jlcmm_data_nfl
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data
 )
 ```
 
@@ -2407,11 +2422,11 @@ summary(jlcmm_m0_1)
 
 ```{r}
 jlcmm_m0_2 <- jlcmm(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
-  random = ~ 1 + time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
   subject = "RID",
-  survival = Surv(time_to_event_nfl, event_nfl) ~ 1,
-  data = jlcmm_data_nfl
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data
 )
 ```
 
@@ -2444,14 +2459,14 @@ LR
 
 ```{r}
 jlcmm_m1_nfl <- jlcmm(
-  fixed = log_PLASMA_NFL ~ time_years_nfl,
-  random = ~ 1 + time_years_nfl,
-  mixture = ~ time_years_nfl,
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
+  mixture = ~ time_years,
   classmb = ~ 1,
   ng = 2,
   subject = "RID",
-  survival = Surv(time_to_event_nfl, event_nfl) ~ 1,
-  data = jlcmm_data_nfl,
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
   B = random(jlcmm_m0_2)
 )
 ```
@@ -2521,7 +2536,7 @@ plot(jlcmm_m1_nfl, which = "survival")
 
 ```{r}
 # longitudinal trajectory by class
-plot(jlcmm_m1_nfl, var.time = "time_years_nfl", which = "fit")
+plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 ```
 
 ## Comparing M0 and M1
@@ -2538,22 +2553,15 @@ summarytable(jlcmm_m0_2, jlcmm_m1_nfl, which = c("G", "loglik", "BIC", "entropy"
 
 # JLCMM: PTAU
 
-```{r}
-# merging the longitudinal and survival data for PTAU
-jlcmm_data_ptau <- surv_data_ptau %>%
-  dplyr::select(RID, event_ptau, time_to_event_ptau) %>%
-  merge(long_data_ptau, by = "RID")
-```
-
 ## M0 (1 latent class)
 
 ```{r}
 jlcmm_m0 <- jlcmm(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-  data = jlcmm_data_ptau
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data
 )
 ```
 
@@ -2565,14 +2573,14 @@ summary(jlcmm_m0)
 
 ```{r}
 jlcmm_m1 <- jlcmm(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
   classmb = ~ 1,
   ng = 2,
   subject = "RID",
-  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-  data = jlcmm_data_ptau,
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
   B = random(jlcmm_m0)
 )
 ```
@@ -2618,7 +2626,7 @@ plot(jlcmm_m1, which = "survival")
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m1, var.time = "time_years_ptau", which = "fit")
+plot(jlcmm_m1, var.time = "time_years", which = "fit")
 ```
 
 ## Comparing M0 and M1
@@ -2670,14 +2678,14 @@ summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 
 ```{r}
 jlcmm_m2 <- jlcmm(
-  fixed = log_PLASMAPTAU181 ~ time_years_ptau,
+  fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
   classmb = ~ 1,
   ng = 3,
   subject = "RID",
-  survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-  data = jlcmm_data_ptau,
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
   B = random(jlcmm_m0)
   )
 ```
@@ -2703,7 +2711,7 @@ plot(jlcmm_m2, which = "survival")
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m2, var.time = "time_years_ptau", which = "fit")
+plot(jlcmm_m2, var.time = "time_years", which = "fit")
 ```
 
 ## Comparing M0, M1, M3
@@ -2730,11 +2738,11 @@ table(class_preds$class, class_preds$APOE4_status)
 TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
 
 ```{r}
-# merging the longitudinal and survival data for NfL
-jlcmm_data_multi <- surv_test_1 %>%
-  dplyr::select(RID, event, time_to_event) %>%
-  merge(long_data_multi, by = "RID") %>%
-  filter(time_to_event != 0)
+# # merging the longitudinal and survival data for NfL
+# jlcmm_data_multi <- surv_test_1 %>%
+#   dplyr::select(RID, event, time_to_event) %>%
+#   merge(long_data, by = "RID") %>%
+#   filter(time_to_event != 0)
 ```
 
 ```{r}
@@ -2744,7 +2752,7 @@ mlcmm_m0 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = jlcmm_data_multi
+  data = jlcmm_data
 )
 
 mlcmm_m1 <- multlcmm(
@@ -2754,7 +2762,7 @@ mlcmm_m1 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = jlcmm_data_multi,
+  data = jlcmm_data,
   B = random(mlcmm_m0)
 )
 
@@ -2765,7 +2773,7 @@ mlcmm_m2 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 3,
-  data = jlcmm_data_multi,
+  data = jlcmm_data,
   B = random(mlcmm_m0)
 )
 ```
@@ -2778,7 +2786,7 @@ mult_jlcmm_m0 <- mpjlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   ng = 1,
-  data = jlcmm_data_multi
+  data = jlcmm_data
 )
 ```
 
@@ -2794,7 +2802,7 @@ mult_jlcmm_m1 <- mpjlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   ng = 2,
-  data = jlcmm_data_multi,
+  data = jlcmm_data,
   B = random(mult_jlcmm_m0)
 )
 ```
@@ -2853,7 +2861,7 @@ mult_jlcmm_m2 <- mpjlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   ng = 3,
-  data = jlcmm_data_multi,
+  data = jlcmm_data,
   B = random(mult_jlcmm_m0)
   )
 ```
