@@ -1159,6 +1159,10 @@ table((surv_data %>% filter(time_to_event == 0))$event)
 # Removing individuals who had a dementia dx at time = 0
 surv_data <- surv_data %>% filter(time_to_event > 0)
 long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
+
+# extracting number of events with time_to_event != 0
+table((surv_data %>% filter(time_to_event > 0))$event)
+table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
 ### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
@@ -1254,11 +1258,9 @@ long_data[scale(long_data$PLASMA_NFL) < -3, ]
 
 # ...
 
-```{r}
-# extracting number of events with time_to_event != 0
-table((surv_data %>% filter(time_to_event > 0))$event)
-table((surv_data %>% filter(time_to_event == 0))$event)
-```
+Even after log-transformation of the outcome, the residual diagnostics for the two LME models show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME models are used as part of a joint modeling framework rather than being interpreted on their own, the main requirement is that they provide a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the models are considered to provide a reasonable fit and to be representative of the population, indicating that they are suitable for use within the joint modeling framework.
+
+To assess the sensitivity of the results, we also fitted alternative models using gamma and t-distributions. These yielded similar results, suggesting that the conclusions are robust despite the observed residual issues.
 
 # Longitudinal models
 
@@ -1323,8 +1325,16 @@ testResiduals(lognormal_residuals_ptau)
 
 student_residuals_ptau <- simulateResiduals(fit_student_ptau)
 testResiduals(student_residuals_ptau)
+```
 
+```{r}
+# Comparing p-tau181 models with AIC and log likelihood
 AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+logLik(fit_lme_log_ptau)
+logLik(fit_lme_cubed_ptau)
+logLik(fit_gamma_ptau)
+logLik(fit_lognormal_ptau)
+logLik(fit_student_ptau)
 ```
 
 ### NfL
@@ -1376,18 +1386,28 @@ testResiduals(lognormal_residuals_nfl)
 
 student_residuals_nfl <- simulateResiduals(fit_student_nfl)
 testResiduals(student_residuals_nfl)
+```
 
+```{r}
+# Comparing NfL-models with AIC and log likelihood
 AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
+logLik(fit_lme_log_nfl)
+logLik(fit_lme_cubed_nfl)
+logLik(fit_gamma_nfl)
+logLik(fit_lognormal_nfl)
+logLik(fit_student_nfl)
 ```
 
 ## For separate joint models
 
 ### Fitted LME models
 
+Log-transformed NfL and cube-transformed p-tau181
+
 ```{r}
 # Longitudinal model for p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  fixed = sqrt(sqrt(PLASMAPTAU181)) ~ time_years + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
   data = long_data
 )
@@ -1464,6 +1484,22 @@ qqline(res_ptau, col = "red")
 qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
+
+## P-tau181 with log-transformation or cube-transformation?
+
+```{r}
+# For P-tau with log-transformation
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
+
+# For P-tau with cube-transformation
+qqnorm(res_cubed_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_cubed_ptau, col = "red")
+```
+
+Even after log-transformation and cube-transformation of the outcome, the residual diagnostics for the LME model show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the model is considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
+
+To assess the sensitivity of the results, alternative models such as gamma and t-distributions were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
 
 # Survival models
 
