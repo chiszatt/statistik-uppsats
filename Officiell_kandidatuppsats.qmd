@@ -281,8 +281,6 @@ We have grouped data, specifically longitudinal data where groups of observation
 
 -   Describes the trajectory of biomarkers at the individual level 
 
-**Linear mixed effects models?** What are these - why use them here?
-
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
 $$ m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
@@ -459,9 +457,36 @@ As the number of iterations L increases and the between-chain variation B decrea
 
 ### Joint Latent Class Model
 
-The joint latent class model assumes that the study population is heterogeneous and that within these subgroups, the observations have the same distribution (Kyheng, 2025, p.2). Therefore, this model is useful for studying the relationship between longitudinal data and survival data when there is suspected heterogeneity in the population.
+The joint latent class model (JLCM) offers a different method for linking a longitudinal biomarker process and a survival process which assumes that the population, $N$, is heterogenous and made up of $G$ homogenous and unobserved latent classes (Kyheng, 2025, p.2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
--   Assume that the study population, $N$, is made up of $G$ homogenous, unobservable classes
+The JLCM consists of three submodels; a multinomial logistic submodel, a linear mixed effects submodel and a proportional hazards submodel. The multinomial logistic regression models the latent classes, such that:
+
+$$
+Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
+\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}
+$$
+
+If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2). This then simplifies the model to;
+
+$$
+Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
+$$
+
+**TO DO:** link class model to surv model and long model here...
+
+The log-likelihood for the JLCM is much more tractable than for the regular joint model (Rizopoulos, p. 123). Log-likelihood estimation for JLCM involves summing over the latent classes, which is computationally advantageous compared to SREM (**REFERENCE SHARED RANDOM EFFECTS MODELS IN THE JOINT MODEL SECTION**) which require mathematical approximation (**LAPLACE/MCMC)** due to integration over the random effects (Proust-Lima et al., p. 5). For JLCM, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., p. 5).
+
+In JLCM, the marker and the time to event are considered to be conditionally independent given the latent classes and the random effects in the longitudinal model account for the correlation between repeated measures (Proust-Lima et al., 2018), whereas in SREM models the marker and time to event are assumed to be conditionally independent given the random effects (). The conditional independence assumptions for the JLCM are then that;
+
+1.  Correlations between observations of the longitudinal biomarker are modelled by the random effects, $b_i$, in the longitudinal model.
+
+2.  The relationship between biomarker trajectory and the time-to-diagnosis is captured completely by the latent class indicator, $c_i$.
+
+There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process (Proust-Lima et al., p. 9).
+
+According to Proust-Lima et al. (p. 7), the number of latent classes should be determined by minimising the BIC, ensuring good discrimination between classes, predictive accuracy, fulfilling the conditional independence assumption and, importantly, the classes should be meaningful. Class discrimination can be assessed by reporting the proportion of individuals who have a posterior latent class membership probability over a certain threshold (Proust-Lima et al., p. 7).
+
+NOTES:
 
 -   $c_i$ is the class that individual $i, i = (1, ... , N)$ belongs to, where the multinomial logistic submodel models the probabilities for each individual of belonging to latent class $g$, given the predefined variables $X_{1,i}$. HOWEVER: no prior assumptions about the latent classes, no covariates included in the model
 
@@ -475,28 +500,7 @@ $$
 
 -   Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
 
-Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
-
--   Correlations between observations (biomarker measurements) are modelled by the random effects, $b_i$, in the longitudinal model
-
--   The relationship between the biomarker trajectory and the time-to-diagnosis is described by the latent class indicator, $c_i$
-
--   THESE ARE THE CONDITIONAL INDEPENDENCE ASSUMPTIONS
-
-According to Rizopoulos, the multinomial logistic regression models the latent classes, such that:
-
-$$
-Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
-\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}
-$$
-
-If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2). This then simplifies the model to:e
-
-$$
-Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
-$$
-
-An advantage of this formulation of the latent class joint model is that the log-likelihood is much more tractable than for the regular joint model (Rizopoulos, p. 123) ... **MORE, WHY, SHOW**
+-   Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
 ### Information criterion, entropy
 
@@ -719,6 +723,8 @@ Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019
 National Cancer Institute (NCI) (n.d.). *Baseline*. <https://www.cancer.gov/publications/dictionaries/cancer-terms/def/baseline>
 
 Peng, R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4.2: Gelman-Rubin Statistic. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
+
+#### **Joint latent class models for longitudinal and time-to-event data: A review**
 
 Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
 
@@ -1278,7 +1284,7 @@ Suggested models:
 
 -   GLMM with Student-t distribution: longer tails
 
-### p-tau181
+### PTAU
 
 ```{r}
 # checking the mean and variance for ptau181
@@ -1402,10 +1408,40 @@ logLik(fit_student_nfl)
 
 ### Fitted LME models
 
-Log-transformed NfL and cube-transformed p-tau181
+# Log-transformed NfL and cube-transformed p-tau181
+
+#### With all genotype levels
+
+-   None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
 
 ```{r}
-# Longitudinal model for p-tau181 with normal distribution 
+# Longitudinal model for log p-tau181 with normal distribution 
+long_model_ptau <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
+  random = ~ time_years | RID,                    
+  data = long_data
+)
+
+summary(long_model_ptau)
+
+# Longitudinal model for log NfL with normal distribution 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
+  random = ~ time_years | RID,
+  data = long_data
+  )
+
+summary(long_model_nfl)
+```
+
+#### Collapsing genotype down to three levels (APOE4_status)
+
+-   All three levels of APOE4_status are significant for the log ptau-181 model
+
+-   None of the levels are significant for log NfL and neither is gender
+
+```{r}
+# Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau <- lme(
   fixed = sqrt(sqrt(PLASMAPTAU181)) ~ time_years + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
@@ -1414,15 +1450,47 @@ long_model_ptau <- lme(
 
 summary(long_model_ptau)
 
-# Longitudinal model for NfL with normal distribution 
-long_model_nfl <- lme(
+# Longitudinal model for log NfL with normal distribution 
+long_model_nfl_full <- lme(
   log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
   random = ~ time_years | RID, # random intercept + slope
   data = long_data
   )
 
-summary(long_model_nfl)
+summary(long_model_nfl_full)
+```
 
+#### NfL without APOE4_status
+
+```{r}
+# Longitudinal model for log NfL without APOE4_status
+long_model_nfl_reduced <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER, 
+  random = ~ time_years | RID,
+  data = long_data
+  )
+
+summary(long_model_nfl_reduced)
+```
+
+#### NfL without PTGENDER
+
+```{r}
+# Longitudinal model for log NfL without covariates
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years, 
+  random = ~ time_years | RID,
+  data = long_data
+  )
+
+summary(long_model_nfl)
+```
+
+```{r}
+AIC(long_model_nfl, long_model_nfl_reduced, long_model_nfl_full)
+```
+
+```{r}
 # Mixed object for multivariate joint model
 mixed <- list(long_model_ptau, long_model_nfl)
 ```
@@ -1508,9 +1576,23 @@ To assess the sensitivity of the results, alternative models such as gamma and t
 ### Fitted standard Cox PH models (for the joint models)
 
 ```{r}
+```
+
+```{r}
 # Cox survival-models, with covariates
-surv_model <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
+surv_model_full <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + genotype,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model)
+```
+
+```{r}
+# Cox survival-models, with covariates
+surv_model_full <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
   data = surv_data,
   x = TRUE
 )
