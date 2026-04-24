@@ -1044,13 +1044,17 @@ demographics_small <- demographics %>%
 
 # We define APOE4 status based on number of E4 alleles
 apoe <- apoe %>%
-  mutate(APOE4_status = case_when(
-    GENOTYPE == "4/4" ~ "2 alleles",
-    GENOTYPE %in% c("2/4", "3/4") ~ "1 allele",
-    TRUE ~ "0 alleles"
-  ),
+  mutate(APOE4_status = as.factor(
+    case_when(
+      GENOTYPE == "4/4" ~ "2 alleles",
+      GENOTYPE %in% c("2/4", "3/4") ~ "1 allele",
+      TRUE ~ "0 alleles")),
   genotype = as.factor(GENOTYPE)
   )
+
+apoe$APOE4_status <- factor(apoe$APOE4_status,
+                            levels = c("0 alleles", "1 allele", "2 alleles"))
+
 ```
 
 ```{r}
@@ -1062,15 +1066,10 @@ surv_data <- surv_data %>%
 
 # We merge apoe with long_data and surv_data
 long_data <- merge(long_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
-surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status", "genotype")], by="RID")
 
-# We make sure that gender and apoe4-status are factors
+# We make sure that gender is a factor
 long_data$PTGENDER <- as.factor(long_data$PTGENDER)
 surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
-long_data$APOE4_status <- factor(long_data$APOE4_status,
-                                 levels = c("0 alleles", "1 allele", "2 alleles"))
-surv_data$APOE4_status <- factor(surv_data$APOE4_status,
-                                 levels = c("0 alleles", "1 allele", "2 alleles"))
 
 # We create age_at_visit 
 long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - long_data$PTDOBYY
@@ -1190,7 +1189,7 @@ baseline <- long_data %>%
 # merging the survival data with demographics and the baseline biomarker values
 surv_data <- surv_data %>%
   merge(demographics_small, by = "RID") %>% 
-  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID") %>%
+  merge(apoe %>% dplyr::select(RID, APOE4_status, genotype), by = "RID") %>%
   merge(baseline, by = "RID")
 ```
 
@@ -1417,7 +1416,7 @@ logLik(fit_student_nfl)
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
+  fixed = sqrt(sqrt(PLASMAPTAU181)) ~ time_years + PTGENDER + genotype,
   random = ~ time_years | RID,                    
   data = long_data
 )
@@ -1576,9 +1575,6 @@ To assess the sensitivity of the results, alternative models such as gamma and t
 ### Fitted standard Cox PH models (for the joint models)
 
 ```{r}
-```
-
-```{r}
 # Cox survival-models, with covariates
 surv_model_full <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + genotype,
@@ -1586,12 +1582,12 @@ surv_model_full <- coxph(
   x = TRUE
 )
 
-summary(surv_model)
+summary(surv_model_full)
 ```
 
 ```{r}
 # Cox survival-models, with covariates
-surv_model_full <- coxph(
+surv_model <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
   data = surv_data,
   x = TRUE
@@ -1602,38 +1598,122 @@ summary(surv_model)
 
 ### Fitted Cox PH models using baseline values of each biomarker
 
+#### PTAU
+
+```{r}
+# Cox survival-models, with covariates including baseline values of each biomarker 
+# For p-tau181 with PTGENDER
+surv_model_ptau_bl_full <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data
+)
+
+summary(surv_model_ptau_bl_full)
+```
+
 ```{r}
 # Cox survival-models, with covariates including baseline values of each biomarker 
 # For p-tau181
 surv_model_ptau_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+    age_at_baseline + APOE4_status + baseline_value_ptau,
   data = surv_data
 )
 
 summary(surv_model_ptau_bl)
 ```
 
+Testing the significance of gender in the Cox proportional hazard model shows that there is no evidence of an improved fit compared with a reduced model with only age at baseline and APOE- $\epsilon 4$ status and baseline ptau-181 value as covariates.
+
 ```{r}
-# For NfL
-surv_model_nfl_bl <- coxph(
+anova(surv_model_ptau_bl_full, surv_model_ptau_bl, test = "LRT")
+```
+
+Assessing predictive performance with concordance index:
+
+```{r}
+rcorr.cens(predict(surv_model_ptau_bl_full),
+                  surv_data$time_to_event, surv_data$event)[1]
+
+rcorr.cens(predict(surv_model_ptau_bl),
+                  surv_data$time_to_event, surv_data$event)[1]
+```
+
+#### NfL
+
+```{r}
+# For NfL with PTGENDER
+surv_model_nfl_bl_full <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data
+)
+
+summary(surv_model_nfl_bl_full)
+```
+
+```{r}
+# For NfL with PTGENDER
+surv_model_nfl_bl <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + APOE4_status + baseline_value_nfl,
   data = surv_data
 )
 
 summary(surv_model_nfl_bl)
 ```
 
+Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate.
+
+```{r}
+anova(surv_model_nfl_bl_full, surv_model_nfl_bl, test = "LRT")
+```
+
+Assessing predictive performance with concordance index:
+
+```{r}
+library(Hmisc)
+
+rcorr.cens(predict(surv_model_nfl_bl_full),
+                  surv_data$time_to_event, surv_data$event)[1]
+
+rcorr.cens(predict(surv_model_nfl_bl),
+                  surv_data$time_to_event, surv_data$event)[1]
+```
+
+#### PTAU and NfL
+
 ```{r}
 # Inlcuding both p-tau181 and NfL
-surv_model_both_bl <- coxph(
+surv_model_both_bl_full <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
   data = surv_data
 )
 
-summary(surv_model_both_bl) 
+summary(surv_model_both_bl_full) 
+```
+
+```{r}
+# Inlcuding both p-tau181 and NfL
+surv_model_both_bl <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data
+)
+
+summary(surv_model_both_bl)
+```
+
+Assessing predictive performance with concordance index:
+
+```{r}
+rcorr.cens(predict(surv_model_both_bl_full),
+                  surv_data$time_to_event, surv_data$event)[1]
+
+rcorr.cens(predict(surv_model_both_bl),
+                  surv_data$time_to_event, surv_data$event)[1]
 ```
 
 ### Test of the assumption of proportional hazards
