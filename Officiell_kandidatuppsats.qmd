@@ -1264,10 +1264,6 @@ long_data[scale(long_data$PLASMA_NFL) < -3, ]
 
 # ...
 
-Even after log-transformation of the outcome, the residual diagnostics for the two LME models show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME models are used as part of a joint modeling framework rather than being interpreted on their own, the main requirement is that they provide a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the models are considered to provide a reasonable fit and to be representative of the population, indicating that they are suitable for use within the joint modeling framework.
-
-To assess the sensitivity of the results, we also fitted alternative models using gamma and t-distributions. These yielded similar results, suggesting that the conclusions are robust despite the observed residual issues.
-
 # Longitudinal models
 
 ## Comparing longitudinal models
@@ -1312,9 +1308,9 @@ fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            data = long_data,
-                            family = students.t(df = 3, link = "identity"))
+#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            #data = long_data,
+                            #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
@@ -1329,18 +1325,18 @@ testResiduals(lme_residuals_cubed_ptau)
 lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
 testResiduals(lognormal_residuals_ptau)
 
-student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-testResiduals(student_residuals_ptau)
+#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+#testResiduals(student_residuals_ptau)
 ```
 
 ```{r}
 # Comparing p-tau181 models with AIC and log likelihood
-AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau)
 logLik(fit_lme_log_ptau)
 logLik(fit_lme_cubed_ptau)
 logLik(fit_gamma_ptau)
 logLik(fit_lognormal_ptau)
-logLik(fit_student_ptau)
+#logLik(fit_student_ptau)
 ```
 
 ### NfL
@@ -1373,9 +1369,9 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           data = long_data,
-                           family = students.t(df = 3, link = "identity"))
+#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           #data = long_data,
+                           #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
@@ -1390,27 +1386,55 @@ testResiduals(lme_residuals_cubed_nfl)
 lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
 testResiduals(lognormal_residuals_nfl)
 
-student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-testResiduals(student_residuals_nfl)
+#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+#testResiduals(student_residuals_nfl)
+```
+
+```{r}
+# Longitudinal model for p-tau181 with t-distribution (identity link)
+long_data$PLASMAPTAU181 <- scale(long_data$PLASMAPTAU181)
+long_data$PLASMA_NFL <- scale(long_data$PLASMA_NFL)
+
+library(GLMMadaptive)
+long_model_ptau_student <- mixed_model(
+  fixed = PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  random = ~ time_years | RID,                    
+  data = long_data,
+  family = students.t(df = 3, link = "identity")
+)
+
+#summary(long_model_ptau_student)
+
+long_model_nfl_student <- mixed_model(
+  fixed = PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  random = ~ time_years | RID,                    
+  data = long_data,
+  family = students.t(df = 3, link = "identity")
+)
+
+#summary(long_model_nfl_student)
 ```
 
 ```{r}
 # Comparing NfL-models with AIC and log likelihood
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, long_model_nfl_student)
 logLik(fit_lme_log_nfl)
 logLik(fit_lme_cubed_nfl)
 logLik(fit_gamma_nfl)
 logLik(fit_lognormal_nfl)
-logLik(fit_student_nfl)
+#logLik(fit_student_nfl)
+logLik(long_model_nfl_student)
 ```
+
+Osäker dock om man kan jämföra log-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor!
 
 ## For separate joint models
 
 ### Fitted LME models
 
-# Log-transformed NfL and cube-transformed p-tau181
+Log-transformed NfL and cube-transformed p-tau181
 
-#### With all genotype levels
+# With all genotype levels
 
 -   None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
 
@@ -1495,20 +1519,6 @@ AIC(long_model_nfl, long_model_nfl_reduced, long_model_nfl_full)
 mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
-```{r}
-# Longitudinal model for p-tau181 with t-distribution (identity link)
-#library(GLMMadaptive)
-#long_model_ptau <- mixed_model(
-  #fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
-  #random = ~ time_years_ptau | RID,                    
-  #data = long_data_ptau,
-      
-#family = students.t(df = 3, link = "identity")
-#)
-
-#summary(long_model_ptau)
-```
-
 ### Residual check
 
 ```{r}
@@ -1555,16 +1565,6 @@ qqline(res_nfl, col = "red")
 
 ## P-tau181 with log-transformation or cube-transformation?
 
-```{r}
-# For P-tau with log-transformation
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-
-# For P-tau with cube-transformation
-qqnorm(res_cubed_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_cubed_ptau, col = "red")
-```
-
 Even after log-transformation and cube-transformation of the outcome, the residual diagnostics for the LME model show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the model is considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
 
 To assess the sensitivity of the results, alternative models such as gamma and t-distributions were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
@@ -1574,9 +1574,6 @@ To assess the sensitivity of the results, alternative models such as gamma and t
 ## For the different cox PH models and the separate joint models
 
 ### Fitted standard Cox PH models (for the joint models)
-
-```{r}
-```
 
 ```{r}
 # Cox survival-models, with covariates
@@ -1591,7 +1588,7 @@ summary(surv_model)
 
 ```{r}
 # Cox survival-models, with covariates
-surv_model_full <- coxph(
+surv_model <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
   data = surv_data,
   x = TRUE
@@ -1608,7 +1605,8 @@ summary(surv_model)
 surv_model_ptau_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
-  data = surv_data
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_ptau_bl)
@@ -1619,7 +1617,8 @@ summary(surv_model_ptau_bl)
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
-  data = surv_data
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_nfl_bl)
@@ -1630,7 +1629,8 @@ summary(surv_model_nfl_bl)
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_both_bl) 
@@ -3068,64 +3068,33 @@ times <- seq(1, 10, by = 0.5)
 ```{r}
 # We define a function to compute time-dependent AUC for Cox models using timeROC
 # We use the linear predictor as the risk score and survival outcome from the dataset
-#get_cox_auc <- function(model, data, times, time_var, event_var) {
-#  
-#  # Extracting survival outcome variables dynamically
-#  T <- data[[time_var]]
-#  delta <- data[[event_var]]
-#  
-#  # Linear predictor
-#  lp <- predict(model, newdata = data, type = "lp")
-#  
-#  # Time-dependent AUC
-#  auc <- timeROC(
-#    T = T,
-#    delta = delta,
-#    marker = lp,
-#    cause = 1,
-#    times = times,
-#    iid = TRUE
-#  )$AUC
-#  
-#  return(auc)
-#}
+get_cox_auc <- function(model, times) {
+  
+  T <- surv_data$time_to_event
+  delta <- surv_data$event
+  
+  lp <- predict(model, newdata = surv_data, type = "lp")
+  
+  timeROC::timeROC(
+    T = T,
+    delta = delta,
+    marker = lp,
+    cause = 1,
+    times = times,
+    iid = TRUE
+  )$AUC
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for Cox model with p-tau181
-#auc_ptau_bl <- get_cox_auc(
-#  surv_model_ptau_bl,
-#  surv_data_ptau,
-#  times,
-#  time_var = "time_to_event_ptau",
-#  event_var = "event_ptau"
-#)
-#
+auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
+
 # We compute time-dependent AUC for Cox model with NfL
-#auc_nfl_bl <- get_cox_auc(
-#  surv_model_nfl_bl,
-#  surv_data_nfl,
-#  times,
-#  time_var = "time_to_event_nfl",
-#  event_var = "event_nfl"
-#)
-#
+auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
+
 # We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
-#auc_both1_bl <- get_cox_auc(
-#  surv_model_both1_bl,
-#  surv_data_ptau,
-#  times,
-#  time_var = "time_to_event_ptau",
-#  event_var = "event_ptau"
-#)
-#
-#auc_both2_bl <- get_cox_auc(
-#  surv_model_both2_bl,
-#  surv_data_nfl,
-#  times,
-#  time_var = "time_to_event_nfl",
-#  event_var = "event_nfl"
-#)
+auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -3137,71 +3106,45 @@ times <- seq(1, 10, by = 0.5)
 -   *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
 
 ```{r}
-# We construct prediction datasets for each joint model by merging the corresponding longitudinal and survival data
-#newdata_ptau <- long_data_ptau %>%
-#  left_join(
-#    surv_data_ptau %>%
-#      dplyr::select(RID, age_at_baseline_ptau, time_to_event_ptau, event_ptau),
-#    by = "RID"
-#  )
-#
-#newdata_nfl <- long_data_nfl %>%
-#  dplyr::left_join(
-#    surv_data_nfl %>%
-#      dplyr::select(RID, age_at_baseline_nfl, time_to_event_nfl, event_nfl),
-#    by = "RID"
-#  )
-#
-#newdata_multi <- long_data_multi %>%
-#  dplyr::left_join(
-#    surv_data_multi %>%
-#      dplyr::select(RID, age_at_baseline, time_to_event, event),
-#    by = "RID"
-#  )
+# We construct prediction datasets for the joint models by merging the  longitudinal and survival data
+newdata <- dplyr::left_join(
+  long_data,
+  dplyr::select(surv_data, RID, age_at_baseline, time_to_event, event),
+  by = "RID"
+)
 ```
 
 ```{r}
 # We define a function to compute time-dependent AUC for joint models using tvAUC
 #We extract the AUC value from the tvAUC output for each horizon time point
-#get_jm_auc <- function(model, newdata, times) {
-#  
-#  aucs <- sapply(times, function(t) {
-#    
-#    tmp <- tvAUC(
-#      model,
-#      newdata = newdata,
-#      Tstart = 0,
-#      Thoriz = t
-#    )
-#    
-#    tmp$auc   
-#  })
-#  
-#  return(as.numeric(aucs))
-#}
+get_jm_auc <- function(model, times) {
+  
+  aucs <- sapply(times, function(t) {
+    
+    tmp <- tvAUC::tvAUC(
+      model,
+      newdata = newdata,
+      Tstart = 0,
+      Thoriz = t
+    )
+    
+    tmp$auc
+  })
+  
+  return(as.numeric(aucs))
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
-#auc_ptau_jm <- get_jm_auc(
-#  joint_model_ptau,
-#  newdata_ptau,
-#  times
-#)
-#
+auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
+
 # We compute time-dependent AUC for the joint model including NfL using tvAUC
-#auc_nfl_jm <- get_jm_auc(
-#  joint_model_nfl,
-#  newdata_nfl,
-#  times
-#)
-#
+auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
+
 # We compute time-dependent AUC for the multivariate joint model using tvAUC
-#auc_multi_jm <- get_jm_auc(
-#  multi_joint_model,
-#  newdata_multi,
-#  times
-#)
+auc_multi_jm <- get_jm_auc(multi_joint_model, times)
+
 ```
 
 ## Time dependent AUC for latent class joint models
@@ -3232,83 +3175,154 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized at clinically relevant time points
-#results <- data.frame(
-#  Model = c("Cox p-tau181", "Cox NfL", "Cox both1", "Cox both2",
-#            "JM p-tau181", "JM NfL", "JM both"),
-#  
-#  AUC_1y  = c(
-#    auc_ptau_bl[2],
-#    auc_nfl_bl[2],
-#    auc_both1_bl[2],
-#    auc_both2_bl[2],
-#    auc_ptau_jm[2],
-#    auc_nfl_jm[2],
-#    auc_multi_jm[2]
-#  ),
-#  
-#  AUC_3y  = c(
-#    auc_ptau_bl[6],
-#    auc_nfl_bl[6],
-#    auc_both1_bl[6],
-#    auc_both2_bl[6],
-#    auc_ptau_jm[6],
-#    auc_nfl_jm[6],
-#    auc_multi_jm[6]
-#  ),
-#  
-#  AUC_5y  = c(
-#    auc_ptau_bl[10],
-#    auc_nfl_bl[10],
-#    auc_both1_bl[10],
-#    auc_both2_bl[10],
-#    auc_ptau_jm[10],
-#    auc_nfl_jm[10],
-#    auc_multi_jm[10]
-#  ),
-#  
-#  AUC_10y = c(
-#    auc_ptau_bl[19],
-#    auc_nfl_bl[19],
-#    auc_both1_bl[19],
-#    auc_both2_bl[19],
-#    auc_ptau_jm[19],
-#    auc_nfl_jm[19],
-#    auc_multi_jm[19]
-#  )
-#)
-#
-#results[, -1] <- round(results[, -1], 3)
-#
-#results
+results <- data.frame(
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both2",
+            "JM p-tau181", "JM NfL", "JM both"),
+  
+  AUC_1y  = c(
+    auc_ptau_bl[2],
+    auc_nfl_bl[2],
+    auc_both_bl[2],
+    auc_ptau_jm[2],
+    auc_nfl_jm[2],
+    auc_multi_jm[2]
+  ),
+  
+  AUC_3y  = c(
+    auc_ptau_bl[6],
+    auc_nfl_bl[6],
+    auc_both_bl[6],
+    auc_ptau_jm[6],
+    auc_nfl_jm[6],
+    auc_multi_jm[6]
+  ),
+  
+  AUC_5y  = c(
+    auc_ptau_bl[10],
+    auc_nfl_bl[10],
+    auc_both_bl[10],
+    auc_ptau_jm[10],
+    auc_nfl_jm[10],
+    auc_multi_jm[10]
+  ),
+  
+  AUC_10y = c(
+    auc_ptau_bl[19],
+    auc_nfl_bl[19],
+    auc_both_bl[19],
+    auc_ptau_jm[19],
+    auc_nfl_jm[19],
+    auc_multi_jm[19]
+  )
+)
+
+results[, -1] <- round(results[, -1], 3)
+
+results
 ```
 
 ## Plot of the results
 
 ```{r}
 # We reshape all AUC results into long format for plotting
-#plot_data <- data.frame(
-#  Time = rep(times, times = 7),
-#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both1", "Cox both2", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
-#  AUC = c(
-#    auc_ptau_bl,
-#    auc_nfl_bl,
-#    auc_both1_bl,
-#    auc_both2_bl,
-#    auc_ptau_jm,
-#    auc_nfl_jm,
-#    auc_multi_jm
-#  )
-#)
-#
-#ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
-#  geom_line(linewidth = 1) +
-#  geom_point(size = 2) +
-#  ylim(0, 1) +
-#  labs(
-#    title = "Time-dependent AUC comparison",
-#    x = "Time (years)",
-#    y = "AUC"
-#  )
+plot_data <- data.frame(
+  Time = rep(times, times = 6),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),#  AUC = c(
+    auc_ptau_bl,
+    auc_nfl_bl,
+    auc_both_bl,
+    auc_ptau_jm,
+    auc_nfl_jm,
+    auc_multi_jm
+  )
+
+ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
 ```
 
-Sensitivity anaysis: how does including those with only one measurement affect the precision?
+# Comparing models using Brier score
+
+```{r}
+# We load required library
+library(pec)
+
+# We specify Cox models for comparison
+cox_models <- list(
+  "Cox p-tau" = surv_model_ptau_bl,
+  "Cox NfL"   = surv_model_nfl_bl,
+  "Cox both"  = surv_model_both_bl
+)
+
+# We compute Brier score using pec for Cox models
+brier_cox <- pec(
+  object = cox_models,
+  formula = Surv(time_to_event, event) ~ 1,
+  data = surv_data,
+  times = times,
+  cens.model = "cox"
+)
+
+# We extract CRPS values from Cox Brier score object
+brier_values <- crps(brier_cox)
+```
+
+```{r}
+# We specify joint models for comparison
+jm_models <- list(
+  "JM p-tau" = joint_model_ptau,
+  "JM NfL"   = joint_model_nfl,
+  "JM both"  = multi_joint_model
+)
+
+# We compute Brier score using pec for joint models
+brier_jm <- pec(
+  object = jm_models,
+  formula = Surv(time_to_event, event) ~ 1,
+  data = surv_data,
+  times = times,
+  cens.model = "cox"
+)
+
+# We extract CRPS values from joint model Brier score object
+brier_values_jm <- crps(brier_jm)
+```
+
+```{r}
+# We extract Brier scores into a unified dataset
+plot_brier <- data.frame(
+  Time = rep(times, times = 6),
+
+  Model = rep(c(
+    "Cox p-tau", "Cox NfL", "Cox both",
+    "JM p-tau", "JM NfL", "JM both"
+  ), each = length(times)),
+
+  Brier = c(
+    brier_cox$AppErr[,"Cox p-tau"],
+    brier_cox$AppErr[,"Cox NfL"],
+    brier_cox$AppErr[,"Cox both"],
+    brier_jm$AppErr[,"JM p-tau"],
+    brier_jm$AppErr[,"JM NfL"],
+    brier_jm$AppErr[,"JM both"]
+  )
+)
+```
+
+```{r}
+# We visualize time-dependent Brier score comparison
+ggplot(plot_brier, aes(x = Time, y = Brier, color = Model)) +
+  geom_line() +
+  ylim(0, 0.25) +
+  labs(
+    title = "Time-dependent Brier Score comparison",
+    x = "Time",
+    y = "Brier score"
+  )
+```
