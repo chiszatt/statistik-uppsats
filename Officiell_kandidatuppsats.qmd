@@ -145,7 +145,7 @@ Among the ones currently being explored and used in research settings, are menti
 
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
--   Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD. **\*\*source?\*\***
+- Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD. **\*\*source?\*\***
 
 **NFL**
 
@@ -231,17 +231,15 @@ However, when longitudinal data are collected at different time points, issues s
 
 **Theory about the model... (specifically why we should use it)**
 
--   Time-to-diagnosis process
+- Time-to-diagnosis process
 
--   Parametric baseline hazard: **flexible parametrics, splines??**
+- Parametric baseline hazard: **flexible parametrics, splines??**
 
--   OR leave undefined -\> Cox PH model
+- OR leave undefined -\> Cox PH model
 
 Assuming a Cox PH survival sub-model:
 
-$$
-h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}
-$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}$$
 
 $\mathbf{v_i}:$ vector of time-independent co-variates
 
@@ -253,9 +251,9 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ### Assumptions!!
 
--   What do we assume about the censoring process?
+- What do we assume about the censoring process?
 
--   Proportionality
+- Proportionality
 
 ### Cox PH model using baseline values of each biomarker
 
@@ -277,9 +275,9 @@ We have grouped data, specifically longitudinal data where groups of observation
 
 **Theory about the model... (specifically why we should use it)**
 
--   Biomarker process
+- Biomarker process
 
--   Describes the trajectory of biomarkers at the individual level 
+- Describes the trajectory of biomarkers at the individual level 
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
@@ -333,7 +331,7 @@ $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bma
 
 ### Assumptions!!
 
--   Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+- Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
 
 ### Simple Joint Model
 
@@ -353,17 +351,15 @@ In the joint model, the hazard function at time $t$ is directly dependent on the
 
 The association structure of the joint model:
 
--   How is the longitudinal model linked to the survival model? 
+- How is the longitudinal model linked to the survival model? 
 
--   Does this association structure change for different biomarkers?
+- Does this association structure change for different biomarkers?
 
--   What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
+- What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
 
 If we include the current rate of change alongside the current value in the proportional-hazard model:
 
-$$
-h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)
-$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
 
 $\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
 
@@ -371,19 +367,19 @@ $\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
 
 Joint-model options:
 
--   Longitudinal sub-model: model of class lme()
+- Longitudinal sub-model: model of class lme()
 
 ### Assumptions!!
 
--   Full conditional independence
+- Full conditional independence
 
-    -   Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
+  - Random effects $\mathbf{b_i}$ explain all statistical dependence between (1) the longitudinal outcome and the survival outcome and (2) repeated measurements within the longitudinal process.
 
-    -   This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
+  - This assumption can fail when: there are time-varying confounders not captured by the random effects (see the longitudinal model for more info about $\mathbf{b_i}$ assumptions), if the measurement error, $e_i(t)$ in the longitudinal model $y_i(t) = m_i(t) + e_i(t)$ is informative, or there are sub-populations (APOE genotype??? Maybe we need to split into populations based on genotype)
 
--   So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
+- So: the longitudinal outcome is independent of the time-to-event outcome and the repeated measurements in the longitudinal outcome are independent of each other
 
--   $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
+- $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
 **Frequentist vs bayesian approach**
 
@@ -419,39 +415,27 @@ The Gelman-Rubin statistic R formalizes this idea (Peng). Consider $J$ Markov ch
 
 Then calculate the chain mean for each chain,
 
-$$
-\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}
-$$
+$$\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}$$
 
 the overall mean across all chains (the grand mean),
 
-$$
-\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j
-$$
+$$\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j$$
 
 the between-chain variance,
 
-$$
-B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2
-$$
+$$B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2$$
 
 the within-chain variance for each chain,
 
-$$
-s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2
-$$
+$$s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2$$
 
 and finally, the average within-chain variance,
 
-$$
-W = \frac{1}{J} \sum_{j=1}^{J} s_j^2
-$$
+$$W = \frac{1}{J} \sum_{j=1}^{J} s_j^2$$
 
 Subsequently, the Gelman-Rubin statistic is:
 
-$$
-R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}
-$$
+$$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
 As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng).
 
@@ -461,16 +445,12 @@ The joint latent class model (JLCM) offers a different method for linking a long
 
 The JLCM consists of three submodels; a multinomial logistic submodel, a linear mixed effects submodel and a proportional hazards submodel. The multinomial logistic regression models the latent classes, such that:
 
-$$
-Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
-\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}
-$$
+$$Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
+\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}$$
 
 If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2). This then simplifies the model to;
 
-$$
-Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}
-$$
+$$Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$
 
 **TO DO:** link class model to surv model and long model here...
 
@@ -488,57 +468,50 @@ According to Proust-Lima et al. (p. 7), the number of latent classes should be d
 
 NOTES:
 
--   $c_i$ is the class that individual $i, i = (1, ... , N)$ belongs to, where the multinomial logistic submodel models the probabilities for each individual of belonging to latent class $g$, given the predefined variables $X_{1,i}$. HOWEVER: no prior assumptions about the latent classes, no covariates included in the model
+- $c_i$ is the class that individual $i, i = (1, ... , N)$ belongs to, where the multinomial logistic submodel models the probabilities for each individual of belonging to latent class $g$, given the predefined variables $X_{1,i}$. HOWEVER: no prior assumptions about the latent classes, no covariates included in the model
 
-$$
-\pi_{i, g} = P(c_i = g | X_{1,i})
-$$
+$$\pi_{i, g} = P(c_i = g | X_{1,i})$$
 
--   The linear submodel now becomes unique to each latent class
+- The linear submodel now becomes unique to each latent class
 
--   The survival submodel is defined for all latent classes
+- The survival submodel is defined for all latent classes
 
--   Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
+- Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
 
--   Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+- Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
 ### Information criterion, entropy
 
 #### Shannon Entropy
 
--   Uncertainty of the variable itself
+- Uncertainty of the variable itself
 
--   Entropy is a quantification of the (average) level of uncertainty associated with a random variable's potential outcomes (similary to entropy in thermodynamics) <https://en.wikipedia.org/wiki/Entropy_(information_theory)>
+- Entropy is a quantification of the (average) level of uncertainty associated with a random variable's potential outcomes (similary to entropy in thermodynamics) <https://en.wikipedia.org/wiki/Entropy_(information_theory)>
 
--   The expected amount of information needed to describe the state of the random variable, given the distribution of probabilities across all possible outcomes
+- The expected amount of information needed to describe the state of the random variable, given the distribution of probabilities across all possible outcomes
 
--   "Information content" of an outcome is related to how probable it is. If a highly likely outcome occurs, the information content is small. The information/surprisal, $I(E)$ of an event approaches $0$ as $p(E)$ approaches $1$:
+- "Information content" of an outcome is related to how probable it is. If a highly likely outcome occurs, the information content is small. The information/surprisal, $I(E)$ of an event approaches $0$ as $p(E)$ approaches $1$:
 
-$$
-I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))
-$$
+$$I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))$$
 
--   Entropy $H$ calculates the average expected amount of information across all possible outcomes of an random variable, $X$, such that:
+- Entropy $H$ calculates the average expected amount of information across all possible outcomes of an random variable, $X$, such that:
 
-    $$ 
-    H(X) = - \sum_{x \in X} p(x)log(p(x))
-    $$
+  $$ 
+  H(X) = - \sum_{x \in X} p(x)log(p(x))$$
 
--   why 1 - p(x)log(p(x))
+- why 1 - p(x)log(p(x))
 
--   <https://www.youtube.com/watch?v=LBOVhy3ITA4>
+- <https://www.youtube.com/watch?v=LBOVhy3ITA4>
 
--   <https://www.youtube.com/watch?v=-4y4X8ELcEM>
+- <https://www.youtube.com/watch?v=-4y4X8ELcEM>
 
 #### Assignment based entropy
 
--   Uncertainty of the class assignment!
+- Uncertainty of the class assignment!
 
--   Posterior probabilities:
+- Posterior probabilities:
 
-$$
-p_i(c_g) = P(C = c_g | \mathbf{X}_ii)
-$$
+$$p_i(c_g) = P(C = c_g | \mathbf{X}_ii)$$
 
 ...
 
@@ -582,17 +555,17 @@ The inclusion criteria required participants to have recorded diagnostic visits 
 
 All protocols allow enrollment for individuals aged 55-90.
 
--   ADNI1
+- ADNI1
 
 800 subjects (200 controls, 400 MCI, 200 mild AD) recruited at around 50 sites in the United States and Canada
 
--   ADNI2
+- ADNI2
 
 Cognitively normal, significant memory concern, early MCI, late MCI, mild AD
 
 Inclusion criteria for rollover participants: originally diagnosed as either MCI (early or late) or CN
 
--   ADNI3
+- ADNI3
 
 700 - 800 rollover participants
 
@@ -600,7 +573,7 @@ Inclusion criteria for rollover participants: originally diagnosed as either MCI
 
 Three cohorts: CN, MCI, mild AD
 
--   ADNI4
+- ADNI4
 
 Introducing the study, it's aims and the type of information gathered.
 
@@ -660,21 +633,97 @@ Finally, apolipoprotein ε4 status is another covariate used to explain progress
 
 *Some bullet points to add to the final paper about things we thought about/did:*
 
--   *Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)*
+- *Merging the diagnosis data with biomarker/amyloid data by RID (unique identifier for patients)*
 
--   *Selecting relevant variables from diagnosis and biomarker/amyloid data set*
+- *Selecting relevant variables from diagnosis and biomarker/amyloid data set*
 
--   *What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)*
+- *What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)*
 
--   *What variables do we need for survival sub-model? (Event, time followed?)*
+- *What variables do we need for survival sub-model? (Event, time followed?)*
 
--   *Joint model: time-var: a character string indicating the time variable in the mixed-effects model*
+- *Joint model: time-var: a character string indicating the time variable in the mixed-effects model*
 
--   *How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?*
+- *How many observations going from CN/MCI -\> AD? Do we need a multi-state survival model?*
 
 # Results
 
 *Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
+
+## Cox models with baseline values of the biomarkers
+
+A Cox proportional hazards model including baseline p-tau181 was first fitted. Checking the proportional hazards assumption showed a violation for age at baseline (χ² = 8.78, df = 1, p = 0.003), while no violations were found for sex (χ² = 0.001, df = 1, p = 0.972), APOE ε4 status (χ² = 2.50, df = 2, p = 0.286), or baseline p-tau181 (χ² = 0.14, df = 1, p = 0.705). The global test was borderline non-significant (χ² = 10.70, df = 5, p = 0.058).
+
+A time-varying Cox model showed a significant time-dependent effect of age (p \< 0.05) and a slightly better fit compared to the standard model (AIC: 2067 vs. 2078; log-likelihood: -1029.5 vs. -1035.0). Despite this, the standard Cox model was kept for the joint modelling step, since time effects are mainly handled through the longitudinal biomarker processes in that framework.
+
+In the final Cox model, baseline p-tau181 was a strong predictor of progression (HR = 2.41, 95% CI: 1.87-3.10, p \< 0.001). Age (HR = 1.03, p = 0.008) and APOE ε4 status (one allele: HR = 2.35; two alleles: HR = 4.08; both p \< 0.001) were also significant predictors, while sex was not (p = 0.56). The model showed good discrimination (C-index = 0.73).
+
+## Cox model with baseline values of NfL
+
+To compare biomarkers, a Cox proportional hazards model was also fitted using baseline NfL instead of p-tau181, while keeping the same covariate structure.
+
+Assessment of the proportional hazards assumption showed a similar pattern to the p-tau model, with a violation for age at baseline (χ² = 9.01, df = 1, p = 0.0027). No violations were observed for sex (χ² = 0.0003, df = 1, p = 0.986), APOE ε4 status (χ² = 3.25, df = 2, p = 0.197), or baseline NfL (χ² = 0.59, df = 1, p = 0.443). However, in contrast to the p-tau model, the global test was statistically significant (χ² = 12.1, df = 5, p = 0.0336), indicating a slightly stronger overall deviation from the proportional hazards assumption, mainly driven by age.
+
+In the final model, baseline NfL was a significant predictor of disease progression (HR = 2.69, 95% CI: 1.90-3.82, p \< 0.001). This suggests that higher NfL levels at baseline are associated with increased risk of developing Alzheimer’s disease/dementia. APOE ε4 status again showed a strong and consistent association, with a clear dose-response pattern (one allele: HR = 2.56; two alleles: HR = 5.19; both p \< 0.001). In contrast, neither age (HR = 1.01, p = 0.30) nor sex (HR = 1.00, p = 0.99) were statistically significant predictors in this model.
+
+Model performance was slightly lower compared to the p-tau181 model, with a concordance index of 0.70 versus 0.73, which suggests somewhat weaker discriminative ability for NfL in this baseline-only framework.
+
+## Cox model with baseline values of p-tau 181
+
+To look at the independent and combined effects of the biomarkers, a Cox proportional hazards model including both baseline p-tau181 and NfL was fitted, along with the clinical covariates.
+
+Checking the proportional hazards assumption showed a violation for age at baseline (χ² = 8.64, df = 1, p = 0.0033). No violations were seen for sex (χ² = 0.009, df = 1, p = 0.923), APOE ε4 status (χ² = 2.73, df = 2, p = 0.256), baseline p-tau181 (χ² = 0.35, df = 1, p = 0.555), or baseline NfL (χ² = 0.99, df = 1, p = 0.319). The global test was not significant (χ² = 10.63, df = 6, p = 0.101), which suggests no major overall violation of the assumption.
+
+In the combined model, both biomarkers remained significant independent predictors of progression. Higher baseline p-tau181 was associated with increased risk (HR = 2.17, 95% CI: 1.66-2.84, p \< 0.001), as was higher baseline NfL (HR = 2.07, 95% CI: 1.45-2.94, p \< 0.001). This suggests that both biomarkers add independent prognostic information when included in the same model.
+
+APOE ε4 status was still a strong predictor, with a clear dose-response pattern (one allele: HR = 2.30; two alleles: HR = 4.21; both p \< 0.001). Age (HR = 1.01, p = 0.47) and sex (HR = 0.94, p = 0.67) were not significant in this model.
+
+Model performance improved slightly compared to the single-biomarker models, with a concordance index of 0.74, suggesting that combining p-tau181 and NfL gives a small gain in predictive ability.
+
+## Joint model for p-tau 181
+
+Next, a joint model was fitted to simultaneously analyse the longitudinal trajectory of p-tau181 and its association with time to progression to Alzheimer’s disease/dementia. A standard Cox model and a linear mixed effects model were therefore first specified.
+
+\*\*Lägga in vad testet av assumption om PH visade för standard cox ph modellen.
+
+for the LME model, even after log-transformation of p-tau181, the residual diagnostics showed some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations were not considered serious, and the model was considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
+
+To assess the sensitivity of the results, alternative LME models with gamma, lognormal or student t-distributions of p-tau181, as well as with splines, were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
+
+The longitudinal submodel showed that p-tau181 levels increased over time (time_years: estimate = 0.029, 95% credible interval: 0.018-0.041, p \< 0.05), indicating a clear upward trajectory of the biomarker prior to disease progression. Males had slightly higher p-tau181 levels compared to females (estimate = 0.118, p = 0.005), while both APOE ε4 one-allele and two-allele carriers showed higher levels of p-tau181 compared to non-carriers (both p \< 0.05). This confirms that p-tau181 is strongly influenced by genetic risk factors and increases progressively over time. In the survival submodel, baseline age showed a small and non-significant association with progression risk (estimate = 0.022, p = 0.146), while sex was also non-significant (estimate = -0.138, p = 0.427). In contrast, APOE ε4 status remained a strong predictor of disease progression, with clear dose-dependent effects (one allele: estimate = 0.777; two alleles: estimate = 1.287; both p \< 0.05).
+
+Most importantly, the association parameter linking longitudinal p-tau181 to the risk of progression was strongly positive (estimate = 1.371, 95% credible interval: 0.989-1.773, p \< 0.05). This indicates that higher p-tau181 levels over time are associated with a substantially increased hazard of developing Alzheimer’s disease/dementia.
+
+Model diagnostics showed generally good convergence, with Rhat values close to 1.00 for most parameters. However, one parameter showed weaker convergence (Rhat = 1.38), which suggests slightly poorer mixing in that part of the model. Despite this, model fit statistics (WAIC and LPML) indicated stable and reliable overall performance without major signs of instability.
+
+\*\*\*Lägga till graferna för convergence också (traceplots och density plots)
+
+## Joint model for NfL
+
+Additionally, a joint model was fitted to analyse the longitudinal trajectory of NfL and its association with time to progression to Alzheimer’s disease/dementia.
+
+The longitudinal submodel showed a clear increase in NfL over time (time_years: estimate = 0.041, 95% credible interval: 0.034-0.048, p \< 0.05), which indicates a steady and relatively strong rise in NfL levels prior to disease progression. There was no evidence of associations with sex (estimate = 0.007, p = 0.845) or APOE ε4 status in the longitudinal process (all p \> 0.05), which suggests that NfL trajectories are largely independent of genetic risk factors.
+
+In the survival submodel, APOE ε4 status remained a strong predictor of progression, with clear dose-dependent effects (one allele: estimate = 0.952; two alleles: estimate = 1.611; both p \< 0.05). In contrast, age (estimate = -0.007, P = 0.666) and sex were not significantly associated with risk in this model.
+
+Most importantly, the association between longitudinal NfL and risk of progression was strong and statistically significant (estimate = 1.649, 95% credible interval: 1.195-2.107, p \< 0.05). This indicates that higher NfL levels over time are strongly linked to increased hazard of developing Alzheimer’s disease/dementia.
+
+Model convergence was generally good, with Rhat values close to 1.00 for most parameters. Model fit statistics (WAIC and LPML) also indicated stable and reliable performance without signs of instability.However, one parameter (residual variance in the longitudinal submodel) showed signs of poorer convergence (Rhat = 1.38), whuch suggests slightly slower mixing. After increasing the number of iterations from 11000 to 20,000, convergence improved, and all parameters showed acceptable Rhat values.
+
+## Multivariate joint model for both p-tau 181 and NfL
+
+?
+
+## Joint latent class mixed model for p-tau 181
+
+?
+
+## Joint latent class mixed model for NfL
+
+?
+
+## Joint latent class mixed model for both p-tau 181 and NfL
+
+?
 
 # Discussion
 
@@ -746,7 +795,7 @@ Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer
 
 World Health Organization (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
--   (2024). *Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease*. <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
+- (2024). *Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease*. <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
 Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
 
@@ -760,13 +809,13 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Pre-processing
 
--   *There are 52 individuals with two measurements recorded on the same exam date.*
+- *There are 52 individuals with two measurements recorded on the same exam date.*
 
--   *How should we deal with these? Average the measurements? Remove the observations?*
+- *How should we deal with these? Average the measurements? Remove the observations?*
 
 1.  *Describe the measurements, their differences and averages*
 
--   *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
+- *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
 
 2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
 3.  
@@ -873,7 +922,7 @@ long_data <- nfl_data %>%
 
 ## Creating a common EXAMDATE and EXAMDATE_baseline variable
 
--   Do this now in order to remove observations from diagnosis data which occur long before first biomarker measurements
+- Do this now in order to remove observations from diagnosis data which occur long before first biomarker measurements
 
 ```{r}
 # checking how many observations where the EXAMDATE is different for nfl and ptau
@@ -895,11 +944,11 @@ table(diff$VISCODE2)
 # long_data[-common, ]
 ```
 
--   There are 5 observations with time differences greater than 30 days
+- There are 5 observations with time differences greater than 30 days
 
--   231/115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
+- 231/115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
 
--   Less clear what the case is with a time difference of 31 days, even 49 days
+- Less clear what the case is with a time difference of 31 days, even 49 days
 
 ```{r}
 # calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
@@ -914,7 +963,7 @@ diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
 
 ### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
 
--   Can create a new variable for a common EXAMDATE in order to define the baseline date from this
+- Can create a new variable for a common EXAMDATE in order to define the baseline date from this
 
 ```{r}
 # testing the method
@@ -1012,8 +1061,6 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## Length check of longitudinal and survival data
-
 ## Correlation check between biomarkers
 
 ```{r}
@@ -1087,6 +1134,16 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
+```
+
+```{r}
+# We filter individuals with at least 1 measurement of ptau_data
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+#length(keep)
 ```
 
 ### Checking individuals final diagnoses for the reduced data set
@@ -1214,11 +1271,17 @@ ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
   theme_classic()
 ```
 
+```{r}
+# Transforming the baseline values in the survival data
+surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
+surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
+```
+
 ## Check for outliers
 
 We still keep them, as we assume they are correct observations.
 
--   Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
+- Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
 
 ```{r}
 # We identify "extreme" values
@@ -1250,15 +1313,15 @@ length(unique(surv_data$RID)) # survival data
 
 Suggested models:
 
--   Gamma: raw data could be modelled well with the gamma distribution since takes no negative values, variance increases with mean, and there is a right-skew to the raw distributions
+- Gamma: raw data could be modelled well with the gamma distribution since takes no negative values, variance increases with mean, and there is a right-skew to the raw distributions
 
--   Linear mixed effects model with log-transformed data: approximately normal, yet still some skew
+- Linear mixed effects model with log-transformed data: approximately normal, yet still some skew
 
--   Linear mixed effects model with cube root transformed data: again, approximately normal, still a bit of skew (why such a low AIC? seems wrong?)
+- Linear mixed effects model with cube root transformed data: again, approximately normal, still a bit of skew (why such a low AIC? seems wrong?)
 
--   GLMM with log-normal distribution
+- GLMM with log-normal distribution
 
--   GLMM with Student-t distribution: longer tails
+- GLMM with Student-t distribution: longer tails
 
 ### PTAU
 
@@ -1310,18 +1373,6 @@ testResiduals(lognormal_residuals_ptau)
 ```
 
 ```{r}
-# Student t-distribution for p-tau181 
-fit_student_ptau <- mixed_model(
-  fixed = PLASMAPTAU181 ~ time_years,
-  random = ~ time_years | RID,                    
-  data = long_data,
-  family = students.t(df = 3, link = "identity")
-)
-
-#summary(fit_student_ptau)
-```
-
-```{r}
 # LME model for p-tau181 with splines 
 library(splines)
 
@@ -1358,7 +1409,7 @@ logLik(fit_spline_ptau)
 
 ### NfL
 
--   Negative AIC for cube root transformed -\> take the absolute value
+- Negative AIC for cube root transformed -\> take the absolute value
 
 ```{r}
 # checking the mean and variance for nfl
@@ -1408,18 +1459,6 @@ testResiduals(lognormal_residuals_nfl)
 ```
 
 ```{r}
-# Student t-distribution for p-tau181 
-fit_student_nfl <- mixed_model(
-  fixed = PLASMA_NFL ~ time_years,
-  random = ~ time_years | RID,                    
-  data = long_data,
-  family = students.t(df = 3, link = "identity")
-)
-
-#summary(fit_student_nfl)
-```
-
-```{r}
 # LME model for NfL with splines 
 library(splines)
 
@@ -1450,13 +1489,12 @@ logLik(fit_lme_log_nfl)
 logLik(fit_lme_cubed_nfl)
 logLik(fit_gamma_nfl)
 logLik(fit_lognormal_nfl)
-#logLik(fit_student_nfl)
 logLik(fit_student_nfl)
 logLik(fit_spline_nfl)
 
 ```
 
-Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor!
+Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor! Tror det är bäst att kolla på residualerna och QQ-plotsen
 
 ## For separate joint models
 
@@ -1464,12 +1502,12 @@ Osäker dock om man kan jämföra log-version och cube-version av lme med de and
 
 # With all genotype levels
 
--   None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
+- None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
 
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = cubed_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
   random = ~ time_years | RID,                    
   data = long_data
 )
@@ -1488,9 +1526,9 @@ summary(long_model_nfl)
 
 #### Collapsing genotype down to three levels (APOE4_status)
 
--   All three levels of APOE4_status are significant for the log ptau-181 model
+- All three levels of APOE4_status are significant for the log ptau-181 model
 
--   None of the levels are significant for log NfL and neither is gender
+- None of the levels are significant for log NfL and neither is gender
 
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
@@ -1590,10 +1628,6 @@ qqline(res_ptau, col = "red")
 qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
-
-Even after log-transformation of p-tau181, the residual diagnostics for the LME model show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the model is considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
-
-To assess the sensitivity of the results, alternative LME models with gamma, lognormal or student t-distributions of p-tau181, as well as with splines, were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
 
 # Survival models
 
@@ -1763,8 +1797,6 @@ cox.zph(surv_model_nfl_bl)
 cox.zph(surv_model_both_bl)
 ```
 
-The proportional hazards assumption is consistently violated for age at baseline across all Cox models, as p-values are around 0.002 to 0.004), showing a clear time-dependent effect. This pattern is stable even when baseline p-tau or NfL are included in the models. In contrast, there is no evidence of violation for APOE4 status or any of the biomarker variables.
-
 To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
 
 ### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
@@ -1787,10 +1819,6 @@ AIC(surv_model, surv_model_tv)
 logLik(surv_model)
 logLik(surv_model_tv)
 ```
-
-In the time-varying Cox model , age at baseline shows a clear time-dependent effect, with the time interaction term being statistically significant (p \< 0.05), indicating that the effect of age increases over follow-up time. The time-varying model also provides a better fit to the data compared to the standard Cox model, with lower AIC (2067 vs 2078) and higher log-likelihood (-1029.5 vs -1035.0). This suggests that allowing the effect of age to vary over time improves how well the model captures the underlying risk structure.
-
-Despite these results, the standard Cox proportional hazards model without a time-varying effect for age will be used in the subsequent joint modelling framework. This is because the joint model already describes how risk changes over time through the longitudinal biomarker trajectories (p-tau and NfL) and their link to the event process. In other words, time dynamics are not handled through a time-varying age effect in the survival model, but through how the biomarkers evolve over time and influence risk. Therefore, adding a separate time-varying effect for age would add extra complexity without being the main way time is modeled in the joint framework.
 
 # Two separate joint models
 
@@ -1824,6 +1852,22 @@ joint_model_nfl <- jm(
   time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
+  n_burnin = 1000L
+  )
+
+summary(joint_model_nfl)
+```
+
+Trying 20000 iterations instead, to see if Rhat values get better:
+
+```{r}
+# Joint model for NfL using package JMbayes2 (bayesian approach)
+joint_model_nfl <- jm(
+  surv_model,
+  long_model_nfl,
+  time_var = "time_years",
+  n_chains = 3L,
+  n_iter = 20000L,
   n_burnin = 1000L
   )
 
@@ -2000,9 +2044,7 @@ The $BIC$ is reduced and the log-likelihood increases when adding a random slope
 summarytable(hlme_m0_1, hlme_m0_2)
 ```
 
-$$
-\lambda_{LR} = - 2 \left\{ \ell(\theta_0) - \ell(\widehat\theta) \right\} \quad \text{where, under } H_0 \quad \lambda_{LR} \sim \chi^2
-$$
+$$\lambda_{LR} = - 2 \left\{ \ell(\theta_0) - \ell(\widehat\theta) \right\} \quad \text{where, under } H_0 \quad \lambda_{LR} \sim \chi^2$$
 
 ```{r}
 # log likelihood for the full model
@@ -3242,7 +3284,7 @@ auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
 
 *The function tvAUC requires the following:*
 
--   *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
+- *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
 
 ```{r}
 # We construct prediction datasets for the joint models by merging the  longitudinal and survival data
