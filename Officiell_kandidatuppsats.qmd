@@ -121,7 +121,7 @@ apoe = APOERES
 
 **AD**
 
-According to World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025). The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
+According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025). The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
 
 **BIOMARKERS**
 
@@ -129,7 +129,7 @@ In the context of Alzheimer's disease, as well as diseases in general, the term 
 
 **AD and BIOMARKERS**
 
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Recent advances in research have made it possible to replace these invasive procedures with blood tests. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis. **\*\*Behövs källa i parentes väl**
+**AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Recent advances in research have made it possible to replace these invasive procedures with blood tests. \*\* källa???** WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. .
 
 **SPECIFIC AD BIOMARKERS**
 
@@ -153,11 +153,17 @@ Another core biomarker of interest in the diagnosis of AD pathology is neurofila
 
 Analysis of the concentration of this molecule OUTSIDE of the cell (in CSF and blood) is a measure of neuronal damage.
 
+**Kortare beskrvining av p-tau181 och NfL**
+
+Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).
+
+Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).
+
+Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).
+
 **SUMMARY**
 
-The abnormal concentrations of these biomarkers are the result of the neuropathological changes symptomatic of AD.
-
-These two biomarkers, along with various other biomarkers and clinical measures related to Alzheimer’s disease, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. The current phase, ADNI4, began in 2022 and is expected to be completed in 2027. Its main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of Alzheimer’s disease (ADNI, n.d.)
+These two blood-based biomarkers, along with various other biomarkers and clinical measures related to Alzheimer’s disease, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. The current phase, ADNI4, began in 2022 and is expected to be completed in 2027. Its main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of Alzheimer’s disease (ADNI, n.d.)
 
 ## Research Context
 
@@ -3268,6 +3274,7 @@ get_cox_auc <- function(model, times) {
 ```
 
 ```{r}
+library(timeROC)
 # We compute time-dependent AUC for Cox model with p-tau181
 auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
 
@@ -3296,6 +3303,7 @@ newdata <- dplyr::left_join(
 ```
 
 ```{r}
+library(timeROC)
 # We define a function to compute time-dependent AUC for joint models using tvAUC
 #We extract the AUC value from the tvAUC output for each horizon time point
 get_jm_auc <- function(model, times) {
@@ -3324,7 +3332,7 @@ auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
 auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
 
 # We compute time-dependent AUC for the multivariate joint model using tvAUC
-auc_multi_jm <- get_jm_auc(multi_joint_model, times)
+#auc_multi_jm <- get_jm_auc(multi_joint_model, times)
 
 ```
 
