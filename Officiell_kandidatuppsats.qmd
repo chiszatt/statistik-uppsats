@@ -119,49 +119,19 @@ apoe = APOERES
 
 *General background information. Introducing some domain specific information about AD diagnosis and pathology, so that the reader is well prepared.*
 
-**AD**
-
 According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025). The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes in AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
-
-**BIOMARKERS**
 
 In the context of Alzheimer's disease, as well as diseases in general, the term "biomarker" is commonly used. According to the Biomarkers Definitions Working Group, a biomarker is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001, p. 91). Similarly, the International Programme on Chemical Safety, is a joint venture on chemical safety led by WHO in coordination with the United Nations and the International Labor Organization, defines it as "any substance, structure, or process that can be measured in the body or its products and influence or predict the incidence of outcome or disease" (2001, p. 1).
 
 **AD and BIOMARKERS**
 
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF.Recent advances in research have made it possible to replace these invasive procedures with blood tests, as increases in the sensitivity of these tests make it possible to accurately detect the lower concentrations of biomarkers found in the blood ().
-
-**\*\* källa???** WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. .
-
-**SPECIFIC AD BIOMARKERS**
-
-**TAU/PTAU181**
+AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF.Recent advances in research have made it possible to replace these invasive procedures with blood tests, as increases in the sensitivity of these tests make it possible to accurately detect the lower concentrations of biomarkers found in the blood (). WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. . **- page???**)
 
 The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and staging of AD in 2024 to reflect the importance of blood-based biomarkers in the diagnosis process. According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Plasma p-tau has had good performance as a standalone biomarker, compared with CSF p-tau which is usually used in conjunction with other biomarkers (Jack et al., p. 5151).
-
-**NFL**
 
 Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al., p. 5158). NfL is usually present inside neurons, and therefore concentrations are expected to be higher in individuals with neuronal injury symptomatic of AD (Clark, C., 2021, p. 7). Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).
 
 Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).
-
-**Kortare beskrvining av p-tau181 och NfL**
-
-**Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).**
-
-**Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).**
-
-Old text:
-
-Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
-
-Tau proteins, which are microtubule-binding proteins, play an essential role in maintaining neuronal stability and morphology under normal conditions. The regional progression of brain atrophy in AD is closely associated with the accumulation of tau proteins. Hyperphosphorylated tau (p-tau), in its full-length or truncated forms, represents a key pathological hallmark of AD, exhibiting over 70 post-translational modifications, including more than 40 phosphorylation sites. Various forms of p-tau can be measured in CSF and plasma
-
-Among the ones currently being explored and used in research settings, are mentioned p-tau181, a plasma phosphorylated tau, and NfL, a plasma neurofilament light (2024: p. 7).
-
-<https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
-
-- Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD. **\*\*source?\*\***
 
 **SUMMARY**
 
@@ -2244,7 +2214,7 @@ pchisq(LR, 2, lower.tail = FALSE)
 LR
 ```
 
-## M2 (2 latent classes)
+## M1 (2 latent classes)
 
 The linear mixed effects model was extended to model 2 classes with a latent class mixed effects model. One assumption of latent class mixed models is that the sample population, $N$ is comprised of $G$ latent, unobserved heterogenous classes. Modelling the longitudinal NfL measurements with a 2 class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for 2 latent classes. Comparing $BIC$ for the 1 class ($1638$) and 2 class ($1658$) models supports the conclusion that there are no latent classes in the data. Additionally, the entropy of the 2 class model was calculated to be $0.0003$, which is further evidence against 2 latent classes. The posterior probabilities were extracted from the 2 class model and the distributions of the probabilities for class 1 and class 2 are visualised below. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between class 1 and class 2.
 
@@ -2267,6 +2237,65 @@ summary(hlme_m1)
 
 ```{r}
 postprob(hlme_m1)
+```
+
+## M2 (3 latent classes)
+
+```{r}
+hlme_m2 <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 3,
+    data = long_data,
+    B = random(hlme_m0_2)
+  )
+
+summary(hlme_m2)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(hlme_m2)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+hlme_m3 <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 4,
+    data = long_data,
+    B = random(hlme_m0_2)
+  )
+
+summary(hlme_m3)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(hlme_m3)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(hlme_m0_2, hlme_m1, hlme_m2, hlme_m3,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
 ```
 
 ## Visualisation
@@ -2305,12 +2334,6 @@ ggplot(pp, aes(prob1, prob2)) +
   geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
   labs(x = "P(Class 1)", y = "P(Class 2)") +
   theme_classic()
-```
-
-## Comparing M0 and M1
-
-```{r}
-summarytable(hlme_m0_2, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 # LCMM: PTAU
@@ -2368,7 +2391,7 @@ pchisq(LR, 2, lower.tail = FALSE)
 LR
 ```
 
-## M2 (2 latent classes)
+## M1 (2 latent classes)
 
 A latent mixed effects model with 2 classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model but not for the class-membership model. The $BIC$ increased when compared to the 1 class model and the posterior probabilities show no clear differentiation between class 1 and class 2, with the average posterior probability being $0.50$ for both classes.
 
@@ -2393,6 +2416,63 @@ summary(hlme_m1)
 
 ```{r}
 postprob(hlme_m1)
+```
+
+## M2 (3 latent classes)
+
+```{r}
+hlme_m2 <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 3,
+    data = long_data,
+    B = random(hlme_m0_1)
+  )
+```
+
+```{r}
+summary(hlme_m2)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(hlme_m2)
+```
+
+## M3 (4 latent classes)
+
+- Does not converge
+
+```{r}
+hlme_m3 <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
+    subject = "RID",
+    classmb = ~ 1,
+    ng = 4,
+    data = long_data,
+    B = random(hlme_m0_1)
+  )
+
+summary(hlme_m3)
+```
+
+## Comparing M0, M1, M2
+
+```{r}
+summarytable(hlme_m0_2, hlme_m1, hlme_m2,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
 ```
 
 ## Visualisation
@@ -2435,18 +2515,6 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
-## Comparing M0 and M1
-
-```{r}
-summarytable(hlme_m0_1, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
-```
-
 # LCMM: NFL (including classmb covariates)
 
 Latent class mixed models for NFL including covariates in the class model
@@ -2467,7 +2535,7 @@ hlme_m0 <- hlme(
 summary(hlme_m0)
 ```
 
-## M2 (2 latent classes)
+## M1 (2 latent classes)
 
 The 2 class model with covariates $APOE4\_status$ and $age\_at\_visit$ is a significantly better fit than the 1 class model according to a likelihood ratio test and comparison of $BIC$ for the two models.
 
@@ -2534,6 +2602,69 @@ LR
 postprob(hlme_m1_nfl_classmb)
 ```
 
+## M2 (3 latent classes)
+
+```{r}
+hlme_m2_nfl_classmb <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit,
+    ng = 3,
+    data = long_data,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m2_nfl_classmb)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(hlme_m2_nfl_classmb)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+hlme_m3_nfl_classmb <- hlme(
+    fixed = log_PLASMA_NFL ~ time_years,
+    mixture = ~ time_years,
+    random = ~ time_years,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit,
+    ng = 4,
+    data = long_data,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m3_nfl_classmb)
+```
+
+### Posterior probabilities
+
+```{r}
+postprob(hlme_m3_nfl_classmb)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(hlme_m0, hlme_m1_nfl_classmb, hlme_m2_nfl_classmb, hlme_m3_nfl_classmb,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
+```
+
 ## Visualisation
 
 ```{r}
@@ -2572,18 +2703,6 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
-## Comparing M0 and M1
-
-```{r}
-summarytable(hlme_m0, hlme_m1_nfl_classmb, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
-```
-
 # LCMM: PTAU (including classmb covariates)
 
 Latent class mixed models for PTAU including covariates in the class model
@@ -2604,7 +2723,7 @@ hlme_m0 <- hlme(
 summary(hlme_m0)
 ```
 
-## M2 (2 latent classes)
+## M1 (2 latent classes)
 
 TO CHECK: difference between genotype in latent class file
 
@@ -2634,7 +2753,7 @@ summary(hlme_m1_PTGENDER)
 ### Excluding PTGENDER
 
 ```{r}
-hlme_m1 <- hlme(
+hlme_m1_ptau_classmb <- hlme(
     fixed = log_PLASMAPTAU181 ~ time_years,
     mixture = ~ 1,
     random = ~ 1,
@@ -2647,13 +2766,70 @@ hlme_m1 <- hlme(
 ```
 
 ```{r}
-summary(hlme_m1)
+summary(hlme_m1_ptau_classmb)
 ```
 
-### Posterior probabilities
+```{r}
+postprob(hlme_m1_ptau_classmb)
+```
+
+## M2 (3 latent classes)
 
 ```{r}
-postprob(hlme_m1)
+hlme_m2_ptau_classmb <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit,
+    ng = 3,
+    data = long_data,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m2_ptau_classmb)
+```
+
+```{r}
+postprob(hlme_m2_ptau_classmb)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+hlme_m3_ptau_classmb <- hlme(
+    fixed = log_PLASMAPTAU181 ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
+    subject = "RID",
+    classmb = ~ APOE4_status + age_at_visit,
+    ng = 4,
+    data = long_data,
+    B = random(hlme_m0)
+  )
+```
+
+```{r}
+summary(hlme_m3_ptau_classmb)
+```
+
+```{r}
+postprob(hlme_m3_ptau_classmb)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(hlme_m0, hlme_m1_ptau_classmb, hlme_m2_ptau_classmb, hlme_m3_ptau_classmb,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
 ```
 
 ## Visualisation
@@ -2692,18 +2868,6 @@ ggplot(pp, aes(prob1, prob2)) +
   geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
   labs(x = "P(Class 1)", y = "P(Class 2)") +
   theme_classic()
-```
-
-## Comparing M0 and M1
-
-```{r}
-summarytable(hlme_m0, hlme_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 # MLCMM: NFL & PTAU
