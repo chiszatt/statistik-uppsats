@@ -1560,7 +1560,7 @@ summary(long_model_ptau)
 - All three levels of APOE4_status are significant
 
 ```{r}
-# Longitudinal model for log p-tau181 with normal distribution 
+# Longitudinal model for log p-tau181 with APOE4 status 
 long_model_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
@@ -1574,21 +1574,29 @@ summary(long_model_ptau)
 
 #### Determining random effects
 
+- Fitting the model with ML estimation in order to compare models using likelihood ratio test
+
+- The results give support to fitting the simpler model with only a random intercept
+
 ```{r}
-# Longitudinal model for log p-tau181 without random slope
-long_model_ptau_simple <- lme(
+m1 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (1 | RID),
+           data = long_data, REML = FALSE)
+
+m2 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (time_years | RID),
+           data = long_data, REML = FALSE)
+```
+
+```{r}
+anova(m1, m2, type = "LRT")
+```
+
+```{r}
+# Updating the longitudinal ptau model
+long_model_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
   random = ~ 1 | RID,                    
   data = long_data
 )
-```
-
-```{r}
-summary(long_model_ptau_simple)
-```
-
-```{r}
-anova(long_model_ptau_simple, long_model_ptau)
 ```
 
 ## NFL
@@ -1657,21 +1665,18 @@ summary(long_model_nfl)
 
 #### Determining the random effects
 
+- The results of the likelihood-ratio test support including a random slope as well as a random intercept for the NfL model
+
 ```{r}
-# Longitudinal model for log NfL without random slope
-long_model_nfl_simple <- lme(
-  log_PLASMA_NFL ~ time_years, 
-  random = ~ 1 | RID,
-  data = long_data
-  )
+m1 <- lmer(log_PLASMA_NFL ~ time_years + (1 | RID),
+           data = long_data, REML = FALSE)
+
+m2 <- lmer(log_PLASMA_NFL ~ time_years + (time_years | RID),
+           data = long_data, REML = FALSE)
 ```
 
 ```{r}
-summary(long_model_nfl_simple)
-```
-
-```{r}
-anova(long_model_nfl_simple, long_model_nfl)
+anova(m1, m2, type = "LRT")
 ```
 
 ```{r}
