@@ -1331,6 +1331,8 @@ mean(long_data$PLASMAPTAU181)
 var(long_data$PLASMAPTAU181)
 ```
 
+#### Fitting the models
+
 ```{r}
 # GLMM
 fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
@@ -1396,6 +1398,20 @@ qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
 qqline(res_ptau, col = "red")
 ```
 
+#### Shapiro-Wilk test
+
+```{r}
+# Shapiro-Wilk test of normality of the residuals
+shapiro.test(gamma_residuals_ptau$fittedResiduals)
+shapiro.test(lme_residuals_log_ptau$fittedResiduals)
+shapiro.test(lme_residuals_cubed_ptau$fittedResiduals)
+shapiro.test(lognormal_residuals_ptau$fittedResiduals)
+shapiro.test(student_residuals_ptau$fittedResiduals)
+shapiro.test(res_ptau)
+```
+
+#### AIC and log-likelihood
+
 ```{r}
 # Comparing p-tau181 models with AIC and log likelihood
 AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau, fit_spline_ptau)
@@ -1416,6 +1432,8 @@ logLik(fit_spline_ptau)
 mean(long_data$PLASMA_NFL)
 var(long_data$PLASMA_NFL)
 ```
+
+#### Fitting the models
 
 ```{r}
 # GLMM
@@ -1482,6 +1500,20 @@ qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
 
+#### Shapiro-Wilk test
+
+```{r}
+# Shapiro-Wilk test of normality of the residuals
+shapiro.test(gamma_residuals_nfl$fittedResiduals)
+shapiro.test(lme_residuals_log_nfl$fittedResiduals)
+shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
+shapiro.test(lognormal_residuals_nfl$fittedResiduals)
+shapiro.test(student_residuals_nfl$fittedResiduals)
+shapiro.test(res_nfl)
+```
+
+#### AIC and log-likelihood
+
 ```{r}
 # Comparing NfL-models with AIC and log likelihood
 AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl, fit_spline_nfl)
@@ -1537,7 +1569,20 @@ summary(long_model_ptau)
 #### Determining random effects
 
 ```{r}
+# Longitudinal model for log p-tau181 without random slope
+long_model_ptau_simple <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  random = ~ 1 | RID,                    
+  data = long_data
+)
+```
 
+```{r}
+summary(long_model_ptau_simple)
+```
+
+```{r}
+anova(long_model_ptau_simple, long_model_ptau)
 ```
 
 ## NFL
@@ -1545,7 +1590,7 @@ summary(long_model_ptau)
 #### With all genotype levels
 
 ```{r}
-# Longitudinal model for log NfL with normal distribution 
+# Longitudinal model for log NfL with normal distribution, all genotype levels
 long_model_nfl <- lme(
   log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
   random = ~ time_years | RID,
@@ -1562,10 +1607,10 @@ summary(long_model_nfl)
 - None of the levels are significant for log NfL and neither is gender
 
 ```{r}
-# Longitudinal model for log NfL with normal distribution 
+# Longitudinal model for log NfL with normal distribution, APOE4_status
 long_model_nfl <- lme(
   fixed = log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
-  random = ~ time_years | RID, # random intercept + slope
+  random = ~ time_years | RID,
   data = long_data
   )
 ```
@@ -1604,12 +1649,6 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-#### Comparing models
-
-```{r}
-AIC(long_model_nfl, long_model_nfl_reduced, long_model_nfl_full)
-```
-
 #### Determining the random effects
 
 ```{r}
@@ -1626,7 +1665,7 @@ summary(long_model_nfl_simple)
 ```
 
 ```{r}
-AIC(long_model_nfl_simple, long_model_nfl)
+anova(long_model_nfl_simple, long_model_nfl)
 ```
 
 ```{r}
@@ -1634,7 +1673,9 @@ AIC(long_model_nfl_simple, long_model_nfl)
 mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
-### Residual check
+## Residual check
+
+#### Residuals vs fitted values
 
 ```{r}
 # residuals of the p-tau181 LME model
@@ -1652,11 +1693,6 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
-# Shapiro-Wilk test of normality of the residuals
-shapiro.test(res_ptau)
-```
-
-```{r}
 # residuals of the NfL LME model
 res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
@@ -1671,12 +1707,19 @@ plot(fitted_vals_nfl, res_nfl,
 abline(h = 0, col = "red", lty = 2)
 ```
 
+#### Shapiro-Wilk test
+
+```{r}
+# Shapiro-Wilk test of normality of the residuals
+shapiro.test(res_ptau)
+```
+
 ```{r}
 # Shapiro-Wilk test of normality of the residuals
 shapiro.test(res_nfl)
 ```
 
-### QQ plots
+#### QQ plots
 
 ```{r}
 # For P-tau
@@ -1692,7 +1735,9 @@ qqline(res_nfl, col = "red")
 
 ## For the different cox PH models and the separate joint models
 
-### Fitted standard Cox PH models (for the joint models)
+## Fitted standard Cox PH models (for the joint models)
+
+#### With all genotype levels
 
 ```{r}
 # Cox survival-models, with covariates
@@ -1706,6 +1751,8 @@ surv_model_full <- coxph(
 summary(surv_model_full)
 ```
 
+#### APOE4 status
+
 ```{r}
 # Cox survival-models, with covariates
 # With APOE4_status
@@ -1717,6 +1764,8 @@ surv_model_full <- coxph(
 
 summary(surv_model_full)
 ```
+
+#### Removing PTGENDER
 
 ```{r}
 # Cox survival-models, with covariates
@@ -1734,9 +1783,9 @@ summary(surv_model)
 anova(surv_model_full, surv_model)
 ```
 
-### Fitted Cox PH models using baseline values of each biomarker
+## Fitted Cox PH models using baseline values of each biomarker
 
-#### PTAU
+### PTAU
 
 ```{r}
 # Cox survival-models, with covariates including baseline values of each biomarker 
@@ -1749,6 +1798,8 @@ surv_model_ptau_bl_full <- coxph(
 
 summary(surv_model_ptau_bl_full)
 ```
+
+#### Removing PTGENDER
 
 ```{r}
 # Cox survival-models, with covariates including baseline values of each biomarker 
@@ -1763,13 +1814,15 @@ surv_model_ptau_bl <- coxph(
 summary(surv_model_ptau_bl)
 ```
 
+#### Comparing models
+
 Testing the significance of gender in the Cox proportional hazard model shows that there is no evidence of an improved fit compared with a reduced model with only age at baseline and APOE- $\epsilon 4$ status and baseline ptau-181 value as covariates.
 
 ```{r}
 anova(surv_model_ptau_bl_full, surv_model_ptau_bl, test = "LRT")
 ```
 
-#### NfL
+### NfL
 
 ```{r}
 # For NfL with PTGENDER
@@ -1783,6 +1836,8 @@ surv_model_nfl_bl_full <- coxph(
 summary(surv_model_nfl_bl_full)
 ```
 
+#### Removing PTGENDER
+
 ```{r}
 # For NfL without PTGENDER
 surv_model_nfl_bl_reduced <- coxph(
@@ -1794,6 +1849,8 @@ surv_model_nfl_bl_reduced <- coxph(
 
 summary(surv_model_nfl_bl_reduced)
 ```
+
+#### Removing age at baseline
 
 ```{r}
 # For NfL without PTGENDER and age at baseline
@@ -1807,13 +1864,15 @@ surv_model_nfl_bl <- coxph(
 summary(surv_model_nfl_bl)
 ```
 
+#### Comparing models
+
 Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate. Additionally, there is no support for including age at baseline in the model with only baseline NfL values.
 
 ```{r}
 anova(surv_model_nfl_bl_full, surv_model_nfl_bl_reduced, surv_model_nfl_bl, test = "LRT")
 ```
 
-#### PTAU and NfL
+### PTAU and NfL
 
 ```{r}
 # Inlcuding both p-tau181 and NfL
@@ -1827,6 +1886,8 @@ surv_model_both_bl_full <- coxph(
 summary(surv_model_both_bl_full) 
 ```
 
+#### Removing PTGENDER
+
 ```{r}
 # Without PTGENDER
 surv_model_both_bl_reduced <- coxph(
@@ -1839,6 +1900,8 @@ surv_model_both_bl_reduced <- coxph(
 summary(surv_model_both_bl_reduced)
 ```
 
+#### Removing age at baseline
+
 ```{r}
 # Without PTGENDER and age at baseline
 surv_model_both_bl <- coxph(
@@ -1850,6 +1913,8 @@ surv_model_both_bl <- coxph(
 
 summary(surv_model_both_bl)
 ```
+
+#### Comparing models
 
 ```{r}
 anova(surv_model_both_bl_full, surv_model_both_bl_reduced, surv_model_both_bl,
