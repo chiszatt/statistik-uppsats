@@ -1496,13 +1496,13 @@ logLik(fit_spline_nfl)
 
 Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor! Tror det är bäst att kolla på residualerna och QQ-plotsen
 
-## For separate joint models
+# Fitted LME models
 
-### Fitted LME models
+## PTAU
 
 #### With all genotype levels
 
-- None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
+- None of the coefficients are significant for any of the levels for genotype
 
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
@@ -1511,24 +1511,15 @@ long_model_ptau <- lme(
   random = ~ time_years | RID,                    
   data = long_data
 )
-
-summary(long_model_ptau)
-
-# Longitudinal model for log NfL with normal distribution 
-long_model_nfl <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
-  random = ~ time_years | RID,
-  data = long_data
-  )
-
-summary(long_model_nfl)
 ```
 
-#### Collapsing genotype down to three levels (APOE4_status)
+```{r}
+summary(long_model_ptau)
+```
 
-- All three levels of APOE4_status are significant for the log ptau-181 model
+#### APOE4 status
 
-- None of the levels are significant for log NfL and neither is gender
+- All three levels of APOE4_status are significant
 
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
@@ -1537,20 +1528,53 @@ long_model_ptau <- lme(
   random = ~ time_years | RID,                    
   data = long_data
 )
+```
 
+```{r}
 summary(long_model_ptau)
+```
 
+#### Determining random effects
+
+```{r}
+
+```
+
+## NFL
+
+#### With all genotype levels
+
+```{r}
+# Longitudinal model for log NfL with normal distribution 
+long_model_nfl <- lme(
+  log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
+  random = ~ time_years | RID,
+  data = long_data
+  )
+```
+
+```{r}
+summary(long_model_nfl)
+```
+
+#### APOE4 status
+
+- None of the levels are significant for log NfL and neither is gender
+
+```{r}
 # Longitudinal model for log NfL with normal distribution 
 long_model_nfl <- lme(
   fixed = log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
   random = ~ time_years | RID, # random intercept + slope
   data = long_data
   )
+```
 
+```{r}
 summary(long_model_nfl)
 ```
 
-#### NfL without APOE4_status
+#### Removing APOE4 status
 
 ```{r}
 # Longitudinal model for log NfL without APOE4_status
@@ -1559,11 +1583,13 @@ long_model_nfl_reduced <- lme(
   random = ~ time_years | RID,
   data = long_data
   )
+```
 
+```{r}
 summary(long_model_nfl_reduced)
 ```
 
-#### NfL without PTGENDER
+#### Removing PTGENDER
 
 ```{r}
 # Longitudinal model for log NfL without covariates
@@ -1572,12 +1598,35 @@ long_model_nfl <- lme(
   random = ~ time_years | RID,
   data = long_data
   )
-
-summary(long_model_nfl)
 ```
 
 ```{r}
+summary(long_model_nfl)
+```
+
+#### Comparing models
+
+```{r}
 AIC(long_model_nfl, long_model_nfl_reduced, long_model_nfl_full)
+```
+
+#### Determining the random effects
+
+```{r}
+# Longitudinal model for log NfL without random slope
+long_model_nfl_simple <- lme(
+  log_PLASMA_NFL ~ time_years, 
+  random = ~ 1 | RID,
+  data = long_data
+  )
+```
+
+```{r}
+summary(long_model_nfl_simple)
+```
+
+```{r}
+AIC(long_model_nfl_simple, long_model_nfl)
 ```
 
 ```{r}
@@ -1603,6 +1652,11 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
+# Shapiro-Wilk test of normality of the residuals
+shapiro.test(res_ptau)
+```
+
+```{r}
 # residuals of the NfL LME model
 res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
@@ -1615,6 +1669,11 @@ plot(fitted_vals_nfl, res_nfl,
      ylab = "Residuals",
      main = "Residuals vs Fitted for NFL")
 abline(h = 0, col = "red", lty = 2)
+```
+
+```{r}
+# Shapiro-Wilk test of normality of the residuals
+shapiro.test(res_nfl)
 ```
 
 ### QQ plots
