@@ -179,9 +179,13 @@ Similarly, in an article from 2026, researchers applied a multi-dimensional join
 
 Thus, the question arises as to which modeling approach is best suited for predicting progression to Alzheimer’s disease dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in Alzheimer’s disease, specifically focusing on plasma biomarkers such as NfL and p-tau.
 
-Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592). This was done to ensure that the approximation method did not lead to "non-ignorable biases" (Wang et al., p. 591).
+Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to Alzheimer’s disease explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592).
 
-In other words, some studies include all available participants, while others impose minimum requirements on the number of repeated measurements, thereby excluding individuals with only a single observation. This variation in inclusion criteria reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice. On one hand, participants with only a single observation do not directly provide information about longitudinal or intra-individual change over time. On the other hand, their observations at a single occasion do still contribute to the analysis, as they inform the estimation of variances and between-subject effects (Fitzmaurice et al., 2011, pp. 214–215). Additionally, linear mixed-effects models are specifically designed to accommodate unbalanced longitudinal data and do not require the same number of observations for each subject, nor measurements at identical time points. This flexibility, together with their ability to model covariance structures in a parsimonious way, makes them particularly well suited for analysing inherently unbalanced data (Fitzmaurice et al., 2011, p. 190).
+In other words, some studies include all available participants, while others impose minimum requirements on the number of repeated measurements, thereby excluding individuals with only a single observation. This variation in inclusion criteria reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice. For example, in the previously mentioned study, such restrictions were applied to ensure that the approximation method did not lead to “non-ignorable biases” (Wang et al., p. 591). On one hand, participants with only a single observation do not provide information about change over time within individuals. On the other hand, their observations at a single time point still contribute useful information to the analysis by informing estimates of variability and between-subject effects (Fitzmaurice et al., 2011, chapter 8, pp. 214-215).
+
+The choice of inclusion strategy also has important implications for statistical efficiency and validity. Analyses restricted to individuals with complete data are generally less efficient than methods that use all available information, resulting in a loss of precision. This loss depends on the pattern and distribution of missing data across subjects and time points, as well as the extent to which missingness is related to observed outcomes. Importantly, missing data may under certain circumstances also introduce bias, potentially leading to misleading inferences about changes in the mean response. Consequently, the mechanism underlying missing data is a critical consideration in longitudinal analyses, as it determines whether exclusion of incomplete cases may distort results (Fitzmaurice et al., chapter 17, p. 491).
+
+Additionally, linear mixed-effects models are specifically designed to accommodate unbalanced longitudinal data and do not require the same number of observations for each subject, nor measurements at identical time points. This flexibility, together with their ability to model covariance structures in a parsimonious way, makes them particularly well suited for analysing inherently unbalanced data (Fitzmaurice et al., chapter 8, p. 190).
 
 ## Research Aims
 
@@ -409,9 +413,9 @@ The data collected for the joint model-based analyses are also often featured by
 
 #### The Gelman-Rubin statistic
 
-Convergence can be evaluated by running multiple chains from different starting values (Peng, 2022). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng).
+Convergence can be evaluated by running multiple chains from different starting values (Peng, 2022, chapter 7.4.2). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng, chapter 7.4.2).
 
-The Gelman-Rubin statistic R formalizes this idea (Peng). Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
+The Gelman-Rubin statistic R formalizes this idea (Peng, chapter 7.4.2). Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
 Then calculate the chain mean for each chain,
 
@@ -437,7 +441,7 @@ Subsequently, the Gelman-Rubin statistic is:
 
 $$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
-As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng).
+As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, chapter 7.4.2).
 
 ### Joint Latent Class Model
 
@@ -515,7 +519,7 @@ $$p_i(c_g) = P(C = c_g | \mathbf{X}_ii)$$
 
 ...
 
-### ROC analysis
+### Time-depending AUC and Brier score
 
 ROC analysis is a valuable method for assessing how well diagnostic tests perform, and more generally for measuring the accuracy of statistical models, such as logistic regression and discriminant analysis, that assign individuals to one of two groups, typically classified as diseased or not diseased. Earlier research on ROC methods mainly focused on ordinal rating data, where responses take a limited set of ordered categories reflecting levels of confidence about disease status. More recently, ROC techniques have increasingly been used with continuous data as well (Zou et al., 2012, p. 3)
 
@@ -538,6 +542,8 @@ Based on the definitions above, the corresponding receiver operating characteris
 The time-dependent area under the curve (AUC) is then defined as:
 
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
+
+Brier score
 
 # Data
 
@@ -773,7 +779,7 @@ Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019
 
 National Cancer Institute (NCI) (n.d.). *Baseline*. <https://www.cancer.gov/publications/dictionaries/cancer-terms/def/baseline>
 
-Peng, R.E. (2022). *Advanced Statistical Computing*. Chapter 7.4.2: Gelman-Rubin Statistic. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
+Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
 #### **Joint latent class models for longitudinal and time-to-event data: A review**
 
@@ -795,9 +801,9 @@ Wolfe, R. A., & Strawderman, R. L. (1996). Logical and statistical fallacies in 
 
 Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer’s Disease' in Brady, S.T., Siegel, G.J., Albers, RW., Price, D.L (8 ed.) *Basic neurochemistry : principles of molecular, cellular, and medical neurobiology*. Waltham, Massachusetts; Oxford: Academic Press / Elsevier.
 
-World Health Organization (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
+World Health Organization (2024). *Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease*. <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
-- (2024). *Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease*. <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
+- (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
 Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
 
