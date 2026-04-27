@@ -1506,7 +1506,7 @@ Osäker dock om man kan jämföra log-version och cube-version av lme med de and
 
 ### Fitted LME models
 
-# With all genotype levels
+#### With all genotype levels
 
 - None of the coefficients are significant for any of the levels for genotype in either the model with log NFL as response variable or log ptau-181 as response variable
 
@@ -1643,8 +1643,33 @@ qqline(res_nfl, col = "red")
 
 ```{r}
 # Cox survival-models, with covariates
-surv_model <- coxph(
+# All genotype levels
+surv_model_full <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + genotype,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model_full)
+```
+
+```{r}
+# Cox survival-models, with covariates
+# With APOE4_status
+surv_model_full <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model_full)
+```
+
+```{r}
+# Cox survival-models, with covariates
+# With APOE4_status
+surv_model <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
   data = surv_data,
   x = TRUE
 )
@@ -1653,14 +1678,7 @@ summary(surv_model)
 ```
 
 ```{r}
-# Cox survival-models, with covariates
-surv_model <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
-  data = surv_data,
-  x = TRUE
-)
-
-summary(surv_model)
+anova(surv_model_full, surv_model)
 ```
 
 ### Fitted Cox PH models using baseline values of each biomarker
@@ -1681,10 +1699,10 @@ summary(surv_model_ptau_bl_full)
 
 ```{r}
 # Cox survival-models, with covariates including baseline values of each biomarker 
-# For p-tau181
+# For p-tau181 without PTGENDER
 surv_model_ptau_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+    age_at_baseline + APOE4_status + baseline_value_ptau,
   data = surv_data,
   x = TRUE
   )
@@ -1696,16 +1714,6 @@ Testing the significance of gender in the Cox proportional hazard model shows th
 
 ```{r}
 anova(surv_model_ptau_bl_full, surv_model_ptau_bl, test = "LRT")
-```
-
-Assessing predictive performance with concordance index:
-
-```{r}
-rcorr.cens(predict(surv_model_ptau_bl_full),
-                  surv_data$time_to_event, surv_data$event)[1]
-
-rcorr.cens(predict(surv_model_ptau_bl),
-                  surv_data$time_to_event, surv_data$event)[1]
 ```
 
 #### NfL
@@ -1723,10 +1731,22 @@ summary(surv_model_nfl_bl_full)
 ```
 
 ```{r}
-# For NfL with PTGENDER
+# For NfL without PTGENDER
+surv_model_nfl_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + APOE4_status + baseline_value_nfl,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model_nfl_bl_reduced)
+```
+
+```{r}
+# For NfL without PTGENDER and age at baseline
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
+    APOE4_status + baseline_value_nfl,
   data = surv_data,
   x = TRUE
 )
@@ -1734,22 +1754,10 @@ surv_model_nfl_bl <- coxph(
 summary(surv_model_nfl_bl)
 ```
 
-Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate.
+Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate. Additionally, there is no support for including age at baseline in the model with only baseline NfL values.
 
 ```{r}
-anova(surv_model_nfl_bl_full, surv_model_nfl_bl, test = "LRT")
-```
-
-Assessing predictive performance with concordance index:
-
-```{r}
-library(Hmisc)
-
-rcorr.cens(predict(surv_model_nfl_bl_full),
-                  surv_data$time_to_event, surv_data$event)[1]
-
-rcorr.cens(predict(surv_model_nfl_bl),
-                  surv_data$time_to_event, surv_data$event)[1]
+anova(surv_model_nfl_bl_full, surv_model_nfl_bl_reduced, surv_model_nfl_bl, test = "LRT")
 ```
 
 #### PTAU and NfL
@@ -1767,10 +1775,22 @@ summary(surv_model_both_bl_full)
 ```
 
 ```{r}
-# Inlcuding both p-tau181 and NfL
+# Without PTGENDER
+surv_model_both_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~
+    age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data,
+  x = TRUE
+)
+
+summary(surv_model_both_bl_reduced)
+```
+
+```{r}
+# Without PTGENDER and age at baseline
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+    APOE4_status + baseline_value_ptau + baseline_value_nfl,
   data = surv_data,
   x = TRUE
 )
@@ -1778,14 +1798,9 @@ surv_model_both_bl <- coxph(
 summary(surv_model_both_bl)
 ```
 
-Assessing predictive performance with concordance index:
-
 ```{r}
-rcorr.cens(predict(surv_model_both_bl_full),
-                  surv_data$time_to_event, surv_data$event)[1]
-
-rcorr.cens(predict(surv_model_both_bl),
-                  surv_data$time_to_event, surv_data$event)[1]
+anova(surv_model_both_bl_full, surv_model_both_bl_reduced, surv_model_both_bl,
+      test = "LRT")
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1810,8 +1825,7 @@ To confirm that age at baseline has a time-dependent effect that violates the pr
 ```{r}
 # We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
 surv_model_tv <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + 
-    APOE4_status + tt(age_at_baseline),
+  Surv(time_to_event, event) ~ age_at_baseline + APOE4_status + tt(age_at_baseline),
   data = surv_data,
   tt = function(x, t, ...) x * log(t)
 )
@@ -1830,6 +1844,8 @@ logLik(surv_model_tv)
 
 ## Fitted joint model for p-tau181
 
+- High Rhat for time_years
+
 ```{r}
 # Joint model for p-tau181 using package JMbayes2 (bayesian approach)
 joint_model_ptau <- jm(
@@ -1840,15 +1856,15 @@ joint_model_ptau <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
+```
 
+```{r}
 summary(joint_model_ptau)
 ```
 
 ## Fitted joint model for NfL
 
-1.  High rhat for log(shape) with JM
-
-2.  High rhat for sigma with JMBayes2
+- Rhat are fine with newly specified long_model_nfl
 
 ```{r}
 # Joint model for NfL using package JMbayes2 (bayesian approach)
@@ -1860,24 +1876,26 @@ joint_model_nfl <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
+```
 
+```{r}
 summary(joint_model_nfl)
 ```
 
 Trying 20000 iterations instead, to see if Rhat values get better:
 
 ```{r}
-# Joint model for NfL using package JMbayes2 (bayesian approach)
-joint_model_nfl <- jm(
-  surv_model,
-  long_model_nfl,
-  time_var = "time_years",
-  n_chains = 3L,
-  n_iter = 20000L,
-  n_burnin = 1000L
-  )
-
-summary(joint_model_nfl)
+# # Joint model for NfL using package JMbayes2 (bayesian approach)
+# joint_model_nfl <- jm(
+#   surv_model,
+#   long_model_nfl,
+#   time_var = "time_years",
+#   n_chains = 3L,
+#   n_iter = 20000L,
+#   n_burnin = 1000L
+#   )
+# 
+# summary(joint_model_nfl)
 ```
 
 ### Traceplots
