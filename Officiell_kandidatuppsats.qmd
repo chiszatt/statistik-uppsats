@@ -1576,7 +1576,7 @@ summary(long_model_ptau)
 
 - Fitting the model with ML estimation in order to compare models using likelihood ratio test
 
-- The results give support to fitting the simpler model with only a random intercept
+- The results give support to fitting the simpler model with only a random intercept. However, $jm()$ does not currently support model fitting for univariate longitudinal data with only a random intercept.
 
 ```{r}
 m1 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (1 | RID),
@@ -1588,15 +1588,6 @@ m2 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (time_year
 
 ```{r}
 anova(m1, m2, type = "LRT")
-```
-
-```{r}
-# Updating the longitudinal ptau model
-long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
-  random = ~ 1 | RID,                    
-  data = long_data
-)
 ```
 
 ## NFL
@@ -1981,6 +1972,36 @@ joint_model_ptau <- jm(
   surv_model,
   long_model_ptau,
   time_var = "time_years",
+  n_chains = 3L,
+  n_iter = 11000L,
+  n_burnin = 1000L
+  )
+```
+
+```{r}
+summary(joint_model_ptau)
+```
+
+- Rhat worse for time_scaled
+
+```{r}
+# Scaling time_years
+long_data$time_scaled <- scale(long_data$time_years)
+
+# Refitting the longitudinal model with time_scaled
+long_model_ptau <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_scaled + PTGENDER + APOE4_status,
+  random = ~ time_scaled | RID,                    
+  data = long_data
+)
+```
+
+```{r}
+# Refitting the joint model for p-tau181 with scaled time variable
+joint_model_ptau <- jm(
+  surv_model,
+  long_model_ptau,
+  time_var = "time_scaled",
   n_chains = 3L,
   n_iter = 11000L,
   n_burnin = 1000L
