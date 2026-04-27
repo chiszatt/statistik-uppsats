@@ -189,7 +189,7 @@ In other words, some studies include all available participants, whereas others 
 
 This study investigates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches. More precisely, the research questions are:
 
-1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, average levels over time, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)?
+1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)?
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
 
@@ -221,7 +221,7 @@ The modelling approaches will be applied to data obtained from the *Alzheimer’
 
 ## Survival analysis
 
-Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse, recovery or other outcomes depending on the research question. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
+As all modeling approaches considered in this study aim to model time to progression to Alzheimer’s disease, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse, recovery or other outcomes depending on the research question. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
 
 With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring (Rizopoulos, 2012, p. 36). Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
 
@@ -649,6 +649,82 @@ Finally, apolipoprotein ε4 status is another covariate used to explain progress
 
 *Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
 
+## Cox models with baseline values of the biomarkers
+
+A Cox proportional hazards model including baseline p-tau181 was first fitted. Checking the proportional hazards assumption showed a violation for age at baseline (χ² = 8.78, df = 1, p = 0.003), while no violations were found for sex (χ² = 0.001, df = 1, p = 0.972), APOE ε4 status (χ² = 2.50, df = 2, p = 0.286), or baseline p-tau181 (χ² = 0.14, df = 1, p = 0.705). The global test was borderline non-significant (χ² = 10.70, df = 5, p = 0.058).
+
+A time-varying Cox model showed a significant time-dependent effect of age (p \< 0.05) and a slightly better fit compared to the standard model (AIC: 2067 vs. 2078; log-likelihood: -1029.5 vs. -1035.0). Despite this, the standard Cox model was kept for the joint modelling step, since time effects are mainly handled through the longitudinal biomarker processes in that framework.
+
+In the final Cox model, baseline p-tau181 was a strong predictor of progression (HR = 2.41, 95% CI: 1.87-3.10, p \< 0.001). Age (HR = 1.03, p = 0.008) and APOE ε4 status (one allele: HR = 2.35; two alleles: HR = 4.08; both p \< 0.001) were also significant predictors, while sex was not (p = 0.56). The model showed good discrimination (C-index = 0.73).
+
+## Cox model with baseline values of NfL
+
+To compare biomarkers, a Cox proportional hazards model was also fitted using baseline NfL instead of p-tau181, while keeping the same covariate structure.
+
+Assessment of the proportional hazards assumption showed a similar pattern to the p-tau model, with a violation for age at baseline (χ² = 9.01, df = 1, p = 0.0027). No violations were observed for sex (χ² = 0.0003, df = 1, p = 0.986), APOE ε4 status (χ² = 3.25, df = 2, p = 0.197), or baseline NfL (χ² = 0.59, df = 1, p = 0.443). However, in contrast to the p-tau model, the global test was statistically significant (χ² = 12.1, df = 5, p = 0.0336), indicating a slightly stronger overall deviation from the proportional hazards assumption, mainly driven by age.
+
+In the final model, baseline NfL was a significant predictor of disease progression (HR = 2.69, 95% CI: 1.90-3.82, p \< 0.001). This suggests that higher NfL levels at baseline are associated with increased risk of developing Alzheimer’s disease/dementia. APOE ε4 status again showed a strong and consistent association, with a clear dose-response pattern (one allele: HR = 2.56; two alleles: HR = 5.19; both p \< 0.001). In contrast, neither age (HR = 1.01, p = 0.30) nor sex (HR = 1.00, p = 0.99) were statistically significant predictors in this model.
+
+Model performance was slightly lower compared to the p-tau181 model, with a concordance index of 0.70 versus 0.73, which suggests somewhat weaker discriminative ability for NfL in this baseline-only framework.
+
+## Cox model with baseline values of p-tau 181
+
+To look at the independent and combined effects of the biomarkers, a Cox proportional hazards model including both baseline p-tau181 and NfL was fitted, along with the clinical covariates.
+
+Checking the proportional hazards assumption showed a violation for age at baseline (χ² = 8.64, df = 1, p = 0.0033). No violations were seen for sex (χ² = 0.009, df = 1, p = 0.923), APOE ε4 status (χ² = 2.73, df = 2, p = 0.256), baseline p-tau181 (χ² = 0.35, df = 1, p = 0.555), or baseline NfL (χ² = 0.99, df = 1, p = 0.319). The global test was not significant (χ² = 10.63, df = 6, p = 0.101), which suggests no major overall violation of the assumption.
+
+In the combined model, both biomarkers remained significant independent predictors of progression. Higher baseline p-tau181 was associated with increased risk (HR = 2.17, 95% CI: 1.66-2.84, p \< 0.001), as was higher baseline NfL (HR = 2.07, 95% CI: 1.45-2.94, p \< 0.001). This suggests that both biomarkers add independent prognostic information when included in the same model.
+
+APOE ε4 status was still a strong predictor, with a clear dose-response pattern (one allele: HR = 2.30; two alleles: HR = 4.21; both p \< 0.001). Age (HR = 1.01, p = 0.47) and sex (HR = 0.94, p = 0.67) were not significant in this model.
+
+Model performance improved slightly compared to the single-biomarker models, with a concordance index of 0.74, suggesting that combining p-tau181 and NfL gives a small gain in predictive ability.
+
+## Joint model for p-tau 181
+
+Next, a joint model was fitted to simultaneously analyse the longitudinal trajectory of p-tau181 and its association with time to progression to Alzheimer’s disease/dementia. A standard Cox model and a linear mixed effects model were therefore first specified.
+
+\*\*Lägga in vad testet av assumption om PH visade för standard cox ph modellen.
+
+for the LME model, even after log-transformation of p-tau181, the residual diagnostics showed some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations were not considered serious, and the model was considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
+
+To assess the sensitivity of the results, alternative LME models with gamma, lognormal or student t-distributions of p-tau181, as well as with splines, were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
+
+The longitudinal submodel showed that p-tau181 levels increased over time (time_years: estimate = 0.029, 95% credible interval: 0.018-0.041, p \< 0.05), indicating a clear upward trajectory of the biomarker prior to disease progression. Males had slightly higher p-tau181 levels compared to females (estimate = 0.118, p = 0.005), while both APOE ε4 one-allele and two-allele carriers showed higher levels of p-tau181 compared to non-carriers (both p \< 0.05). This confirms that p-tau181 is strongly influenced by genetic risk factors and increases progressively over time. In the survival submodel, baseline age showed a small and non-significant association with progression risk (estimate = 0.022, p = 0.146), while sex was also non-significant (estimate = -0.138, p = 0.427). In contrast, APOE ε4 status remained a strong predictor of disease progression, with clear dose-dependent effects (one allele: estimate = 0.777; two alleles: estimate = 1.287; both p \< 0.05).
+
+Most importantly, the association parameter linking longitudinal p-tau181 to the risk of progression was strongly positive (estimate = 1.371, 95% credible interval: 0.989-1.773, p \< 0.05). This indicates that higher p-tau181 levels over time are associated with a substantially increased hazard of developing Alzheimer’s disease/dementia.
+
+Model diagnostics showed generally good convergence, with Rhat values close to 1.00 for most parameters. However, one parameter showed weaker convergence (Rhat = 1.38), which suggests slightly poorer mixing in that part of the model. Despite this, model fit statistics (WAIC and LPML) indicated stable and reliable overall performance without major signs of instability.
+
+\*\*\*Lägga till graferna för convergence också (traceplots och density plots)
+
+## Joint model for NfL
+
+Additionally, a joint model was fitted to analyse the longitudinal trajectory of NfL and its association with time to progression to Alzheimer’s disease/dementia.
+
+The longitudinal submodel showed a clear increase in NfL over time (time_years: estimate = 0.041, 95% credible interval: 0.034-0.048, p \< 0.05), which indicates a steady and relatively strong rise in NfL levels prior to disease progression. There was no evidence of associations with sex (estimate = 0.007, p = 0.845) or APOE ε4 status in the longitudinal process (all p \> 0.05), which suggests that NfL trajectories are largely independent of genetic risk factors.
+
+In the survival submodel, APOE ε4 status remained a strong predictor of progression, with clear dose-dependent effects (one allele: estimate = 0.952; two alleles: estimate = 1.611; both p \< 0.05). In contrast, age (estimate = -0.007, P = 0.666) and sex were not significantly associated with risk in this model.
+
+Most importantly, the association between longitudinal NfL and risk of progression was strong and statistically significant (estimate = 1.649, 95% credible interval: 1.195-2.107, p \< 0.05). This indicates that higher NfL levels over time are strongly linked to increased hazard of developing Alzheimer’s disease/dementia.
+
+Model convergence was generally good, with Rhat values close to 1.00 for most parameters. Model fit statistics (WAIC and LPML) also indicated stable and reliable performance without signs of instability.However, one parameter (residual variance in the longitudinal submodel) showed signs of poorer convergence (Rhat = 1.38), whuch suggests slightly slower mixing. After increasing the number of iterations from 11000 to 20,000, convergence improved, and all parameters showed acceptable Rhat values.
+
+## Multivariate joint model for both p-tau 181 and NfL
+
+?
+
+## Joint latent class mixed model for p-tau 181
+
+?
+
+## Joint latent class mixed model for NfL
+
+?
+
+## Joint latent class mixed model for both p-tau 181 and NfL
+
+?
+
 # Discussion
 
 ## Main findings/summary
@@ -985,21 +1061,6 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## Length check of longitudinal and survival data
-
-```{r}
-# We check the number of individuals in each dataset 
-length(unique(long_data$RID)) # longitudinal data
-length(unique(surv_data$RID)) # survival data
-
-# # removing the two individuals who are not in the survival data set from the longitudinal data set
-long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
-
-# Rechecking the number of individuals in each dataset 
-length(unique(long_data$RID)) # longitudinal data
-length(unique(surv_data$RID)) # survival data
-```
-
 ## Correlation check between biomarkers
 
 ```{r}
@@ -1073,6 +1134,16 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 
 # We check number of individuals with at least 3 measurements 
 length(keep)
+```
+
+```{r}
+# We filter individuals with at least 1 measurement of ptau_data
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+#length(keep)
 ```
 
 ### Checking individuals final diagnoses for the reduced data set
@@ -1166,14 +1237,6 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-## Recheck of longitudinal and survival data lengths
-
-```{r}
-# We check the number of individuals in each dataset 
-length(unique(long_data$RID)) # longitudinal data for ptau
-length(unique(surv_data$RID)) # survival data, global test version
-```
-
 # Distribution check of each biomarker
 
 1.  **Since cube root transform gives a better Gaussian approximation for ptau, should we consider using this? The downside is that values cannot take negative values, which is possible with the natural logarithm transformation: is this true though - sqrt(4) = +- 2 ... but how does this work in practice?**
@@ -1234,11 +1297,15 @@ long_data[scale(long_data$PLASMA_NFL) > 3, ]
 long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
 
+## Recheck of longitudinal and survival data lengths
+
+```{r}
+# We check the number of individuals in each dataset 
+length(unique(long_data$RID)) # longitudinal data
+length(unique(surv_data$RID)) # survival data
+```
+
 # ...
-
-Even after log-transformation of the outcome, the residual diagnostics for the two LME models show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME models are used as part of a joint modeling framework rather than being interpreted on their own, the main requirement is that they provide a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the models are considered to provide a reasonable fit and to be representative of the population, indicating that they are suitable for use within the joint modeling framework.
-
-To assess the sensitivity of the results, we also fitted alternative models using gamma and t-distributions. These yielded similar results, suggesting that the conclusions are robust despite the observed residual issues.
 
 # Longitudinal models
 
@@ -1284,9 +1351,9 @@ fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            data = long_data,
-                            family = students.t(df = 3, link = "identity"))
+#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            #data = long_data,
+                            #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
@@ -1301,18 +1368,43 @@ testResiduals(lme_residuals_cubed_ptau)
 lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
 testResiduals(lognormal_residuals_ptau)
 
-student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-testResiduals(student_residuals_ptau)
+#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+#testResiduals(student_residuals_ptau)
+```
+
+```{r}
+# LME model for p-tau181 with splines 
+library(splines)
+
+fit_spline_ptau <- lme(
+  fixed = log_PLASMAPTAU181 ~ ns(time_years, df = 3),
+  random = ~ time_years | RID,
+  data = long_data,
+  method = "REML"
+)
+
+res_ptau <- residuals(fit_spline_ptau, type = "pearson")
+fit_ptau <- fitted(fit_spline_ptau)
+
+plot(fit_ptau, res_ptau,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red", lty = 2)
+
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
 ```
 
 ```{r}
 # Comparing p-tau181 models with AIC and log likelihood
-AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau)
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_student_ptau, fit_spline_ptau)
 logLik(fit_lme_log_ptau)
 logLik(fit_lme_cubed_ptau)
 logLik(fit_gamma_ptau)
 logLik(fit_lognormal_ptau)
 logLik(fit_student_ptau)
+logLik(fit_spline_ptau)
 ```
 
 ### NfL
@@ -1345,9 +1437,9 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           data = long_data,
-                           family = students.t(df = 3, link = "identity"))
+#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           #data = long_data,
+                           #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
@@ -1362,25 +1454,51 @@ testResiduals(lme_residuals_cubed_nfl)
 lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
 testResiduals(lognormal_residuals_nfl)
 
-student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-testResiduals(student_residuals_nfl)
+#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+#testResiduals(student_residuals_nfl)
+```
+
+```{r}
+# LME model for NfL with splines 
+library(splines)
+
+fit_spline_nfl <- lme(
+  fixed = log_PLASMA_NFL ~ ns(time_years, df = 3),
+  random = ~ time_years | RID,
+  data = long_data,
+  method = "REML"
+)
+
+res_nfl <- residuals(fit_spline_nfl, type = "pearson")
+fit_nfl <- fitted(fit_spline_nfl)
+
+plot(fit_nfl, res_nfl,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red", lty = 2)
+
+qqnorm(res_nfl, main = "QQ plot: NfL residuals")
+qqline(res_nfl, col = "red")
 ```
 
 ```{r}
 # Comparing NfL-models with AIC and log likelihood
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl)
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_student_nfl, fit_spline_nfl)
 logLik(fit_lme_log_nfl)
 logLik(fit_lme_cubed_nfl)
 logLik(fit_gamma_nfl)
 logLik(fit_lognormal_nfl)
 logLik(fit_student_nfl)
+logLik(fit_spline_nfl)
+
 ```
+
+Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor! Tror det är bäst att kolla på residualerna och QQ-plotsen
 
 ## For separate joint models
 
 ### Fitted LME models
-
-# Log-transformed NfL and cube-transformed p-tau181
 
 #### With all genotype levels
 
@@ -1389,7 +1507,7 @@ logLik(fit_student_nfl)
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = sqrt(sqrt(PLASMAPTAU181)) ~ time_years + PTGENDER + genotype,
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
   random = ~ time_years | RID,                    
   data = long_data
 )
@@ -1415,7 +1533,7 @@ summary(long_model_nfl)
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau <- lme(
-  fixed = sqrt(sqrt(PLASMAPTAU181)) ~ time_years + PTGENDER + APOE4_status,
+  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
   data = long_data
 )
@@ -1423,13 +1541,13 @@ long_model_ptau <- lme(
 summary(long_model_ptau)
 
 # Longitudinal model for log NfL with normal distribution 
-long_model_nfl_full <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
+long_model_nfl <- lme(
+  fixed = log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
   random = ~ time_years | RID, # random intercept + slope
   data = long_data
   )
 
-summary(long_model_nfl_full)
+summary(long_model_nfl)
 ```
 
 #### NfL without APOE4_status
@@ -1465,20 +1583,6 @@ AIC(long_model_nfl, long_model_nfl_reduced, long_model_nfl_full)
 ```{r}
 # Mixed object for multivariate joint model
 mixed <- list(long_model_ptau, long_model_nfl)
-```
-
-```{r}
-# Longitudinal model for p-tau181 with t-distribution (identity link)
-#library(GLMMadaptive)
-#long_model_ptau <- mixed_model(
-  #fixed = log_PLASMAPTAU181 ~ time_years_ptau + PTGENDER + APOE4_status,
-  #random = ~ time_years_ptau | RID,                    
-  #data = long_data_ptau,
-      
-#family = students.t(df = 3, link = "identity")
-#)
-
-#summary(long_model_ptau)
 ```
 
 ### Residual check
@@ -1525,22 +1629,6 @@ qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 ```
 
-## P-tau181 with log-transformation or cube-transformation?
-
-```{r}
-# For P-tau with log-transformation
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-
-# For P-tau with cube-transformation
-qqnorm(res_cubed_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_cubed_ptau, col = "red")
-```
-
-Even after log-transformation and cube-transformation of the outcome, the residual diagnostics for the LME model show some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations are not considered serious, and the model is considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
-
-To assess the sensitivity of the results, alternative models such as gamma and t-distributions were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
-
 # Survival models
 
 ## For the different cox PH models and the separate joint models
@@ -1549,19 +1637,19 @@ To assess the sensitivity of the results, alternative models such as gamma and t
 
 ```{r}
 # Cox survival-models, with covariates
-surv_model_full <- coxph(
+surv_model <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + genotype,
   data = surv_data,
   x = TRUE
 )
 
-summary(surv_model_full)
+summary(surv_model)
 ```
 
 ```{r}
 # Cox survival-models, with covariates
 surv_model <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
   data = surv_data,
   x = TRUE
 )
@@ -1590,9 +1678,10 @@ summary(surv_model_ptau_bl_full)
 # For p-tau181
 surv_model_ptau_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau,
-  data = surv_data
-)
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data,
+  x = TRUE
+  )
 
 summary(surv_model_ptau_bl)
 ```
@@ -1610,7 +1699,8 @@ anova(surv_model_ptau_bl_full, surv_model_ptau_bl, test = "LRT")
 surv_model_nfl_bl_full <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
-  data = surv_data
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_nfl_bl_full)
@@ -1620,8 +1710,9 @@ summary(surv_model_nfl_bl_full)
 # For NfL with PTGENDER
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_nfl,
-  data = surv_data
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_nfl_bl)
@@ -1640,7 +1731,8 @@ anova(surv_model_nfl_bl_full, surv_model_nfl_bl, test = "LRT")
 surv_model_both_bl_full <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_both_bl_full) 
@@ -1650,8 +1742,9 @@ summary(surv_model_both_bl_full)
 # Inlcuding both p-tau181 and NfL
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data
+    age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data,
+  x = TRUE
 )
 
 summary(surv_model_both_bl)
@@ -1672,23 +1765,17 @@ cox.zph(surv_model_nfl_bl)
 cox.zph(surv_model_both_bl)
 ```
 
-### Test of time-varying coefficient Cox models for APOE4-status due to evidence of non-proportional hazards
+To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
+
+### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
 
 ```{r}
-# Making apoe4-status numeric
-surv_data$APOE4_num <- dplyr::recode(
-  surv_data$APOE4_status,
-  "0 alleles" = 0,
-  "1 allele"  = 1,
-  "2 alleles" = 2
-)
-
-# We fit a time-varying coefficient Cox model where APOE4 status is modeled as time-varying
+# We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
 surv_model_tv <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + 
-    APOE4_num + tt(APOE4_num),
+    APOE4_status + tt(age_at_baseline),
   data = surv_data,
-  tt = function(x, t, ...) x * log(t + 1)
+  tt = function(x, t, ...) x * log(t)
 )
 
 summary(surv_model_tv)
@@ -1701,22 +1788,9 @@ logLik(surv_model)
 logLik(surv_model_tv)
 ```
 
-Time-varying apoe4-status is not significant in the time-varying Cox PH model (p-value = 0.105). Additionally, It barely gives better model fit (AIC values: 2077 vs 2075. Log likelihood: -1034 vs -1033) –\> Given these results, and to keep interpretation simple, we'll continue with the standard Cox PH model.
-
 # Two separate joint models
 
 ## Fitted joint model for p-tau181
-
-```{r}
-# Joint model for p-tau181 using package JM (frequentist approach)
-joint_model_ptau <- jointModel(
-  long_model_ptau,
-  surv_model,
-  timeVar = "time_years"
-)
-
-summary(joint_model_ptau)
-```
 
 ```{r}
 # Joint model for p-tau181 using package JMbayes2 (bayesian approach)
@@ -1739,17 +1813,6 @@ summary(joint_model_ptau)
 2.  High rhat for sigma with JMBayes2
 
 ```{r}
-# Joint model for NfL using package JM (frequentist approach)
-joint_model_nfl <- jointModel(
-  long_model_nfl,
-  surv_model,
-  timeVar = "time_years"
-)
-
-summary(joint_model_nfl)
-```
-
-```{r}
 # Joint model for NfL using package JMbayes2 (bayesian approach)
 joint_model_nfl <- jm(
   surv_model,
@@ -1759,9 +1822,23 @@ joint_model_nfl <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
+
+summary(joint_model_nfl)
 ```
 
+Trying 20000 iterations instead, to see if Rhat values get better:
+
 ```{r}
+# Joint model for NfL using package JMbayes2 (bayesian approach)
+joint_model_nfl <- jm(
+  surv_model,
+  long_model_nfl,
+  time_var = "time_years",
+  n_chains = 3L,
+  n_iter = 20000L,
+  n_burnin = 1000L
+  )
+
 summary(joint_model_nfl)
 ```
 
@@ -1790,6 +1867,59 @@ densplot(joint_model_ptau, parm = "betas")
 densplot(joint_model_ptau, parm = "alphas")
 densplot(joint_model_ptau, parm = "sigmas")
 ```
+
+### Sensitivity analysis: frequentist joint models
+
+As a sensitivity analysis, joint models using a maximum likelihood approach are also fitted. Given the known sensitivity of this estimation method to model specification and scaling, biomarker values are standardised, all covariates are excluded, and only random intercepts are included in the longitudinal submodels.
+
+```{r}
+simple_surv_model <- coxph(
+  Surv(time_to_event, event) ~ 1,
+  data = surv_data,
+  x = TRUE
+)
+```
+
+```{r}
+long_data$log_PLASMAPTAU181_s <- scale(long_data$log_PLASMAPTAU181)
+long_data$log_PLASMA_NFL_s <- scale(long_data$log_PLASMA_NFL)
+
+simple_long_model_ptau <- lme(
+  fixed = log_PLASMAPTAU181_s ~ time_years,
+  random = ~ 1 | RID,                    
+  data = long_data
+)
+
+simple_long_model_nfl <- lme(
+  fixed = log_PLASMA_NFL_s ~ time_years, 
+  random = ~ 1 | RID,
+  data = long_data
+)
+```
+
+```{r}
+# Joint model for p-tau181 using package JM (frequentist approach)
+joint_model_ptau_freq <- jointModel(
+  simple_long_model_ptau,
+  simple_surv_model,
+  timeVar = "time_years"
+)
+
+summary(joint_model_ptau_freq)
+```
+
+```{r}
+# Joint model for NfL using package JM (frequentist approach)
+joint_model_nfl_freq <- jointModel(
+  simple_long_model_nfl,
+  simple_surv_model,
+  timeVar = "time_years"
+)
+
+summary(joint_model_nfl_freq)
+```
+
+Neither of the joint models fitted using maximum likelihood converged successfully, even after scaling the biomarkers, removing all covariates, and simplifying the longitudinal submodels to include only random intercepts.
 
 # Multivariate joint model
 
@@ -3087,64 +3217,33 @@ times <- seq(1, 10, by = 0.5)
 ```{r}
 # We define a function to compute time-dependent AUC for Cox models using timeROC
 # We use the linear predictor as the risk score and survival outcome from the dataset
-#get_cox_auc <- function(model, data, times, time_var, event_var) {
-#  
-#  # Extracting survival outcome variables dynamically
-#  T <- data[[time_var]]
-#  delta <- data[[event_var]]
-#  
-#  # Linear predictor
-#  lp <- predict(model, newdata = data, type = "lp")
-#  
-#  # Time-dependent AUC
-#  auc <- timeROC(
-#    T = T,
-#    delta = delta,
-#    marker = lp,
-#    cause = 1,
-#    times = times,
-#    iid = TRUE
-#  )$AUC
-#  
-#  return(auc)
-#}
+get_cox_auc <- function(model, times) {
+  
+  T <- surv_data$time_to_event
+  delta <- surv_data$event
+  
+  lp <- predict(model, newdata = surv_data, type = "lp")
+  
+  timeROC::timeROC(
+    T = T,
+    delta = delta,
+    marker = lp,
+    cause = 1,
+    times = times,
+    iid = TRUE
+  )$AUC
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for Cox model with p-tau181
-#auc_ptau_bl <- get_cox_auc(
-#  surv_model_ptau_bl,
-#  surv_data_ptau,
-#  times,
-#  time_var = "time_to_event_ptau",
-#  event_var = "event_ptau"
-#)
-#
+auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
+
 # We compute time-dependent AUC for Cox model with NfL
-#auc_nfl_bl <- get_cox_auc(
-#  surv_model_nfl_bl,
-#  surv_data_nfl,
-#  times,
-#  time_var = "time_to_event_nfl",
-#  event_var = "event_nfl"
-#)
-#
+auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
+
 # We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
-#auc_both1_bl <- get_cox_auc(
-#  surv_model_both1_bl,
-#  surv_data_ptau,
-#  times,
-#  time_var = "time_to_event_ptau",
-#  event_var = "event_ptau"
-#)
-#
-#auc_both2_bl <- get_cox_auc(
-#  surv_model_both2_bl,
-#  surv_data_nfl,
-#  times,
-#  time_var = "time_to_event_nfl",
-#  event_var = "event_nfl"
-#)
+auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -3156,71 +3255,45 @@ times <- seq(1, 10, by = 0.5)
 - *"newdata = a data.frame that contains the longitudinal and covariate information for the subjects for which prediction of survival probabilities is required. The names of the variables in this data.frame must be the same as in the data.frames that were used to fit the linear mixed effects and the event process model that were supplied as the two first argument of jm."*
 
 ```{r}
-# We construct prediction datasets for each joint model by merging the corresponding longitudinal and survival data
-#newdata_ptau <- long_data_ptau %>%
-#  left_join(
-#    surv_data_ptau %>%
-#      dplyr::select(RID, age_at_baseline_ptau, time_to_event_ptau, event_ptau),
-#    by = "RID"
-#  )
-#
-#newdata_nfl <- long_data_nfl %>%
-#  dplyr::left_join(
-#    surv_data_nfl %>%
-#      dplyr::select(RID, age_at_baseline_nfl, time_to_event_nfl, event_nfl),
-#    by = "RID"
-#  )
-#
-#newdata_multi <- long_data_multi %>%
-#  dplyr::left_join(
-#    surv_data_multi %>%
-#      dplyr::select(RID, age_at_baseline, time_to_event, event),
-#    by = "RID"
-#  )
+# We construct prediction datasets for the joint models by merging the  longitudinal and survival data
+newdata <- dplyr::left_join(
+  long_data,
+  dplyr::select(surv_data, RID, age_at_baseline, time_to_event, event),
+  by = "RID"
+)
 ```
 
 ```{r}
 # We define a function to compute time-dependent AUC for joint models using tvAUC
 #We extract the AUC value from the tvAUC output for each horizon time point
-#get_jm_auc <- function(model, newdata, times) {
-#  
-#  aucs <- sapply(times, function(t) {
-#    
-#    tmp <- tvAUC(
-#      model,
-#      newdata = newdata,
-#      Tstart = 0,
-#      Thoriz = t
-#    )
-#    
-#    tmp$auc   
-#  })
-#  
-#  return(as.numeric(aucs))
-#}
+get_jm_auc <- function(model, times) {
+  
+  aucs <- sapply(times, function(t) {
+    
+    tmp <- tvAUC::tvAUC(
+      model,
+      newdata = newdata,
+      Tstart = 0,
+      Thoriz = t
+    )
+    
+    tmp$auc
+  })
+  
+  return(as.numeric(aucs))
+}
 ```
 
 ```{r}
 # We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
-#auc_ptau_jm <- get_jm_auc(
-#  joint_model_ptau,
-#  newdata_ptau,
-#  times
-#)
-#
+auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
+
 # We compute time-dependent AUC for the joint model including NfL using tvAUC
-#auc_nfl_jm <- get_jm_auc(
-#  joint_model_nfl,
-#  newdata_nfl,
-#  times
-#)
-#
+auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
+
 # We compute time-dependent AUC for the multivariate joint model using tvAUC
-#auc_multi_jm <- get_jm_auc(
-#  multi_joint_model,
-#  newdata_multi,
-#  times
-#)
+auc_multi_jm <- get_jm_auc(multi_joint_model, times)
+
 ```
 
 ## Time dependent AUC for latent class joint models
@@ -3251,83 +3324,155 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized at clinically relevant time points
-#results <- data.frame(
-#  Model = c("Cox p-tau181", "Cox NfL", "Cox both1", "Cox both2",
-#            "JM p-tau181", "JM NfL", "JM both"),
-#  
-#  AUC_1y  = c(
-#    auc_ptau_bl[2],
-#    auc_nfl_bl[2],
-#    auc_both1_bl[2],
-#    auc_both2_bl[2],
-#    auc_ptau_jm[2],
-#    auc_nfl_jm[2],
-#    auc_multi_jm[2]
-#  ),
-#  
-#  AUC_3y  = c(
-#    auc_ptau_bl[6],
-#    auc_nfl_bl[6],
-#    auc_both1_bl[6],
-#    auc_both2_bl[6],
-#    auc_ptau_jm[6],
-#    auc_nfl_jm[6],
-#    auc_multi_jm[6]
-#  ),
-#  
-#  AUC_5y  = c(
-#    auc_ptau_bl[10],
-#    auc_nfl_bl[10],
-#    auc_both1_bl[10],
-#    auc_both2_bl[10],
-#    auc_ptau_jm[10],
-#    auc_nfl_jm[10],
-#    auc_multi_jm[10]
-#  ),
-#  
-#  AUC_10y = c(
-#    auc_ptau_bl[19],
-#    auc_nfl_bl[19],
-#    auc_both1_bl[19],
-#    auc_both2_bl[19],
-#    auc_ptau_jm[19],
-#    auc_nfl_jm[19],
-#    auc_multi_jm[19]
-#  )
-#)
-#
-#results[, -1] <- round(results[, -1], 3)
-#
-#results
+results <- data.frame(
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both2",
+            "JM p-tau181", "JM NfL", "JM both"),
+  
+  AUC_1y  = c(
+    auc_ptau_bl[2],
+    auc_nfl_bl[2],
+    auc_both_bl[2],
+    auc_ptau_jm[2],
+    auc_nfl_jm[2],
+    auc_multi_jm[2]
+  ),
+  
+  AUC_3y  = c(
+    auc_ptau_bl[6],
+    auc_nfl_bl[6],
+    auc_both_bl[6],
+    auc_ptau_jm[6],
+    auc_nfl_jm[6],
+    auc_multi_jm[6]
+  ),
+  
+  AUC_5y  = c(
+    auc_ptau_bl[10],
+    auc_nfl_bl[10],
+    auc_both_bl[10],
+    auc_ptau_jm[10],
+    auc_nfl_jm[10],
+    auc_multi_jm[10]
+  ),
+  
+  AUC_10y = c(
+    auc_ptau_bl[19],
+    auc_nfl_bl[19],
+    auc_both_bl[19],
+    auc_ptau_jm[19],
+    auc_nfl_jm[19],
+    auc_multi_jm[19]
+  )
+)
+
+results[, -1] <- round(results[, -1], 3)
+
+results
 ```
 
 ## Plot of the results
 
 ```{r}
 # We reshape all AUC results into long format for plotting
-#plot_data <- data.frame(
-#  Time = rep(times, times = 7),
-#  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both1", "Cox both2", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
-#  AUC = c(
-#    auc_ptau_bl,
-#    auc_nfl_bl,
-#    auc_both1_bl,
-#    auc_both2_bl,
-#    auc_ptau_jm,
-#    auc_nfl_jm,
-#    auc_multi_jm
-#  )
-#)
-#
-#ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
-#  geom_line(linewidth = 1) +
-#  geom_point(size = 2) +
-#  ylim(0, 1) +
-#  labs(
-#    title = "Time-dependent AUC comparison",
-#    x = "Time (years)",
-#    y = "AUC"
-#  )
+plot_data <- data.frame(
+  Time = rep(times, times = 6),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),#  AUC = c(
+    auc_ptau_bl,
+    auc_nfl_bl,
+    auc_both_bl,
+    auc_ptau_jm,
+    auc_nfl_jm,
+    auc_multi_jm
+  )
+
+ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
 ```
 
-Sensitivity anaysis: how does including those with only one measurement affect the precision?
+# Comparing models using time-depedning brier score
+
+```{r}
+# We load required library
+library(pec)
+
+# We specify Cox models for comparison
+cox_models <- list(
+  "Cox p-tau" = surv_model_ptau_bl,
+  "Cox NfL"   = surv_model_nfl_bl,
+  "Cox both"  = surv_model_both_bl
+)
+
+# We compute Brier score using pec for Cox models
+brier_cox <- pec(
+  object = cox_models,
+  formula = Surv(time_to_event, event) ~ 1,
+  data = surv_data,
+  times = times,
+  cens.model = "cox"
+)
+
+# We extract CRPS values from Cox Brier score object
+brier_values <- crps(brier_cox)
+brier_values
+```
+
+```{r}
+# We specify joint models for comparison
+jm_models <- list(
+  "JM p-tau" = joint_model_ptau,
+  "JM NfL"   = joint_model_nfl,
+   "JM both"  = multi_joint_model
+)
+
+# We compute Brier score using pec for joint models
+brier_jm <- pec(
+  object = jm_models,
+  formula = Surv(time_to_event, event) ~ 1,
+  data = surv_data,
+  times = times,
+  cens.model = "cox"
+)
+
+# We extract CRPS values from joint model Brier score object
+brier_values_jm <- crps(brier_jm)
+```
+
+```{r}
+# We extract Brier scores into a unified dataset
+plot_brier <- data.frame(
+  Time = rep(times, times = 6),
+
+  Model = rep(c(
+    "Cox p-tau", "Cox NfL", "Cox both",
+    "JM p-tau", "JM NfL", "JM both"
+  ), each = length(times)),
+
+  Brier = c(
+    brier_cox$AppErr[,"Cox p-tau"],
+    brier_cox$AppErr[,"Cox NfL"],
+    brier_cox$AppErr[,"Cox both"],
+    brier_jm$AppErr[,"JM p-tau"],
+    brier_jm$AppErr[,"JM NfL"],
+    brier_jm$AppErr[,"JM both"]
+  )
+)
+```
+
+```{r}
+# We visualize time-dependent Brier score comparison
+ggplot(plot_brier, aes(x = Time, y = Brier, color = Model)) +
+  geom_line() +
+  ylim(0, 0.25) +
+  labs(
+    title = "Time-dependent Brier Score comparison",
+    x = "Time",
+    y = "Brier score"
+  )
+```
