@@ -155,11 +155,11 @@ Analysis of the concentration of this molecule OUTSIDE of the cell (in CSF and b
 
 **Kortare beskrvining av p-tau181 och NfL**
 
-Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).
+**Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).**
 
-Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).
+**Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).**
 
-Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).
+**Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).**
 
 **SUMMARY**
 
