@@ -129,13 +129,29 @@ In the context of Alzheimer's disease, as well as diseases in general, the term 
 
 **AD and BIOMARKERS**
 
-**AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Recent advances in research have made it possible to replace these invasive procedures with blood tests. \*\* källa???** WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. .
+AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF.Recent advances in research have made it possible to replace these invasive procedures with blood tests, as increases in the sensitivity of these tests make it possible to accurately detect the lower concentrations of biomarkers found in the blood ().
+
+**\*\* källa???** WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. .
 
 **SPECIFIC AD BIOMARKERS**
 
 **TAU/PTAU181**
 
-The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and staging of AD in 2024 to reflect the importance of blood-based biomarkers in the diagnosis process. According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012). Plasma p-tau has had good performance as a standalone biomarker, compared with CSF p-tau which is usually used in conjunction with other biomarkers, suggesting that plasma p-tau assays perform better than CSF p-tau assays in AD diagnosis (Jack et al., p. 5151).
+The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and staging of AD in 2024 to reflect the importance of blood-based biomarkers in the diagnosis process. According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Plasma p-tau has had good performance as a standalone biomarker, compared with CSF p-tau which is usually used in conjunction with other biomarkers (Jack et al., p. 5151).
+
+**NFL**
+
+Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al., p. 5158). NfL is usually present inside neurons, and therefore concentrations are expected to be higher in individuals with neuronal injury symptomatic of AD (Clark, C., 2021, p. 7). Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).
+
+Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).
+
+**Kortare beskrvining av p-tau181 och NfL**
+
+**Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).**
+
+**Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).**
+
+Old text:
 
 Från: <https://journals.sagepub.com/doi/10.1177/25424823261432112>
 
@@ -146,20 +162,6 @@ Among the ones currently being explored and used in research settings, are menti
 <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
 - Among these, p-tau181 is significantly elevated in the CSF of AD patients and is considered a critical biomarker for the disease. The ability of p-tau181 to differentiate AD from other neurodegenerative conditions, such as frontotemporal lobar degeneration and chronic traumatic encephalopathy, is crucial for the accurate diagnosis of AD. Furthermore, p-tau181 levels correlate with AD severity and predict disease progression, providing valuable insights for evaluating therapeutic efficacy and guiding treatment strategies. Recent findings indicate that p-tau181 have excellent discriminative performance in plasma, paving the way for non-invasive monitoring of AD. **\*\*source?\*\***
-
-**NFL**
-
-Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al.). NfL is a molecule usually present inside neurons, and therefore
-
-Analysis of the concentration of this molecule OUTSIDE of the cell (in CSF and blood) is a measure of neuronal damage.
-
-**Kortare beskrvining av p-tau181 och NfL**
-
-**Among the different blood-based biomarkers currently being explored and used in research settings is p-tau181, a type of plasma phosphorylated tau. Other types include p-tau217 and p-tau231. Clinical research suggests that p-tau isoforms show high performance in identifying Alzheimer's disease, with concentrations expected to be higher in individuals with AD pathology (WHO, 2024, p. 7; Wong et al., 2012, p.?).**
-
-**Plasma neurofilament light (NfL) is another blood-based biomarker. In contrast to p-tau181, it is commonly considered a nonspecific marker of neurodegeneration. Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia (WHO, 2024, p. 7).**
-
-**Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).**
 
 **SUMMARY**
 
@@ -772,6 +774,8 @@ Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Ha
 Kamarudin, A. N., Cox, T., & Kolamunnage-Dona, R. (2017). Time-dependent ROC curve analysis in medical research: Current methods and applications. BMC Medical Research Methodology, 17, 53. <https://doi.org/10.1186/s12874-017-0332-6>
 
 Kyheng, M., Babykina, G., & Duhamel, A. (2025). Joint Latent Class Models: A Tutorial on Practical Applications in Clinical Research. *Stat Med*, 44(8-9):e70047. [10.1002/sim.70047](https://doi.org/10.1002/sim.70047). PMID: 40277369; PMCID: PMC12023844.
+
+Mattsson, N., Andreasson, U., Zetterberg, H., & Blennow, K. (2017). Association of Plasma Neurofilament Light With Neurodegeneration in Patients With Alzheimer Disease. *JAMA Neurology*, *74*(5), 557. https://doi.org/10.1001/jamaneurol.2016.6117
 
 Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019). Association Between Longitudinal Plasma Neurofilament Light and Neurodegeneration in Patients With Alzheimer Disease. *JAMA neurology*, 76(7), 791-799. <https://doi.org/10.1001/jamaneurol.2019.0765>
 
@@ -1982,28 +1986,17 @@ joint_model_ptau <- jm(
 summary(joint_model_ptau)
 ```
 
-- Rhat worse for time_scaled
+#### 20000 iterations
+
+- $\widehat R$ for $time\_years$ with $20,000$ iterations is acceptable
 
 ```{r}
-# Scaling time_years
-long_data$time_scaled <- scale(long_data$time_years)
-
-# Refitting the longitudinal model with time_scaled
-long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_scaled + PTGENDER + APOE4_status,
-  random = ~ time_scaled | RID,                    
-  data = long_data
-)
-```
-
-```{r}
-# Refitting the joint model for p-tau181 with scaled time variable
 joint_model_ptau <- jm(
   surv_model,
   long_model_ptau,
-  time_var = "time_scaled",
+  time_var = "time_years",
   n_chains = 3L,
-  n_iter = 11000L,
+  n_iter = 20000L,
   n_burnin = 1000L
   )
 ```
@@ -2030,22 +2023,6 @@ joint_model_nfl <- jm(
 
 ```{r}
 summary(joint_model_nfl)
-```
-
-Trying 20000 iterations instead, to see if Rhat values get better:
-
-```{r}
-# # Joint model for NfL using package JMbayes2 (bayesian approach)
-# joint_model_nfl <- jm(
-#   surv_model,
-#   long_model_nfl,
-#   time_var = "time_years",
-#   n_chains = 3L,
-#   n_iter = 20000L,
-#   n_burnin = 1000L
-#   )
-# 
-# summary(joint_model_nfl)
 ```
 
 ### Traceplots
@@ -2143,11 +2120,41 @@ For both models, the slope variance is very low (lme: 0.0011, mixed_model: 0.036
 ```{r}
 fForms <- list(
   "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
-  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL)
   )      
 ```
 
 ## Fitted multivariate joint model
+
+- High $\widehat R$ for $time_years$
+
+```{r}
+multi_joint_model <- jm(surv_model, mixed ,
+                        time_var = "time_years",
+                        functional_forms = fForms,
+                        n_chains = 3L,
+                        n_iter = 20000L,
+                        n_burnin = 2000L
+                        )
+
+summary(multi_joint_model)
+```
+
+```{r}
+summary <- summary(multi_joint_model)
+summary$Survival
+```
+
+#### With random slope for NfL
+
+- $\widehat R$ for $time\_years$ now fine, but many others now high
+
+```{r}
+fForms <- list(
+  "log_PLASMAPTAU181" = ~ value(log_PLASMAPTAU181), 
+  "log_PLASMA_NFL" = ~ value(log_PLASMA_NFL) + slope(log_PLASMA_NFL)
+  )  
+```
 
 ```{r}
 multi_joint_model <- jm(surv_model, mixed ,
