@@ -201,7 +201,7 @@ As all modeling approaches considered in this study aim to model time to progres
 
 With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring (Rizopoulos, 2012, p. 36). Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
 
-However, when longitudinal data are collected at different time points, issues such as left truncation (also referred to as delayed entry) may arise. Left truncation occurs when individuals enter the study after the origin of the underlying time scale, meaning that only individuals who have survived or remained event-free up to the point of entry are included in the analysis (källa?).
+Left truncation - However, when longitudinal data are collected at different time points, issues such as left truncation (also referred to as delayed entry) may arise. Left truncation occurs when individuals enter the study after the origin of the underlying time scale, meaning that only individuals who have survived or remained event-free up to the point of entry are included in the analysis (källa?).
 
 ## Proportional Hazard Model
 
@@ -315,14 +315,6 @@ $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bma
 
 #### Frequentist vs bayesian approach
 
-*Man kan skatta joint-modellen med paketet JM, på frekventistiskt sätt med maximum likelihood, eller med paketet JMbayes2, på bayeisanskt sätt.*
-
-*Vår frekventistiska modell konvergerar inte alls dock, även utan kovariat, d.v.s. även enklaste versionen –\> Det beror nog på att maximum likelihood-metoden är jättekänslig mot skev eller konstig fördelning (som vi har), medan bayesian är mer flexibel –\> Måste hitta källa på det, men det kan användas som motivering för valet av bayesian approach. Bra att ta upp båda metoderna dock.*
-
-*Viktigt att ta upp om priordelning, att det behövs för bayesiansk fördelning. Väljs det automatiskt i JM()-funktionen (någon sorts standard) eller måste man välja själv? Uitfrån vad i såna fall?*
-
-*Skriva om MCMC och Convergence, vad det innebär inom bayesian approach, för att ens kunna prata o the Gelmain-Rubin statistic*
-
 **Theory about the model... (specifically why we should use it)**
 
 In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
@@ -361,25 +353,13 @@ Joint-model options:
 
 **Frequentist vs bayesian approach**
 
-"A simultaneous inferential method through a joint likelihood may be favorable, but the computational burden for proposed MVJ modelings can be very intensive, even sometimes infeasible, and may cause problems of algorithm convergence. (Brown et al., 2003, p. ?; Wu et al. 2010, p ?) <https://academic.oup.com/biometrics/article-abstract/59/2/221/7286178?redirectedFrom=fulltext&login=false>
+However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be impractical. This becomes even more challenging when the data include measurement error, missing values, or nonlinear longitudinal patterns, since these features increase model complexity. From a Bayesian perspective, the joint modelling framework can be approached in a more direct way, avoiding many of the complex approximations that are typically required in frequentist methods. At the same time, when noninformative priors are used, the resulting estimates are often very similar to those obtained from maximum likelihood approaches (Wu et al., 2008; Brown et al., 2003, p. 222).
 
-<https://pubmed.ncbi.nlm.nih.gov/19673859/>
-
-Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
-
-Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
-
-Bayesian joint modeling method shows the advantage. Thus, the parameters can be estimated simultaneously for the MVJ models implemented by Markov Chain Monte Carlo (MCMC) techniques for the skew-normal MVJ model. The simultaneous statistical inference on all unknown model parameters will capture the underlying association between the longitudinal exposures and the event time data.
-
-<https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
-
-Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
+With the R package JMbayes, joint models can be fitted under a Bayesian approach using Markov chain Monte Carlo algorithms.
 
 ### Prior distribution
 
-In Bayesian joint modelling, all unknown parameters are assigned prior distributions within a unified probabilistic framework that combines longitudinal and survival data (Rizopoulos 2018). In JMbayes, this framework is implemented using default weakly informative priors that provide limited prior influence while ensuring stable estimation (Rizopoulos 2018).
-
-More specifically, regression coefficients are typically assigned independent normal priors with mean zero and large variance, while variance components follow inverse Gamma priors. The dependence structure of the random effects is defined through a correlation matrix and standard deviations, where the correlation matrix follows an LKJ prior and the standard deviations follow half Student t priors (Rizopoulos 2018).
+In JMbayes, the bayesian joint modelling framework is implemented using default weakly informative priors that provide limited prior influence while ensuring stable estimation (Rizopoulos 2018). More specifically, regression coefficients are typically assigned independent normal priors with mean zero and large variance, while variance components follow inverse Gamma priors. The dependence structure of the random effects is defined through a correlation matrix and standard deviations, where the correlation matrix follows an LKJ prior and the standard deviations follow half Student t priors (Rizopoulos 2018).
 
 The association parameters linking the longitudinal and survival processes are also given normal priors with mean zero and large variance. The baseline hazard function is modelled flexibly using B splines, where smoothness is controlled through penalised Gaussian priors together with Gamma distributed smoothing parameters (Rizopoulos 2018).
 
@@ -388,16 +368,6 @@ Overall, this prior structure mainly acts as regularisation while allowing the d
 **MCMC and convergence**
 
 <https://www.sciencedirect.com/topics/social-sciences/markov-chain-monte-carlo>
-
-### Multivariate Joint Model
-
-In this study, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Multivariate joint models extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to Alzheimer’s disease or dementia.
-
-....
-
-However, as the joint model includes a linear mixed-effects model with the normal assumption for a single longitudinal outcome, joint model-based analyses may not provide robust inference when longitudinal measurements exhibit skewness and/or heavy tails (Huang et al, 2022, p.?). Consequently, joint models, besides with the traditional approach of maximum likelihood estimation, can also be estimated within a Bayesian framework using MCMC techniques (Rizopoulos, 2012, p. 62). This approach allows for more flexible and complex association structures (Andrinopoulou & Rizopoulos, 2016, p.?).
-
-The data collected for the joint model-based analyses are also often featured by multivariate longitudinal outcomes which are significantly correlated, and ignoring their correlation may lead to biased estimation (Huang et al, 2022, p.?). The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016, p.?).
 
 #### The Gelman-Rubin Statistic
 
@@ -430,6 +400,14 @@ Subsequently, the Gelman-Rubin statistic is:
 $$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
 As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, chapter 7.4.2).
+
+### Multivariate Joint Model
+
+In this study, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Multivariate joint models extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to Alzheimer’s disease or dementia.
+
+....
+
+Ignoring their correlation may lead to biased estimation. The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016, p.?).
 
 ### Joint Latent Class Model
 
@@ -697,9 +675,9 @@ To assess the sensitivity of the results, alternative LME models with gamma, log
 
 The longitudinal submodel showed that p-tau181 levels increased over time (time_years: estimate = 0.029, 95% credible interval: 0.018-0.041, p \< 0.05), indicating a clear upward trajectory of the biomarker prior to disease progression. Males had slightly higher p-tau181 levels compared to females (estimate = 0.118, p = 0.005), while both APOE ε4 one-allele and two-allele carriers showed higher levels of p-tau181 compared to non-carriers (both p \< 0.05). This confirms that p-tau181 is strongly influenced by genetic risk factors and increases progressively over time. In the survival submodel, baseline age showed a small and non-significant association with progression risk (estimate = 0.022, p = 0.146), while sex was also non-significant (estimate = -0.138, p = 0.427). In contrast, APOE ε4 status remained a strong predictor of disease progression, with clear dose-dependent effects (one allele: estimate = 0.777; two alleles: estimate = 1.287; both p \< 0.05).
 
-Most importantly, the association parameter linking longitudinal p-tau181 to the risk of progression was strongly positive (estimate = 1.371, 95% credible interval: 0.989-1.773, p \< 0.05). This indicates that higher p-tau181 levels over time are associated with a substantially increased hazard of developing Alzheimer’s disease/dementia.
+The association parameter linking longitudinal p-tau181 to the risk of progression was strongly positive (estimate = 1.371, 95% credible interval: 0.989-1.773, p \< 0.05). This indicates that higher p-tau181 levels over time are associated with a substantially increased hazard of developing Alzheimer’s disease/dementia.
 
-Model diagnostics showed generally good convergence, with Rhat values close to 1.00 for most parameters. However, one parameter showed weaker convergence (Rhat = 1.38), which suggests slightly poorer mixing in that part of the model. Despite this, model fit statistics (WAIC and LPML) indicated stable and reliable overall performance without major signs of instability.
+Model diagnostics showed generally good convergence, with Rhat values close to 1.00 for most parameters. However, one parameter (residual variance in the longitudinal submodel) showed signs of poorer convergence (Rhat = 1.38), whuch suggests slightly slower mixing. After increasing the number of iterations from 11000 to 20,000, convergence improved, and all parameters showed acceptable Rhat values.
 
 \*\*\*Lägga till graferna för convergence också (traceplots och density plots)
 
@@ -713,7 +691,7 @@ In the survival submodel, APOE ε4 status remained a strong predictor of progres
 
 Most importantly, the association between longitudinal NfL and risk of progression was strong and statistically significant (estimate = 1.649, 95% credible interval: 1.195-2.107, p \< 0.05). This indicates that higher NfL levels over time are strongly linked to increased hazard of developing Alzheimer’s disease/dementia.
 
-Model convergence was generally good, with Rhat values close to 1.00 for most parameters. Model fit statistics (WAIC and LPML) also indicated stable and reliable performance without signs of instability.However, one parameter (residual variance in the longitudinal submodel) showed signs of poorer convergence (Rhat = 1.38), whuch suggests slightly slower mixing. After increasing the number of iterations from 11000 to 20,000, convergence improved, and all parameters showed acceptable Rhat values.
+Model convergence was generally good, with Rhat values close to 1.00 for most parameters.
 
 ## Multivariate joint model for both p-tau181 and NfL
 
@@ -765,6 +743,8 @@ Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a
 
 Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
 
+Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
+
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
 Chen, S. D., Huang, Y. Y., Shen, X. N., Guo, Y., Tan, L., Dong, Q., Yu, J. T., & Alzheimer’s Disease Neuroimaging Initiative (2021). Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer's disease. *Translational psychiatry*, 11(1), 356. <https://doi.org/10.1038/s41398-021-01476-7>
@@ -776,8 +756,6 @@ Fitzmaurice, G. M., Laird, N. M., & Ware, J. H. (2011). *Applied longitudinal an
 Ghahremani, M., Wang, M., Chen, H.-Y., Zetterberg, H., Smith, E. & Ismail, Z. (2022). Plasma P-Tau181 and Neuropsychiatric Symptoms in Preclinical and Prodromal Alzheimer Disease. *Neurology*, p.10.1212. [10.1212/WNL.0000000000201517](https://doi.org/10.1212/WNL.0000000000201517)
 
 Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z., Zhang, Z., Meng, W., & Wang, S. (2026). Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study. *Sci Rep*. <https://doi.org/10.1038/s41598-026-44192-2>
-
-Huang, Y., Chen, J., Xu, L., & Tang, N. S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Frontiers in big data*, 5(1), 812725. <https://doi.org/10.3389/fdata.2022.812725>
 
 Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, *20*(8). https://doi.org/10.1002/alz.13859
 
@@ -820,6 +798,8 @@ World Health Organization (2024). *Preferred product characteristics of blood-ba
 - (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
 Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
+
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
 
 Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
 
