@@ -313,7 +313,7 @@ $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bma
 
 ### Simple Joint Model
 
-#### Frequentist vs bayesian approach
+The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62).
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -357,7 +357,7 @@ However, a key difficulty in joint modelling is that the estimation process can 
 
 With the R package JMbayes, joint models can be fitted under a Bayesian approach using Markov chain Monte Carlo algorithms.
 
-### Prior distribution 
+#### Prior distribution 
 
 In JMbayes, the bayesian joint modelling framework is implemented using default weakly informative priors that provide limited prior influence while ensuring stable estimation (Rizopoulos 2018). More specifically, regression coefficients are typically assigned independent normal priors with mean zero and large variance, while variance components follow inverse Gamma priors. The dependence structure of the random effects is defined through a correlation matrix and standard deviations, where the correlation matrix follows an LKJ prior and the standard deviations follow half Student t priors (Rizopoulos 2018).
 
