@@ -375,7 +375,7 @@ Bayesian joint modeling method shows the advantage. Thus, the parameters can be 
 
 Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
 
-### Prior distribution 
+### Prior distribution
 
 In Bayesian joint modelling, all unknown parameters are assigned prior distributions within a unified probabilistic framework that combines longitudinal and survival data (Rizopoulos 2018). In JMbayes, this framework is implemented using default weakly informative priors that provide limited prior influence while ensuring stable estimation (Rizopoulos 2018).
 
@@ -725,9 +725,13 @@ Model convergence was generally good, with Rhat values close to 1.00 for most pa
 
 ## Joint latent class mixed model for NfL
 
-?
+First, a one class linear mixed effects model with a random intercept was estimated. This model had statistically significant coefficients for the intercept and slope for the fixed effects ($p < 0.05$) and the variance for the intercept was given to be $0.196$. A model with both a random slope and intercept on the longitudinal NfL measurements gave statistically significant coefficients for the fixed effects ($p < 0.05$) and variances for the intercept and slope of $0.184$ and $0.001$ respectively. The slope variance was small but non-zero. Comparison of $BIC$ and the log-likelihoods of these two models show a modest improvement in fit for the model with random intercept and slope, with $BIC$ improving from $1640.95$ to $1639.20$ and log-likelihood increasing from $-807.18$ to $-799.66$. **ADJUSTED LRT**. It was therefore decided to include the random slope in the model.
 
-## Joint latent class mixed model for both p-tau181 and NfL
+Modelling the longitudinal NfL measurements with a 2 class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for 2 latent classes. Comparing $BIC$ for the 1 class ($1639$) and 2 class ($1659$) models supports the conclusion that there are 2 latent classes are not captured in the data. Additionally, the entropy of the 2 class model was calculated to be $0.0003$, which is further evidence against 2 latent classes. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between class 1 and class 2. Models with 3 and 4 latent classes were also fit. The $BIC$ for the 3 class model was extremely high compared to the one class model ($2 \cdot 10 ^ 9$) but both $BIC$ and log-likelihood were reduced for the 4 class model ($BIC = 1574$, log-likelihood $= -736.94$). However, analysis of the classification shows that the model does not meaningfully classify individuals, with $95.84 \%$ of individuals being classified into class 3. It is therefore clear to see that no latent classes can be distinguished by longitudinal NfL trajectories alone.
+
+JOINT MODEL
+
+## Multivariate joint latent class mixed model for p-tau181 and NfL
 
 ?
 
@@ -2510,7 +2514,7 @@ postprob(hlme_m2)
 
 ## M3 (4 latent classes)
 
-- Does not converge
+- Infinite parameters
 
 ```{r}
 hlme_m3 <- hlme(
@@ -2521,7 +2525,8 @@ hlme_m3 <- hlme(
     classmb = ~ 1,
     ng = 4,
     data = long_data,
-    B = random(hlme_m0_1)
+    B = random(hlme_m0_1),
+    nproc = 30
   )
 
 summary(hlme_m3)
@@ -2686,8 +2691,6 @@ hlme_m2_nfl_classmb <- hlme(
 summary(hlme_m2_nfl_classmb)
 ```
 
-### Posterior probabilities
-
 ```{r}
 postprob(hlme_m2_nfl_classmb)
 ```
@@ -2710,8 +2713,6 @@ hlme_m3_nfl_classmb <- hlme(
 ```{r}
 summary(hlme_m3_nfl_classmb)
 ```
-
-### Posterior probabilities
 
 ```{r}
 postprob(hlme_m3_nfl_classmb)
@@ -2990,7 +2991,7 @@ pchisq(LR, 2, lower.tail = FALSE)
 LR
 ```
 
-## M2 (2 latent classes)
+## M1 (2 latent classes)
 
 ```{r}
 mlcmm_m1_1 <- multlcmm(
@@ -3049,10 +3050,66 @@ pchisq(LR, 2, lower.tail = FALSE)
 LR
 ```
 
-### Posterior probabilities
+## M2 (3 latent classes)
 
 ```{r}
-postprob(mlcmm_m1_1)
+mlcmm_m2 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 3,
+  data = long_data,
+  B = random(mlcmm_m0_1),
+  nproc = 10
+)
+```
+
+```{r}
+summary(mlcmm_m2)
+```
+
+```{r}
+postprob(mlcmm_m3)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+mlcmm_m3 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 4,
+  data = long_data,
+  B = random(mlcmm_m0_1),
+  nproc = 10
+)
+```
+
+```{r}
+summary(mlcmm_m3)
+```
+
+```{r}
+postprob(mlcmm_m3)
+```
+
+## Comparing M0, M1, M2, M3
+
+cannot run LT tests on different class models (1 class vs 2 class) as they are not nested in the typical sense
+
+```{r}
+summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
 ```
 
 ## M2 (2 latent classes) (including class covariates)
@@ -3073,8 +3130,6 @@ mlcmm_m1 <- multlcmm(
 ```{r}
 summary(mlcmm_m1)
 ```
-
-### Posterior probabilities
 
 ```{r}
 postprob(mlcmm_m1)
@@ -3116,20 +3171,6 @@ ggplot(pp, aes(prob1, prob2)) +
   geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
   labs(x = "P(Class 1)", y = "P(Class 2)") +
   theme_classic()
-```
-
-## Comparing M0 and M1
-
-cannot run LT tests on different class models (1 class vs 2 class) as they are not nested in the typical sense
-
-```{r}
-summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 # JLCMM: NFL
@@ -3218,10 +3259,68 @@ jlcmm_m1_nfl <- jlcmm(
 summary(jlcmm_m1_nfl)
 ```
 
-### Posterior probabilities
-
 ```{r}
 postprob(jlcmm_m1_nfl)
+```
+
+## M2 (3 latent classes)
+
+```{r}
+jlcmm_m2_nfl <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
+  mixture = ~ time_years,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
+  B = random(jlcmm_m0_2)
+)
+```
+
+```{r}
+summary(jlcmm_m2_nfl)
+```
+
+```{r}
+postprob(jlcmm_m2_nfl)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+jlcmm_m3_nfl <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1 + time_years,
+  mixture = ~ time_years,
+  classmb = ~ 1,
+  ng = 4,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
+  B = random(jlcmm_m0_2)
+)
+```
+
+```{r}
+summary(jlcmm_m3_nfl)
+```
+
+```{r}
+postprob(jlcmm_m3_nfl)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(jlcmm_m0_2, jlcmm_m1_nfl, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
 ```
 
 ## Visualisation
@@ -3282,18 +3381,6 @@ plot(jlcmm_m1_nfl, which = "survival")
 plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 ```
 
-## Comparing M0 and M1
-
-```{r}
-summarytable(jlcmm_m0_2, jlcmm_m1_nfl, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
-```
-
 # JLCMM: PTAU
 
 ## M0 (1 latent class)
@@ -3315,7 +3402,7 @@ summary(jlcmm_m0)
 ## M1 (2 latent classes)
 
 ```{r}
-jlcmm_m1 <- jlcmm(
+jlcmm_m1_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
@@ -3329,59 +3416,11 @@ jlcmm_m1 <- jlcmm(
 ```
 
 ```{r}
-summary(jlcmm_m1)
+summary(jlcmm_m1_ptau)
 ```
 
-### Posterior probabilities
-
 ```{r}
-postprob(jlcmm_m1)
-```
-
-## Visualisation
-
-### Distribution of posterior probabilities (class 1)
-
-```{r}
-
-```
-
-### Distribution of posterior probabilities (class 2)
-
-```{r}
-
-```
-
-### Class certainty scatterplot
-
-```{r}
-
-```
-
-### Survival curves by class
-
-```{r}
-# survival curves by class
-plot(jlcmm_m1, which = "survival")
-```
-
-### Longitudinal trajectories by class
-
-```{r}
-# longitudnal trajectories by class
-plot(jlcmm_m1, var.time = "time_years", which = "fit")
-```
-
-## Comparing M0 and M1
-
-```{r}
-summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
+postprob(jlcmm_m1_ptau)
 ```
 
 ## M2 (3 latent classes)
@@ -3420,7 +3459,7 @@ summarytable(jlcmm_m0, jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 ```{r}
-jlcmm_m2 <- jlcmm(
+jlcmm_m2_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
@@ -3434,11 +3473,94 @@ jlcmm_m2 <- jlcmm(
 ```
 
 ```{r}
-summary(jlcmm_m2)
+summary(jlcmm_m2_ptau)
 ```
 
 ```{r}
-postprob(jlcmm_m2)
+postprob(jlcmm_m2_ptau)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+jlcmm_m3_ptau <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  classmb = ~ 1,
+  ng = 4,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
+  B = random(jlcmm_m0)
+  )
+```
+
+```{r}
+summary(jlcmm_m3_ptau)
+```
+
+```{r}
+postprob(jlcmm_m3_ptau)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
+             which = c("G", "loglik", "BIC", "entropy"))
+```
+
+```{r}
+# saving which class each individual was predicted to be in
+class_preds <- jlcmm_m2$pprobY
+
+# merging with genotype data
+class_preds <- class_preds %>%
+  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
+
+# checking the distribution of genotype by class
+table(class_preds$class, class_preds$APOE4_status)
+```
+
+### Adjusted LRT
+
+```{r}
+
+```
+
+## Visualisation
+
+### Distribution of posterior probabilities (class 1)
+
+```{r}
+
+```
+
+### Distribution of posterior probabilities (class 2)
+
+```{r}
+
+```
+
+### Class certainty scatterplot
+
+```{r}
+
+```
+
+### Survival curves by class
+
+```{r}
+# survival curves by class
+plot(jlcmm_m1, which = "survival")
+```
+
+### Longitudinal trajectories by class
+
+```{r}
+# longitudnal trajectories by class
+plot(jlcmm_m1, var.time = "time_years", which = "fit")
 ```
 
 ## Visualisation
@@ -3457,26 +3579,9 @@ plot(jlcmm_m2, which = "survival")
 plot(jlcmm_m2, var.time = "time_years", which = "fit")
 ```
 
-## Comparing M0, M1, M3
-
-```{r}
-summarytable(jlcmm_m0, jlcmm_m1, jlcmm_m2,
-             which = c("G", "loglik", "BIC", "entropy"))
-```
-
-```{r}
-# saving which class each individual was predicted to be in
-class_preds <- jlcmm_m2$pprobY
-
-# merging with genotype data
-class_preds <- class_preds %>%
-  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
-
-# checking the distribution of genotype by class
-table(class_preds$class, class_preds$APOE4_status)
-```
-
 # MJLCMM: NFL & PTAU
+
+## 1: Random intercept and slope
 
 TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
 
@@ -3489,8 +3594,9 @@ TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
 ```
 
 ```{r}
-# fitting multivariate latent class model with 1 class and 2 classes with jlcmm_data_multi
+# fitting multivariate latent class model with 1, 2, 3 and 4 classes with random intercept and random slope
 
+# 1 class model
 mlcmm_m0 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -3498,6 +3604,7 @@ mlcmm_m0 <- multlcmm(
   data = jlcmm_data
 )
 
+# 2 class model
 mlcmm_m1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -3509,6 +3616,7 @@ mlcmm_m1 <- multlcmm(
   B = random(mlcmm_m0)
 )
 
+# 3 class model
 mlcmm_m2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -3519,6 +3627,19 @@ mlcmm_m2 <- multlcmm(
   data = jlcmm_data,
   B = random(mlcmm_m0)
 )
+
+# 4 class model
+mlcmm_m3 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  mixture = ~ time_years,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 4,
+  data = jlcmm_data,
+  B = random(mlcmm_m0)
+)
+
 ```
 
 ## M0 (1 latent class)
@@ -3554,10 +3675,199 @@ mult_jlcmm_m1 <- mpjlcmm(
 summary(mult_jlcmm_m1)
 ```
 
-### Posterior probabilities
+```{r}
+postprob(mult_jlcmm_m1)
+```
+
+## M2 (3 latent classes)
+
+```{r}
+mult_jlcmm_m2 <- mpjlcmm(
+  longitudinal = list(mlcmm_m2),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 3,
+  data = jlcmm_data,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m2)
+```
+
+```{r}
+postprob(mult_jlcmm_m2)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+mult_jlcmm_m3 <- mpjlcmm(
+  longitudinal = list(mlcmm_m3),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 4,
+  data = jlcmm_data,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m3)
+```
+
+```{r}
+postprob(mult_jlcmm_m3)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+```
+
+### Adjusted LRT
+
+```{r}
+
+```
+
+## 1: Random intercept
+
+```{r}
+# fitting multivariate latent class model with 1, 2, 3 and 4 classes with random intercept and random slope
+
+# 1 class model
+mlcmm_m0 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  subject = "RID",
+  data = jlcmm_data
+)
+
+# 2 class model
+mlcmm_m1 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 2,
+  data = jlcmm_data,
+  B = random(mlcmm_m0)
+)
+
+# 3 class model
+mlcmm_m2 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 3,
+  data = jlcmm_data,
+  B = random(mlcmm_m0)
+)
+
+# 4 class model
+mlcmm_m3 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 4,
+  data = jlcmm_data,
+  B = random(mlcmm_m0)
+)
+
+```
+
+## M0 (1 latent class)
+
+```{r}
+mult_jlcmm_m0 <- mpjlcmm(
+  longitudinal = list(mlcmm_m0),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 1,
+  data = jlcmm_data
+)
+```
+
+```{r}
+summary(mult_jlcmm_m0)
+```
+
+## M1 (2 latent classes)
+
+```{r}
+mult_jlcmm_m1 <- mpjlcmm(
+  longitudinal = list(mlcmm_m1),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 2,
+  data = jlcmm_data,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m1)
+```
 
 ```{r}
 postprob(mult_jlcmm_m1)
+```
+
+## M2 (3 latent classes)
+
+```{r}
+mult_jlcmm_m2 <- mpjlcmm(
+  longitudinal = list(mlcmm_m2),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 3,
+  data = jlcmm_data,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m2)
+```
+
+```{r}
+postprob(mult_jlcmm_m2)
+```
+
+## M3 (4 latent classes)
+
+```{r}
+mult_jlcmm_m3 <- mpjlcmm(
+  longitudinal = list(mlcmm_m3),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 4,
+  data = jlcmm_data,
+  B = random(mult_jlcmm_m0)
+)
+```
+
+```{r}
+summary(mult_jlcmm_m3)
+```
+
+```{r}
+postprob(mult_jlcmm_m3)
+```
+
+## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+
 ```
 
 ## Visualisation
@@ -3588,35 +3898,6 @@ plot(mult_jlcmm_m1, which = "survival")
 
 ```{r}
 # plot(mult_jlcmm_m1, var.time = "time_years", which = "fit")
-```
-
-## Comparing M0 and M1
-
-```{r}
-summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-## M2 (3 latent classes)
-
-```{r}
-mult_jlcmm_m2 <- mpjlcmm(
-  longitudinal = list(mlcmm_m2),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
-  )
-```
-
-```{r}
-summary(mult_jlcmm_m2)
-```
-
-### Posterior probabilities
-
-```{r}
-postprob(mult_jlcmm_m2)
 ```
 
 ## Visualisation
