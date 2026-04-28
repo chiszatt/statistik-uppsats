@@ -197,8 +197,6 @@ The modelling approaches will be applied to data obtained from the *Alzheimer’
 
 ## Survival analysis
 
-The progression to Alzheimer’s disease or dementia, which can be naturally framed as a time-to-event process. Survival analysis provides a statistical framework for analyzing the time until an event occurs while appropriately accounting for censoring, which arises when individuals do not experience the event during the observation period.
-
 As all modeling approaches considered in this study aim to model time to progression to Alzheimer’s disease, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse or recovery. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
 
 With respect to the temporal relationship between the event and censoring time, censoring is typically classified as either right or left censoring (Rizopoulos, 2012, p. 36). Right censoring occurs when, for some individuals, the event of interest is not observed during the study period, although it is known to occur after the last recorded observation. This may arise if follow-up ends before the event occurs, if the study is terminated after a pre-specified number of events, or if participants are lost to follow-up due to relocation or similar reasons. In all such cases, the exact event time is unknown but is known to exceed the last observed time point (Rizopoulos, p. 36). In studies of Alzheimer’s disease, not all participants develop the disease during the follow-up period; for these individuals, the exact time of onset is unknown, and they are therefore considered right-censored observations.
@@ -376,6 +374,16 @@ Bayesian joint modeling method shows the advantage. Thus, the parameters can be 
 <https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2022.812725/full#cite>
 
 Huang, Y., Chen, J., Xu, L., & Tang, N.S. (2022). Bayesian Joint Modeling of Multivariate Longitudinal and Survival Data With an Application to Diabetes Study. *Front. Big Data* 5:812725. 10.3389/fdata.2022.812725
+
+### Prior distribution 
+
+In Bayesian joint modelling, all unknown parameters are assigned prior distributions within a unified probabilistic framework that combines longitudinal and survival data (Rizopoulos 2018). In JMbayes, this framework is implemented using default weakly informative priors that provide limited prior influence while ensuring stable estimation (Rizopoulos 2018).
+
+More specifically, regression coefficients are typically assigned independent normal priors with mean zero and large variance, while variance components follow inverse Gamma priors. The dependence structure of the random effects is defined through a correlation matrix and standard deviations, where the correlation matrix follows an LKJ prior and the standard deviations follow half Student t priors (Rizopoulos 2018).
+
+The association parameters linking the longitudinal and survival processes are also given normal priors with mean zero and large variance. The baseline hazard function is modelled flexibly using B splines, where smoothness is controlled through penalised Gaussian priors together with Gamma distributed smoothing parameters (Rizopoulos 2018).
+
+Overall, this prior structure mainly acts as regularisation while allowing the data to drive inference. In multivariate settings, additional association parameters can be introduced, and shrinkage priors like global-local or ridge-type priors can be used to handle higher dimensional parameter structures (Rizopoulos 2018).
 
 **MCMC and convergence**
 
@@ -788,6 +796,8 @@ Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O
 Ranganathan, P., Deo, V., & Pramesh, C. S. (2025). Time-to-event analysis. *Perspectives in clinical research*, 16(2), 102-105. <https://doi.org/10.4103/picr.picr_52_25>
 
 Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b12208>
+
+- (2018). *Multivariate joint models*.
 
 Scollard, P., Mukherjee, S., Choi, S. E., Lee, M. L., Klinedinst, B., Gibbons, L. E., Trittschuh, E. H., Mez, J., Saykin, A. J., James, B. D., Proust-Lima, C., & Crane, P. K. (2026). Heterogeneous patterns of cognitive decline in Alzheimer's disease across three domains of cognition. *Journal of Alzheimer's disease : JAD*, 110(1), 383-396. <https://doi.org/10.1177/13872877251414975> 
 
