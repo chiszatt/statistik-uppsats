@@ -705,7 +705,9 @@ Model convergence was generally good, with Rhat values close to 1.00 for most pa
 
 In order to assess whether latent classes can be distinguished solely from p-tau181 trajectories, latent class mixed models were first fit. A one class model was fit and the random effects structure was decided by comparing $BIC$, log-likelihoods and running a likelihood ratio test between the model with both a random intercept and random slope and a model with only a random intercept. The $BIC$ for the more complex model increased compared to the intercept only model and the likelihood ratio test gave $\lambda_{LR} = 0.92$ on 2 degrees of freedom ($p = 0.63$), therefore the intercept only random effects structure was chosen.
 
-A latent mixed effects model with two classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). Additionally, the $BIC$ increased when compared to the one class model and the posterior probabilities show no clear differentiation between classes, with the average posterior probability being $0.50$ for both classes. Similarly, the three class model had significant coefficients for the lonitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assaigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model. The conclusion is that the model cannot determine any number of latent classes through ptau-181 trajectories alone.
+A latent mixed effects model with two classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). Additionally, the $BIC$ increased when compared to the one class model and the posterior probabilities show no clear differentiation between classes, with the average posterior probability being $0.50$ for both classes. Similarly, the three class model had significant coefficients for the longitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model. The conclusion is that the model cannot determine any number of latent classes through ptau-181 trajectories alone.
+
+The longitudinal ptau-181 trajectories were then modeled jointly with the survival process for $G$ assumed latent classes with the joint latent class mixed effects model.
 
 ## Joint latent class mixed model for NfL
 
@@ -713,13 +715,22 @@ First, latent class mixed models were fit and the random effects were decided ba
 
 Modelling the longitudinal NfL measurements with a two class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for two latent classes. Comparing $BIC$ for the one class ($1639$) and two class ($1659$) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be $0.0003$ - further evidence against two latent classes. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between the two classes. Models with three and four latent classes were also fit. The $BIC$ for the three class model was extremely high compared to the one class model ($2 \cdot 10 ^ 9$) but both $BIC$ and log-likelihood were reduced for the four class model ($BIC = 1574$, log-likelihood $= -736.94$). However, analysis of the classification shows that the model does not meaningfully classify individuals, with $95.84 \%$ of individuals being classified into class three. It is therefore clear to see that the model cannot discern latent classes by longitudinal NfL trajectories alone.
 
-LCMM with covariates: classes are distinguishable.
+**LCMM with covariates: classes are distinguishable. ??? is this necessary????**
 
-JOINT MODEL
+Next, joint latent class mixed effects models of longitudinal NfL measurements and time-to-diagnosis were fit. The random effects structure was chosen to include only a random intercept due to an increase in the $BIC$ from $2998.4$ to $3001.2$ when including a random slope. Although the log-likelihood increased slightly for the more complex model and a likelihood ratio test suggests the complex model is preferable, the simpler model was chosen as $BIC$ is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, PG.**) and model parsimony helps stabilise joint latent mixed effects models (**SOURCE**). **More on the one class, two class and three class models...**
+
+Comparing log-likelihood, $BIC$ and entropy between the one, two and three class models suggests that a two class model best captures the joint longitudinal NfL and survival process.
+
+```{r}
+# printing the summary metrics
+jlcmm_nfl_summary %>% kbl() %>% kable_styling()
+```
 
 ## Multivariate joint latent class mixed model for p-tau181 and NfL
 
 Again, a multivariate latent class mixed effects model was first fit on the longitudinal ptau-181 and NfL measurements before fitting the joint model. The likelihood ratio test between the model with both a random intercept and slope and the model with only a random intercept gave $\lambda_{LR} = 1.27$ on 2 degrees of freedom ($p = 0.0008$). Both models had statistically significant parameters for the linear link functions for the multivariate latent class model ($p < 0.01$).
+
+For the two class model, the coefficient for the fixed effects in the class membership model was insignificant ($p = 0.99$), as were the coefficients in the longitudinal model ($p = 0.98, p = 0.53, p = 0.58$) but the parameters of the link functions were all significant ($p < 0.01$). Posterior probabilities for both classes clustered around $0.50$ and posterior classification for class one was $55\%$ and $45\%$ for class two, showing very poor discrimination between classes. A three class model did not immediately converge, and considering the poor discrimination of the two class model it was decided to not attempt to continue fitting the three and four class models.
 
 ## Comparison of Predictive Performance
 
@@ -2964,24 +2975,7 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
-mlcmm_m1_1 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 2,
-  data = long_data,
-  B = random(mlcmm_m0_1)
-)
-```
-
-```{r}
-summary(mlcmm_m1_1)
-```
-
-```{r}
-mlcmm_m1_2 <- multlcmm(
+mlcmm_m1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   mixture = ~ time_years,
@@ -2994,30 +2988,15 @@ mlcmm_m1_2 <- multlcmm(
 ```
 
 ```{r}
-summary(mlcmm_m1_2)
-```
-
-### Determining the random effects
-
-Interesting: log likelihood is increased for the full model, but $BIC$ increases. Even more uncertain results -\> choose the simpler model (parsimony - look into this)
-
-```{r}
-summarytable(mlcmm_m1_1, mlcmm_m1_2)
+summary(mlcmm_m1)
 ```
 
 ```{r}
-# log likelihood for the full model
-l = mlcmm_m1_2$loglik
+postprob(mlcmm_m1)
+```
 
-# log likelihood for the reduced model
-l_0 = mlcmm_m1_1$loglik
-
-# computing the LR test statistic
-LR = - 2 * (l_0 - l)
-
-# computing the p-value given the null hypothesis is true (the reduced model is the true model)
-pchisq(LR, 2, lower.tail = FALSE)
-LR
+```{r}
+plot(mlcmm_m1, which="fit", var.time="time_years")
 ```
 
 ## M2 (3 latent classes)
@@ -3041,7 +3020,7 @@ summary(mlcmm_m2)
 ```
 
 ```{r}
-postprob(mlcmm_m3)
+postprob(mlcmm_m2)
 ```
 
 ## M3 (4 latent classes)
@@ -3068,9 +3047,7 @@ summary(mlcmm_m3)
 postprob(mlcmm_m3)
 ```
 
-## Comparing M0, M1, M2, M3
-
-cannot run LT tests on different class models (1 class vs 2 class) as they are not nested in the typical sense
+## Comparing M0, M1
 
 ```{r}
 summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
@@ -3214,14 +3191,14 @@ LR
 ```{r}
 jlcmm_m1_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1 + time_years,
-  mixture = ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
   classmb = ~ 1,
   ng = 2,
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_2)
+  B = random(jlcmm_m0_1)
 )
 ```
 
@@ -3238,14 +3215,14 @@ postprob(jlcmm_m1_nfl)
 ```{r}
 jlcmm_m2_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1 + time_years,
-  mixture = ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
   classmb = ~ 1,
   ng = 3,
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_2)
+  B = random(jlcmm_m0_1)
 )
 ```
 
@@ -3262,14 +3239,14 @@ postprob(jlcmm_m2_nfl)
 ```{r}
 jlcmm_m3_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1 + time_years,
-  mixture = ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
   classmb = ~ 1,
   ng = 4,
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_2)
+  B = random(jlcmm_m0_1)
 )
 ```
 
@@ -3284,7 +3261,15 @@ postprob(jlcmm_m3_nfl)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable(jlcmm_m0_2, jlcmm_m1_nfl, which = c("G", "loglik", "BIC", "entropy"))
+library(kableExtra)
+
+# saving the summary metrics as a data frame
+jlcmm_nfl_summary <- as.data.frame(summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
+                                                which = c("G", "loglik", "BIC", "entropy")))
+
+# renaming the models for the table output
+row.names(jlcmm_nfl_summary) <- c("1 class model", "2 class model", "3 class model")
+
 ```
 
 ### Adjusted LRT
@@ -3354,6 +3339,8 @@ plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 # JLCMM: PTAU
 
 ## M0 (1 latent class)
+
+The one class joint latent class model was fit with a random intercept. The one class model has statistically significant coefficients ($p < 0.01$
 
 ```{r}
 jlcmm_m0 <- jlcmm(
