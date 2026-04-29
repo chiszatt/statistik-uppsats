@@ -77,26 +77,27 @@ library(glmmTMB)
 library(DHARMa) # for running residual diagnostics on GLMM
 library(lcmm)
 library(timeROC)
+library(kableExtra)
 ```
 
 ```{r}
 # Loading data
 #Milou
 # # NfL data
- load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
- nfl_data <- BLENNOWPLASMANFLLONG
-# # P-tau181 data
- load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
- ptau_data <- UGOTPTAU181
-# # Diagnosis data
- load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
- diagnosis_data <- DXSUM
-# # Demographics data
- load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
- demographics <- PTDEMOG
-# # Apoe data
- load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
- apoe <- APOERES
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+#  nfl_data <- BLENNOWPLASMANFLLONG
+# # # P-tau181 data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+#  ptau_data <- UGOTPTAU181
+# # # Diagnosis data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+#  diagnosis_data <- DXSUM
+# # # Demographics data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+#  demographics <- PTDEMOG
+# # # Apoe data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+#  apoe <- APOERES
 ```
 
 ```{r}
@@ -687,7 +688,7 @@ Comparing log-likelihood, $BIC$ and entropy between the one, two and three class
 
 ```{r}
 # printing the summary metrics
-jlcmm_nfl_summary %>% kbl() %>% kable_styling()
+# jlcmm_nfl_summary %>% kbl() %>% kable_styling()
 ```
 
 ## Multivariate joint latent class mixed model for p-tau181 and NfL
@@ -3225,7 +3226,6 @@ postprob(jlcmm_m3_nfl)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-library(kableExtra)
 
 # saving the summary metrics as a data frame
 jlcmm_nfl_summary <- as.data.frame(summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
@@ -3433,15 +3433,15 @@ summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
 ```
 
 ```{r}
-# saving which class each individual was predicted to be in
-class_preds <- jlcmm_m2$pprobY
-
-# merging with genotype data
-class_preds <- class_preds %>%
-  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
-
-# checking the distribution of genotype by class
-table(class_preds$class, class_preds$APOE4_status)
+# # saving which class each individual was predicted to be in
+# class_preds <- jlcmm_m2_ptau$pprobY
+# 
+# # merging with genotype data
+# class_preds <- class_preds %>%
+#   merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
+# 
+# # checking the distribution of genotype by class
+# table(class_preds$class, class_preds$APOE4_status)
 ```
 
 ### Adjusted LRT
@@ -3474,14 +3474,14 @@ table(class_preds$class, class_preds$APOE4_status)
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m1, which = "survival")
+plot(jlcmm_m1_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m1, var.time = "time_years", which = "fit")
+plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
 ```
 
 ## Visualisation
@@ -3490,14 +3490,14 @@ plot(jlcmm_m1, var.time = "time_years", which = "fit")
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m2, which = "survival")
+plot(jlcmm_m2_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m2, var.time = "time_years", which = "fit")
+plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
 ```
 
 # MJLCMM: NFL & PTAU
