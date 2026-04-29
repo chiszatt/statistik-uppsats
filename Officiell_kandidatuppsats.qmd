@@ -703,19 +703,23 @@ Model convergence was generally good, with Rhat values close to 1.00 for most pa
 
 ## Joint latent class mixed model for p-tau181
 
-?
+In order to assess whether latent classes can be distinguished solely from p-tau181 trajectories, latent class mixed models were first fit. A one class model was fit and the random effects structure was decided by comparing $BIC$, log-likelihoods and running a likelihood ratio test between the model with both a random intercept and random slope and a model with only a random intercept. The $BIC$ for the more complex model increased compared to the intercept only model and the likelihood ratio test gave $\lambda_{LR} = 0.92$ on 2 degrees of freedom ($p = 0.63$), therefore the intercept only random effects structure was chosen.
+
+A latent mixed effects model with two classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). Additionally, the $BIC$ increased when compared to the one class model and the posterior probabilities show no clear differentiation between classes, with the average posterior probability being $0.50$ for both classes. Similarly, the three class model had significant coefficients for the lonitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assaigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model. The conclusion is that the model cannot determine any number of latent classes through ptau-181 trajectories alone.
 
 ## Joint latent class mixed model for NfL
 
-First, a one class linear mixed effects model with a random intercept was estimated. This model had statistically significant coefficients for the intercept and slope for the fixed effects ($p < 0.05$) and the variance for the intercept was given to be $0.196$. A model with both a random slope and intercept on the longitudinal NfL measurements gave statistically significant coefficients for the fixed effects ($p < 0.05$) and variances for the intercept and slope of $0.184$ and $0.001$ respectively. The slope variance was small but non-zero. Comparison of $BIC$ and the log-likelihoods of these two models show a modest improvement in fit for the model with random intercept and slope, with $BIC$ improving from $1640.95$ to $1639.20$ and log-likelihood increasing from $-807.18$ to $-799.66$. **ADJUSTED LRT**. It was therefore decided to include the random slope in the model.
+First, latent class mixed models were fit and the random effects were decided based off of the one class model, as was done with ptau-181. The one class model with only a random intercept had statistically significant coefficients for the fixed effects ($p < 0.01$) and the variance for the intercept in the random effects structure was given to be $0.196$. A model with both a random slope and intercept also gave statistically significant coefficients for the fixed effects ($p < 0.01$) and the variances for the intercept and slope of the random effects were $0.184$ and $0.001$ respectively. Comparison of the $BIC$ and log-likelihoods of both models show a modest improvement in both metrics for the model with both random intercept and slope. Additionally, testing whether the improvement in the model with the random slope is statistically significant with a likelihood ratio test gave $\lambda_{LR} = 15.034$ on $2$ degrees of freedom ($p = 0.0005$). It was therefore decided to include the random slope in further models with more than one class.
 
-Modelling the longitudinal NfL measurements with a 2 class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for 2 latent classes. Comparing $BIC$ for the 1 class ($1639$) and 2 class ($1659$) models supports the conclusion that there are 2 latent classes are not captured in the data. Additionally, the entropy of the 2 class model was calculated to be $0.0003$, which is further evidence against 2 latent classes. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between class 1 and class 2. Models with 3 and 4 latent classes were also fit. The $BIC$ for the 3 class model was extremely high compared to the one class model ($2 \cdot 10 ^ 9$) but both $BIC$ and log-likelihood were reduced for the 4 class model ($BIC = 1574$, log-likelihood $= -736.94$). However, analysis of the classification shows that the model does not meaningfully classify individuals, with $95.84 \%$ of individuals being classified into class 3. It is therefore clear to see that no latent classes can be distinguished by longitudinal NfL trajectories alone.
+Modelling the longitudinal NfL measurements with a two class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for two latent classes. Comparing $BIC$ for the one class ($1639$) and two class ($1659$) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be $0.0003$ - further evidence against two latent classes. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between the two classes. Models with three and four latent classes were also fit. The $BIC$ for the three class model was extremely high compared to the one class model ($2 \cdot 10 ^ 9$) but both $BIC$ and log-likelihood were reduced for the four class model ($BIC = 1574$, log-likelihood $= -736.94$). However, analysis of the classification shows that the model does not meaningfully classify individuals, with $95.84 \%$ of individuals being classified into class three. It is therefore clear to see that the model cannot discern latent classes by longitudinal NfL trajectories alone.
+
+LCMM with covariates: classes are distinguishable.
 
 JOINT MODEL
 
 ## Multivariate joint latent class mixed model for p-tau181 and NfL
 
-?
+Again, a multivariate latent class mixed effects model was first fit on the longitudinal ptau-181 and NfL measurements before fitting the joint model. The likelihood ratio test between the model with both a random intercept and slope and the model with only a random intercept gave $\lambda_{LR} = 1.27$ on 2 degrees of freedom ($p = 0.0008$). Both models had statistically significant parameters for the linear link functions for the multivariate latent class model ($p < 0.01$).
 
 ## Comparison of Predictive Performance
 
@@ -2448,7 +2452,7 @@ LR
 
 ## M1 (2 latent classes)
 
-A latent mixed effects model with 2 classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model but not for the class-membership model. The $BIC$ increased when compared to the 1 class model and the posterior probabilities show no clear differentiation between class 1 and class 2, with the average posterior probability being $0.50$ for both classes.
+A latent mixed effects model with 2 classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). The $BIC$ increased when compared to the 1 class model and the posterior probabilities show no clear differentiation between class 1 and class 2, with the average posterior probability being $0.50$ for both classes.
 
 ```{r}
 hlme_m1 <- hlme(
@@ -2475,6 +2479,8 @@ postprob(hlme_m1)
 
 ## M2 (3 latent classes)
 
+Similarly, the three class model had significant coefficients for the lonitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assaigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model.
+
 ```{r}
 hlme_m2 <- hlme(
     fixed = log_PLASMAPTAU181 ~ time_years,
@@ -2496,26 +2502,6 @@ summary(hlme_m2)
 
 ```{r}
 postprob(hlme_m2)
-```
-
-## M3 (4 latent classes)
-
-- Infinite parameters
-
-```{r}
-hlme_m3 <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ 1,
-    ng = 4,
-    data = long_data,
-    B = random(hlme_m0_1),
-    nproc = 30
-  )
-
-summary(hlme_m3)
 ```
 
 ## Comparing M0, M1, M2
@@ -2927,8 +2913,6 @@ ggplot(pp, aes(prob1, prob2)) +
 Multivariate latent class mixed models with both NFL and PTAU
 
 ## M0 (1 latent class)
-
-Some support from the likelihood ratio test that the full model is the better fit for the multivariate mixed effects model. However, there is only a very modest decrease in $BIC$ for the model with both random intercept and slope. Considering these two points, a 2 class model with only random intercept will be compared against a model with a random intercept and slope in order to better assess which random effects structure is best.
 
 ```{r}
 mlcmm_m0_1 <- multlcmm(
