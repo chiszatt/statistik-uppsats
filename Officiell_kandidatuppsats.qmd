@@ -239,63 +239,27 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ## Joint models
 
-In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their evolution may be directly related to disease progression. Joint models provide a unified framework for simultaneously analyzing longitudinal biomarker data and time-to-event outcomes. The key idea is to link a longitudinal submodel describing biomarker trajectories with a survival submodel describing disease progression.
+In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their evolution may be directly related to disease progression. Joint models provide a unified framework for simultaneously analyzing longitudinal biomarker data and time-to-event outcomes. The key idea is to link a longitudinal submodel describing biomarker trajectories with a survival submodel describing disease progression. An extension of the joint model allows for the modelling of latent classes within the population.
 
 ### Longitudinal Data
 
-Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $T_{i, j}$ and $N_{i, j}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at the $j^{th}$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{T:\text{ } i, j} = E(T_{i, j})$ and $\mu_{N:\text{ } i, j} = E(N_{i, j})$. Considering the data are made up of repeated responses on the same individuals, the assumption of independence between observations is illogical. Clearly, the baseline levels of p-tau181 and NfL for an individual are correlated with the measurements on subsequent occasions.
+Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. Considering the data are made up of repeated measurements from the same individuals, the assumption of independence between observations is illogical. Clearly, the levels of p-tau181 and NfL for an individual are correlated with measurements made on prior and subsequent occasions and the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
 
 ### Linear Mixed Effects Models
 
-The longitudinal component of a joint model is typically specified using a linear mixed effects model, which captures both population-level trends and individual variability in biomarker trajectories.
-
-We have grouped data, specifically longitudinal data where groups of observations are correlated, since we have repeated measurements on the same individuals. We expect data *within* the groups, that is, data collected form the same individual, to be more correlated than those *between* the groups. Mixed effects models are not only for longitudinal data, but for any data where there is non-independence between observations.
-
-**Theory about the model... (specifically why we should use it)**
-
-- Biomarker process
-
-- Describes the trajectory of biomarkers at the individual level 
+The longitudinal component of a joint model is typically specified using a linear mixed effects model, which captures both population-level trends and individual variability in biomarker trajectories. Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
 $$ m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
 
-$y_i(t):$ the observed longitudinal biomarker
-
-$m_i(t):$ the trajectory function which represents the **true unobserved** **value of the biomarker** at time $t$ for patient $i$ - we assume that we do not observe the true value due to measurement errors or other reasons.
-
-$\mathbf{X_i}^T(t)\beta:$ the fixed effects
-
-$\mathbf{Z_i}^T\mathbf{b_i}:$the random effects
-
-The full model becomes:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that we do not observe the true biomarker value due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\beta$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$. Combining the true trajectory function with the error term gives:
 
 $$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
-### Generalised Linear Mixed Effects Model
+The linear mixed effects model can be generalised when the response variable does not follow an approximately normal distribution, where some link function, $g(x)$, links the expected value given the random effects to the linear predictor, which includes both fixed and random effects. Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
 
-*Inte ens säkert att vi behöver denna del, om residualerna för standard-LME modellerna kan räknas som ok*
-
-Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
-
-An extension of GLMs, where the linear predictor contains random effects alongside the fixed effects. This is used to extend the linear mixed model to non-normal data.
-
-Given random effects, $\mathbf{u}$ the dependent variable, $\mathbf{y}$, is distributed according to the exponential family, such that $g(E[\mathbf{y}|\mathbf{u}]) = \mathbf{X𝛽} + \mathbf{Zu}$. Some link function, $g(x)$, links the expected value of $\mathbf{y}$ given the random effects to the linear predictor which included both fixed effects and random effects.
-
-Where:
-
-$\mathbf{X}$ = the fixed effects design matrix
-
-$\mathbf{\beta}$ = the fixed effects
-
-$\mathbf{Z}$ = the random effects design matrix
-
-$\mathbf{u}$ = the random effects
-
-What do we model as random?
-
-We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
+Estimation:
 
 We do not tend to estimate $\mathbf{u}$, but instead assume that $u_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(u) = 0$.
 
@@ -307,13 +271,11 @@ Like all variance-covariance matrices, some elements are redundant since they ar
 
 $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bmatrix} $$
 
-### Assumptions!!
+We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
 
-- Random effects $\mathbf{b_i}$ are **time-invariant** - they are assumed to come from a normal distribution, $\mathbf{b_i} \sim N(0, \sigma^2)$, and represent stable, latent characteristics about the individuals disease, such as a generally fast declining disease trajectory but cannot represent other factors that effect disease trajectory over-time, e.g. medication. Any external time-varying process that effects the biomarker trajectory and the hazard cannot be represented by the random effects.
+Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
 
 ### Simple Joint Model
-
-The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62).
 
 **Theory about the model... (specifically why we should use it)**
 
@@ -352,6 +314,8 @@ Joint-model options:
 - $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
 **Frequentist vs bayesian approach**
+
+The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62).
 
 However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be impractical. This becomes even more challenging when the data include measurement error, missing values, or nonlinear longitudinal patterns, since these features increase model complexity. From a Bayesian perspective, the joint modelling framework can be approached in a more direct way, avoiding many of the complex approximations that are typically required in frequentist methods. At the same time, when noninformative priors are used, the resulting estimates are often very similar to those obtained from maximum likelihood approaches (Wu et al., 2008; Brown et al., 2003, p. 222).
 
