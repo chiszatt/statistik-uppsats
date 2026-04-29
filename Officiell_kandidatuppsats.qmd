@@ -195,7 +195,7 @@ The modelling approaches will be applied to data obtained from the *Alzheimer’
 
 *Måste förkortas och göras mer sammanhängande*
 
-## Survival analysis
+## Survival Analysis
 
 As all modeling approaches considered in this study aim to model time to progression to Alzheimer’s disease, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse or recovery. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
 
