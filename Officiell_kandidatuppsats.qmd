@@ -83,35 +83,35 @@ library(kableExtra)
 ```{r}
 # Loading data
 #Milou
-# # NfL data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-#  nfl_data <- BLENNOWPLASMANFLLONG
-# # # P-tau181 data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-#  ptau_data <- UGOTPTAU181
-# # # Diagnosis data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-#  diagnosis_data <- DXSUM
-# # # Demographics data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-#  demographics <- PTDEMOG
-# # # Apoe data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-#  apoe <- APOERES
+ # NfL data
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+  nfl_data <- BLENNOWPLASMANFLLONG
+ # # P-tau181 data
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+  ptau_data <- UGOTPTAU181
+ # # Diagnosis data
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+  diagnosis_data <- DXSUM
+ # # Demographics data
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+  demographics <- PTDEMOG
+ # # Apoe data
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+  apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
 
-ptau_data = UGOTPTAU181
+#ptau_data = UGOTPTAU181
 
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
-demographics = PTDEMOG
+#demographics = PTDEMOG
 
-apoe = APOERES
+#apoe = APOERES
 ```
 
 # Introduction
@@ -126,7 +126,7 @@ In the context of Alzheimer's disease, as well as diseases in general, the term 
 
 **AD and BIOMARKERS**
 
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF.Recent advances in research have made it possible to replace these invasive procedures with blood tests, as increases in the sensitivity of these tests make it possible to accurately detect the lower concentrations of biomarkers found in the blood (). WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. . **- page???**)
+AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF.Recent advances in research have made it possible to replace these invasive procedures with blood tests, as increases in the sensitivity of these tests make it possible to accurately detect the lower concentrations of biomarkers found in the blood (). WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6)
 
 The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and staging of AD in 2024 to reflect the importance of blood-based biomarkers in the diagnosis process. According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Plasma p-tau has had good performance as a standalone biomarker, compared with CSF p-tau which is usually used in conjunction with other biomarkers (Jack et al., p. 5151).
 
@@ -176,7 +176,9 @@ This study investigates the prediction of Alzheimer’s disease/dementia progres
 
 To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to Alzheimer’s disease/dementia. Second, single-biomarker joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker and their association with the time-to-event outcome. Third, multivariate joint models will be used to jointly analyse multiple biomarkers, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying distinct subgroups. A univariate joint latent class model will be fit for NfL and ptau-181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and ptau-181 simultaneously. All models will be adjusted for relevant covariates.
 
-To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Model performance will be evaluated using time-dependent AUC for dynamic prediction. The significance level will be set at 0.05 for all analyses.
+To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. The significance level will be set at 0.05 for all analyses.
+
+More specifically, model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to Alzheimer’s disease progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, time horizons of 1, 2, 3, 4, and 5 years were selected to capture short- to mid-term progression.
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
@@ -699,7 +701,7 @@ For the two class model, the coefficient for the fixed effects in the class memb
 
 ## Comparison of Predictive Performance
 
-Predictive performance was evaluated using time-dependent AUC and Brier Score at semiannual time points over a 10-year follow-up period and visualized as continuous performance curves over time. To facilitate interpretation, performance estimates are additionally reported at selected clinically relevant time points at 1, 3, 5, and 10 years.
+Predictive performance was evaluated using time-dependent AUC and Brier Score at yearly time points from 1 to 5 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in a table.
 
 # Discussion
 
@@ -722,6 +724,8 @@ Predictive performance was evaluated using time-dependent AUC and Brier Score at
 # Bibliography (APA-style)
 
 Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.). *About ADNI*. <https://adni.loni.usc.edu/about/>
+
+Alzheimer’s Association (n.d.). Mild cognitive impairment (MCI). <https://www.alz.org/alzheimers-dementia/what-is-dementia/related_conditions/mild-cognitive-impairment>
 
 Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a joint model of longitudinal and survival outcomes assuming different association structures. *Statistics in medicine*, 35(26), 4813-4823. <https://doi.org/10.1002/sim.7027>
 
@@ -783,9 +787,11 @@ World Health Organization (2024). *Preferred product characteristics of blood-ba
 
 - (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
-Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
-
 Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. https://doi.org/10.1111/j.1541-0420.2009.01308.x
+
+Xia, X., Duffner, L. A., Bintener, C., Bradshaw, A., Lamirel, D., & Jönsson, L. (2025). Diagnostic and prognostic multimodal prediction models in Alzheimer's disease: A scoping review. *Journal of Alzheimer's disease* *: JAD*, 108(1), 209-221. [https://doi.org/10.1177/13872877251351630](http://127.0.0.1:14086/#0)
+
+Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
 
 Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
 
@@ -3290,14 +3296,14 @@ row.names(jlcmm_nfl_summary) <- c("1 class model", "2 class model", "3 class mod
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m1_nfl, which = "survival")
+#plot(jlcmm_m1_nfl, which = "survival")
 ```
 
 ### Survival curves by class
 
 ```{r}
 # longitudinal trajectory by class
-plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
+#plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 ```
 
 # JLCMM: PTAU
@@ -3474,14 +3480,14 @@ summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m1_ptau, which = "survival")
+#plot(jlcmm_m1_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
+#plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
 ```
 
 ## Visualisation
@@ -3490,14 +3496,14 @@ plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m2_ptau, which = "survival")
+#plot(jlcmm_m2_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
+#plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
 ```
 
 # MJLCMM: NFL & PTAU
@@ -3814,7 +3820,7 @@ summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entr
 ### Survival curves by class
 
 ```{r}
-plot(mult_jlcmm_m1, which = "survival")
+#plot(mult_jlcmm_m1, which = "survival")
 ```
 
 ```{r}
@@ -3827,7 +3833,7 @@ plot(mult_jlcmm_m1, which = "survival")
 
 ```{r}
 # survival curves by class
-plot(mult_jlcmm_m2, which = "survival")
+#plot(mult_jlcmm_m2, which = "survival")
 ```
 
 ```{r}
@@ -3855,7 +3861,7 @@ Bootstrap LRT???
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
-times <- seq(1, 10, by = 0.5)
+times <- c(1, 2, 3, 4, 5)
 ```
 
 ## Time-dependent AUC for fitted Cox PH models
@@ -3912,7 +3918,6 @@ newdata <- dplyr::left_join(
 ```{r}
 library(JMbayes2)
 # We define a function to compute time-dependent AUC for joint models using tvAUC
-#We extract the AUC value from the tvAUC output for each horizon time point
 get_jm_auc <- function(model, times) {
   
   aucs <- sapply(times, function(t) {
@@ -3932,18 +3937,18 @@ get_jm_auc <- function(model, times) {
 ```
 
 ```{r}
-# We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
+# We compute time-dependent AUC for the joint model including p-tau181 
 auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
 
-# We compute time-dependent AUC for the joint model including NfL using tvAUC
+# We compute time-dependent AUC for the joint model including NfL 
 auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
 
-# We compute time-dependent AUC for the multivariate joint model using tvAUC
-#auc_multi_jm <- get_jm_auc(multi_joint_model, times)
+# We compute time-dependent AUC for the multivariate joint model 
+auc_multi_jm <- get_jm_auc(multi_joint_model, times)
 
 ```
 
-## Time dependent AUC for latent class joint models
+## Time-dependent AUC for latent class joint models
 
 Landmark: the time at which predictions are made
 
@@ -3967,54 +3972,52 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 
 3.  Class specific discrimination
 
-## Table of selected results
+## Table of the results
 
 ```{r}
-# Time-dependent AUC for Cox and joint models summarized at clinically relevant time points
-results <- data.frame(
-  Model = c("Cox p-tau181", "Cox NfL", "Cox both2",
+# Time-dependent AUC for Cox and joint models summarized in a table
+results_table_AUC <- data.frame(
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both",
             "JM p-tau181", "JM NfL", "JM both"),
   
-  AUC_1y  = c(
-    auc_ptau_bl[2],
-    auc_nfl_bl[2],
-    auc_both_bl[2],
-    auc_ptau_jm[2],
-    auc_nfl_jm[2],
-    auc_multi_jm[2]
-  ),
+  AUC_1y = c(auc_ptau_bl[1],
+             auc_nfl_bl[1],
+             auc_both_bl[1],
+             auc_ptau_jm[1],
+             auc_nfl_jm[1],
+             auc_multi_jm[1]),
   
-  AUC_3y  = c(
-    auc_ptau_bl[6],
-    auc_nfl_bl[6],
-    auc_both_bl[6],
-    auc_ptau_jm[6],
-    auc_nfl_jm[6],
-    auc_multi_jm[6]
-  ),
+  AUC_2y = c(auc_ptau_bl[2],
+             auc_nfl_bl[2],
+             auc_both_bl[2],
+             auc_ptau_jm[2],
+             auc_nfl_jm[2],
+             auc_multi_jm[2]),
   
-  AUC_5y  = c(
-    auc_ptau_bl[10],
-    auc_nfl_bl[10],
-    auc_both_bl[10],
-    auc_ptau_jm[10],
-    auc_nfl_jm[10],
-    auc_multi_jm[10]
-  ),
+  AUC_3y = c(auc_ptau_bl[3],
+             auc_nfl_bl[3],
+             auc_both_bl[3],
+             auc_ptau_jm[3],
+             auc_nfl_jm[3],
+             auc_multi_jm[3]),
   
-  AUC_10y = c(
-    auc_ptau_bl[19],
-    auc_nfl_bl[19],
-    auc_both_bl[19],
-    auc_ptau_jm[19],
-    auc_nfl_jm[19],
-    auc_multi_jm[19]
-  )
+  AUC_4y = c(auc_ptau_bl[4],
+             auc_nfl_bl[4],
+             auc_both_bl[4],
+             auc_ptau_jm[4],
+             auc_nfl_jm[4],
+             auc_multi_jm[4]),
+  
+  AUC_5y = c(auc_ptau_bl[5],
+             auc_nfl_bl[5],
+             auc_both_bl[5],
+             auc_ptau_jm[5],
+             auc_nfl_jm[5],
+             auc_multi_jm[5])
 )
 
-results[, -1] <- round(results[, -1], 3)
-
-results
+results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
+results_table_AUC
 ```
 
 ## Plot of the results
@@ -4022,8 +4025,11 @@ results
 ```{r}
 # We reshape all AUC results into long format for plotting
 plot_data <- data.frame(
-  Time = rep(times, times = 6),
-  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
+  Time = rep(times, 6),
+  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both",
+                "JM p-tau", "JM NfL", "JM multi"),
+              each = length(times)),
+  AUC = c(
     auc_ptau_bl,
     auc_nfl_bl,
     auc_both_bl,
@@ -4031,7 +4037,9 @@ plot_data <- data.frame(
     auc_nfl_jm,
     auc_multi_jm
   )
+) 
 
+# Plot
 ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
   geom_line(linewidth = 1) +
   geom_point(size = 2) +
@@ -4077,6 +4085,7 @@ cox_brier
 ## Time-dependent Brier score for fitted joint models
 
 ```{r}
+# We define a function to compute time-dependent Brier score for joint models using tvBrier
 get_jm_brier <- function(model, times) {
   
   briers <- sapply(times, function(t) {
@@ -4096,23 +4105,45 @@ get_jm_brier <- function(model, times) {
 ```
 
 ```{r}
+# We compute time-dependent Brier score for the joint model including p-tau181 
 brier_ptau_jm <- get_jm_brier(joint_model_ptau, times)
 brier_ptau_jm
 
+# We compute time-dependent Brier score for the joint model including NfL 
 brier_nfl_jm <- get_jm_brier(joint_model_nfl, times)
 brier_nfl_jm
 
-# brier_multi_jm <- get_jm_brier(multi_joint_model, times)
-# brier_multi_jm
+# We compute time-dependent Brier score for the multivariate joint model 
+brier_multi_jm <- get_jm_brier(multi_joint_model, times)
+brier_multi_jm
 ```
 
-## Time dependent AUC for latent class joint models
+## Time-dependent Brier score for latent class joint models
 
 ...
 
-## Table of selected results
+## Table of the results
 
 ```{r}
+# Time-dependent Brier score for Cox and joint models summarized in a table
+results_table_Brier <- data.frame(
+  Time = times,
+
+  Cox_p_tau = cox_brier$`Cox p-tau`,
+  Cox_NfL = cox_brier$`Cox NfL`,
+  Cox_both = cox_brier$`Cox both`,
+
+  JM_p_tau = brier_ptau_jm,
+  JM_NfL = brier_nfl_jm,
+  JM_both = brier_multi_jm
+)
+round(results_table_Brier, 3)
+```
+
+## Plot of the results
+
+```{r}
+# We reshape all AUC results into long format for plotting
 all_table <- data.frame(
   Time = times,
   Cox_p_tau = cox_brier$`Cox p-tau`,
@@ -4121,11 +4152,7 @@ all_table <- data.frame(
   JM_p_tau  = brier_ptau_jm,
   JM_NfL    = brier_nfl_jm
 )
-```
 
-```{r}
-library(ggplot2)
-# gör om till long format för ggplot
 plot_data <- all_table %>%
   pivot_longer(
     cols = -Time,
@@ -4143,38 +4170,4 @@ ggplot(plot_data, aes(x = Time, y = Brier, color = Model)) +
     x = "Time",
     y = "Brier score"
   )
-```
-
-## Table of selected results
-
-```{r}
-report_times <- c(1, 3, 5, 10)
-```
-
-```{r}
-cox_report <- lapply(brier_cox$AppErr, function(x) {
-  approx(brier_cox$time, x, xout = report_times)$y
-})
-```
-
-```{r}
-jm_ptau_report <- approx(times, brier_ptau_jm, xout = report_times)$y
-jm_nfl_report  <- approx(times, brier_nfl_jm,  xout = report_times)$y
-```
-
-```{r}
-results_table <- data.frame(
-  Time = report_times,
-
-  Cox_p_tau = cox_report$`Cox p-tau`,
-  Cox_NfL   = cox_report$`Cox NfL`,
-  Cox_both  = cox_report$`Cox both`,
-
-  JM_p_tau  = jm_ptau_report,
-  JM_NfL    = jm_nfl_report
-)
-```
-
-```{r}
-round(results_table, 3)
 ```
