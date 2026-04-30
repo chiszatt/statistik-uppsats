@@ -83,21 +83,21 @@ library(kableExtra)
 ```{r}
 # Loading data
 #Milou
-# # NfL data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-#  nfl_data <- BLENNOWPLASMANFLLONG
-# # # P-tau181 data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-#  ptau_data <- UGOTPTAU181
-# # # Diagnosis data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-#  diagnosis_data <- DXSUM
-# # # Demographics data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-#  demographics <- PTDEMOG
-# # # Apoe data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-#  apoe <- APOERES
+# NfL data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+ nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ ptau_data <- UGOTPTAU181
+# # Diagnosis data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+ diagnosis_data <- DXSUM
+# # Demographics data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+ demographics <- PTDEMOG
+# # Apoe data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+ apoe <- APOERES
 ```
 
 ```{r}
@@ -672,19 +672,23 @@ In order to assess whether latent classes can be distinguished solely from p-tau
 
 A latent mixed effects model with two classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). Additionally, the $BIC$ increased when compared to the one class model and the posterior probabilities show no clear differentiation between classes, with the average posterior probability being $0.50$ for both classes. Similarly, the three class model had significant coefficients for the longitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model. The conclusion is that the model cannot determine any number of latent classes through ptau-181 trajectories alone.
 
-The longitudinal ptau-181 trajectories were then modeled jointly with the survival process for $G$ assumed latent classes with the joint latent class mixed effects model.
+The longitudinal ptau-181 trajectories were then modeled jointly with the survival process for G assumed latent classes with the joint latent class mixed effects model.
 
 ## Joint latent class mixed model for NfL
 
-First, latent class mixed models were fit and the random effects were decided based off of the one class model, as was done with ptau-181. The one class model with only a random intercept had statistically significant coefficients for the fixed effects ($p < 0.01$) and the variance for the intercept in the random effects structure was given to be $0.196$. A model with both a random slope and intercept also gave statistically significant coefficients for the fixed effects ($p < 0.01$) and the variances for the intercept and slope of the random effects were $0.184$ and $0.001$ respectively. Comparison of the $BIC$ and log-likelihoods of both models show a modest improvement in both metrics for the model with both random intercept and slope. Additionally, testing whether the improvement in the model with the random slope is statistically significant with a likelihood ratio test gave $\lambda_{LR} = 15.034$ on $2$ degrees of freedom ($p = 0.0005$). It was therefore decided to include the random slope in further models with more than one class.
+First, latent class mixed effects models were fit and the random effects were decided based off of the one class model, as was done with ptau-181. Both models gave statistically significant coefficients for the fixed effects (p \< 0.001). Since BIC is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, PG.**), only a random intercept was chosen, as the simpler model had a lower BIC (1503.4) compared with the more complex model (1506.1).
 
-Modelling the longitudinal NfL measurements with a two class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for two latent classes. Comparing $BIC$ for the one class ($1639$) and two class ($1659$) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be $0.0003$ - further evidence against two latent classes. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between the two classes. Models with three and four latent classes were also fit. The $BIC$ for the three class model was extremely high compared to the one class model ($2 \cdot 10 ^ 9$) but both $BIC$ and log-likelihood were reduced for the four class model ($BIC = 1574$, log-likelihood $= -736.94$). However, analysis of the classification shows that the model does not meaningfully classify individuals, with $95.84 \%$ of individuals being classified into class three. It is therefore clear to see that the model cannot discern latent classes by longitudinal NfL trajectories alone.
+Modelling the longitudinal NfL measurements with a two class linear mixed effects model produced significant coefficients for the fixed effetcs in the longitudinal submodel (intercept class1: p = 0.034, intercept class2: p = 0.033, slope: p \< 0.001) but the intercept in the class membership model was not significant (p = 0.9997). Comparing BIC for the one class and two class (1516.5) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be 0.0003 - further evidence against two latent classes. The model had poor class discrimination, with the posterior probabilities clustering around 0.50, showing indistinguishable classification between the two classes. Since the model with two latent classes showed no improvement compared to the one class model, it was decided against fitting further models with more classes. 
 
-**LCMM with covariates: classes are distinguishable. ??? is this necessary????**
+**Latent class mixed effects models with APOE4 and gender as covariates in the class membership model were fit. Interestingly, these models sufficiently discriminated classes within the sample population, giving further support to the inclusion of these covariates in the other models in this paper.**
 
-Next, joint latent class mixed effects models of longitudinal NfL measurements and time-to-diagnosis were fit. The random effects structure was chosen to include only a random intercept due to an increase in the $BIC$ from $2998.4$ to $3001.2$ when including a random slope. Although the log-likelihood increased slightly for the more complex model and a likelihood ratio test suggests the complex model is preferable, the simpler model was chosen as $BIC$ is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, PG.**) and model parsimony helps stabilise joint latent mixed effects models (**SOURCE**). **More on the one class, two class and three class models...**
+Next, joint latent class models were fit to jointly model the longitudinal NFL biomarker trajectories and the time-to-diagnosis process, given G latent classes. Two one class joint latent class models were fit, one with only a random intercept, and another including both random intercept and slope. Both models has significant score test statistics for the conditional independence assumption (p \< 0.001), suggesting that the data supports more than one latent class in the sample population. All parameters in both models were significant for both the longitudinal submodel and the survival submodel (p \< 0.001). Despite a significant likelihood ratio test between the more complex model and the simpler model (p = 0.006), the BIC for the simpler model was lower (2998.4 vs 3001.2). Therefore, for model parsimony, only a random intercept was included in the random effects structure.
 
-Comparing log-likelihood, $BIC$ and entropy between the one, two and three class models suggests that a two class model best captures the joint longitudinal NfL and survival process.
+Additionally, two and three class models were fit. The score test statistic for the two class model became non-significant, meaning that the data supports the hypothesis that there is independence between the longitudinal outcome and the survival outcome, suggesting that the correlation is captured solely through class membership. All parameters in the longitudinal submodel, the survival submodel and the class membership submodel were significant (p \< 0.001). Analysis of the posterior class membership probabilities reveals that the model assigned 75 % of individuals to class 1 and 25 % of individuals to class 2, resulting in meaningful class sizes. Further, the model discriminated well between classes. The mean posterior probability for class 1 was 0.90 and 0.94 for class two, whilst the percentage of posterior probabilities that were over 0.80 were 83 % for class 1 and 89 % for class 2. 
+
+For the three class model, the score test statistic was again non-significant, however, there were also some non-significant model parameters. For the third class, the intercept was insignificant for the class membership model (p = 0.075), as well as both parameters in the proportional hazard model (p = 0.99). Upon inspection of classification from posterior probabilities, the model assigned just 2 % of individuals to class 2. It is suspect whether this could be considered a meaningfully large group, and whether individuals are arbitrarily assigned to this group. According to the model, the mean probability of being assigned to class 2 for those in assigned to class 2 was 0.85, and for class 3 it was 0.74, a clear reduction in certainty compared to the two class model. 
+
+The four class model did not converge on first try, and considering the poorer results from the three class model compared with the two class model, it was decided to discontinue fitting a model with four classes. The BIC for the two class model (2931.6) was an improvement on the one class model (2998.4), whilst the three class model performed better than the one class model, but worse than the two class model. Entropy was higher for the two class model (0.68) compared with the three class model (0.52). The comparison of these models suggests that the two class model best captures the joint longitudinal NfL and survival process.
 
 ```{r}
 # printing the summary metrics
@@ -2188,15 +2192,7 @@ Choice of p-value <https://pmc.ncbi.nlm.nih.gov/articles/PMC5059270/>
 
 # LCMM: NFL
 
-Latent class mixed models for NFL
-
 ## M0 (1 latent class)
-
-First, a one class linear mixed effects model with a random intercept was estimated. This model has statistically significant coefficients for the intercept and slope for the fixed effects ($p < 0.05$) and the variance for the intercept was given to be $0.196$.
-
-A model with both a random slope and intercept on the longitudinal NfL measurements gave statistically significant coefficients for the fixed effects (p \< 0.05) and variances for the intercept and slope of $0.184$ and $0.001$ respectively. The slope variance was small but non-zero.
-
-Comparison of $BIC$ and the log-likelihoods of these two models show a small but
 
 ```{r}
 hlme_m0_1 <- hlme(
@@ -2251,18 +2247,16 @@ LR
 
 ## M1 (2 latent classes)
 
-The linear mixed effects model was extended to model 2 classes with a latent class mixed effects model. One assumption of latent class mixed models is that the sample population, $N$ is comprised of $G$ latent, unobserved heterogenous classes. Modelling the longitudinal NfL measurements with a 2 class linear mixed effects model produced insignificant coefficients ($p > 0.05$). From this, it can be concluded that there is no evidence for 2 latent classes. Comparing $BIC$ for the 1 class ($1638$) and 2 class ($1658$) models supports the conclusion that there are no latent classes in the data. Additionally, the entropy of the 2 class model was calculated to be $0.0003$, which is further evidence against 2 latent classes. The posterior probabilities were extracted from the 2 class model and the distributions of the probabilities for class 1 and class 2 are visualised below. The posterior probabilities cluster around $0.50$, showing indistinguishable classification between class 1 and class 2.
-
 ```{r}
 hlme_m1 <- hlme(
     fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
     subject = "RID",
     classmb = ~ 1,
     ng = 2,
     data = long_data,
-    B = random(hlme_m0_2)
+    B = random(hlme_m0_1)
   )
 
 summary(hlme_m1)
@@ -2279,13 +2273,13 @@ postprob(hlme_m1)
 ```{r}
 hlme_m2 <- hlme(
     fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
     subject = "RID",
     classmb = ~ 1,
     ng = 3,
     data = long_data,
-    B = random(hlme_m0_2)
+    B = random(hlme_m0_1)
   )
 
 summary(hlme_m2)
@@ -2302,13 +2296,13 @@ postprob(hlme_m2)
 ```{r}
 hlme_m3 <- hlme(
     fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
+    mixture = ~ 1,
+    random = ~ 1,
     subject = "RID",
     classmb = ~ 1,
     ng = 4,
     data = long_data,
-    B = random(hlme_m0_2)
+    B = random(hlme_m0_1)
   )
 
 summary(hlme_m3)
@@ -3102,6 +3096,13 @@ jlcmm_data <- surv_data %>%
 
 ## M0 (1 latent class)
 
+```         
+             G    loglik      BIC   entropy
+jlcmm_m0_1   1 -1479.537 2998.415 1.0000000
+jlcmm_m1_nfl 2 -1433.037 2931.642 0.6833857
+jlcmm_m2_nfl 3 -1432.401 2956.598 0.5160664
+```
+
 ```{r}
 jlcmm_m0_1 <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
@@ -3224,6 +3225,11 @@ postprob(jlcmm_m3_nfl)
 ```
 
 ## Comparing M0, M1, M2, M3
+
+```{r}
+summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
+                                                which = c("G", "loglik", "BIC", "entropy"))
+```
 
 ```{r}
 
@@ -3882,14 +3888,14 @@ get_cox_auc <- function(model, times) {
 ```
 
 ```{r}
-# We compute time-dependent AUC for Cox model with p-tau181
-auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
-
-# We compute time-dependent AUC for Cox model with NfL
-auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
-
-# We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
-auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
+# # We compute time-dependent AUC for Cox model with p-tau181
+# auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
+# 
+# # We compute time-dependent AUC for Cox model with NfL
+# auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
+# 
+# # We compute time-dependent AUC for Cox model with both p-tau181 and NfL (combined model)
+# auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -3933,10 +3939,10 @@ get_jm_auc <- function(model, times) {
 
 ```{r}
 # We compute time-dependent AUC for the joint model including p-tau181 using tvAUC
-auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
+# auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
 
 # We compute time-dependent AUC for the joint model including NfL using tvAUC
-auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
+# auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
 
 # We compute time-dependent AUC for the multivariate joint model using tvAUC
 #auc_multi_jm <- get_jm_auc(multi_joint_model, times)
@@ -3971,76 +3977,76 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized at clinically relevant time points
-results <- data.frame(
-  Model = c("Cox p-tau181", "Cox NfL", "Cox both2",
-            "JM p-tau181", "JM NfL", "JM both"),
-  
-  AUC_1y  = c(
-    auc_ptau_bl[2],
-    auc_nfl_bl[2],
-    auc_both_bl[2],
-    auc_ptau_jm[2],
-    auc_nfl_jm[2],
-    auc_multi_jm[2]
-  ),
-  
-  AUC_3y  = c(
-    auc_ptau_bl[6],
-    auc_nfl_bl[6],
-    auc_both_bl[6],
-    auc_ptau_jm[6],
-    auc_nfl_jm[6],
-    auc_multi_jm[6]
-  ),
-  
-  AUC_5y  = c(
-    auc_ptau_bl[10],
-    auc_nfl_bl[10],
-    auc_both_bl[10],
-    auc_ptau_jm[10],
-    auc_nfl_jm[10],
-    auc_multi_jm[10]
-  ),
-  
-  AUC_10y = c(
-    auc_ptau_bl[19],
-    auc_nfl_bl[19],
-    auc_both_bl[19],
-    auc_ptau_jm[19],
-    auc_nfl_jm[19],
-    auc_multi_jm[19]
-  )
-)
-
-results[, -1] <- round(results[, -1], 3)
-
-results
+# results <- data.frame(
+#   Model = c("Cox p-tau181", "Cox NfL", "Cox both2",
+#             "JM p-tau181", "JM NfL", "JM both"),
+#   
+#   AUC_1y  = c(
+#     auc_ptau_bl[2],
+#     auc_nfl_bl[2],
+#     auc_both_bl[2],
+#     auc_ptau_jm[2],
+#     auc_nfl_jm[2],
+#     auc_multi_jm[2]
+#   ),
+#   
+#   AUC_3y  = c(
+#     auc_ptau_bl[6],
+#     auc_nfl_bl[6],
+#     auc_both_bl[6],
+#     auc_ptau_jm[6],
+#     auc_nfl_jm[6],
+#     auc_multi_jm[6]
+#   ),
+#   
+#   AUC_5y  = c(
+#     auc_ptau_bl[10],
+#     auc_nfl_bl[10],
+#     auc_both_bl[10],
+#     auc_ptau_jm[10],
+#     auc_nfl_jm[10],
+#     auc_multi_jm[10]
+#   ),
+#   
+#   AUC_10y = c(
+#     auc_ptau_bl[19],
+#     auc_nfl_bl[19],
+#     auc_both_bl[19],
+#     auc_ptau_jm[19],
+#     auc_nfl_jm[19],
+#     auc_multi_jm[19]
+#   )
+# )
+# 
+# results[, -1] <- round(results[, -1], 3)
+# 
+# results
 ```
 
 ## Plot of the results
 
 ```{r}
 # We reshape all AUC results into long format for plotting
-plot_data <- data.frame(
-  Time = rep(times, times = 6),
-  Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
-    auc_ptau_bl,
-    auc_nfl_bl,
-    auc_both_bl,
-    auc_ptau_jm,
-    auc_nfl_jm,
-    auc_multi_jm
-  )
-
-ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
-  ylim(0, 1) +
-  labs(
-    title = "Time-dependent AUC comparison",
-    x = "Time (years)",
-    y = "AUC"
-  )
+# plot_data <- data.frame(
+#   Time = rep(times, times = 6),
+#   Model = rep(c("Cox p-tau", "Cox NfL", "Cox both", "JM p-tau", "JM NfL", "JM multi"), each = length(times)),
+#     auc_ptau_bl,
+#     auc_nfl_bl,
+#     auc_both_bl,
+#     auc_ptau_jm,
+#     auc_nfl_jm,
+#     auc_multi_jm
+#   )
+# 
+# ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
+#   geom_line(linewidth = 1) +
+#   geom_point(size = 2) +
+#   ylim(0, 1) +
+#   labs(
+#     title = "Time-dependent AUC comparison",
+#     x = "Time (years)",
+#     y = "AUC"
+#   )
 ```
 
 # Comparing models using time-depending Brier score
@@ -4048,59 +4054,59 @@ ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
 ## Time-dependent Brier score for fitted Cox PH models
 
 ```{r}
-# We load required library
-library(pec)
-
-# We specify Cox models for comparison
-cox_models <- list(
-  "Cox p-tau" = surv_model_ptau_bl,
-  "Cox NfL"   = surv_model_nfl_bl,
-  "Cox both"  = surv_model_both_bl
-)
-
-# We compute Brier score using pec for Cox models
-brier_cox <- pec(
-  object = cox_models,
-  formula = Surv(time_to_event, event) ~ 
-    age_at_baseline + PTGENDER + APOE4_status,
-  data = surv_data,
-  times = times,
-  cens.model = "cox"
-)
-
-cox_brier <- lapply(brier_cox$AppErr, function(x)
-  approx(brier_cox$time, x, xout = times)$y
-)
-cox_brier
+# # We load required library
+# library(pec)
+# 
+# # We specify Cox models for comparison
+# cox_models <- list(
+#   "Cox p-tau" = surv_model_ptau_bl,
+#   "Cox NfL"   = surv_model_nfl_bl,
+#   "Cox both"  = surv_model_both_bl
+# )
+# 
+# # We compute Brier score using pec for Cox models
+# brier_cox <- pec(
+#   object = cox_models,
+#   formula = Surv(time_to_event, event) ~ 
+#     age_at_baseline + PTGENDER + APOE4_status,
+#   data = surv_data,
+#   times = times,
+#   cens.model = "cox"
+# )
+# 
+# cox_brier <- lapply(brier_cox$AppErr, function(x)
+#   approx(brier_cox$time, x, xout = times)$y
+# )
+# cox_brier
 ```
 
 ## Time-dependent Brier score for fitted joint models
 
 ```{r}
-get_jm_brier <- function(model, times) {
-  
-  briers <- sapply(times, function(t) {
-    
-    tmp <- tvBrier(
-      model,
-      newdata = newdata,
-      Tstart = 0,
-      Thoriz = t
-    )
-    
-    return(tmp$Brier)
-  })
-  
-  return(as.numeric(briers))
-}
+# get_jm_brier <- function(model, times) {
+#   
+#   briers <- sapply(times, function(t) {
+#     
+#     tmp <- tvBrier(
+#       model,
+#       newdata = newdata,
+#       Tstart = 0,
+#       Thoriz = t
+#     )
+#     
+#     return(tmp$Brier)
+#   })
+#   
+#   return(as.numeric(briers))
+# }
 ```
 
 ```{r}
-brier_ptau_jm <- get_jm_brier(joint_model_ptau, times)
-brier_ptau_jm
-
-brier_nfl_jm <- get_jm_brier(joint_model_nfl, times)
-brier_nfl_jm
+# brier_ptau_jm <- get_jm_brier(joint_model_ptau, times)
+# brier_ptau_jm
+# 
+# brier_nfl_jm <- get_jm_brier(joint_model_nfl, times)
+# brier_nfl_jm
 
 # brier_multi_jm <- get_jm_brier(multi_joint_model, times)
 # brier_multi_jm
@@ -4113,68 +4119,68 @@ brier_nfl_jm
 ## Table of selected results
 
 ```{r}
-all_table <- data.frame(
-  Time = times,
-  Cox_p_tau = cox_brier$`Cox p-tau`,
-  Cox_NfL   = cox_brier$`Cox NfL`,
-  Cox_both  = cox_brier$`Cox both`,
-  JM_p_tau  = brier_ptau_jm,
-  JM_NfL    = brier_nfl_jm
-)
+# all_table <- data.frame(
+#   Time = times,
+#   Cox_p_tau = cox_brier$`Cox p-tau`,
+#   Cox_NfL   = cox_brier$`Cox NfL`,
+#   Cox_both  = cox_brier$`Cox both`,
+#   JM_p_tau  = brier_ptau_jm,
+#   JM_NfL    = brier_nfl_jm
+# )
 ```
 
 ```{r}
 library(ggplot2)
 # gör om till long format för ggplot
-plot_data <- all_table %>%
-  pivot_longer(
-    cols = -Time,
-    names_to = "Model",
-    values_to = "Brier"
-  )
-
-# plot
-ggplot(plot_data, aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  theme_minimal() +
-  labs(
-    title = "Time-dependent Brier Score: Cox vs Joint Models",
-    x = "Time",
-    y = "Brier score"
-  )
+# plot_data <- all_table %>%
+#   pivot_longer(
+#     cols = -Time,
+#     names_to = "Model",
+#     values_to = "Brier"
+#   )
+# 
+# # plot
+# ggplot(plot_data, aes(x = Time, y = Brier, color = Model)) +
+#   geom_line(size = 1) +
+#   geom_point(size = 2) +
+#   theme_minimal() +
+#   labs(
+#     title = "Time-dependent Brier Score: Cox vs Joint Models",
+#     x = "Time",
+#     y = "Brier score"
+#   )
 ```
 
 ## Table of selected results
 
 ```{r}
-report_times <- c(1, 3, 5, 10)
+# report_times <- c(1, 3, 5, 10)
 ```
 
 ```{r}
-cox_report <- lapply(brier_cox$AppErr, function(x) {
-  approx(brier_cox$time, x, xout = report_times)$y
-})
+# cox_report <- lapply(brier_cox$AppErr, function(x) {
+#   approx(brier_cox$time, x, xout = report_times)$y
+# })
 ```
 
 ```{r}
-jm_ptau_report <- approx(times, brier_ptau_jm, xout = report_times)$y
-jm_nfl_report  <- approx(times, brier_nfl_jm,  xout = report_times)$y
+# jm_ptau_report <- approx(times, brier_ptau_jm, xout = report_times)$y
+# jm_nfl_report  <- approx(times, brier_nfl_jm,  xout = report_times)$y
 ```
 
 ```{r}
-results_table <- data.frame(
-  Time = report_times,
-
-  Cox_p_tau = cox_report$`Cox p-tau`,
-  Cox_NfL   = cox_report$`Cox NfL`,
-  Cox_both  = cox_report$`Cox both`,
-
-  JM_p_tau  = jm_ptau_report,
-  JM_NfL    = jm_nfl_report
-)
+# results_table <- data.frame(
+#   Time = report_times,
+# 
+#   Cox_p_tau = cox_report$`Cox p-tau`,
+#   Cox_NfL   = cox_report$`Cox NfL`,
+#   Cox_both  = cox_report$`Cox both`,
+# 
+#   JM_p_tau  = jm_ptau_report,
+#   JM_NfL    = jm_nfl_report
+# )
 ```
 
 ```{r}
-round(results_table, 3)
+# round(results_table, 3)
 ```
