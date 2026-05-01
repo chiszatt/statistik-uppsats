@@ -43,6 +43,8 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, output = TRUE)
 ```
 
+# Pre-processing
+
 ```{r, warning=FALSE}
 # loading libraries
 library(dplyr)
@@ -59,6 +61,10 @@ library(lcmm)
 library(timeROC)
 library(kableExtra)
 ```
+
+## Loading the data
+
+The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Disease Neuroimaging Initiative (ADNI). The data sets include longitudinal ptau-181 and NfL measurements, diagnosis, demographic and genetic data.
 
 ```{r}
 # Loading data
@@ -94,8 +100,6 @@ library(kableExtra)
 #apoe = APOERES
 ```
 
-# Pre-processing
-
 - *There are 52 individuals with two measurements recorded on the same exam date.*
 
 - *How should we deal with these? Average the measurements? Remove the observations?*
@@ -113,7 +117,9 @@ grep("381_S_10###", diagnosis_data$PTID)
 grep("381_S_10###", apoe$PTID)
 ```
 
-## Selection of required variables
+## Selecting required variables
+
+Variables for the unique identifier for each individual, visit code, exam date, biomarker measurements, diagnosis and genetic data were extracted.
 
 ```{r, warning=FALSE}
 # We select the required nfl variables
@@ -130,7 +136,7 @@ apoe <- apoe %>%
 
 # We select the required diagnosis variables
 diagnosis_data <- diagnosis_data %>%
-  dplyr::select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+  dplyr::select(RID, VISCODE2, EXAMDATE, DIAGNOSIS)
 
 # We add _dx on the diagnosis variables 
 diagnosis_data <- diagnosis_data %>%
@@ -139,7 +145,7 @@ diagnosis_data <- diagnosis_data %>%
 
 ## Checking RID with more than one measurement recorded on the same exam date
 
-For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses will be performed to evaluate the robustness of the findings.
+For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses were performed to evaluate the robustness of the findings.
 
 ```{r}
 ## Checking which obs have double VISCODE2 codes
@@ -199,7 +205,7 @@ head(nfl_data %>%
      )
 ```
 
-## Merging nfl and ptau data for longitudinal data set
+## Merging NfL and ptau-181 data for the longitudinal data set
 
 ```{r}
 # We merge NFL and ptau data for longitudinal data by RID and VISCODE2
@@ -209,7 +215,7 @@ long_data <- nfl_data %>%
 
 ## Creating a common EXAMDATE and EXAMDATE_baseline variable
 
-- Do this now in order to remove observations from diagnosis data which occur long before first biomarker measurements
+This was performed before preparation of the other variables for the survival and longitudinal models in order to use EXAMDATE_baseline to remove any observations from the diagnosis data set which occur long before the first biomarker measurements for that individual.
 
 ```{r}
 # checking how many observations where the EXAMDATE is different for nfl and ptau
@@ -292,9 +298,9 @@ long_data <- long_data %>%
 #   ungroup()
 ```
 
-## Removing diagnosis observations before biomarker measurements
+## Removing early diagnosis observations
 
-1.  Use diagnosis observations no longer than 50 days before first biomarker measurements – we can change this number and see what difference it makes
+Any diagnoses that were made more than 50 days before the first biomarker measurements were made were removed.
 
 ```{r}
 # filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
@@ -321,7 +327,7 @@ diagnosis_data <- diagnosis_data %>%
 surv_data <- long_data %>% left_join(diagnosis_data, by = c("RID"))
 ```
 
-## Count of missing values
+## Checking missing values
 
 ```{r}
 # We count missing values per column in long_data: all these are variables we will use in the model, so we can remove with na.omit()
@@ -348,14 +354,14 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## Correlation check between biomarkers
+## Checking correlation between biomarkers
 
 ```{r}
 # Correlation between the biomarkers 
 cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
 ```
 
-## Addition of selected demographic variables (age and gender) and APOE4 status
+## Merging selected demographic variables (age and gender) and APOE4 status
 
 ```{r}
 # We only keep the demographics variables we need and one row per person 
@@ -397,7 +403,7 @@ long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - lo
 surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
 ```
 
-### Checking individuals final diagnoses for the full data set
+### Checking individual's final diagnoses for the full data set
 
 ```{r}
 # final diagnoses for the full sample size
@@ -411,7 +417,7 @@ table(
   )
 ```
 
-## Selection of participants with at least 3 measurements
+## Selecting participants with at least 3 measurements
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
@@ -447,9 +453,9 @@ table(
   )
 ```
 
-## Preparation for Cox PH model
+## Preparing for Cox PH model
 
-### Construction of global (common) baseline, age at baseline, event and time-to-event variables
+### Constructing global (common) baseline, age at baseline, event and time-to-event variables
 
 ```{r}
 surv_data <- surv_data %>%
@@ -501,7 +507,7 @@ table((surv_data %>% filter(time_to_event > 0))$event)
 table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
-### Construction of baseline values of each biomarker, to include in the Cox PH models as covariates
+### Constructing baseline values of each biomarker, to include in the Cox PH models as covariates
 
 ```{r}
 # Creating a data frame with the first biomarker measurements
@@ -524,9 +530,7 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-# Distribution check of each biomarker
-
-1.  **Since cube root transform gives a better Gaussian approximation for ptau, should we consider using this? The downside is that values cannot take negative values, which is possible with the natural logarithm transformation: is this true though - sqrt(4) = +- 2 ... but how does this work in practice?**
+# Checking distribution of each biomarker
 
 ```{r}
 # We check the distribution of each biomarker
@@ -564,11 +568,9 @@ surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
 surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
 ```
 
-## Check for outliers
+## Checking outliers
 
-We still keep them, as we assume they are correct observations.
-
-- Checking for observations either side of the mean of the standardised data shows there are no values 3 sds below the mean, only above.
+Checking for extreme observations shows there are no values 3 standard deviations below the mean, only above. An assessment of these more extreme observations suggests that they are within a reasonable range and are assumed to be correct observations.
 
 ```{r}
 # We identify "extreme" values
@@ -584,7 +586,7 @@ long_data[scale(long_data$PLASMA_NFL) > 3, ]
 long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
 
-## Recheck of longitudinal and survival data lengths
+## Rechecking longitudinal and survival data lengths
 
 ```{r}
 # We check the number of individuals in each dataset 
