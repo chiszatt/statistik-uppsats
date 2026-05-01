@@ -680,7 +680,7 @@ First, latent class mixed effects models were fit and the random effects were de
 
 Modelling the longitudinal NfL measurements with a two class linear mixed effects model produced significant coefficients for the fixed effetcs in the longitudinal submodel (intercept class1: p = 0.034, intercept class2: p = 0.033, slope: p \< 0.001) but the intercept in the class membership model was not significant (p = 0.9997). Comparing BIC for the one class and two class (1516.5) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be 0.0003 - further evidence against two latent classes. The model had poor class discrimination, with the posterior probabilities clustering around 0.50, showing indistinguishable classification between the two classes. Since the model with two latent classes showed no improvement compared to the one class model, it was decided against fitting further models with more classes. 
 
-**Latent class mixed effects models with APOE4 and gender as covariates in the class membership model were fit. Interestingly, these models sufficiently discriminated classes within the sample population, giving further support to the inclusion of these covariates in the other models in this paper.**
+Latent class mixed effects models with APOE4 status and gender as covariates in the class membership model were fit. Interestingly, these models sufficiently discriminated classes within the sample population, giving further support to the inclusion of these covariates in the other models in this paper. One, two, three and four class models were fit. The BIC decreased with added classes (1 class: 1506.1, 2 class: 1323.9, 3 class: 1316.7, 4 class: 1279.5) whilst the log-likelihood increased (1 class: -733.4, 2 class: -622.6, 3 class: -592.8, 4 class: -551.2). However, the classifications based of off posterior probabilities shows that for the three and four class only a very small percentage have been assigned to one of the classes (two class model, class2: 0.71 %, four class model, class4: 1.99 %), therefore, this suggests that two classes are sufficient in explaining most of the variance in the sample population.
 
 Next, joint latent class models were fit to jointly model the longitudinal NFL biomarker trajectories and the time-to-diagnosis process, given G latent classes. Two one class joint latent class models were fit, one with only a random intercept, and another including both random intercept and slope. Both models has significant score test statistics for the conditional independence assumption (p \< 0.001), suggesting that the data supports more than one latent class in the sample population. All parameters in both models were significant for both the longitudinal submodel and the survival submodel (p \< 0.001). Despite a significant likelihood ratio test between the more complex model and the simpler model (p = 0.006), the BIC for the simpler model was lower (2998.4 vs 3001.2). Therefore, for model parsimony, only a random intercept was included in the random effects structure.
 
@@ -2570,6 +2570,10 @@ hlme_m1_PTGENDER <- hlme(
 summary(hlme_m1_PTGENDER)
 ```
 
+```{r}
+postprob(hlme_m1_PTGENDER)
+```
+
 ### Excluding PTGENDER
 
 ```{r}
@@ -2589,27 +2593,6 @@ hlme_m1_nfl_classmb <- hlme(
 summary(hlme_m1_nfl_classmb)
 ```
 
-### Assessment of covariate PTGENDER
-
-A likelihood ratio test for the two models shows that there is a statistically significant increase in performance for the reduced model without gender as a covariate. It is therefore the reduced 2 class model which we compare with the 1 class model henceforth.
-
-```{r}
-# log likelihood for the full model
-l = hlme_m1_PTGENDER$loglik
-
-# log likelihood for the reduced model
-l_0 = hlme_m1_nfl_classmb$loglik
-
-# computing the LR test statistic
-LR = - 2 * (l_0 - l)
-
-# computing the p-value given the null hypothesis is true (the reduced model is the true model)
-pchisq(LR, 2, lower.tail = FALSE)
-LR
-```
-
-### Posterior probabilities
-
 ```{r}
 postprob(hlme_m1_nfl_classmb)
 ```
@@ -2622,7 +2605,7 @@ hlme_m2_nfl_classmb <- hlme(
     mixture = ~ time_years,
     random = ~ time_years,
     subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
+    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
     ng = 3,
     data = long_data,
     B = random(hlme_m0)
@@ -2645,7 +2628,7 @@ hlme_m3_nfl_classmb <- hlme(
     mixture = ~ time_years,
     random = ~ time_years,
     subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
+    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
     ng = 4,
     data = long_data,
     B = random(hlme_m0)
@@ -3393,7 +3376,7 @@ jlcmm_m2_ptau <- jlcmm(
   classmb = ~ 1,
   ng = 3,
   subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
+  survival = Ss**Läggae_to_event, event) ~ 1,
   data = jlcmm_data,
   B = random(jlcmm_m0)
   )
