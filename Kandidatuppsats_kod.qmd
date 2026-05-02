@@ -3266,58 +3266,13 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 
 ```{r}
 # Defining a function to compute time dependent AUC for joint latent class models
-jlcmm_timeAUC <- function(model, newdata, ID, time_var, event_var,
-                          landmark, horizon, cause = 1) {
-  
-#   Computing the dynamic survival predictions from joint models using dynpred() in the lcmm package
-  dynp <- dynpred(
-    model = model,
-    newdata = newdata,
-    var.time = time_var,
-    horizon = horizon,
-    landmark = landmark
-  )
-  
-#   Extracting the predicted survival probabilities 
-  preds <- dynp$pred["pred"]
-#   Extracting the unique identifiers (RID) relating to the predicitons
-  ids <- dynp$pred[ID]
-#   Creatng a data frame of predictions and IDs
-  dfpred <- data.frame(id = ids, pred = preds)
-  
-#   Fetching the true events for each ID for each time point
-  dftrue <- unique(newdata[c(ID, time_var, event_var)])
-  
-#   Merging the true and predicted data frames
-  merged <- merge(dfpred, dftrue, by = ID)
-  
-#   Time dependent AUC with timeROC()
-  roc <- timeROC(
-    T = merged$time,
-    delta = merged$event,
-#     timeROC assumes higher values equal higher risk, but lower survival probabilities equal higher risk, thus the sign flip for the marker
-    marker = -merged$pred,
-    cause = cause,
-    times = horizon,
-    iid = TRUE
-  )
-  
-  return(list(
-    horizon = horizon,
-    roc = roc,
-    AUC = roc["AUC"]
-  ))
-}
-```
-
-```{r}
-# Defining a function to compute time dependent AUC for joint latent class models
 jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var,
                           landmark, times, cause = 1) {
   
 #   Initiating a data frame to save the results in at each horizon time
   output <- data.frame(
     times = times,
+    cases = NA,
     AUC = NA
   )
 
@@ -3354,7 +3309,7 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 #     Filtering for the predictions from horizon h
     data_h <- merged %>% filter(horizon == h)
     
-    #     Identifiying individuals that convert in the time l + h (cases) or remain disease free past h (controls)
+    #     Identifiying individuals that convert (cases) in the time between landmark and landmark + horizon (l + h) or remain disease free past l + h (controls)
     cases <- data_h$event == 1 & data_h$time > landmark & data_h$time <= h
     controls <- data_h$time > h
     data_h <- data_h[cases | controls, ]
@@ -3368,6 +3323,8 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
       iid = TRUE)
     
     output$AUC[i] <- roc$AUC[2]
+#     Checking the events in the time window between l and l + h
+    output$cases[i] <- sum(cases)
     
   }
   return(output)
@@ -3375,19 +3332,15 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 ```
 
 ```{r}
-data_lcmm
-```
-
-```{r}
-AUC_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data,
+auc_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data,
                                   "RID", "time_years", "time_to_event", "event",
                                   2, c(3, 4, 5, 6, 7))
 ```
 
 ```{r}
-AUC_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
-                                   "RID", "time_to_event", "event",
-                                   0, times)
+auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
+                                   "RID", "time_years", "time_to_event", "event",
+                                   2, c(3, 4, 5, 6, 7))
 ```
 
 ```{r}
@@ -3400,8 +3353,8 @@ AUC_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized in a table
 results_table_AUC <- data.frame(
-  Model = c("Cox p-tau181", "Cox NfL", "Cox both",
-            "JM p-tau181", "JM NfL", "JM both"),
+  Model = c("Cox ptau-181", "Cox NfL", "Cox both",
+            "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
   
   AUC_1y = c(auc_ptau_bl[1],
              auc_nfl_bl[1],
