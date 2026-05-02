@@ -3154,7 +3154,7 @@ Bootstrap LRT???
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
-times <- c(1, 2, 3, 4, 5)
+times <- c(3, 4, 5, 6, 7, 8)
 ```
 
 ## Time-dependent AUC for fitted Cox PH models
@@ -3217,7 +3217,7 @@ get_jm_auc <- function(model, times) {
     tmp <- tvAUC(
       model,
       newdata = newdata,
-      Tstart = 0,
+      Tstart = 2,
       Thoriz = t
     )
     
@@ -3315,11 +3315,11 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
     data_h <- data_h[cases | controls, ]
     
     roc <- timeROC(
-      T = data_h$time - landmark,
+      T = data_h$time,
       delta = data_h$event,
       marker = data_h$pred,
       cause = cause,
-      times = h - landmark,
+      times = h,
       iid = TRUE)
     
     output$AUC[i] <- roc$AUC[2]
@@ -3334,13 +3334,13 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 ```{r}
 auc_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data,
                                   "RID", "time_years", "time_to_event", "event",
-                                  2, c(3, 4, 5, 6, 7))
+                                  2, c(3, 4, 5, 6, 7, 8))
 ```
 
 ```{r}
 auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
                                    "RID", "time_years", "time_to_event", "event",
-                                   2, c(3, 4, 5, 6, 7))
+                                   2, c(3, 4, 5, 6, 7, 8))
 ```
 
 ```{r}
@@ -3356,40 +3356,50 @@ results_table_AUC <- data.frame(
   Model = c("Cox ptau-181", "Cox NfL", "Cox both",
             "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
   
-  AUC_1y = c(auc_ptau_bl[1],
+  AUC_3y = c(auc_ptau_bl[1],
              auc_nfl_bl[1],
              auc_both_bl[1],
              auc_ptau_jm[1],
              auc_nfl_jm[1],
-             auc_multi_jm[1]),
+             auc_multi_jm[1],
+             auc_jlcmm_m2_ptau[1,3],
+             auc_jlcmm_m2_nfl[1,3]),
   
-  AUC_2y = c(auc_ptau_bl[2],
+  AUC_4y = c(auc_ptau_bl[2],
              auc_nfl_bl[2],
              auc_both_bl[2],
              auc_ptau_jm[2],
              auc_nfl_jm[2],
-             auc_multi_jm[2]),
+             auc_multi_jm[2],
+             auc_jlcmm_m2_ptau[2,3],
+             auc_jlcmm_m2_nfl[2,3]),
   
-  AUC_3y = c(auc_ptau_bl[3],
+  AUC_5y = c(auc_ptau_bl[3],
              auc_nfl_bl[3],
              auc_both_bl[3],
              auc_ptau_jm[3],
              auc_nfl_jm[3],
-             auc_multi_jm[3]),
+             auc_multi_jm[3],
+             auc_jlcmm_m2_ptau[3,3],
+             auc_jlcmm_m2_nfl[3,3]),
   
-  AUC_4y = c(auc_ptau_bl[4],
+  AUC_6y = c(auc_ptau_bl[4],
              auc_nfl_bl[4],
              auc_both_bl[4],
              auc_ptau_jm[4],
              auc_nfl_jm[4],
-             auc_multi_jm[4]),
+             auc_multi_jm[4],
+             auc_jlcmm_m2_ptau[4,3],
+             auc_jlcmm_m2_nfl[4,3]),
   
-  AUC_5y = c(auc_ptau_bl[5],
+  AUC_7y = c(auc_ptau_bl[5],
              auc_nfl_bl[5],
              auc_both_bl[5],
              auc_ptau_jm[5],
              auc_nfl_jm[5],
-             auc_multi_jm[5])
+             auc_multi_jm[5],
+             auc_jlcmm_m2_ptau[5,3],
+             auc_jlcmm_m2_nfl[5,3])
 )
 
 results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
