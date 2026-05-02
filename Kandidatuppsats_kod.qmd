@@ -3311,16 +3311,88 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, event_var,
 ```
 
 ```{r}
-AUC_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data, "RID", "time_years", "event", 0, times)
+# Defining a function to compute time dependent AUC for joint latent class models
+jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var,
+                          landmark, times, cause = 1) {
+  
+#   Initiating a data frame to save the results in at each horizon time
+  output <- data.frame(
+    times = times,
+    AUC = NA
+  )
+
+#   Calculating the dynamic survival predictions from joint models using dynpred() in the lcmm package
+  dynpreds <- dynpred(
+    model = model,
+    newdata = newdata,
+    var.time = time_var,
+    horizon = times,
+    landmark = landmark
+  )
+  
+#   Extracting the predicted survival probabilities 
+  preds <- dynpreds$pred["pred"]
+#   Extracting the unique identifiers (RID) relating to the predicitons
+  ids <- dynpreds$pred[ID]
+#   Extracting the horizon relating to the predicitons
+  horizons <- dynpreds$pred["horizon"]
+  
+#   Creatng a data frame of predictions, horizons and IDs
+  dfpred <- data.frame(id = ids, horizon = horizons, pred = preds)
+  
+#   Fetching the true events for each ID for each time point
+  dftrue <- unique(newdata[c(ID, surv_time_var, event_var)])
+  names(dftrue) <- c(ID, "time", "event")
+  
+#   Merging the true and predicted data frames
+  merged <- merge(dfpred, dftrue, by = ID)
+  
+#   Looping through the horizon times
+  for(i in 1:length(times)) {
+    h = times[i]
+    
+#     Filtering for the predictions from horizon h
+    data_h <- merged %>% filter(horizon == h)
+    
+    #     Identifiying individuals that convert in the time l + h (cases) or remain disease free past h (controls)
+    cases <- data_h$event == 1 & data_h$time > landmark & data_h$time <= h
+    controls <- data_h$time > h
+    data_h <- data_h[cases | controls, ]
+    
+    roc <- timeROC(
+      T = data_h$time - landmark,
+      delta = data_h$event,
+      marker = data_h$pred,
+      cause = cause,
+      times = h - landmark,
+      iid = TRUE)
+    
+    output$AUC[i] <- roc$AUC[2]
+    
+  }
+  return(output)
+}
 ```
 
 ```{r}
-AUC_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data, "RID", "time_years", "event", 0, times)
+data_lcmm
+```
+
+```{r}
+AUC_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data,
+                                  "RID", "time_years", "time_to_event", "event",
+                                  2, c(3, 4, 5, 6, 7))
+```
+
+```{r}
+AUC_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
+                                   "RID", "time_to_event", "event",
+                                   0, times)
 ```
 
 ```{r}
 #  model must be jlcmm for dynpred()
-# AUC_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data, "RID", "time_years", "event", 0, times)
+# AUC_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data, "RID", "time_to_event", "event", 0, times)
 ```
 
 ## Table of the results
