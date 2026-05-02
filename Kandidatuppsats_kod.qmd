@@ -88,16 +88,17 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
 
-#ptau_data = UGOTPTAU181
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
 
-#diagnosis_data = DXSUM
+ptau_data = UGOTPTAU181
 
-#demographics = PTDEMOG
+diagnosis_data = DXSUM
 
-#apoe = APOERES
+demographics = PTDEMOG
+
+apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -2522,6 +2523,18 @@ row.names(jlcmm_nfl_summary) <- c("1 class model", "2 class model", "3 class mod
 
 ```
 
+```{r}
+# # saving which class each individual was predicted to be in
+class_preds <- jlcmm_m2_nfl$pprobY
+
+# merging with genotype data
+class_preds <- class_preds %>%
+  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
+
+# checking the distribution of genotype by class
+table(class_preds$class, class_preds$APOE4_status)
+```
+
 ### Adjusted LRT
 
 ```{r}
@@ -2576,14 +2589,14 @@ row.names(jlcmm_nfl_summary) <- c("1 class model", "2 class model", "3 class mod
 
 ```{r}
 # survival curves by class
-#plot(jlcmm_m1_nfl, which = "survival")
+plot(jlcmm_m1_nfl, which = "survival")
 ```
 
 ### Survival curves by class
 
 ```{r}
 # longitudinal trajectory by class
-#plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
+plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 ```
 
 # JLCMM: PTAU
@@ -2673,7 +2686,7 @@ jlcmm_m2_ptau <- jlcmm(
   classmb = ~ 1,
   ng = 3,
   subject = "RID",
-  survival = Ss**Läggae_to_event, event) ~ 1,
+  survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
   B = random(jlcmm_m0)
   )
@@ -2720,14 +2733,14 @@ summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
 
 ```{r}
 # # saving which class each individual was predicted to be in
-# class_preds <- jlcmm_m2_ptau$pprobY
-# 
-# # merging with genotype data
-# class_preds <- class_preds %>%
-#   merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
-# 
-# # checking the distribution of genotype by class
-# table(class_preds$class, class_preds$APOE4_status)
+class_preds <- jlcmm_m2_ptau$pprobY
+
+# merging with genotype data
+class_preds <- class_preds %>%
+  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
+
+# checking the distribution of genotype by class
+table(class_preds$class, class_preds$APOE4_status)
 ```
 
 ### Adjusted LRT
@@ -2760,14 +2773,14 @@ summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
 
 ```{r}
 # survival curves by class
-#plot(jlcmm_m1_ptau, which = "survival")
+plot(jlcmm_m1_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-#plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
+plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
 ```
 
 ## Visualisation
@@ -2931,7 +2944,7 @@ postprob(mult_jlcmm_m3)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(mult_jlcmm_m0, mult_jlcmm_m1, mult_jlcmm_m2, which = c("G", "loglik", "BIC", "entropy"))
 ```
 
 ### Adjusted LRT
@@ -3250,6 +3263,65 @@ Fiing the horizon, varying the landmark: how well does the model predict convers
 2.  Overall model discrimination
 
 3.  Class specific discrimination
+
+```{r}
+# Defining a function to compute time dependent AUC for joint latent class models
+jlcmm_timeAUC <- function(model, newdata, ID, time_var, event_var,
+                          landmark, horizon, cause = 1) {
+  
+#   Computing the dynamic survival predictions from joint models using dynpred() in the lcmm package
+  dynp <- dynpred(
+    model = model,
+    newdata = newdata,
+    var.time = time_var,
+    horizon = horizon,
+    landmark = landmark
+  )
+  
+#   Extracting the predicted survival probabilities 
+  preds <- dynp$pred["pred"]
+#   Extracting the unique identifiers (RID) relating to the predicitons
+  ids <- dynp$pred[ID]
+#   Creatng a data frame of predictions and IDs
+  dfpred <- data.frame(id = ids, pred = preds)
+  
+#   Fetching the true events for each ID for each time point
+  dftrue <- unique(newdata[c(ID, time_var, event_var)])
+  
+#   Merging the true and predicted data frames
+  merged <- merge(dfpred, dftrue, by = ID)
+  
+#   Time dependent AUC with timeROC()
+  roc <- timeROC(
+    T = merged$time,
+    delta = merged$event,
+#     timeROC assumes higher values equal higher risk, but lower survival probabilities equal higher risk, thus the sign flip for the marker
+    marker = -merged$pred,
+    cause = cause,
+    times = horizon,
+    iid = TRUE
+  )
+  
+  return(list(
+    horizon = horizon,
+    roc = roc,
+    AUC = roc["AUC"]
+  ))
+}
+```
+
+```{r}
+AUC_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data, "RID", "time_years", "event", 0, times)
+```
+
+```{r}
+AUC_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data, "RID", "time_years", "event", 0, times)
+```
+
+```{r}
+#  model must be jlcmm for dynpred()
+# AUC_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data, "RID", "time_years", "event", 0, times)
+```
 
 ## Table of the results
 
