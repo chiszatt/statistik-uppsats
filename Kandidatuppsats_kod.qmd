@@ -33,11 +33,6 @@ format:
 editor: visual
 ---
 
-```{=latex}
-\tableofcontents
-
-\newpage
-```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, output = TRUE)

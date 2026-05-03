@@ -53,6 +53,12 @@ format:
 editor: visual
 ---
 
+```{=latex}
+\tableofcontents
+
+\newpage
+```
+
 # Introduction
 
 ## Background
@@ -101,11 +107,9 @@ Additionally, linear mixed-effects models are specifically designed to accommoda
 
 ## Research Aims
 
-*What are our research questions?*
-
 This study investigates the prediction of Alzheimer’s disease/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches. More precisely, the research questions are:
 
-1.  Which modeling approach provides the best prediction of progression to Alzheimer’s disease/dementia when using longitudinal biomarker data (Including baseline levels, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)?
+1.  Which modeling approach provides the best prediction of progression to dementia due to Alzheimer’s disease when using longitudinal blood biomarker data? (Including baseline levels, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
 3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
 
@@ -113,7 +117,7 @@ This study investigates the prediction of Alzheimer’s disease/dementia progres
 
 *How will we accomplish this? –\> Introduce the methods we will use.*
 
-To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to Alzheimer’s disease/dementia. Second, single-biomarker joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker and their association with the time-to-event outcome. Third, multivariate joint models will be used to jointly analyse multiple biomarkers, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying distinct subgroups. A univariate joint latent class model will be fit for NfL and ptau-181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and ptau-181 simultaneously. All models will be adjusted for relevant covariates.
+To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to dementia due to Alzheimer’s disease. Second, univariate joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker separately and their association with the survival outcome. Third, multivariate joint models will be used to jointly model both biomarker trajectories simultaneously, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying possible latent subgroups. A univariate joint latent class model will be fit for NfL and ptau-181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and ptau-181 simultaneously. All models will be adjusted for relevant covariates.
 
 To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. The significance level will be set at 0.05 for all analyses.
 
@@ -121,7 +125,7 @@ More specifically, model performance will be evaluated using time-dependent AUC 
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
-There exists a wide range of biomarkers for Alzheimer’s disease that could be investigated in this context. However, given that plasma-based biomarkers have only relatively recently gained attention in research, their inclusion was considered both timely and relevant. Accordingly, the two biomarkers included in the analyses are p-tau181 and neurofilament light chain (NfL). They were selected due to their established relevance in the prediction of dementia and Alzheimer’s disease progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. Even though other clinically relevant biomarkers are available, they were not included due to the limited availability of sufficiently large longitudinal datasets with repeated measurements. In this study, priority was given to data quality and longitudinal depth rather than the number of biomarkers considered. In addition, the selected biomarkers represent biologically distinct processes: p-tau181 is more specifically associated with Alzheimer’s disease pathology, while NfL reflects more general neuroaxonal damage and is not disease-specific. This contrast makes them particularly informative for comparative analyses of biomarker behaviour and predictive performance in dementia progression.
+There exists a wide range of biomarkers for Alzheimer’s disease that could be investigated in this context. However, given that plasma-based biomarkers have only relatively recently gained attention in research, their inclusion was considered both timely and relevant. Accordingly, the two biomarkers included in the analyses are p-tau181 and NfL. They were selected due to their established relevance in the prediction of dementia and Alzheimer’s disease progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. Even though other clinically relevant biomarkers are available, they were not included due to the limited availability of sufficiently large longitudinal datasets with repeated measurements. In this study, priority was given to data quality and longitudinal depth rather than the number of biomarkers considered. In addition, the selected biomarkers represent biologically distinct processes: p-tau181 is more specifically associated with Alzheimer’s disease pathology, while NfL reflects more general neuroaxonal damage and is not disease-specific. This contrast makes them particularly informative for comparative analyses of biomarker behaviour and predictive performance in dementia progression.
 
 Additional modelling approaches could have been considered given the aims of the study. For instance, the Cox Proportional Hazard model can be extended for modelling the relationship between time-dependent covariates and survival time. Caution implementing these must be taken, however, as the model cannot handle endogenous time-dependent covariates such as biomarkers, only those which are exogenous (Rizopoulos, 2012, p.51). **For example, if the event is defined as death, endogenous variables can inherently effect the survival outcome only be Endogenous variables inherently carry information about survival times........**
 
@@ -145,7 +149,7 @@ With respect to the temporal relationship between the event and censoring time, 
 
 Left truncation - However, when longitudinal data are collected at different time points, issues such as left truncation (also referred to as delayed entry) can arise. It occurs when individuals enter the study after the origin of the underlying time scale, meaning that only individuals who have survived or remained event-free up to the point of entry are included in the analysis (källa?).
 
-## Proportional Hazard Model
+## Cox Proportional Hazard Model
 
 To quantify the association between biomarkers and disease progression, relative hazard models are commonly used. These models compare the hazard of progression between individuals with different covariate profiles.
 
@@ -179,6 +183,10 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ...
 
+---
+
+**I think we can get rid of these subsections, and merge the information into other sections. It becomes a bit messy and incoherent with all the subtitles when the document is rendered**
+
 ## Joint models
 
 In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their evolution may be directly related to disease progression. Joint models provide a unified framework for simultaneously analyzing longitudinal biomarker data and time-to-event outcomes. The key idea is to link a longitudinal submodel describing biomarker trajectories with a survival submodel describing disease progression. An extension of the joint model allows for the modelling of latent classes within the population.
@@ -187,7 +195,19 @@ In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measu
 
 Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. Considering the data are made up of repeated measurements from the same individuals, the assumption of independence between observations is illogical. Clearly, the levels of p-tau181 and NfL for an individual are correlated with measurements made on prior and subsequent occasions and the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
 
-### Linear Mixed-Effects Models
+---
+
+## Joint Modellling of Longitudinal and Survival Data
+
+In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the estimate of the biomarker level at time $t$. The longitudinal process - modelled by a linear mixed-effects model - and the survival process - modelled by a proportional hazard model - are linked by an association structure. This structure can link the survival process to the current value of the biomarker estimate and also include the current rate of change of the biomarker trajectory. For instance, if the current rate of change is included as well as the current value in the proportional hazard model, this becomes:
+
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
+
+where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and the current rate of change, $m_i'(t)$, respectively to the hazard function. Further, $\boldsymbol{\gamma}^T$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector time-independent covariates for the $i^{th}$ individual.
+
+This univariate framework is applied to the longitudinal ptau-181 and NfL measurements separately to model their trajectories jointly with survival outcomes. Multivariate joint models extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to Alzheimer’s disease or dementia. Therefore, both p-tau181 and NfL are then considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. **Ignoring their correlation may lead to biased estimation. The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016, p.?).**
+
+### The Linear Mixed-Effects Submodel
 
 The longitudinal component of a joint model is typically specified using a linear mixed-effects model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories. Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
 
@@ -199,31 +219,23 @@ where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual 
 
 $$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
-// The linear mixed effects model can be generalised when the response variable does not follow an approximately normal distribution, where some link function, $g(x)$, links the expected value given the random effects to the linear predictor, which includes both fixed and random effects. Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/> //
+The linear mixed effects model can be generalised when the response variable does not follow an approximately normal distribution. In this case, some link function, $g(x)$, links the expected value given the random effects to the linear predictor, which takes into acount both the fixed and random effects (Rizopoulus, pp. 139 - 140). This approach is tested, as ptau-181 and NfL measurements are not normally distributed.
 
-Estimation:
+### The Survival Submodel
 
-The random effects are not typically estimated. It is instead assumed that $b_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and random effects are seen as deviations from the fixed effects, where $E(b) = 0$. For a model with a simple random effects structure, including only a random intercept, the variance-covariance for the random effects simplifies to $\sigma^2_{intercept}$. Extending the random effects structure to include a random gradient results in the following variance-covariance structure:
+Assuming a Cox PH survival submodel:
 
-$$ G = \begin{bmatrix} \sigma^2_{intercept} & \sigma_{intercept, slope} \\ \sigma_{intercept, slope} & \sigma^2_{slope} \end{bmatrix} $$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}$$
 
-Like all variance-covariance matrices, some elements are repeated and therefore redundant. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, results in estimating fewer $\left( \frac{p(p + 1)}{2} \right)$ elements. Assuming independence of the random effects, the variance-covariance matrix for the random effects becomes diagonal:
+$\mathbf{v_i}:$ vector of time-independent co-variates
 
-$$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bmatrix} $$
+$\phi:$ vector of log-hazard ratios
 
-We can model random intercept and keep all other effects fixed. In that case, for $i$ biomarker measurements on $j$ individuals, the random effects design matrix - $\mathbf{Z}$ - is a $i \cdot j$ matrix containing 1's and 0's, where $z_{i,j} = 1$ if the $i^{th}$ biomarker measurements were taken from the $j^{th}$ individuals, and $z_{i,j} = 0$ if the $i^{th}$ biomarker measurements were not taken from the $j^{th}$ individual.
+$\alpha:$ the association parameter
 
-Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
+$M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker profile** up to time $t$
 
-### Simple Joint Model of Longitudinal and Survival Data
-
-In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$. The longitudinal process and the survival process are associated by an association structure, which can link the survival process to the current value of the biomarker estimate, or also include the current rate of change of the biomarker trajectory. For instance, if the current rate of change is included as well as the current value in the proportional hazard model, this becomes:
-
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
-
-where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and the current rate of change, $m_i'(t)$, respectively to the hazard function, and $\boldsymbol{\gamma}^T\mathbf{w}_i$ is the vector of covariates and coefficients for the $i^{th}$ individual.
-
-### Assumptions!!
+### Assumptions of the Joint Model
 
 - Full conditional independence
 
@@ -235,7 +247,7 @@ where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)
 
 - $\mathbf{b_i}$ drives the **true (unobserved)** biomarker trajectory and hazard of AD diagnosis: the observed $y_i(t)$ is the observed biomarker state, $m_i(t)$, plus noise. Where $m_i(t)$ is itself determined by $\mathbf{b_i}$, \*\*since the others are fixed ????? \*\*, once we know $\mathbf{b_i}$, the observed biomarker measurement and the survival times are no longer dependent. The observed $y_i$'s are useful in determining $\mathbf{b_i}$ which is the useful information in estimating survival times.
 
-**Frequentist vs bayesian approach**
+**Estimation: Frequentist vs Bayesian Approach**
 
 The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62).
 
@@ -251,7 +263,7 @@ The association parameters linking the longitudinal and survival processes are a
 
 This prior structure mainly acts as regularisation while allowing the data to drive inference. In multivariate settings, additional association parameters can be introduced, and shrinkage priors like global-local or ridge-type priors can be used to handle higher dimensional parameter structures (Rizopoulos, 2018).
 
-#### The Gelman-Rubin Statistic
+### The Gelman-Rubin Statistic
 
 Convergence within the framework of bayesian joint modeling can be evaluated by running multiple chains from different starting values (Peng, 2022, chapter 7.4.2). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng, chapter 7.4.2).
 
@@ -283,15 +295,7 @@ $$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
 As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, chapter 7.4.2).
 
-### Multivariate Joint Model
-
-In this study, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Multivariate joint models extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to Alzheimer’s disease or dementia.
-
-....
-
-Ignoring their correlation may lead to biased estimation. The bayesian approach allows for multivariate joint modelling (Andrinopoulou & Rizopoulos, 2016, p.?).
-
-### Joint Latent Class Model
+## Joint Latent Class Mixed Model
 
 While standard joint models assume a homogeneous population, Alzheimer’s disease is highly heterogeneous, with patients exhibiting different patterns of cognitive decline and biomarker evolution. Joint latent class models address this by assuming that the population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks.
 
@@ -317,11 +321,13 @@ In **JLCM**, the marker and the time to event are considered to be conditionally
 
 2.  The relationship between biomarker trajectory and the time-to-diagnosis is captured completely by the latent class indicator, $c_i$.
 
-#### Score Test for Conditional Independence
+### Determining the Latent Classes
+
+**Score Test for Conditional Independence**
 
 One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process (Proust-Lima et al., p. 9).
 
-#### Bayesian Information Criterion
+**Bayesian Information Criterion**
 
 **Why are we introducing this?**
 
@@ -331,7 +337,7 @@ According to Proust-Lima et al. (p. 7), one aspect of detemining the optimal num
 
 **How will we use it?**
 
-#### Entropy
+**Class Discrimiation**
 
 **Why are we introducing this?**
 
@@ -341,7 +347,7 @@ Ensuring good discrimination between classes is an important component of select
 
 **How will we use it?**
 
-##### Shannon Entropy
+Shannon Entropy
 
 - Uncertainty of the variable itself
 
@@ -364,7 +370,7 @@ $$I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))$$
 
 - <https://www.youtube.com/watch?v=-4y4X8ELcEM>
 
-##### Assignment based entropy
+Assignment based entropy
 
 - Uncertainty of the class assignment!
 
@@ -374,7 +380,7 @@ $$p_i(c_g) = P(C = c_g | \mathbf{X}_ii)$$
 
 ...
 
-#### Integrated Classification Likelihood Criterion
+**Integrated Classification Likelihood Criterion**
 
 Both fit and discrimination
 
@@ -382,7 +388,9 @@ Both fit and discrimination
 
 The chosen classes should be clinically meaningful.
 
-### Time-depending AUC and Brier score
+# Model Comparison
+
+## Time-dependent AUC
 
 Information criteria such as AIC and BIC are often used to evaluate the overall predictive performance of joint models that combine both longitudinal and survival components. In many applications, however, the main interest is the survival outcome itself, and in particular how well a longitudinal biomarker can be used to predict it (Rizopoulos, p. 194).
 
@@ -412,9 +420,11 @@ The time-dependent area under the curve (AUC) is then defined as:
 
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
-Brier score
+## Brier score
 
-# Data
+...
+
+# Description of Data
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
