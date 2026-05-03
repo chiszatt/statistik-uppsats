@@ -325,6 +325,10 @@ In **JLCM**, the marker and the time to event are considered to be conditionally
 
 One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process even against two misspecified alternative hypotheses (Jacqmin-Gadda, 2010, p. 17).
 
+The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and the time-to-event is captured solely by group membership. For a model with a current value association structure, under the null hypothesis the association parameter, $\alpha_1$, is assumed to be zero (Jacqmin-Gadda, p. 13):
+
+$$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
+
 **Bayesian Information Criterion**
 
 **Why are we introducing this?**
