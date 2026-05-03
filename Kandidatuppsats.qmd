@@ -157,7 +157,7 @@ To quantify the association between biomarkers and disease progression, relative
 
 - OR leave undefined -\> Cox PH model
 
-Assuming a Cox PH survival sub-model:
+Assuming a Cox PH survival submodel:
 
 $$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha m_i(t) \right\}$$
 
@@ -187,29 +187,27 @@ In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measu
 
 Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. Considering the data are made up of repeated measurements from the same individuals, the assumption of independence between observations is illogical. Clearly, the levels of p-tau181 and NfL for an individual are correlated with measurements made on prior and subsequent occasions and the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
 
-### Linear Mixed Effects Models
+### Linear Mixed-Effects Models
 
-The longitudinal component of a joint model is typically specified using a linear mixed effects model, which captures both population-level trends and individual variability in biomarker trajectories. Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
+The longitudinal component of a joint model is typically specified using a linear mixed-effects model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories. Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
-$$ m_i(t) = \mathbf{X_i^T}\beta + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
+$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
 
-where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that we do not observe the true biomarker value due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\beta$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$. Combining the true trajectory function with the error term gives:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that we do not observe the true biomarker value due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). Combining the true biomarker trajectory function with the error term gives:
 
 $$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
-The linear mixed effects model can be generalised when the response variable does not follow an approximately normal distribution, where some link function, $g(x)$, links the expected value given the random effects to the linear predictor, which includes both fixed and random effects. Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
+// The linear mixed effects model can be generalised when the response variable does not follow an approximately normal distribution, where some link function, $g(x)$, links the expected value given the random effects to the linear predictor, which includes both fixed and random effects. Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/> //
 
 Estimation:
 
-We do not tend to estimate $\mathbf{u}$, but instead assume that $u_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and the random effects are seen as deviations from the fixed effects and have $E(u) = 0$.
-
-For a model with only a random intercept, $\mathbf{G}$ becomes $G = \sigma^2_{intercept}$. If we extend the model to have random slope, we get:
+The random effects are not typically estimated. It is instead assumed that $b_i \sim N(0, \mathbf{G})$, where $\mathbf{G}$ is the variance-covariance matrix of the random effects. The fixed effects are estimated, and random effects are seen as deviations from the fixed effects, where $E(b) = 0$. For a model with a simple random effects structure, including only a random intercept, the variance-covariance for the random effects simplifies to $\sigma^2_{intercept}$. Extending the random effects structure to include a random gradient results in the following variance-covariance structure:
 
 $$ G = \begin{bmatrix} \sigma^2_{intercept} & \sigma_{intercept, slope} \\ \sigma_{intercept, slope} & \sigma^2_{slope} \end{bmatrix} $$
 
-Like all variance-covariance matrices, some elements are redundant since they are repeated. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, means estimating $\frac{p(p + 1)}{2}$ elements instead. Assuming (**?????**) the random effects are independent, the variance-covariance matrix for the random effects becomes diagonal:
+Like all variance-covariance matrices, some elements are repeated and therefore redundant. Estimating instead some function of $\mathbf{G}$, where $\mathbf{G} = \sigma(\theta)$, results in estimating fewer $\left( \frac{p(p + 1)}{2} \right)$ elements. Assuming independence of the random effects, the variance-covariance matrix for the random effects becomes diagonal:
 
 $$ G = \begin{bmatrix} \sigma^2_{intercept} & 0 \\ 0 & \sigma^2_{slope} \end{bmatrix} $$
 
@@ -217,31 +215,13 @@ We can model random intercept and keep all other effects fixed. In that case, fo
 
 Ref: <https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-generalized-linear-mixed-models/>
 
-### Simple Joint Model
+### Simple Joint Model of Longitudinal and Survival Data
 
-**Theory about the model... (specifically why we should use it)**
+In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$. The longitudinal process and the survival process are associated by an association structure, which can link the survival process to the current value of the biomarker estimate, or also include the current rate of change of the biomarker trajectory. For instance, if the current rate of change is included as well as the current value in the proportional hazard model, this becomes:
 
-In the joint model, the hazard function at time $t$ is directly dependent on the estimate of the biomarker at time $t$.
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
 
-The association structure of the joint model:
-
-- How is the longitudinal model linked to the survival model? 
-
-- Does this association structure change for different biomarkers?
-
-- What happens to time-to-diagnosis predictions if we assume the standard structure when another underlying association is a better fit?
-
-If we include the current rate of change alongside the current value in the proportional-hazard model:
-
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\phi^T\mathbf{v_i} + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad where \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
-
-$\alpha_1 :$ links the current value of the biomarker - $m_i(t)$
-
-$\alpha_2 :$ links the current gradient/rate of change - $m_i'(t)$
-
-Joint-model options:
-
-- Longitudinal sub-model: model of class lme()
+where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and the current rate of change, $m_i'(t)$, respectively to the hazard function, and $\boldsymbol{\gamma}^T\mathbf{w}_i$ is the vector of covariates and coefficients for the $i^{th}$ individual.
 
 ### Assumptions!!
 
@@ -313,54 +293,55 @@ Ignoring their correlation may lead to biased estimation. The bayesian approach 
 
 ### Joint Latent Class Model
 
-While standard joint models assume a homogeneous population, Alzheimer’s disease is highly heterogeneous, with patients exhibiting different patterns of cognitive decline and biomarker evolution. Latent class joint models address this by assuming that the population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks.
+While standard joint models assume a homogeneous population, Alzheimer’s disease is highly heterogeneous, with patients exhibiting different patterns of cognitive decline and biomarker evolution. Joint latent class models address this by assuming that the population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks.
 
-The joint latent class model (JLCM) offers a different method for linking a longitudinal biomarker process and a survival process which assumes that the population, $N$, is heterogenous and made up of $G$ homogenous and unobserved latent classes (Kyheng, 2025, p.2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+This model links a longitudinal biomarker process and a survival process whilst assuming that the population, N, is heterogenous and made up of G homogenous and unobserved latent classes (Kyheng, 2025, p.2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122). The multivariate joint latent class model extends the joint latent class modeling framework by allowing multiple longitudinal biomarkers to be modeled simultaneously within each latent class, while linking their joint evolution to a class-specific risk. In this analysis, the univariate joint latent class model will be fit on the longitudinal ptau-181 and NfL measurements separately, and then by compared to the multivariate model for both biomarkers, in order to assess which method more accurately models the class-specific hazard of progression to dementia due to Alzheimer’s disease, and whether, in fact, any latent classes can be distinguished at all.
 
-The JLCM consists of three submodels; a multinomial logistic submodel, a linear mixed effects submodel and a proportional hazards submodel. The multinomial logistic regression models the latent classes, such that:
+The **JLCM (shorthand or not? question for Milou)** consists of three submodels; a multinomial logistic submodel, a linear mixed effects submodel and a proportional hazard submodel. Multinomial logistic regression models classes, such that:
 
-$$Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}
-\qquad where \qquad \overset{\mathbf{X}_i \text{ is the set of covariates for individual }i}{\boldsymbol{\beta}_l \text{ is the set of coefficients for latent group } g}$$
+$$Pr(c_i = g) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$
 
-If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2). This then simplifies the model to;
+where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual and $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ group. If there are no prior assumptions about the latent classes, then there will be no covariates in the multinomial logistic regression model (Kyheng, p.2), which further highlights the assumption that the classes are not described by observed covariates, as per Proust-Lima et al. The class submodel then simplifies to:
 
 $$Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$
 
-**TO DO:** link class model to surv model and long model here...
+Linking the class submodel to the linear mixed effects submodel and the survival submodel, assuming only a random intercept, results in the following:
 
-The log-likelihood for the JLCM is much more tractable than for the regular joint model (Rizopoulos, p. 123). Log-likelihood estimation for JLCM involves summing over the latent classes, which is computationally advantageous compared to SREM (**REFERENCE SHARED RANDOM EFFECTS MODELS IN THE JOINT MODEL SECTION**) which require mathematical approximation (**LAPLACE/MCMC)** due to integration over the random effects (Proust-Lima et al., p. 5). For JLCM, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., p. 5).
+$$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$
 
-In JLCM, the marker and the time to event are considered to be conditionally independent given the latent classes and the random effects in the longitudinal model account for the correlation between repeated measures (Proust-Lima et al., 2018), whereas in SREM models the marker and time to event are assumed to be conditionally independent given the random effects (). The conditional independence assumptions for the JLCM are then that;
+The log-likelihood for the **JLCM** is much more tractable than for the regular joint model (Rizopoulos, p. 123), making estimation less computationally demaning. Log-likelihood estimation for **JLCM** involves summing over the latent classes, which is computationally advantageous compared to SREM (**REFERENCE SHARED RANDOM EFFECTS MODELS IN THE JOINT MODEL SECTION**) which require mathematical approximation (**LAPLACE/MCMC)** due to integration over the random effects (Proust-Lima et al., p. 5). For **JLCM**, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., p. 5).
+
+In **JLCM**, the marker and the time to event are considered to be conditionally independent given the latent classes and the random effects in the longitudinal model account for the correlation between repeated measures (Proust-Lima et al., 2018), whereas in **SREM** models the marker and time to event are assumed to be conditionally independent given the random effects (**SOURCE**). The conditional independence assumptions for the **JLCM** are then that;
 
 1.  Correlations between observations of the longitudinal biomarker are modelled by the random effects, $b_i$, in the longitudinal model.
 
 2.  The relationship between biomarker trajectory and the time-to-diagnosis is captured completely by the latent class indicator, $c_i$.
 
-There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process (Proust-Lima et al., p. 9).
+#### Score Test for Conditional Independence
 
-According to Proust-Lima et al. (p. 7), the number of latent classes should be determined by minimising the BIC, ensuring good discrimination between classes, predictive accuracy, fulfilling the conditional independence assumption and, importantly, the classes should be meaningful. Class discrimination can be assessed by reporting the proportion of individuals who have a posterior latent class membership probability over a certain threshold (Proust-Lima et al., p. 7).
+One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process (Proust-Lima et al., p. 9).
 
-NOTES:
+#### Bayesian Information Criterion
 
-- $c_i$ is the class that individual $i, i = (1, ... , N)$ belongs to, where the multinomial logistic submodel models the probabilities for each individual of belonging to latent class $g$, given the predefined variables $X_{1,i}$. HOWEVER: no prior assumptions about the latent classes, no covariates included in the model
+**Why are we introducing this?**
 
-$$\pi_{i, g} = P(c_i = g | X_{1,i})$$
+According to Proust-Lima et al. (p. 7), one aspect of detemining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC).
 
-- The linear submodel now becomes unique to each latent class
+**What is it?**
 
-- The survival submodel is defined for all latent classes
+**How will we use it?**
 
-- Assumption: conditional independence, correlation between biomarker trajectories and event occurrence are fully described by the latent class (Jacqmin-Gadda: score test for residual dependence between longitudinal data and event risk )
+#### Entropy
 
-- Latent class joint models offer a way to model the expected longitudinal biomarker measurements alongside time-to-diagnosis given that the population is made up of latent, unobserved classes that are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+**Why are we introducing this?**
 
-### Multivariate Joint Latent Class Model
+Ensuring good discrimination between classes is an important component of selecting the number of classes in the final model. Class discrimination can be assessed by reporting the proportion of individuals who have a posterior latent class membership probability over a certain threshold, typically 0.7, 0.8 or 0.9 (Proust-Lima et al., p. 7). One possible measure of the discriminative power of a latent class structure is entropy.
 
-Multivariate latent class joint models extend the latent class joint modeling framework by allowing multiple longitudinal biomarkers to be modeled simultaneously within each latent class, while linking their joint evolution to a class-specific risk of progression to Alzheimer’s disease or dementia.
+**What is it?**
 
-### Information criterion, entropy
+**How will we use it?**
 
-#### Shannon Entropy
+##### Shannon Entropy
 
 - Uncertainty of the variable itself
 
@@ -383,7 +364,7 @@ $$I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))$$
 
 - <https://www.youtube.com/watch?v=-4y4X8ELcEM>
 
-#### Assignment based entropy
+##### Assignment based entropy
 
 - Uncertainty of the class assignment!
 
@@ -392,6 +373,14 @@ $$I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))$$
 $$p_i(c_g) = P(C = c_g | \mathbf{X}_ii)$$
 
 ...
+
+#### Integrated Classification Likelihood Criterion
+
+Both fit and discrimination
+
+**Validation**
+
+The chosen classes should be clinically meaningful.
 
 ### Time-depending AUC and Brier score
 
@@ -531,9 +520,9 @@ APOE ε4 status is included as a fixed covariate in all statistical models. In t
 
 - *Selecting relevant variables from diagnosis and biomarker/amyloid data set*
 
-- *What variables do we need for longitudinal sub-model? (Repeated measurement, time followed?)*
+- *What variables do we need for longitudinal submodel? (Repeated measurement, time followed?)*
 
-- *What variables do we need for survival sub-model? (Event, time followed?)*
+- *What variables do we need for survival submodel? (Event, time followed?)*
 
 - *Joint model: time-var: a character string indicating the time variable in the mixed-effects model*
 
@@ -719,6 +708,8 @@ Scollard, P., Mukherjee, S., Choi, S. E., Lee, M. L., Klinedinst, B., Gibbons, L
 Sweeting, M. J., Barrett, J. K., Thompson, S. G., & Wood, A. M. (2017). The use of repeated blood pressure measures for cardiovascular risk prediction: a comparison of statistical models in the ARIC study. *Statistics in medicine*, 36(28), 4514-4528. <https://doi.org/10.1002/sim.7144>
 
 Therneau, T.M. & Grambsch, P.M (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. <https://doi.org/10.1007/978-1-4757-3294-8>
+
+Verbeke, G., & Geert Molenberghs. (2000). *Linear Mixed Models for Longitudinal Data*. Springer Science & Business Media.
 
 Wang, C., Shen, J., Charalambous, C., & Pan, J. (2024). Modeling biomarker variability in joint analysis of longitudinal and time-to-event data. *Biostatistics* (Oxford, England), 25(2), 577-596. <https://doi.org/10.1093/biostatistics/kxad009>
 

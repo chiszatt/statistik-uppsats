@@ -3473,8 +3473,8 @@ ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
 # We specify Cox models for comparison
 cox_models <- list(
    "Cox p-tau" = surv_model_ptau_bl,
-   "Cox NfL"   = surv_model_nfl_bl,
-   "Cox both"  = surv_model_both_bl
+   "Cox NfL" = surv_model_nfl_bl,
+   "Cox both" = surv_model_both_bl
  )
  
 # We compute Brier score using pec for Cox models
@@ -3558,10 +3558,10 @@ round(results_table_Brier, 3)
 all_table <- data.frame(
   Time = times,
   Cox_p_tau = cox_brier$`Cox p-tau`,
-  Cox_NfL   = cox_brier$`Cox NfL`,
-  Cox_both  = cox_brier$`Cox both`,
-  JM_p_tau  = brier_ptau_jm,
-  JM_NfL    = brier_nfl_jm
+  Cox_NfL = cox_brier$`Cox NfL`,
+  Cox_both = cox_brier$`Cox both`,
+  JM_p_tau = brier_ptau_jm,
+  JM_NfL = brier_nfl_jm
 )
 
 plot_data <- all_table %>%
