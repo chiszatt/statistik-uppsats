@@ -185,21 +185,21 @@ $M_i = \left\{m_i, \quad 0 \le s \le t\right\}:$ the **true unobserved biomarker
 
 ---
 
-**I think we can get rid of these subsections, and merge the information into other sections. It becomes a bit messy and incoherent with all the subtitles when the document is rendered**
+**I think we should get rid of these subsections: I have now merged some of the most relevant information with other sections, so we can remove this if we are both happy to do so.**
 
 ## Joint models
 
 In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their evolution may be directly related to disease progression. Joint models provide a unified framework for simultaneously analyzing longitudinal biomarker data and time-to-event outcomes. The key idea is to link a longitudinal submodel describing biomarker trajectories with a survival submodel describing disease progression. An extension of the joint model allows for the modelling of latent classes within the population.
 
-### Longitudinal Data
-
-Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. Considering the data are made up of repeated measurements from the same individuals, the assumption of independence between observations is illogical. Clearly, the levels of p-tau181 and NfL for an individual are correlated with measurements made on prior and subsequent occasions and the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
+\*\* Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. \*\*
 
 ---
 
 ## Joint Modellling of Longitudinal and Survival Data
 
-In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the estimate of the biomarker level at time $t$. The longitudinal process - modelled by a linear mixed-effects model - and the survival process - modelled by a proportional hazard model - are linked by an association structure. This structure can link the survival process to the current value of the biomarker estimate and also include the current rate of change of the biomarker trajectory. For instance, if the current rate of change is included as well as the current value in the proportional hazard model, this becomes:
+In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the estimate of the biomarker level at time $t$. In Alzheimer’s disease research specifically, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their relationship between their trajectories and disease progression is analysed.
+
+The longitudinal process - modelled by a linear mixed-effects model - and the survival process - modelled by a proportional hazard model - are linked by an association structure. This structure can link the survival process to the current value of the biomarker estimate and also include the current rate of change of the biomarker trajectory. For instance, if the current rate of change is included as well as the current value in the proportional hazard model, this becomes:
 
 $$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
 
@@ -209,13 +209,17 @@ This univariate framework is applied to the longitudinal ptau-181 and NfL measur
 
 ### The Linear Mixed-Effects Submodel
 
-The longitudinal component of a joint model is typically specified using a linear mixed-effects model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories. Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
+The longitudinal component of the joint model is specified by linear mixed-effects model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories.
+
+Longitudinal data consists of repeated measurements from the same individuals, wherby the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, t, are correlated with the measurements made on prior and subsequent occasions. Therefore, the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
+
+Following the notation of Rizopoulos (p. 54), the biomarker process for ptau-181 and NfL can be considered such that:
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
 $$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
 
-where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that we do not observe the true biomarker value due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). Combining the true biomarker trajectory function with the error term gives:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that we do not observe the true biomarker value due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the non-independence of the repeated measurements. Combining the true biomarker trajectory function with the error term gives:
 
 $$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2) $$
 
