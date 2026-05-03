@@ -171,7 +171,7 @@ where $\mathbf{x}^T$ is a vector of covariates and $\boldsymbol{\beta}$ is a vec
 
 - What do we assume about the censoring process?
 
-- Proportionality
+A key assumption of this model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, as it allows the baseline hazard function to be dropped from the partial likelihood (Moore, pg. 94).
 
 ...
 
@@ -203,7 +203,7 @@ This univariate framework is applied to the longitudinal p-tau181 and NfL measur
 
 The longitudinal component of the joint model is specified by the linear mixed-effects model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories.
 
-Longitudinal data consists of repeated measurements from the same individuals, wherby the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, t, are correlated with the measurements made on prior and subsequent occasions. Therefore, the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
+Longitudinal data consists of repeated measurements from the same individuals, wherby the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, $t$, are correlated with the measurements made on prior and subsequent occasions. Therefore, the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, where the data can be considered grouped and where there is non-independence between observations, is handled well by linear mixed effects models.
 
 Following the notation of Rizopoulos (p. 54), the biomarker process for p-tau181 and NfL can be considered such that:
 
@@ -323,7 +323,7 @@ In **JLCM**, the marker and the time to event are considered to be conditionally
 
 **Score Test for Conditional Independence**
 
-One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process (Proust-Lima et al., p. 9).
+One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process even against two misspecified alternative hypotheses (Jacqmin-Gadda, 2010, p. 17).
 
 **Bayesian Information Criterion**
 
@@ -688,6 +688,8 @@ Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z
 Hamra, G., MacLehose, R., & Richardson, D. (2013). Markov chain Monte Carlo: an introduction for epidemiologists. *International journal of epidemiology*, 42(2), 627-634. <https://doi.org/10.1093/ije/dyt043>
 
 Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, *20*(8). https://doi.org/10.1002/alz.13859
+
+Jacqmin-Gadda, H., Proust-Lima, C., Taylor, J. M. G., & Commenges, D. (2010). Score Test for Conditional Independence Between Longitudinal Outcome and Time to Event Given the Classes in the Joint Latent Class Model. *Biometrics*, *66*(1), 11–19. http://www.jstor.org/stable/40663147
 
 Kamarudin, A. N., Cox, T., & Kolamunnage-Dona, R. (2017). Time-dependent ROC curve analysis in medical research: Current methods and applications. BMC Medical Research Methodology, 17, 53. <https://doi.org/10.1186/s12874-017-0332-6>
 
