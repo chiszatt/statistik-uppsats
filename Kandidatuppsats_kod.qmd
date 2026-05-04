@@ -3352,23 +3352,11 @@ plot_data <- data.frame(
   )
 ) 
 
-# Plot of all models
-ggplot(plot_data, aes(x = Time, y = AUC, color = Model)) +
-  geom_line(linewidth = 0.5) +
-  geom_point(aes(shape = Model), size = 2) +
-  scale_shape_manual(values = c(0,1,2,3,4,5,6,7,8)) +
-  ylim(0.5, 1) +
-  labs(
-    title = "Time-dependent AUC comparison",
-    x = "Time (years)",
-    y = "AUC"
-  )
-
 # Plot of Cox models
 ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
   geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
-  ylim(0.5, 1) +
+  ylim(0, 1) +
   labs(
     title = "Time-dependent AUC comparison",
     x = "Time (years)",
@@ -3379,7 +3367,7 @@ ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
 ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
   geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
-  ylim(0.5, 1) +
+  ylim(0, 1) +
   labs(
     title = "Time-dependent AUC comparison",
     x = "Time (years)",
