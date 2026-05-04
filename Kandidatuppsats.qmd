@@ -319,68 +319,39 @@ In **JLCM**, the marker and the time to event are considered to be conditionally
 
 2.  The relationship between biomarker trajectory and the time-to-diagnosis is captured completely by the latent class indicator, $c_i$.
 
-### Determining the Latent Classes
+There are various methods for assessing the conditional independence assumption, but simulations have demonstrated the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival processes, even against two misspecified alternative hypotheses (Jacqmin-Gadda, 2010, p. 17).
 
-**Score Test for Conditional Independence**
-
-One factor in model assessment for JLCMs is analysis of the score test for conditional independence. There are various methods for assessing the conditional independence assumption, but simulations have shown the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival process even against two misspecified alternative hypotheses (Jacqmin-Gadda, 2010, p. 17).
-
-The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and the time-to-event is captured solely by group membership. For a model with a current value association structure, under the null hypothesis the association parameter, $\alpha_1$, is assumed to be zero (Jacqmin-Gadda, p. 13):
+The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and time-to-event is captured entirely by group membership. Given the class membership is known, there is assumed to be no remaining dependence between the biomarker response and the event-time response. Assuming a model with a current value association structure, the association parameter, $\alpha_1$, is assumed to be zero under the null hypothesis (Jacqmin-Gadda, p. 13):
 
 $$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
 
+...
+
+### **Class Enumeration**
+
+Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux, p. 196, 1996). Therefore, other metrics must be utilised for this purpose.
+
 **Bayesian Information Criterion**
 
-**Why are we introducing this?**
+According to Proust-Lima et al. (p. 7), one aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**). RESULTS FROM SIMULATION STUDY (MORGAN ET AL.)
 
-According to Proust-Lima et al. (p. 7), one aspect of detemining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC).
+**Posterior Probabilities**
 
-**What is it?**
+Ensuring good discrimination between classes is an important component of selecting the number of classes in the final model. Class discrimination can be assessed by reporting the proportion of individuals who have a posterior latent class membership probability over a certain threshold (Proust-Lima et al., p. 7), typically 0.7, 0.8 or 0.9.
 
-**How will we use it?**
+**Entropy**
 
-**Class Discrimiation**
+One possible measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, pg. 150), which takes values between 0 and 1 and is calculated as follows:
 
-**Why are we introducing this?**
+$$EN(G) = 1 - 
+\frac{
+\sum_{i = 1}^{N}\sum_{g = 1}^{G} \widehat\pi_{i,g}log(\widehat\pi_{i,g})
+}
+{
+Nlog(G)
+}$$
 
-Ensuring good discrimination between classes is an important component of selecting the number of classes in the final model. Class discrimination can be assessed by reporting the proportion of individuals who have a posterior latent class membership probability over a certain threshold, typically 0.7, 0.8 or 0.9 (Proust-Lima et al., p. 7). One possible measure of the discriminative power of a latent class structure is entropy.
-
-**What is it?**
-
-**How will we use it?**
-
-Shannon Entropy
-
-- Uncertainty of the variable itself
-
-- Entropy is a quantification of the (average) level of uncertainty associated with a random variable's potential outcomes (similary to entropy in thermodynamics) <https://en.wikipedia.org/wiki/Entropy_(information_theory)>
-
-- The expected amount of information needed to describe the state of the random variable, given the distribution of probabilities across all possible outcomes
-
-- "Information content" of an outcome is related to how probable it is. If a highly likely outcome occurs, the information content is small. The information/surprisal, $I(E)$ of an event approaches $0$ as $p(E)$ approaches $1$:
-
-$$I(E) = log \left( \frac{1}{p(E)} \right) = -log(p(E))$$
-
-- Entropy $H$ calculates the average expected amount of information across all possible outcomes of an random variable, $X$, such that:
-
-  $$ 
-  H(X) = - \sum_{x \in X} p(x)log(p(x))$$
-
-- why 1 - p(x)log(p(x))
-
-- <https://www.youtube.com/watch?v=LBOVhy3ITA4>
-
-- <https://www.youtube.com/watch?v=-4y4X8ELcEM>
-
-Assignment based entropy
-
-- Uncertainty of the class assignment!
-
-- Posterior probabilities:
-
-$$p_i(c_g) = P(C = c_g | \mathbf{X}_ii)$$
-
-...
+where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$.
 
 **Integrated Classification Likelihood Criterion**
 
@@ -678,6 +649,8 @@ Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints
 Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
+
+Celeux, G., Soromenho, G. An entropy criterion for assessing the number of clusters in a mixture model. *Journal of Classification*: 13, 195–212 (1996). https://doi.org/10.1007/BF01246098
 
 Chen, S. D., Huang, Y. Y., Shen, X. N., Guo, Y., Tan, L., Dong, Q., Yu, J. T., & Alzheimer’s Disease Neuroimaging Initiative (2021). Longitudinal plasma phosphorylated tau 181 tracks disease progression in Alzheimer's disease. *Translational psychiatry*, 11(1), 356. <https://doi.org/10.1038/s41398-021-01476-7>
 
