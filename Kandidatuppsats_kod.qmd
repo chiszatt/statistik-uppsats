@@ -1338,59 +1338,6 @@ densplot(joint_model_nfl, parm = "alphas")
 densplot(joint_model_nfl, parm = "sigmas")
 ```
 
-### Sensitivity analysis: frequentist joint models
-
-As a sensitivity analysis, joint models using a maximum likelihood approach are also fitted. Given the known sensitivity of this estimation method to model specification and scaling, biomarker values are standardised, all covariates are excluded, and only random intercepts are included in the longitudinal submodels.
-
-```{r}
-simple_surv_model <- coxph(
-  Surv(time_to_event, event) ~ 1,
-  data = surv_data,
-  x = TRUE
-)
-```
-
-```{r}
-long_data$log_PLASMAPTAU181_s <- scale(long_data$log_PLASMAPTAU181)
-long_data$log_PLASMA_NFL_s <- scale(long_data$log_PLASMA_NFL)
-
-simple_long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181_s ~ time_years,
-  random = ~ 1 | RID,                    
-  data = long_data
-)
-
-simple_long_model_nfl <- lme(
-  fixed = log_PLASMA_NFL_s ~ time_years, 
-  random = ~ 1 | RID,
-  data = long_data
-)
-```
-
-```{r}
-# Joint model for p-tau181 using package JM (frequentist approach)
-joint_model_ptau_freq <- jointModel(
-  simple_long_model_ptau,
-  simple_surv_model,
-  timeVar = "time_years"
-)
-
-summary(joint_model_ptau_freq)
-```
-
-```{r}
-# Joint model for NfL using package JM (frequentist approach)
-joint_model_nfl_freq <- jointModel(
-  simple_long_model_nfl,
-  simple_surv_model,
-  timeVar = "time_years"
-)
-
-summary(joint_model_nfl_freq)
-```
-
-Neither of the joint models fitted using maximum likelihood converged successfully, even after scaling the biomarkers, removing all covariates, and simplifying the longitudinal submodels to include only random intercepts.
-
 # Multivariate joint model
 
 ## To check if the models have stable random slopes
