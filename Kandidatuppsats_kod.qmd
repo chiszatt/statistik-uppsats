@@ -2507,8 +2507,6 @@ plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
 
 # MJLCMM: NFL & PTAU
 
-## 1: Random intercept and slope
-
 TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
 
 ```{r}
@@ -2563,8 +2561,26 @@ mlcmm_m3 <- multlcmm(
 ## M0 (1 latent class)
 
 ```{r}
-mult_jlcmm_m0 <- mpjlcmm(
-  longitudinal = list(mlcmm_m0),
+# fitting multivariate latent class model with 1 class and random intercept
+mlcmm_m0_1 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  subject = "RID",
+  data = jlcmm_data
+)
+
+# fitting multivariate latent class model with 1 class and random intercept and random slope
+mlcmm_m0_2 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  subject = "RID",
+  data = jlcmm_data
+)
+```
+
+```{r}
+mult_jlcmm_m0_1 <- mpjlcmm(
+  longitudinal = list(mlcmm_m0_1),
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   ng = 1,
@@ -2573,92 +2589,33 @@ mult_jlcmm_m0 <- mpjlcmm(
 ```
 
 ```{r}
-summary(mult_jlcmm_m0)
+summary(mult_jlcmm_m0_1)
+```
+
+```{r}
+mult_jlcmm_m0_2 <- mpjlcmm(
+  longitudinal = list(mlcmm_m0_2),
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  ng = 1,
+  data = jlcmm_data
+)
+```
+
+```{r}
+summary(mult_jlcmm_m0_2)
+```
+
+### Determining the random effects
+
+```{r}
+summarytable(mult_jlcmm_m0_1, mult_jlcmm_m0_2)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
-mult_jlcmm_m1 <- mpjlcmm(
-  longitudinal = list(mlcmm_m1),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 2,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m1)
-```
-
-```{r}
-postprob(mult_jlcmm_m1)
-```
-
-## M2 (3 latent classes)
-
-```{r}
-mult_jlcmm_m2 <- mpjlcmm(
-  longitudinal = list(mlcmm_m2),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m2)
-```
-
-```{r}
-postprob(mult_jlcmm_m2)
-```
-
-## M3 (4 latent classes)
-
-```{r}
-mult_jlcmm_m3 <- mpjlcmm(
-  longitudinal = list(mlcmm_m3),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 4,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m3)
-```
-
-```{r}
-postprob(mult_jlcmm_m3)
-```
-
-## Comparing M0, M1, M2, M3
-
-```{r}
-summarytable(mult_jlcmm_m0, mult_jlcmm_m1, mult_jlcmm_m2, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-## 1: Random intercept
-
-```{r}
-# fitting multivariate latent class model with 1, 2, 3 and 4 classes with random intercept and random slope
-
-# 1 class model
-mlcmm_m0 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  subject = "RID",
-  data = jlcmm_data
-)
-
-# 2 class model
+# fitting a multivariate latent class model with 2 latent classes
 mlcmm_m1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2667,52 +2624,9 @@ mlcmm_m1 <- multlcmm(
   classmb = ~ 1,
   ng = 2,
   data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-# 3 class model
-mlcmm_m2 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-# 4 class model
-mlcmm_m3 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 4,
-  data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-```
-
-## M0 (1 latent class)
-
-```{r}
-mult_jlcmm_m0 <- mpjlcmm(
-  longitudinal = list(mlcmm_m0),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 1,
-  data = jlcmm_data
+  B = random(mlcmm_m0_1)
 )
 ```
-
-```{r}
-summary(mult_jlcmm_m0)
-```
-
-## M1 (2 latent classes)
 
 ```{r}
 mult_jlcmm_m1 <- mpjlcmm(
@@ -2721,7 +2635,7 @@ mult_jlcmm_m1 <- mpjlcmm(
   survival = Surv(time_to_event, event) ~ 1,
   ng = 2,
   data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
+  B = random(mult_jlcmm_m0_1)
 )
 ```
 
@@ -2736,13 +2650,27 @@ postprob(mult_jlcmm_m1)
 ## M2 (3 latent classes)
 
 ```{r}
+# fitting a multivariate latent class model with 3 latent classes
+mlcmm_m2 <- multlcmm(
+  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  subject = "RID",
+  classmb = ~ 1,
+  ng = 3,
+  data = jlcmm_data,
+  B = random(mlcmm_m0_1)
+)
+```
+
+```{r}
 mult_jlcmm_m2 <- mpjlcmm(
   longitudinal = list(mlcmm_m2),
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   ng = 3,
   data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
+  B = random(mult_jlcmm_m0_1)
 )
 ```
 
@@ -2754,31 +2682,11 @@ summary(mult_jlcmm_m2)
 postprob(mult_jlcmm_m2)
 ```
 
-## M3 (4 latent classes)
-
-```{r}
-mult_jlcmm_m3 <- mpjlcmm(
-  longitudinal = list(mlcmm_m3),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 4,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m3)
-```
-
-```{r}
-postprob(mult_jlcmm_m3)
-```
-
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
+summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
+             which = c("G", "loglik", "BIC", "entropy"))
 
 ```
 
@@ -2811,8 +2719,6 @@ summarytable(mult_jlcmm_m0, mult_jlcmm_m1, which = c("G", "loglik", "BIC", "entr
 ```{r}
 # plot(mult_jlcmm_m1, var.time = "time_years", which = "fit")
 ```
-
-## Visualisation
 
 ### Survival curves by class
 
@@ -3024,7 +2930,7 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 ```
 
 ```{r}
-auc_jlcmm_m2_nfl <- jlcmm_timeAUC(jlcmm_m2_nfl, jlcmm_data,
+auc_jlcmm_m1_nfl <- jlcmm_timeAUC(jlcmm_m1_nfl, jlcmm_data,
                                   "RID", "time_years", "time_to_event", "event",
                                   2, c(3, 4, 5, 6, 7, 8))
 ```
