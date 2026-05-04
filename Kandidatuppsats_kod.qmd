@@ -2174,6 +2174,20 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
+jlcmm_m1_nfl_search <- gridsearch(m = jlcmm(fixed = log_PLASMA_NFL ~ time_years,
+                                            random = ~ 1,
+                                            mixture = ~ 1,
+                                            classmb = ~ 1,
+                                            ng = 2,
+                                            subject = "RID",
+                                            survival = Surv(time_to_event, event) ~ 1,
+                                            data = jlcmm_data),
+                                  minit = jlcmm_m0_1,
+                                  rep = 50,
+                                  maxiter = 50)
+```
+
+```{r}
 jlcmm_m1_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -2183,7 +2197,7 @@ jlcmm_m1_nfl <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1)
+  B = jlcmm_m1_nfl_search$best
 )
 ```
 
@@ -2198,6 +2212,20 @@ postprob(jlcmm_m1_nfl)
 ## M2 (3 latent classes)
 
 ```{r}
+jlcmm_m2_nfl_search <- gridsearch(m = jlcmm(fixed = log_PLASMA_NFL ~ time_years,
+                                            random = ~ 1,
+                                            mixture = ~ 1,
+                                            classmb = ~ 1,
+                                            ng = 3,
+                                            subject = "RID",
+                                            survival = Surv(time_to_event, event) ~ 1,
+                                            data = jlcmm_data),
+                                  minit = jlcmm_m0_1,
+                                  rep = 50,
+                                  maxiter = 50)
+```
+
+```{r}
 jlcmm_m2_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -2207,7 +2235,7 @@ jlcmm_m2_nfl <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1)
+  B = jlcmm_m2_nfl_search$best
 )
 ```
 
@@ -2311,8 +2339,6 @@ plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 
 ## M0 (1 latent class)
 
-The one class joint latent class model was fit with a random intercept. The one class model has statistically significant coefficients ($p < 0.01$
-
 ```{r}
 jlcmm_m0_1 <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
@@ -2350,6 +2376,20 @@ summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ## M1 (2 latent classes)
 
 ```{r}
+jlcmm_m1_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
+                                              random = ~ 1,
+                                              mixture = ~ 1,
+                                              classmb = ~ 1,
+                                              ng = 2,
+                                              subject = "RID",
+                                              survival = Surv(time_to_event, event) ~ 1,
+                                              data = jlcmm_data),
+                                    minit = jlcmm_m0_1,
+                                    rep = 50,
+                                    maxiter = 50)
+```
+
+```{r}
 jlcmm_m1_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2359,7 +2399,7 @@ jlcmm_m1_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1)
+  B = jlcmm_m1_ptau_search$best
 )
 ```
 
@@ -2387,23 +2427,18 @@ postprob(jlcmm_m1_ptau)
 
 6.  *Plot survival curves (how?)*
 
-### gridsearch()
-
 ```{r}
-# gridsearch(m = jlcmm(
-#   fixed = log_PLASMAPTAU181 ~ time_years_ptau,
-#   random = ~ 1,
-#   mixture = ~ 1,
-#   classmb = ~ 1,
-#   ng = 2,
-#   subject = "RID",
-#   survival = Surv(time_to_event_ptau, event_ptau) ~ 1,
-#   data = jlcmm_data_ptau,
-#   B = random(jlcmm_m0)),
-#   minit = jlcmm_m1,
-#   rep = 50,
-#   maxiter = 30)
-
+jlcmm_m2_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
+                                              random = ~ 1,
+                                              mixture = ~ 1,
+                                              classmb = ~ 1,
+                                              ng = 3,
+                                              subject = "RID",
+                                              survival = Surv(time_to_event, event) ~ 1,
+                                              data = jlcmm_data),
+                                    minit = jlcmm_m0_1,
+                                    rep = 50,
+                                    maxiter = 50)
 ```
 
 ```{r}
@@ -2416,7 +2451,7 @@ jlcmm_m2_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1)
+  B = jlcmm_m2_ptau_search$best
   )
 ```
 
@@ -2431,6 +2466,20 @@ postprob(jlcmm_m2_ptau)
 ## M3 (4 latent classes)
 
 ```{r}
+jlcmm_m3_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
+                                              random = ~ 1,
+                                              mixture = ~ 1,
+                                              classmb = ~ 1,
+                                              ng = 4,
+                                              subject = "RID",
+                                              survival = Surv(time_to_event, event) ~ 1,
+                                              data = jlcmm_data),
+                                    minit = jlcmm_m0_1,
+                                    rep = 50,
+                                    maxiter = 50)
+```
+
+```{r}
 jlcmm_m3_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2440,7 +2489,7 @@ jlcmm_m3_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1)
+  B = jlcmm_m3_ptau_search$best
   )
 ```
 
