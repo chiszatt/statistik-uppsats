@@ -173,7 +173,7 @@ A key assumption of this model is the assumed proportionality between hazard fun
 
 ...
 
----
+------------------------------------------------------------------------
 
 **I think we should get rid of these subsections: I have now merged some of the most relevant information with other sections, so we can remove this if we are both happy to do so.**
 
@@ -183,7 +183,7 @@ In Alzheimer’s disease research, biomarkers such as p-tau181 and NfL are measu
 
 \*\* Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. \*\*
 
----
+------------------------------------------------------------------------
 
 ## Joint Modelling of Longitudinal and Survival Data
 

@@ -1210,6 +1210,8 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
 
 ### Test of the assumption of proportional hazards
 
+# Check global violation
+
 ```{r}
 ##### For the standard Cox PH model
 cox.zph(surv_model)
@@ -1445,13 +1447,9 @@ summary(hlme_m0_2)
 
 ### Determining the random effects
 
-The $BIC$ is reduced and the log-likelihood increases when adding a random slope to the linear mixed effects model. Additionally, testing whether the improvement in the model with the random slope is statistically significant with a likelihood ratio tests gave $\lambda_{LR} = 16.09$ on $2$ degrees of freedom ($p < 0.05$).
-
 ```{r}
 summarytable(hlme_m0_1, hlme_m0_2)
 ```
-
-$$\lambda_{LR} = - 2 \left\{ \ell(\theta_0) - \ell(\widehat\theta) \right\} \quad \text{where, under } H_0 \quad \lambda_{LR} \sim \chi^2$$
 
 ```{r}
 # log likelihood for the full model
@@ -1491,63 +1489,11 @@ summary(hlme_m1)
 postprob(hlme_m1)
 ```
 
-## M2 (3 latent classes)
+## Comparing M0, M1
 
 ```{r}
-hlme_m2 <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ 1,
-    ng = 3,
-    data = long_data,
-    B = random(hlme_m0_1)
-  )
-
-summary(hlme_m2)
-```
-
-### Posterior probabilities
-
-```{r}
-postprob(hlme_m2)
-```
-
-## M3 (4 latent classes)
-
-```{r}
-hlme_m3 <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ 1,
-    ng = 4,
-    data = long_data,
-    B = random(hlme_m0_1)
-  )
-
-summary(hlme_m3)
-```
-
-### Posterior probabilities
-
-```{r}
-postprob(hlme_m3)
-```
-
-## Comparing M0, M1, M2, M3
-
-```{r}
-summarytable(hlme_m0_2, hlme_m1, hlme_m2, hlme_m3,
+summarytable(hlme_m0_2, hlme_m1,
              which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## Visualisation
@@ -1590,8 +1536,6 @@ ggplot(pp, aes(prob1, prob2)) +
 
 # LCMM: PTAU
 
-Latent class mixed models for PTAU
-
 ## M0 (1 latent class)
 
 ```{r}
@@ -1621,8 +1565,6 @@ summary(hlme_m0_2)
 ```
 
 ### Determining the random effects
-
-Comparing the $BIC$ from a model with random intercept versus a model with both random intercept and slope and the results of a log-likelihood test give support to the reduced model with only a random intercept in the longitudinal model. Therefore, only a random intercept will be used when modelling the longitudinal ptau-181 data.
 
 ```{r}
 summarytable(hlme_m0_1, hlme_m0_2)
@@ -1670,44 +1612,11 @@ summary(hlme_m1)
 postprob(hlme_m1)
 ```
 
-## M2 (3 latent classes)
-
-Similarly, the three class model had significant coefficients for the lonitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assaigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model.
+## Comparing M0, M1
 
 ```{r}
-hlme_m2 <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ 1,
-    ng = 3,
-    data = long_data,
-    B = random(hlme_m0_1)
-  )
-```
-
-```{r}
-summary(hlme_m2)
-```
-
-### Posterior probabilities
-
-```{r}
-postprob(hlme_m2)
-```
-
-## Comparing M0, M1, M2
-
-```{r}
-summarytable(hlme_m0_2, hlme_m1, hlme_m2,
+summarytable(hlme_m0_2, hlme_m1,
              which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## Visualisation
@@ -1750,9 +1659,9 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
-# LCMM: NFL (including classmb covariates)
+# ...
 
-Latent class mixed models for NFL including covariates in the class model
+# LCMM: NFL (including classmb covariates)
 
 ## M0 (1 latent class)
 
@@ -1772,40 +1681,13 @@ summary(hlme_m0)
 
 ## M1 (2 latent classes)
 
-The 2 class model with covariates $APOE4\_status$ and $age\_at\_visit$ is a significantly better fit than the 1 class model according to a likelihood ratio test and comparison of $BIC$ for the two models.
-
-### Including PTGENDER
-
-```{r}
-hlme_m1_PTGENDER <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
-    ng = 2,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m1_PTGENDER)
-```
-
-```{r}
-postprob(hlme_m1_PTGENDER)
-```
-
-### Excluding PTGENDER
-
 ```{r}
 hlme_m1_nfl_classmb <- hlme(
     fixed = log_PLASMA_NFL ~ time_years,
     mixture = ~ time_years,
     random = ~ time_years,
     subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
+    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
     ng = 2,
     data = long_data,
     B = random(hlme_m0)
@@ -1871,12 +1753,6 @@ postprob(hlme_m3_nfl_classmb)
 ```{r}
 summarytable(hlme_m0, hlme_m1_nfl_classmb, hlme_m2_nfl_classmb, hlme_m3_nfl_classmb,
              which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## Visualisation
@@ -2084,6 +1960,8 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
+# ...
+
 # MLCMM: NFL & PTAU
 
 Multivariate latent class mixed models with both NFL and PTAU
@@ -2160,68 +2038,10 @@ summary(mlcmm_m1)
 postprob(mlcmm_m1)
 ```
 
-```{r}
-plot(mlcmm_m1, which="fit", var.time="time_years")
-```
-
-## M2 (3 latent classes)
-
-```{r}
-mlcmm_m2 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 3,
-  data = long_data,
-  B = random(mlcmm_m0_1),
-  nproc = 10
-)
-```
-
-```{r}
-summary(mlcmm_m2)
-```
-
-```{r}
-postprob(mlcmm_m2)
-```
-
-## M3 (4 latent classes)
-
-```{r}
-mlcmm_m3 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 4,
-  data = long_data,
-  B = random(mlcmm_m0_1),
-  nproc = 10
-)
-```
-
-```{r}
-summary(mlcmm_m3)
-```
-
-```{r}
-postprob(mlcmm_m3)
-```
-
 ## Comparing M0, M1
 
 ```{r}
 summarytable(mlcmm_m0_1, mlcmm_m1, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## M2 (2 latent classes) (including class covariates)
@@ -2301,13 +2121,6 @@ jlcmm_data <- surv_data %>%
 ```
 
 ## M0 (1 latent class)
-
-```         
-             G    loglik      BIC   entropy
-jlcmm_m0_1   1 -1479.537 2998.415 1.0000000
-jlcmm_m1_nfl 2 -1433.037 2931.642 0.6833857
-jlcmm_m2_nfl 3 -1432.401 2956.598 0.5160664
-```
 
 ```{r}
 jlcmm_m0_1 <- jlcmm(
@@ -2406,31 +2219,7 @@ summary(jlcmm_m2_nfl)
 postprob(jlcmm_m2_nfl)
 ```
 
-## M3 (4 latent classes)
-
-```{r}
-jlcmm_m3_nfl <- jlcmm(
-  fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  classmb = ~ 1,
-  ng = 4,
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  data = jlcmm_data,
-  B = random(jlcmm_m0_1)
-)
-```
-
-```{r}
-summary(jlcmm_m3_nfl)
-```
-
-```{r}
-postprob(jlcmm_m3_nfl)
-```
-
-## Comparing M0, M1, M2, M3
+## Comparing M0, M1, M2
 
 ```{r}
 summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
@@ -2458,12 +2247,6 @@ class_preds <- class_preds %>%
 
 # checking the distribution of genotype by class
 table(class_preds$class, class_preds$APOE4_status)
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## Visualisation
@@ -2517,7 +2300,7 @@ table(class_preds$class, class_preds$APOE4_status)
 plot(jlcmm_m1_nfl, which = "survival")
 ```
 
-### Survival curves by class
+### Longitudinal trajectory by class
 
 ```{r}
 # longitudinal trajectory by class
@@ -2531,7 +2314,7 @@ plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 The one class joint latent class model was fit with a random intercept. The one class model has statistically significant coefficients ($p < 0.01$
 
 ```{r}
-jlcmm_m0 <- jlcmm(
+jlcmm_m0_1 <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
@@ -2541,7 +2324,27 @@ jlcmm_m0 <- jlcmm(
 ```
 
 ```{r}
-summary(jlcmm_m0)
+summary(jlcmm_m0_1)
+```
+
+```{r}
+jlcmm_m0_2 <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years,
+  random = ~ time_years,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data
+)
+```
+
+```{r}
+summary(jlcmm_m0_2)
+```
+
+### Determining the random effects
+
+```{r}
+summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
 ## M1 (2 latent classes)
@@ -2556,7 +2359,7 @@ jlcmm_m1_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0)
+  B = random(jlcmm_m0_1)
 )
 ```
 
@@ -2613,7 +2416,7 @@ jlcmm_m2_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0)
+  B = random(jlcmm_m0_1)
   )
 ```
 
@@ -2637,7 +2440,7 @@ jlcmm_m3_ptau <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0)
+  B = random(jlcmm_m0_1)
   )
 ```
 
@@ -2652,7 +2455,7 @@ postprob(jlcmm_m3_ptau)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable(jlcmm_m0, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
+summarytable(jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
              which = c("G", "loglik", "BIC", "entropy"))
 ```
 
@@ -2666,12 +2469,6 @@ class_preds <- class_preds %>%
 
 # checking the distribution of genotype by class
 table(class_preds$class, class_preds$APOE4_status)
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## Visualisation
@@ -2698,22 +2495,6 @@ table(class_preds$class, class_preds$APOE4_status)
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m1_ptau, which = "survival")
-```
-
-### Longitudinal trajectories by class
-
-```{r}
-# longitudnal trajectories by class
-plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
-```
-
-## Visualisation
-
-### Survival curves by class
-
-```{r}
-# survival curves by class
 plot(jlcmm_m2_ptau, which = "survival")
 ```
 
@@ -2721,7 +2502,7 @@ plot(jlcmm_m2_ptau, which = "survival")
 
 ```{r}
 # longitudnal trajectories by class
-#plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
+plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
 ```
 
 # MJLCMM: NFL & PTAU
@@ -2729,14 +2510,6 @@ plot(jlcmm_m2_ptau, which = "survival")
 ## 1: Random intercept and slope
 
 TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
-
-```{r}
-# # merging the longitudinal and survival data for NfL
-# jlcmm_data_multi <- surv_test_1 %>%
-#   dplyr::select(RID, event, time_to_event) %>%
-#   merge(long_data, by = "RID") %>%
-#   filter(time_to_event != 0)
-```
 
 ```{r}
 # fitting multivariate latent class model with 1, 2, 3 and 4 classes with random intercept and random slope
@@ -2870,12 +2643,6 @@ postprob(mult_jlcmm_m3)
 
 ```{r}
 summarytable(mult_jlcmm_m0, mult_jlcmm_m1, mult_jlcmm_m2, which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
 ```
 
 ## 1: Random intercept
