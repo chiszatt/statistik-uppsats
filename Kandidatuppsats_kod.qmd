@@ -33,9 +33,13 @@ format:
 editor: visual
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, output = TRUE)
+```
+
+```{r}
+ptau_data_full = UGOTPTAU181
+nfl_data_full = BLENNOWPLASMANFLLONG
 ```
 
 # Pre-processing
@@ -82,6 +86,7 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```
 
 ```{r}
+
 # Charley
 
 library(ADNIMERGE2)
@@ -1216,28 +1221,6 @@ cox.zph(surv_model_ptau_bl)
 cox.zph(surv_model_nfl_bl)
 # With both p-tau181 and NfL baseline values
 cox.zph(surv_model_both_bl)
-```
-
-To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
-
-### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
-
-```{r}
-# We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
-surv_model_tv <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + tt(age_at_baseline),
-  data = surv_data,
-  tt = function(x, t, ...) x * log(t)
-)
-
-summary(surv_model_tv)
-```
-
-```{r}
-AIC(surv_model, surv_model_tv)
-
-logLik(surv_model)
-logLik(surv_model_tv)
 ```
 
 # Two separate joint models
@@ -2784,7 +2767,7 @@ plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
 
 ```{r}
 # survival curves by class
-#plot(jlcmm_m2_ptau, which = "survival")
+plot(jlcmm_m2_ptau, which = "survival")
 ```
 
 ### Longitudinal trajectories by class
