@@ -65,9 +65,9 @@ editor: visual
 
 According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world. First described by Dr. Alois Alzheimer in 1901, the disease continues to present significant challenges for the medical field, and no definitive cure exists to date (WHO, 2025). The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (preclinical AD), a predementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes due to AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
 
-In the context of AD, as well as diseases in general, the term "biomarker" is commonly used. According to the Biomarkers Definitions Working Group, a biomarker is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001, p. 91). ***Similarly, the International Programme on Chemical Safety, is a joint venture on chemical safety led by WHO in coordination with the United Nations and the International Labor Organization, defines it as "any substance, structure, or process that can be measured in the body or its products and influence or predict the incidence of outcome or disease" (2001, p. 1).***
+In the context of AD, as well as diseases in general, the term "biomarker" is commonly used. According to the Biomarkers Definitions Working Group, a biomarker is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (2001, p. 91).
 
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Breakthroughs in technology (Rissin et al., 2010) have allowed for quantification of biomarkers at much smaller concentrations than previous methods, typically being up to 1000 times more sensitive (Chang et al., 2012, pg. 2). Using this method, biomarkers can be detected peripherally from their origin where concentrations are much smaller. These advances mean that more invasive procedures can be substituted with blood tests. ***WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6)***
+AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. Breakthroughs in technology have allowed for quantification of biomarkers at much smaller concentrations than previous methods, typically being up to 1000 times more sensitive (Rissin et al., 2010; Chang et al., 2012, p. 2). Using this method, biomarkers can be detected peripherally from their origin where concentrations are much smaller. These advances mean that more invasive procedures can be substituted with blood tests. ***WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6)***
 
 -- PREVIOUS PTAU SECTION —
 
@@ -163,7 +163,7 @@ where $\psi$ is the proportional hazards constant (Moore, 2016, pp. 43 - 44). Th
 
 $$h(t) = \psi h_0(t)$$
 
-which is the proportional hazards assumption (Moore, pg. 55). Further, covariate information is linked to the proportional hazards constant exponentially, yeilding the following model:
+which is the proportional hazards assumption (Moore, p. 55). Further, covariate information is linked to the proportional hazards constant exponentially, yeilding the following model:
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
@@ -173,9 +173,9 @@ where $\mathbf{x}^T$ is a vector of covariates and $\boldsymbol{\beta}$ is a vec
 
 - What do we assume about the censoring process?
 
-A key assumption of this model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, as it allows the baseline hazard function to be dropped from the partial likelihood (Moore, pg. 94). However, according to Moore, minor violations of this assumption are unlikely to have large consequences on inference and parameter estimation.
+A key assumption of this model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, as it allows the baseline hazard function to be dropped from the partial likelihood (Moore, p. 94). However, according to Moore, undefined.
 
-The concordance index (C index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the C index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Seo Young Park et al., 2017, pg. 1701).
+The concordance index (C index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the C index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Seo Young Park et al., 2017, p. 1701).
 
 ...
 
@@ -325,7 +325,7 @@ The score test assumes the null hypothesis of conditional independence, that is,
 
 $$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
 
-Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared-random effects in the model (Proust-Lima et al., pg. 8). Therefore, a significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
+Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared-random effects in the model (Proust-Lima et al., p. 8). Therefore, a significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
 ### Estimation
 
@@ -335,7 +335,7 @@ The log-likelihood for the **JLCM** is much more tractable than for the regular 
 
 ### **Class Enumeration**
 
-Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux, p. 196, 1996). Therefore, other metrics must be utilised for this purpose.
+Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
 **Bayesian Information Criterion**
 
@@ -349,7 +349,7 @@ Reporting the proportion of individuals who have a posterior probability over a 
 
 **Entropy**
 
-One possible measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, pg. 150), which takes values between 0 and 1 and is calculated as follows:
+One possible measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, p. 150), which takes values between 0 and 1 and is calculated as follows:
 
 $$EN(G) = 1 - 
 \frac{
@@ -403,6 +403,8 @@ The time-dependent area under the curve (AUC) is then defined as:
 
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
+An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the marker performs no better than random guessing such as flipping a coin (Rizopoulos, p. 196)
+
 ## Brier score
 
 <https://en.wikipedia.org/wiki/Brier_score>
@@ -411,7 +413,27 @@ The Brier score can be thought of as the mean squared error of the prediction fo
 
 $$\text{Brier Score} = \frac{1}{N}\sum_{t = 1}^{N}(p_t - o_t)^2$$
 
-where $p_t$ is the predicted probability of an event and $o_t$ is the observed outcome. The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability (Seo Young Park, pg. 1704). **\*\*TIME DEPENDENT BRIER SCORE\*\***
+where $p_t$ is the predicted probability of an event and $o_t$ is the observed outcome. The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability (Seo Young Park, p. 1704). **\*\*TIME DEPENDENT BRIER SCORE\*\***
+
+# Version utifrån <https://arxiv.org/html/2501.01280v1#S2> 
+
+**Time-dependent AUC**
+
+Time-dependent AUC is a measure of the model’s discriminatory ability at time $t$, i.e. its ability to distinguish between individuals who will experience the event after time $t$ and those who will not. It is defined via time-dependent sensitivity and specificity over a threshold $c \in [0,1]$ (Yang et al., 2026):
+
+$$\mathrm{sen}(t,\Delta t,c)=\Pr\{\Pi_i(t+\Delta t \mid t)\ge c \mid T_i \ge t\}$$
+
+$$\mathrm{spe}(t,\Delta t,c)=\Pr\{\Pi_i(t+\Delta t \mid t)< c \mid T_i \ge t+\Delta t\}$$
+
+Varying $c$ yields the ROC curve, and the resulting time-dependent AUC summarizes the model’s ability to correctly rank individuals according to their risk over the prediction horizon $t+\Delta t$ (Yang et al., 2026). An AUC value of $1$ indicates perfect discrimination, whereas a value of $0.5$ corresponds to no discrimination, equivalent to random guessing (Rizopoulos, p. 196).
+
+**Time-dependent Brier score**
+
+The time-dependent Brier score measures the mean squared difference between the observed event status and the predicted event probability at time $t+\Delta t$, conditional on being event-free at time $t$ (Yang et al., 2026).
+
+$$BS(t+\Delta t,t)=E\left[(I(T < t+\Delta t)-\Pi(t+\Delta t \mid t))^2 \mid T \ge t\right]$$
+
+A lower value indicates better predictive performance. In practice, the Brier score is estimated using either a model-based approach or inverse probability of censoring weighting (IPCW) to account for censoring (Yang et al., 2026).
 
 # Description of Data
 
@@ -591,7 +613,7 @@ The longitudinal p-tau181 trajectories were then modeled jointly with the surviv
 
 ## Joint latent class mixed model for NfL
 
-First, latent class mixed-effects models were fit and the random effects were decided based off of the one class model, as was done with p-tau181. Both models gave statistically significant coefficients for the fixed effects (p \< 0.001). Since BIC is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, PG.**), only a random intercept was chosen, as the simpler model had a lower BIC (1503.4) compared with the more complex model (1506.1).
+First, latent class mixed-effects models were fit and the random effects were decided based off of the one class model, as was done with p-tau181. Both models gave statistically significant coefficients for the fixed effects (p \< 0.001). Since BIC is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, P.**), only a random intercept was chosen, as the simpler model had a lower BIC (1503.4) compared with the more complex model (1506.1).
 
 Modelling the longitudinal NfL measurements with a two class linear mixed-effects model produced significant coefficients for the fixed effetcs in the longitudinal submodel (intercept class1: p = 0.034, intercept class2: p = 0.033, slope: p \< 0.001) but the intercept in the class membership model was not significant (p = 0.9997). Comparing BIC for the one class and two class (1516.5) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be 0.0003 - further evidence against two latent classes. The model had poor class discrimination, with the posterior probabilities clustering around 0.50, showing indistinguishable classification between the two classes. Since the model with two latent classes showed no improvement compared to the one class model, it was decided against fitting further models with more classes. 
 
@@ -652,7 +674,7 @@ Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
-Celeux, G., Soromenho, G. An entropy criterion for assessing the number of clusters in a mixture model. *Journal of Classification*: 13, 195–212 (1996). https://doi.org/10.1007/BF01246098
+Celeux, G. & Soromenho, G. (1996). An entropy criterion for assessing the number of clusters in a mixture model. *Journal of Classification*: 13(1), 195-212. https://doi.org/10.1007/BF01246098
 
 Chang, L., Rissin, D. M., Fournier, D. R., Piech, T., Patel, P. P., Wilson, D. H., & Duffy, D. C. (2012). Single Molecule Enzyme-Linked Immunosorbent Assays: Theoretical Considerations. *Journal of Immunological Methods*, *378*(1-2), 102–115. https://doi.org/10.1016/j.jim.2012.02.011
 
