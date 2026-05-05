@@ -1420,6 +1420,7 @@ Choice of p-value <https://pmc.ncbi.nlm.nih.gov/articles/PMC5059270/>
 ## M0 (1 latent class)
 
 ```{r}
+# Fitting a one class latent class mixed model with a random intercept
 hlme_m0_1 <- hlme(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -1433,6 +1434,7 @@ summary(hlme_m0_1)
 ```
 
 ```{r}
+# Fitting a one class latent class mixed model with a random intercept and slope
 hlme_m0_2 <- hlme(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ time_years,
@@ -1448,6 +1450,7 @@ summary(hlme_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(hlme_m0_1, hlme_m0_2)
 ```
 
@@ -1469,6 +1472,7 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
+# Fitting a two class latent class mixed model
 hlme_m1 <- hlme(
     fixed = log_PLASMA_NFL ~ time_years,
     mixture = ~ 1,
@@ -1539,6 +1543,7 @@ ggplot(pp, aes(prob1, prob2)) +
 ## M0 (1 latent class)
 
 ```{r}
+# Fitting a one class latent class mixed model with a random intercept
 hlme_m0_1 <- hlme(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -1552,6 +1557,7 @@ summary(hlme_m0_1)
 ```
 
 ```{r}
+# Fitting a one class latent class mixed model with a random intercept and slope
 hlme_m0_2 <- hlme(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -1567,6 +1573,7 @@ summary(hlme_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(hlme_m0_1, hlme_m0_2)
 ```
 
@@ -1587,9 +1594,8 @@ LR
 
 ## M1 (2 latent classes)
 
-A latent mixed effects model with 2 classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). The $BIC$ increased when compared to the 1 class model and the posterior probabilities show no clear differentiation between class 1 and class 2, with the average posterior probability being $0.50$ for both classes.
-
 ```{r}
+# Fitting a two class latent class mixed model
 hlme_m1 <- hlme(
     fixed = log_PLASMAPTAU181 ~ time_years,
     mixture = ~ 1,
@@ -1659,309 +1665,6 @@ ggplot(pp, aes(prob1, prob2)) +
   theme_classic()
 ```
 
-# ...
-
-# LCMM: NFL (including classmb covariates)
-
-## M0 (1 latent class)
-
-```{r}
-# updating the 1 class model
-hlme_m0 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  data = long_data
-)
-```
-
-```{r}
-summary(hlme_m0)
-```
-
-## M1 (2 latent classes)
-
-```{r}
-hlme_m1_nfl_classmb <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
-    ng = 2,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m1_nfl_classmb)
-```
-
-```{r}
-postprob(hlme_m1_nfl_classmb)
-```
-
-## M2 (3 latent classes)
-
-```{r}
-hlme_m2_nfl_classmb <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
-    ng = 3,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m2_nfl_classmb)
-```
-
-```{r}
-postprob(hlme_m2_nfl_classmb)
-```
-
-## M3 (4 latent classes)
-
-```{r}
-hlme_m3_nfl_classmb <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ time_years,
-    random = ~ time_years,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
-    ng = 4,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m3_nfl_classmb)
-```
-
-```{r}
-postprob(hlme_m3_nfl_classmb)
-```
-
-## Comparing M0, M1, M2, M3
-
-```{r}
-summarytable(hlme_m0, hlme_m1_nfl_classmb, hlme_m2_nfl_classmb, hlme_m3_nfl_classmb,
-             which = c("G", "loglik", "BIC", "entropy"))
-```
-
-## Visualisation
-
-```{r}
-# saving the posterior probabilities into a data frame
-pp <- hlme_m1_nfl_classmb$pprob
-```
-
-### Distribution of posterior probabilities (class 1)
-
-```{r}
-# plotting posterior probabilities for class 1
-ggplot(pp, aes(x = prob1)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 1") +
-  theme_classic()
-```
-
-### Distribution of posterior probabilities (class 2)
-
-```{r}
-# plotting posterior probabilities for class 2
-ggplot(pp, aes(x = prob2)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 1") +
-  theme_classic()
-```
-
-### Class certainty scatterplot
-
-```{r}
-# scatterplot of class certainty
-ggplot(pp, aes(prob1, prob2)) +
-  geom_point(alpha = .8) +
-  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
-  labs(x = "P(Class 1)", y = "P(Class 2)") +
-  theme_classic()
-```
-
-# LCMM: PTAU (including classmb covariates)
-
-Latent class mixed models for PTAU including covariates in the class model
-
-## M0 (1 latent class)
-
-```{r}
-# updating the 1 class model
-hlme_m0 <- hlme(
-  fixed = log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  subject = "RID",
-  data = long_data
-)
-```
-
-```{r}
-summary(hlme_m0)
-```
-
-## M1 (2 latent classes)
-
-TO CHECK: difference between genotype in latent class file
-
-```{r}
-levels(long_data$APOE4_status)
-```
-
-### Including PTGENDER
-
-```{r}
-hlme_m1_PTGENDER <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit + PTGENDER,
-    ng = 2,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m1_PTGENDER)
-```
-
-### Excluding PTGENDER
-
-```{r}
-hlme_m1_ptau_classmb <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
-    ng = 2,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m1_ptau_classmb)
-```
-
-```{r}
-postprob(hlme_m1_ptau_classmb)
-```
-
-## M2 (3 latent classes)
-
-```{r}
-hlme_m2_ptau_classmb <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
-    ng = 3,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m2_ptau_classmb)
-```
-
-```{r}
-postprob(hlme_m2_ptau_classmb)
-```
-
-## M3 (4 latent classes)
-
-```{r}
-hlme_m3_ptau_classmb <- hlme(
-    fixed = log_PLASMAPTAU181 ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ APOE4_status + age_at_visit,
-    ng = 4,
-    data = long_data,
-    B = random(hlme_m0)
-  )
-```
-
-```{r}
-summary(hlme_m3_ptau_classmb)
-```
-
-```{r}
-postprob(hlme_m3_ptau_classmb)
-```
-
-## Comparing M0, M1, M2, M3
-
-```{r}
-summarytable(hlme_m0, hlme_m1_ptau_classmb, hlme_m2_ptau_classmb, hlme_m3_ptau_classmb,
-             which = c("G", "loglik", "BIC", "entropy"))
-```
-
-### Adjusted LRT
-
-```{r}
-
-```
-
-## Visualisation
-
-```{r}
-# saving the posterior probabilities into a data frame
-pp <- hlme_m1$pprob
-```
-
-### Distribution of posterior probabilities (class 1)
-
-```{r}
-# plotting posterior probabilities for class 1
-ggplot(pp, aes(x = prob1)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 1") +
-  theme_classic()
-```
-
-### Distribution of posterior probabilities (class 2)
-
-```{r}
-# plotting posterior probabilities for class 1
-ggplot(pp, aes(x = prob2)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 2") +
-  theme_classic()
-```
-
-### Class certainty scatterplot
-
-```{r}
-# scatterplot of class certainty
-ggplot(pp, aes(prob1, prob2)) +
-  geom_point(alpha = .8) +
-  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
-  labs(x = "P(Class 1)", y = "P(Class 2)") +
-  theme_classic()
-```
-
-# ...
-
 # MLCMM: NFL & PTAU
 
 Multivariate latent class mixed models with both NFL and PTAU
@@ -1969,6 +1672,7 @@ Multivariate latent class mixed models with both NFL and PTAU
 ## M0 (1 latent class)
 
 ```{r}
+# Fitting a one class multivariate latent class mixed model with a random intercept
 mlcmm_m0_1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -1982,6 +1686,7 @@ summary(mlcmm_m0_1)
 ```
 
 ```{r}
+# Fitting a one class multivariate latent class mixed model with a random intercept and slope
 mlcmm_m0_2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -1997,6 +1702,7 @@ summary(mlcmm_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(mlcmm_m0_1, mlcmm_m0_2)
 ```
 
@@ -2018,6 +1724,7 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
+# Fitting a two class multivariate latent class mixed model
 mlcmm_m1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -2107,12 +1814,6 @@ ggplot(pp, aes(prob1, prob2)) +
 
 # JLCMM: NFL
 
-1.  Posterior probabilities show good classification
-
-2.  Score test statistic for conditional independence is significant with 1 class and not significant with 2 classes: evidence for 2 classes
-
-3.  No covariates in the survival model OR the class membership model, evidence for latent classes?
-
 ```{r}
 # merging the longitudinal and survival data for jlcmm
 jlcmm_data <- surv_data %>%
@@ -2123,6 +1824,7 @@ jlcmm_data <- surv_data %>%
 ## M0 (1 latent class)
 
 ```{r}
+# Fitting a one class joint latent class mixed model with a random intercept
 jlcmm_m0_1 <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -2137,6 +1839,7 @@ summary(jlcmm_m0_1)
 ```
 
 ```{r}
+# Fitting a one class joint latent class mixed model with a random intercept and slope
 jlcmm_m0_2 <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1 + time_years,
@@ -2153,6 +1856,7 @@ summary(jlcmm_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
@@ -2174,6 +1878,7 @@ LR
 ## M1 (2 latent classes)
 
 ```{r}
+# Running gridsearch() for a two class model
 # jlcmm_m1_nfl_search <- gridsearch(m = jlcmm(fixed = log_PLASMA_NFL ~ time_years,
 #           random = ~ 1,
 #           mixture = ~ 1,
@@ -2188,6 +1893,7 @@ LR
 ```
 
 ```{r}
+# Estimating two class model using the best result from gridsearch() as a starting value
 # jlcmm_m1_nfl <- jlcmm(
 #   fixed = log_PLASMA_NFL ~ time_years,
 #   random = ~ 1,
@@ -2202,6 +1908,8 @@ LR
 ```
 
 ```{r}
+# Fitting a two class joint latent class mixed model
+# Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
 jlcmm_m1_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -2226,6 +1934,7 @@ postprob(jlcmm_m1_nfl)
 ## M2 (3 latent classes)
 
 ```{r}
+# Running gridsearch() for a three class model
 # jlcmm_m2_nfl_search <- gridsearch(m = jlcmm(fixed = log_PLASMA_NFL ~ time_years,
 #                                             random = ~ 1,
 #                                             mixture = ~ 1,
@@ -2240,6 +1949,7 @@ postprob(jlcmm_m1_nfl)
 ```
 
 ```{r}
+# Estimating two class model using the best result from gridsearch() as a starting value
 # jlcmm_m2_nfl <- jlcmm(
 #   fixed = log_PLASMA_NFL ~ time_years,
 #   random = ~ 1,
@@ -2254,6 +1964,8 @@ postprob(jlcmm_m1_nfl)
 ```
 
 ```{r}
+# Fitting a three class joint latent class mixed model
+# Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
 jlcmm_m2_nfl <- jlcmm(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
@@ -2368,6 +2080,7 @@ plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
 ## M0 (1 latent class)
 
 ```{r}
+# Fitting a one class joint latent class mixed model with random intercept
 jlcmm_m0_1 <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2382,6 +2095,7 @@ summary(jlcmm_m0_1)
 ```
 
 ```{r}
+# Fitting a one class joint latent class mixed model with a random intercept and slope
 jlcmm_m0_2 <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -2398,12 +2112,14 @@ summary(jlcmm_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
+# Running gridsearch() for a two class model
 # jlcmm_m1_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
 #                                               random = ~ 1,
 #                                               mixture = ~ 1,
@@ -2418,6 +2134,7 @@ summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
 ```{r}
+# Estimating two class model using the best result from gridsearch() as a starting value
 # jlcmm_m1_ptau <- jlcmm(
 #   fixed = log_PLASMAPTAU181 ~ time_years,
 #   random = ~ 1,
@@ -2432,6 +2149,8 @@ summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
 ```{r}
+# Fitting a two class joint latent class mixed model
+# Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
 jlcmm_m1_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2470,6 +2189,7 @@ postprob(jlcmm_m1_ptau)
 6.  *Plot survival curves (how?)*
 
 ```{r}
+# Running gridsearch() for a three class model
 # jlcmm_m2_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
 #                                               random = ~ 1,
 #                                               mixture = ~ 1,
@@ -2484,6 +2204,7 @@ postprob(jlcmm_m1_ptau)
 ```
 
 ```{r}
+# Estimating two class model using the best result from gridsearch() as a starting value
 # jlcmm_m2_ptau <- jlcmm(
 #   fixed = log_PLASMAPTAU181 ~ time_years,
 #   random = ~ 1,
@@ -2498,6 +2219,8 @@ postprob(jlcmm_m1_ptau)
 ```
 
 ```{r}
+# Fitting a three class joint latent class mixed model
+# Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
 jlcmm_m1_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2522,6 +2245,7 @@ postprob(jlcmm_m2_ptau)
 ## M3 (4 latent classes)
 
 ```{r}
+# Running gridsearch() for a four class model
 # jlcmm_m3_ptau_search <- gridsearch(m = jlcmm(fixed = log_PLASMAPTAU181 ~ time_years,
 #                                               random = ~ 1,
 #                                               mixture = ~ 1,
@@ -2536,6 +2260,7 @@ postprob(jlcmm_m2_ptau)
 ```
 
 ```{r}
+# Estimating two class model using the best result from gridsearch() as a starting value
 # jlcmm_m3_ptau <- jlcmm(
 #   fixed = log_PLASMAPTAU181 ~ time_years,
 #   random = ~ 1,
@@ -2550,6 +2275,8 @@ postprob(jlcmm_m2_ptau)
 ```
 
 ```{r}
+# Fitting a four class joint latent class mixed model
+# Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
 jlcmm_m1_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2626,61 +2353,11 @@ plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
 
 # MJLCMM: NFL & PTAU
 
-TWO CLASS MULTIVARIATE LATENT CLASS MIXED MODEL -\> significant
-
-```{r}
-# fitting multivariate latent class model with 1, 2, 3 and 4 classes with random intercept and random slope
-
-# 1 class model
-mlcmm_m0 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  data = jlcmm_data
-)
-
-# 2 class model
-mlcmm_m1 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ time_years,
-  mixture = ~ time_years,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 2,
-  data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-# 3 class model
-mlcmm_m2 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ time_years,
-  mixture = ~ time_years,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-# 4 class model
-mlcmm_m3 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ time_years,
-  mixture = ~ time_years,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 4,
-  data = jlcmm_data,
-  B = random(mlcmm_m0)
-)
-
-```
-
 ## M0 (1 latent class)
 
 ```{r}
-# fitting multivariate latent class model with 1 class and random intercept
+# Modelling the longitudinal data only, these will be used as arguments in the joint models
+# Fitting a one class multivariate latent class mixed model with random intercept
 mlcmm_m0_1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2688,7 +2365,7 @@ mlcmm_m0_1 <- multlcmm(
   data = jlcmm_data
 )
 
-# fitting multivariate latent class model with 1 class and random intercept and random slope
+# Fitting a one class multivariate latent class model with random intercept and slope
 mlcmm_m0_2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
@@ -2698,6 +2375,8 @@ mlcmm_m0_2 <- multlcmm(
 ```
 
 ```{r}
+# Modelling longitudinal and survival data
+# Fitting a one class multivariate joint latent class model with random intercept
 mult_jlcmm_m0_1 <- mpjlcmm(
   longitudinal = list(mlcmm_m0_1),
   subject = "RID",
@@ -2712,6 +2391,8 @@ summary(mult_jlcmm_m0_1)
 ```
 
 ```{r}
+# Modelling longitudinal and survival data
+# Fitting a one class multivariate joint latent class model with random intercept and slope
 mult_jlcmm_m0_2 <- mpjlcmm(
   longitudinal = list(mlcmm_m0_2),
   subject = "RID",
@@ -2728,13 +2409,15 @@ summary(mult_jlcmm_m0_2)
 ### Determining the random effects
 
 ```{r}
+# Comparing BIC and log-likelihood for the two one class models with different random effects structures
 summarytable(mult_jlcmm_m0_1, mult_jlcmm_m0_2)
 ```
 
 ## M1 (2 latent classes)
 
 ```{r}
-# fitting a multivariate latent class model with 2 latent classes
+# Modelling longitudinal data, used as argument in the joint model
+# Fitting a multivariate latent class model with two latent classes
 mlcmm_m1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2748,6 +2431,8 @@ mlcmm_m1 <- multlcmm(
 ```
 
 ```{r}
+# Modelling longitudinal and survival data
+# Fitting a multivariate joint latent class model with two latent classes
 mult_jlcmm_m1 <- mpjlcmm(
   longitudinal = list(mlcmm_m1),
   subject = "RID",
@@ -2769,7 +2454,8 @@ postprob(mult_jlcmm_m1)
 ## M2 (3 latent classes)
 
 ```{r}
-# fitting a multivariate latent class model with 3 latent classes
+# Modelling longitudinal data, used as argument in the joint model
+# Fitting a three class multivariate latent class model
 mlcmm_m2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
@@ -2783,6 +2469,8 @@ mlcmm_m2 <- multlcmm(
 ```
 
 ```{r}
+# Modelling longitudinal and survival data
+# Fitting a three class multivariate joint latent class model
 mult_jlcmm_m2 <- mpjlcmm(
   longitudinal = list(mlcmm_m2),
   subject = "RID",
