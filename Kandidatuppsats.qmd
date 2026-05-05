@@ -423,7 +423,7 @@ where $G_i(t)$ is the censoring survival function, which quantifies the probabil
 
 $$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
 
-where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time, becomes then the IPCW-adjusted Brier score:
+where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Seo Young Park et al., 1704), becomes then the IPCW-adjusted Brier score:
 
 $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
@@ -622,6 +622,12 @@ Model convergence was generally good, with $\widehat R$ values close to 1.00 for
 ?
 
 ## Joint latent class mixed model for p-tau181
+
+- Complementary log-log plot showed curvature, Weibull assumes a linear log-log plot.
+
+- Weibull baseline hazard was compared against a flexible baseline hazard using "3-quant-piecewise"
+
+- BIC was lower for Weibull (5582) than for flexible hazard (5595), suggesting that Weibull fits the data better, despite slight violations of the log-log plot
 
 In order to assess whether latent classes can be distinguished solely from p-tau181 trajectories, latent class mixed models were first fit. A one class model was fit and the random effects structure was decided by comparing $BIC$, log-likelihoods and running a likelihood ratio test between the model with both a random intercept and random slope and a model with only a random intercept. The $BIC$ for the more complex model increased compared to the intercept only model and the likelihood ratio test gave $\lambda_{LR} = 0.92$ on 2 degrees of freedom ($p = 0.63$), therefore the intercept only random effects structure was chosen.
 

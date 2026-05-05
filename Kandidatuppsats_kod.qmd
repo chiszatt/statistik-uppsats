@@ -1815,6 +1815,12 @@ ggplot(pp, aes(prob1, prob2)) +
 # JLCMM: NFL
 
 ```{r}
+surv <- survfit(Surv(surv_data$time_to_event, surv_data$event) ~ 1)
+
+plot(log(surv$time), log(-log(surv$surv)), main="Weibull Check")
+```
+
+```{r}
 # merging the longitudinal and survival data for jlcmm
 jlcmm_data <- surv_data %>%
   dplyr::select(RID, event, time_to_event) %>%
@@ -2088,10 +2094,24 @@ jlcmm_m0_1 <- jlcmm(
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data
 )
+
+# Fitting a one class joint latent class mixed model with flexible baseline hazard to check performance against parametric hazard (Weibull)
+jlcmm_m0_1_p <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  hazard = "3-quant-piecewise",
+  data = jlcmm_data
+)
 ```
 
 ```{r}
 summary(jlcmm_m0_1)
+```
+
+```{r}
+summary(jlcmm_m0_1_splines)
 ```
 
 ```{r}
@@ -2221,7 +2241,7 @@ postprob(jlcmm_m1_ptau)
 ```{r}
 # Fitting a three class joint latent class mixed model
 # Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
-jlcmm_m1_ptau <- jlcmm(
+jlcmm_m2_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
@@ -2240,6 +2260,27 @@ summary(jlcmm_m2_ptau)
 
 ```{r}
 postprob(jlcmm_m2_ptau)
+```
+
+```{r}
+# Checking flexible baseline hazard (piecewise)
+jlcmm_m2_ptau_piecewise <- jlcmm(
+  fixed = log_PLASMAPTAU181 ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  classmb = ~ 1,
+  ng = 3,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  hazard = "3-quant-piecewise",
+  data = jlcmm_data,
+  B = random(jlcmm_m0_1_p)
+)
+```
+
+```{r}
+# Flexible hazard with two parameters has higher BIC than Weibull hazard
+summary(jlcmm_m2_ptau_piecewise)
 ```
 
 ## M3 (4 latent classes)
