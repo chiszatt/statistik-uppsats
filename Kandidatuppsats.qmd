@@ -175,7 +175,7 @@ where $\mathbf{x}^T$ is a vector of covariates and $\boldsymbol{\beta}$ is a vec
 
 A key assumption of this model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, as it allows the baseline hazard function to be dropped from the partial likelihood (Moore, pg. 94). However, according to Moore, minor violations of this assumption are unlikely to have large consequences on inference and parameter estimation.
 
-The concordance index (C index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the C index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Seo Yung Park et al., 2017, pg. 1701).
+The concordance index (C index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the C index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Seo Young Park et al., 2017, pg. 1701).
 
 ...
 
@@ -409,9 +409,9 @@ $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
 The Brier score can be thought of as the mean squared error of the prediction forecast, and is commonly formulated as:
 
-$$BS = \frac{1}{N}\sum_{t = 1}^{N}(f_t - o_t)^2$$
+$$\text{Brier Score} = \frac{1}{N}\sum_{t = 1}^{N}(p_t - o_t)^2$$
 
-and takes values from 0 to 1, where a score of 0 is given to a model with perfectly predictions, and 1 is given to a model with only incorrect predictions.
+where $p_t$ is the predicted probability of an event and $o_t$ is the observed outcome. The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability (Seo Young Park, pg. 1704). **\*\*TIME DEPENDENT BRIER SCORE\*\***
 
 # Description of Data
 
