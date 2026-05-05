@@ -1208,6 +1208,88 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
       test = "LRT")
 ```
 
+#### Cox comparison table 
+
+```{r}
+# Building Cox Comparison Table
+# Extracting Model Output
+extract_model <- function(model) {
+  s <- summary(model)
+
+  data.frame(
+    Variable = rownames(s$coefficients),
+    HR = exp(s$coefficients[, "coef"]),
+    CI_low = s$conf.int[, "lower .95"],
+    CI_high = s$conf.int[, "upper .95"],
+    P = s$coefficients[, "Pr(>|z|)"],
+    row.names = NULL
+  )
+}
+
+# Formatting HR And CI
+format_hr_ci <- function(hr, low, high) {
+  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
+}
+
+# Formatting P Values
+format_p <- function(x) {
+  ifelse(is.na(x), NA,
+         ifelse(x < 0.001, "<0.001", round(x, 3)))
+}
+
+# Extracting Models
+ptau <- extract_model(surv_model_ptau_bl)
+nfl  <- extract_model(surv_model_nfl_bl)
+both <- extract_model(surv_model_both_bl)
+
+# Building Variable Set
+all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
+
+# Safe Value Extraction
+get_value <- function(df, var, col) {
+  out <- rep(NA, length(var))
+
+  for (i in seq_along(var)) {
+    idx <- which(df$Variable == var[i])
+    if (length(idx) == 1) {
+      out[i] <- df[idx, col]
+    }
+  }
+  out
+}
+
+# Building Final Table
+table <- data.frame(
+  Variable = all_vars,
+
+  PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau, all_vars, "HR"),
+    get_value(ptau, all_vars, "CI_low"),
+    get_value(ptau, all_vars, "CI_high")
+  ),
+  PTau_P = format_p(get_value(ptau, all_vars, "P")),
+
+  NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl, all_vars, "HR"),
+    get_value(nfl, all_vars, "CI_low"),
+    get_value(nfl, all_vars, "CI_high")
+  ),
+  NfL_P = format_p(get_value(nfl, all_vars, "P")),
+
+  Both_HR_95_CI = format_hr_ci(
+    get_value(both, all_vars, "HR"),
+    get_value(both, all_vars, "CI_low"),
+    get_value(both, all_vars, "CI_high")
+  ),
+  Both_P = format_p(get_value(both, all_vars, "P")),
+
+  row.names = NULL
+)
+
+# Showing Table
+table
+```
+
 ### Test of the assumption of proportional hazards
 
 # Check global violation
@@ -1410,6 +1492,95 @@ summary$Survival
 ```
 
 # ...
+
+#### Joint model comparison table 
+
+```{r}
+# Building joint model table 
+
+# Extract survival part correctly
+extract_jm <- function(model) {
+
+  s <- summary(model)$coefficients$Survival
+
+  data.frame(
+    Variable = rownames(s),
+
+    # Converting beta -> HR 
+    HR = exp(s[, "Mean"]),
+
+    # Converting CI  
+    CI_low = exp(s[, "2.5%"]),
+    CI_high = exp(s[, "97.5%"]),
+
+    p = s[, "P"],
+
+    row.names = NULL
+  )
+}
+
+# Formatting HR + CI
+format_hr_ci <- function(hr, low, high) {
+  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
+}
+
+# Formatting p-values
+format_p <- function(x) {
+  ifelse(is.na(x), NA,
+         ifelse(x < 0.001, "<0.001", round(x, 3)))
+}
+
+# Extracting models
+ptau <- extract_jm(joint_model_ptau)
+nfl  <- extract_jm(joint_model_nfl)
+multi <- extract_jm(multi_joint_model)
+
+# All variables
+all_vars <- unique(c(ptau$Variable, nfl$Variable, multi$Variable))
+
+# Extraction 
+get_value <- function(df, var, col) {
+  out <- rep(NA, length(var))
+
+  for (i in seq_along(var)) {
+    idx <- which(df$Variable == var[i])
+    if (length(idx) == 1) {
+      out[i] <- df[idx, col]
+    }
+  }
+  out
+}
+
+# Final table
+table_jm <- data.frame(
+  Variable = all_vars,
+
+  PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau, all_vars, "HR"),
+    get_value(ptau, all_vars, "CI_low"),
+    get_value(ptau, all_vars, "CI_high")
+  ),
+  PTau_p = format_p(get_value(ptau, all_vars, "p")),
+
+  NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl, all_vars, "HR"),
+    get_value(nfl, all_vars, "CI_low"),
+    get_value(nfl, all_vars, "CI_high")
+  ),
+  NfL_p = format_p(get_value(nfl, all_vars, "p")),
+
+  Multi_HR_95_CI = format_hr_ci(
+    get_value(multi, all_vars, "HR"),
+    get_value(multi, all_vars, "CI_low"),
+    get_value(multi, all_vars, "CI_high")
+  ),
+  Multi_p = format_p(get_value(multi, all_vars, "p")),
+
+  row.names = NULL
+)
+
+table_jm
+```
 
 # Latent Class Mixed Models
 
@@ -2977,3 +3148,5 @@ ggplot(plot_data, aes(x = Time, y = Brier, color = Model)) +
     y = "Brier score"
   )
 ```
+
+# Appendix 
