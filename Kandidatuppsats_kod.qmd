@@ -2924,7 +2924,9 @@ brier_multi_jm
 
 ## Time-dependent Brier score for latent class joint models
 
-...
+```{r}
+
+```
 
 ## Table of the results
 
