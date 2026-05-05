@@ -1838,10 +1838,24 @@ jlcmm_m0_1 <- jlcmm(
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data
 )
+
+# Fitting a one class joint latent class mixed model with flexible hazard
+jlcmm_m0_1_piecewise <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  hazard = "3-quant-piecewise",
+  data = jlcmm_data
+)
 ```
 
 ```{r}
 summary(jlcmm_m0_1)
+```
+
+```{r}
+summary(jlcmm_m0_1_piecewise)
 ```
 
 ```{r}
@@ -1931,6 +1945,26 @@ jlcmm_m1_nfl <- jlcmm(
 
 ```{r}
 summary(jlcmm_m1_nfl)
+```
+
+```{r}
+# Checking flexible hazard
+jlcmm_m1_nfl_piecewise <- jlcmm(
+  fixed = log_PLASMA_NFL ~ time_years,
+  random = ~ 1,
+  mixture = ~ 1,
+  classmb = ~ 1,
+  ng = 2,
+  subject = "RID",
+  survival = Surv(time_to_event, event) ~ 1,
+  data = jlcmm_data,
+  B = random(jlcmm_m0_1_piecewise)
+)
+```
+
+```{r}
+# Does not converge
+summary(jlcmm_m1_nfl_piecewise)
 ```
 
 ```{r}
@@ -2096,7 +2130,7 @@ jlcmm_m0_1 <- jlcmm(
 )
 
 # Fitting a one class joint latent class mixed model with flexible baseline hazard to check performance against parametric hazard (Weibull)
-jlcmm_m0_1_p <- jlcmm(
+jlcmm_m0_1_piecewise <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
@@ -2111,7 +2145,7 @@ summary(jlcmm_m0_1)
 ```
 
 ```{r}
-summary(jlcmm_m0_1_splines)
+summary(jlcmm_m0_1_piecewise)
 ```
 
 ```{r}
@@ -2274,7 +2308,7 @@ jlcmm_m2_ptau_piecewise <- jlcmm(
   survival = Surv(time_to_event, event) ~ 1,
   hazard = "3-quant-piecewise",
   data = jlcmm_data,
-  B = random(jlcmm_m0_1_p)
+  B = random(jlcmm_m0_1_piecewise)
 )
 ```
 
