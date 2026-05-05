@@ -389,6 +389,12 @@ The traditional ROC curve method assumes that both the disease status and the ma
 
 When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., p. 2).
 
+**QUESTIONS:**
+
+1.  When is $Z_i$ used after defining it?
+
+2.  What is the difference between $\delta_i$ and $D_i(t)$? Does $\delta_i$ refer to whether the event happens at all, whereas $D_i(t)$ refers to whether the event has occured by time $t$? If they are different, where is $\delta_i$ referenced after being defined?
+
 The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., p. 2).
 
 In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017, p. 2).
@@ -409,13 +415,25 @@ An AUC value of 1 means perfect ability to distinguish between patients with and
 
 ## Brier score
 
-<https://en.wikipedia.org/wiki/Brier_score>
+The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, pg. 4). IPCW weights are calculated for each individual $i = 1 , ... , n_{sample}$ at each time point $t$, such that:
 
-The Brier score can be thought of as the mean squared error of the prediction forecast, and is commonly formulated as:
+$$\omega_i(t) =
+\frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G_i T^*_i-} +
+\frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G_i(t)}$$
 
-$$\text{Brier Score} = \frac{1}{N}\sum_{t = 1}^{N}(p_t - o_t)^2$$
+where $G_i(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event for the $i^{th}$ individual, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., pp. 4 - 5). The commonly formulated Brier score:
 
-where $p_t$ is the predicted probability of an event and $o_t$ is the observed outcome. The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability (Seo Young Park, p. 1704). **\*\*TIME DEPENDENT BRIER SCORE\*\***
+$$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
+
+where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Seo Young Park et al., 1704), becomes then the IPCW-adjusted Brier score:
+
+$$BS =
+\frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
+\frac{\widehat S_i(t)^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G_i T^*_i-} +
+\frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G_i(t)}
+\right)$$
+
+where $\tilde n(t)$ is the sum of the IPC weight (Prince et al., pg. 6). The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability.
 
 # Version utifrån <https://arxiv.org/html/2501.01280v1#S2>
 
@@ -485,7 +503,7 @@ Under this section, all variables used in the analysis will be described, along 
 
 ### Diagnosis status
 
-The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: NC, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
+The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
 
 The variable was retrieved from the dataset DXSUM in ADNIMERGE2, for which the data were collected by ???. Across the 1190 included participants, there are 29,743 observations in total, consisting of 10,812 CN, 14,649 MCI, and 4,282 dementia diagnoses. The observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
 
@@ -606,6 +624,12 @@ Model convergence was generally good, with $\widehat R$ values close to 1.00 for
 ?
 
 ## Joint latent class mixed model for p-tau181
+
+- Complementary log-log plot showed curvature, Weibull assumes a linear log-log plot.
+
+- Weibull baseline hazard was compared against a flexible baseline hazard using "3-quant-piecewise"
+
+- BIC was lower for Weibull (5582) than for flexible hazard (5595), suggesting that Weibull fits the data better, despite slight violations of the log-log plot
 
 In order to assess whether latent classes can be distinguished solely from p-tau181 trajectories, latent class mixed models were first fit. A one class model was fit and the random effects structure was decided by comparing $BIC$, log-likelihoods and running a likelihood ratio test between the model with both a random intercept and random slope and a model with only a random intercept. The $BIC$ for the more complex model increased compared to the intercept only model and the likelihood ratio test gave $\lambda_{LR} = 0.92$ on 2 degrees of freedom ($p = 0.63$), therefore the intercept only random effects structure was chosen.
 
