@@ -1262,26 +1262,26 @@ get_value <- function(df, var, col) {
 table <- data.frame(
   Variable = all_vars,
 
-  PTau_HR_95_CI = format_hr_ci(
+  Cox_PTau_HR_95_CI = format_hr_ci(
     get_value(ptau, all_vars, "HR"),
     get_value(ptau, all_vars, "CI_low"),
     get_value(ptau, all_vars, "CI_high")
   ),
-  PTau_P = format_p(get_value(ptau, all_vars, "P")),
+  Cox_PTau_P = format_p(get_value(ptau, all_vars, "P")),
 
-  NfL_HR_95_CI = format_hr_ci(
+  Cox_NfL_HR_95_CI = format_hr_ci(
     get_value(nfl, all_vars, "HR"),
     get_value(nfl, all_vars, "CI_low"),
     get_value(nfl, all_vars, "CI_high")
   ),
-  NfL_P = format_p(get_value(nfl, all_vars, "P")),
+  Cox_NfL_P = format_p(get_value(nfl, all_vars, "P")),
 
-  Both_HR_95_CI = format_hr_ci(
+  Cox_Both_HR_95_CI = format_hr_ci(
     get_value(both, all_vars, "HR"),
     get_value(both, all_vars, "CI_low"),
     get_value(both, all_vars, "CI_high")
   ),
-  Both_P = format_p(get_value(both, all_vars, "P")),
+  Cox_Both_P = format_p(get_value(both, all_vars, "P")),
 
   row.names = NULL
 )
@@ -1488,7 +1488,7 @@ summary <- summary(multi_joint_model)
 summary$Survival
 ```
 
-With 25,000 iterations
+*With 25,000 iterations*
 
 ```{r}
 multi_joint_model <- jm(surv_model, mixed ,
@@ -1535,45 +1535,80 @@ summary$Survival
 ### Joint model comparison table
 
 ```{r}
-# Building Joint Model Comparison Table 
-# Extracting survival coefficients (gammas)
-extract_joint <- function(model) {
+# Building Joint Model Comparison Table
+# Extracting Model Output
+extract_model <- function(model) {
 
-  g <- coef(model)$gammas
+  s <- summary(model)$Survival
 
   data.frame(
-    Variable = names(g),
+    Variable = rownames(s),
 
-    # Converting log-HR to hazard ratios
-    HR = exp(as.numeric(g)),
+    HR = exp(s[, "Mean"]),
+    CI_low = exp(s[, "2.5%"]),
+    CI_high = exp(s[, "97.5%"]),
 
+    P = s[, "P"],
     row.names = NULL
   )
 }
 
-# Extracting models
-ptau  <- extract_joint(joint_model_ptau)
-nfl   <- extract_joint(joint_model_nfl)
-multi <- extract_joint(multi_joint_model)
-
-# Combining variable sets
-all_vars <- unique(c(ptau$Variable, nfl$Variable, multi$Variable))
-
-# Safe value extraction
-get_value <- function(df, var, col) {
-  sapply(var, function(v) {
-    idx <- which(df$Variable == v)
-    if (length(idx) == 1) df[idx, col] else NA
-  })
+# Formatting HR And CI
+format_hr_ci <- function(hr, low, high) {
+  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
 }
 
-# Building comparison table
+# Formatting P Values
+format_p <- function(x) {
+  ifelse(is.na(x), NA,
+         ifelse(x < 0.001, "<0.001", round(x, 3)))
+}
+
+# Extracting Models
+ptau <- extract_model(joint_model_ptau)
+nfl  <- extract_model(joint_model_nfl)
+both <- extract_model(multi_joint_model)
+
+# Building Variable Set
+all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
+
+# Value Extraction
+get_value <- function(df, var, col) {
+  out <- rep(NA, length(var))
+
+  for (i in seq_along(var)) {
+    idx <- which(df$Variable == var[i])
+    if (length(idx) == 1) {
+      out[i] <- df[idx, col]
+    }
+  }
+  out
+}
+
+# Building Final Table
 table_joint <- data.frame(
   Variable = all_vars,
 
-  PTau_HR  = round(get_value(ptau, all_vars, "HR"), 3),
-  NfL_HR   = round(get_value(nfl, all_vars, "HR"), 3),
-  Multi_HR = round(get_value(multi, all_vars, "HR"), 3),
+  JM_PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau, all_vars, "HR"),
+    get_value(ptau, all_vars, "CI_low"),
+    get_value(ptau, all_vars, "CI_high")
+  ),
+  JM_PTau_P = format_p(get_value(ptau, all_vars, "P")),
+
+  JM_NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl, all_vars, "HR"),
+    get_value(nfl, all_vars, "CI_low"),
+    get_value(nfl, all_vars, "CI_high")
+  ),
+  JM_NfL_P = format_p(get_value(nfl, all_vars, "P")),
+
+  JM_Both_HR_95_CI = format_hr_ci(
+    get_value(both, all_vars, "HR"),
+    get_value(both, all_vars, "CI_low"),
+    get_value(both, all_vars, "CI_high")
+  ),
+  JM_Both_P = format_p(get_value(both, all_vars, "P")),
 
   row.names = NULL
 )
