@@ -614,6 +614,14 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 ```
 
+```{r}
+# Checking the event distribution for the in-sample observations
+table(surv_data_in$event)
+
+# Checking the event distribution for the out-sample observations
+table(surv_data_out$event)
+```
+
 ## ...
 
 # Longitudinal models
