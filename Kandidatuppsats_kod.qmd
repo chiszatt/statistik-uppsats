@@ -1553,7 +1553,7 @@ summary$Survival
 
 ```{r}
 # Building Joint Model Comparison Table
-# Extracting Model Output
+# Extracting Models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
 extract_model <- function(model) {
 
   s <- summary(model)$Survival
