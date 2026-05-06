@@ -235,7 +235,9 @@ A core assumption of the joint model for longitudinal and survival data is full 
 
 **\*\*Frequentist vs Bayesian Approach\*\***
 
-The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62). However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be impractical. This becomes even more challenging when the data include measurement error, missing values, or nonlinear longitudinal patterns, since these features increase model complexity. From a Bayesian perspective, the joint modelling framework can be approached in a more direct way, avoiding many of the complex approximations that are typically required in frequentist methods. At the same time, when noninformative priors are used, the resulting estimates are often very similar to those obtained from maximum likelihood approaches (Wu et al., 2008; Brown et al., 2003, p. 222).
+The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62). However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be impractical. This becomes even more challenging when the data include measurement error, missing values, or nonlinear longitudinal patterns, since these features increase model complexity.
+
+An alternative is a Bayesian estimation approach, which differs from the frequentist framework in that, while the frequentist approach treats parameters as fixed but unknown quantities estimated solely from the data, the Bayesian approach treats parameters as random variables and combines a prior distribution with the observed data to obtain a posterior distribution (Carlin & Louis, 2008). From this perspective, joint modelling can be done in a more direct way, often avoiding many of the complex approximations that are typically required in frequentist methods. At the same time, when weakly ninformative priors are used, the resulting estimates are often very similar to those obtained from maximum likelihood approaches (Wu et al., 2008; Brown et al., 2003, p. 222).
 
 **\*\*Kanske kort beskrivning om generella skillnaden mellan bayesian vs frequentist? -\> fokusera på bayesiansk istället, kanske inte viktigt med frekventist här \*\***
 
@@ -429,21 +431,21 @@ where $\tilde n(t)$ is the sum of the IPC weight (Prince et al., pg. 6). The Bri
 
 **Time-dependent AUC**
 
-Time-dependent AUC is a measure of the model’s discriminatory ability at time $t$, i.e. its ability to distinguish between individuals who will experience the event after time $t$ and those who will not. It is defined via time-dependent sensitivity and specificity over a threshold $c \in [0,1]$ (Yang et al., 2026):
+Time-dependent AUC is a measure of the model’s discriminatory ability at time $t$, meaning its ability to distinguish between individuals who will experience the event after time $t$ and those who will not. It is defined via time-dependent sensitivity and specificity over a threshold $c \in [0,1]$ (Yang et al., 2026, p. 3):
 
 $$\mathrm{sen}(t,\Delta t,c)=\Pr\{\Pi_i(t+\Delta t \mid t)\ge c \mid T_i \ge t\}$$
 
 $$\mathrm{spe}(t,\Delta t,c)=\Pr\{\Pi_i(t+\Delta t \mid t)< c \mid T_i \ge t+\Delta t\}$$
 
-Varying $c$ yields the ROC curve, and the resulting time-dependent AUC summarizes the model’s ability to correctly rank individuals according to their risk over the prediction horizon $t+\Delta t$ (Yang et al., 2026). An AUC value of $1$ indicates perfect discrimination, whereas a value of $0.5$ corresponds to no discrimination, equivalent to random guessing (Rizopoulos, p. 196).
+Varying $c$ yields the ROC curve, and the resulting time-dependent AUC summarizes the model’s ability to correctly rank individuals according to their risk over the prediction horizon $t+\Delta t$ (Yang et al., p. 3). An AUC value of $1$ indicates perfect discrimination, while a value of $0.5$ corresponds to no discrimination, equivalent to random guessing (Rizopoulos, 2012, p. 196).
 
 **Time-dependent Brier score**
 
-The time-dependent Brier score measures the mean squared difference between the observed event status and the predicted event probability at time $t+\Delta t$, conditional on being event-free at time $t$ (Yang et al., 2026).
+The time-dependent Brier score measures the mean squared difference between the observed event status and the predicted event probability at time $t+\Delta t$, conditional on being event-free at time $t$ (Yang et al., p. 6). Therefore, it captures both calibration and overall prediction error.
 
 $$BS(t+\Delta t,t)=E\left[(I(T < t+\Delta t)-\Pi(t+\Delta t \mid t))^2 \mid T \ge t\right]$$
 
-A lower value indicates better predictive performance. In practice, the Brier score is estimated using either a model-based approach or inverse probability of censoring weighting (IPCW) to account for censoring (Yang et al., 2026).
+In contrast to the time-dependent AUC, a lower value indicates better predictive performance (Yang et al., p. 6).
 
 # Description of Data
 
@@ -687,6 +689,8 @@ Andrinopoulou, E. R., & Rizopoulos, D. (2016). Bayesian shrinkage approach for a
 Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
 
 Brown, E.R. & Ibrahim, J.G. (2003). A Bayesian Semiparametric Joint Hierarchical Model for Longitudinal and Survival Data, *Biometrics*, 59(2), 221-228, [https://doi.org/10.1111/1541-04](#0)
+
+Carlin, B. P., & Louis, T. A. (2008). *Bayesian methods for data analysis* (3rd ed.). CRC Press.
 
 Carrillo, M. C., Dean, R. A., Nicolas, F., Miller, D. S., Berman, R., Khachaturian, Z., Bain, L. J., Schindler, R., Knopman, D., & Alzheimer's Association Research Roundtable (2013). Revisiting the framework of the National Institute on Aging-Alzheimer's Association diagnostic criteria. *Alzheimer's & dementia : the journal of the Alzheimer's Association*, 9(5), 594-601. <https://doi.org/10.1016/j.jalz.2013.05.1762>
 
