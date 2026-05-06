@@ -331,19 +331,13 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-**Bayesian Information Criterion**
+According to Proust-Lima et al. (p. 7), one aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**). RESULTS FROM SIMULATION STUDY (MORGAN ET AL.) Ensuring good discrimination between classes is another important component of selecting the number of classes in the final model. Class discrimination can be assessed by analysis of the posterior class membership probability, given by:
 
-According to Proust-Lima et al. (p. 7), one aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**). RESULTS FROM SIMULATION STUDY (MORGAN ET AL.)
+$$$$
 
-**Posterior Probabilities**
+Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7), typically 0.7, 0.8 or 0.9. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may
 
-Ensuring good discrimination between classes is an important component of selecting the number of classes in the final model. Class discrimination can be assessed by analysis of the posterior class membership probability, given by:
-
-Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7), typically 0.7, 0.8 or 0.9.
-
-**Entropy**
-
-One possible measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, p. 150), which takes values between 0 and 1 and is calculated as follows:
+One measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, p. 150), which takes values between 0 and 1 and is calculated as follows:
 
 $$EN(G) = 1 - 
 \frac{
@@ -363,7 +357,7 @@ Both fit and discrimination
 
 **Validation**
 
-The chosen classes should be clinically meaningful.
+Further, the chosen classes should be clinically meaningful.
 
 # Model Comparison
 
