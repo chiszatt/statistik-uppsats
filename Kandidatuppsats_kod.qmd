@@ -1307,6 +1307,31 @@ cox.zph(surv_model_nfl_bl)
 cox.zph(surv_model_both_bl)
 ```
 
+```{r}
+surv_model_plot <- cox.zph(surv_model)
+plot(surv_model_plot)
+```
+
+### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
+
+To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
+
+```{r}
+# We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
+surv_model_tv <- coxph(
+  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + tt(age_at_baseline),
+  data = surv_data,
+  tt = function(x, t, ...) x * log(t)
+)
+
+summary(surv_model_tv)
+
+AIC(surv_model, surv_model_tv)
+
+logLik(surv_model)
+logLik(surv_model_tv)
+```
+
 # Two separate joint models
 
 ## Fitted joint model for p-tau181
@@ -1461,6 +1486,20 @@ summary(multi_joint_model)
 ```{r}
 summary <- summary(multi_joint_model)
 summary$Survival
+```
+
+With 25,000 iterations
+
+```{r}
+multi_joint_model <- jm(surv_model, mixed ,
+                        time_var = "time_years",
+                        functional_forms = fForms,
+                        n_chains = 3L,
+                        n_iter = 25000L,
+                        n_burnin = 2000L
+                        )
+
+summary(multi_joint_model)
 ```
 
 #### With random slope for NfL
