@@ -537,6 +537,10 @@ hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
 # We log transform the biomarkers 
 long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
 long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
+
+# We log transform the biomarkers 
+long_data_out$log_PLASMAPTAU181 <- log(long_data_out$PLASMAPTAU181)
+long_data_out$log_PLASMA_NFL <- log(long_data_out$PLASMA_NFL)
 ```
 
 ```{r}
@@ -653,25 +657,25 @@ var(long_data$PLASMAPTAU181)
 ```{r}
 # GLMM
 fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
-                   data = long_data,
+                   data = long_data_in,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
 fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
-                data = long_data)
+                data = long_data_in)
 
 # LME approach with log transformed data
 fit_lme_cubed_ptau <- lmer(sqrt(sqrt(PLASMAPTAU181)) ~ time_years + (1|RID), 
-                           data = long_data)
+                           data = long_data_in)
 
 # Lognormal - similar to log-transforming then fitting LME
 fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                             data = long_data,
+                             data = long_data_in,
                              family = lognormal(link = "log"))
 
 # Student-t
 #fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            #data = long_data,
+                            #data = long_data_in,
                             #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -698,7 +702,7 @@ library(splines)
 fit_spline_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ ns(time_years, df = 3),
   random = ~ time_years | RID,
-  data = long_data,
+  data = long_data_in,
   method = "REML"
 )
 
@@ -753,25 +757,25 @@ var(long_data$PLASMA_NFL)
 ```{r}
 # GLMM
 fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
-                   data = long_data,
+                   data = long_data_in,
                    family = Gamma(link = "log"))
 
 # LME approach with log transformed data
 fit_lme_log_nfl <- lmer(log(PLASMA_NFL) ~ time_years + (1|RID), 
-                data = long_data)
+                data = long_data_in)
 
 # LME approach with log transformed data
 fit_lme_cubed_nfl <- lmer(sqrt(sqrt(PLASMA_NFL)) ~ time_years + (1|RID), 
-                          data = long_data)
+                          data = long_data_in)
 
 # Lognormal - similar to log-transforming then fitting LME
 fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                             data = long_data,
+                             data = long_data_in,
                              family = lognormal(link = "log"))
 
 # Student-t
 #fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           #data = long_data,
+                           #data = long_data_in,
                            #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
@@ -798,7 +802,7 @@ library(splines)
 fit_spline_nfl <- lme(
   fixed = log_PLASMA_NFL ~ ns(time_years, df = 3),
   random = ~ time_years | RID,
-  data = long_data,
+  data = long_data_in,
   method = "REML"
 )
 
@@ -856,7 +860,7 @@ Osäker dock om man kan jämföra log-version och cube-version av lme med de and
 long_model_ptau_full <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
   random = ~ time_years | RID,                    
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -873,7 +877,7 @@ summary(long_model_ptau_full)
 long_model_ptau <- lme(
   fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -889,10 +893,10 @@ summary(long_model_ptau)
 
 ```{r}
 m1 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (1 | RID),
-           data = long_data, REML = FALSE)
+           data = long_data_in, REML = FALSE)
 
 m2 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (time_years | RID),
-           data = long_data, REML = FALSE)
+           data = long_data_in, REML = FALSE)
 ```
 
 ```{r}
@@ -908,7 +912,7 @@ anova(m1, m2, type = "LRT")
 long_model_nfl_full <- lme(
   log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
   random = ~ time_years | RID,
-  data = long_data
+  data = long_data_in
   )
 ```
 
@@ -925,7 +929,7 @@ summary(long_model_nfl_full)
 long_model_nfl <- lme(
   fixed = log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
   random = ~ time_years | RID,
-  data = long_data
+  data = long_data_in
   )
 ```
 
@@ -940,7 +944,7 @@ summary(long_model_nfl)
 long_model_nfl_reduced1 <- lme(
   log_PLASMA_NFL ~ time_years + PTGENDER, 
   random = ~ time_years | RID,
-  data = long_data
+  data = long_data_in
   )
 ```
 
@@ -955,7 +959,7 @@ summary(long_model_nfl_reduced1)
 long_model_nfl_reduced2 <- lme(
   log_PLASMA_NFL ~ time_years, 
   random = ~ time_years | RID,
-  data = long_data
+  data = long_data_in
   )
 ```
 
@@ -969,10 +973,10 @@ summary(long_model_nfl_reduced2)
 
 ```{r}
 m1 <- lmer(log_PLASMA_NFL ~ time_years + (1 | RID),
-           data = long_data, REML = FALSE)
+           data = long_data_in, REML = FALSE)
 
 m2 <- lmer(log_PLASMA_NFL ~ time_years + (time_years | RID),
-           data = long_data, REML = FALSE)
+           data = long_data_in, REML = FALSE)
 ```
 
 ```{r}
@@ -1055,7 +1059,7 @@ qqline(res_nfl, col = "red")
 # All genotype levels
 surv_model_full <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + genotype,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1069,7 +1073,7 @@ summary(surv_model_full)
 # With APOE4_status
 surv_model <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1083,7 +1087,7 @@ summary(surv_model)
 # With APOE4_status
 surv_model_reduced <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1104,7 +1108,7 @@ anova(surv_model, surv_model_reduced)
 surv_model_ptau_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1119,7 +1123,7 @@ summary(surv_model_ptau_bl)
 surv_model_ptau_bl_reduced <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + APOE4_status + baseline_value_ptau,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
   )
 
@@ -1141,7 +1145,7 @@ anova(surv_model_ptau_bl, surv_model_ptau_bl_reduced, test = "LRT")
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1155,7 +1159,7 @@ summary(surv_model_nfl_bl)
 surv_model_nfl_bl_reduced1 <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + APOE4_status + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1169,7 +1173,7 @@ summary(surv_model_nfl_bl_reduced1)
 surv_model_nfl_bl_reduced2 <- coxph(
   Surv(time_to_event, event) ~
     APOE4_status + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1191,7 +1195,7 @@ anova(surv_model_nfl_bl, surv_model_nfl_bl_reduced1, surv_model_nfl_bl_reduced2,
 surv_model_both_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1205,7 +1209,7 @@ summary(surv_model_both_bl)
 surv_model_both_bl_reduced1 <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1219,7 +1223,7 @@ summary(surv_model_both_bl_reduced1)
 surv_model_both_bl_reduced2 <- coxph(
   Surv(time_to_event, event) ~
     APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data,
+  data = surv_data_in,
   x = TRUE
 )
 
@@ -1345,7 +1349,7 @@ To confirm that age at baseline has a time-dependent effect that violates the pr
 # We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
 surv_model_tv <- coxph(
   Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + tt(age_at_baseline),
-  data = surv_data,
+  data = surv_data_in,
   tt = function(x, t, ...) x * log(t)
 )
 
@@ -1655,7 +1659,7 @@ hlme_m0_1 <- hlme(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1669,7 +1673,7 @@ hlme_m0_2 <- hlme(
   fixed = log_PLASMA_NFL ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1710,7 +1714,7 @@ hlme_m1 <- hlme(
     subject = "RID",
     classmb = ~ 1,
     ng = 2,
-    data = long_data,
+    data = long_data_in,
     B = random(hlme_m0_1)
   )
 
@@ -1778,7 +1782,7 @@ hlme_m0_1 <- hlme(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1792,7 +1796,7 @@ hlme_m0_2 <- hlme(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1833,7 +1837,7 @@ hlme_m1 <- hlme(
     subject = "RID",
     classmb = ~ 1,
     ng = 2,
-    data = long_data,
+    data = long_data_in,
     B = random(hlme_m0_1)
   )
 ```
@@ -1907,7 +1911,7 @@ mlcmm_m0_1 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1921,7 +1925,7 @@ mlcmm_m0_2 <- multlcmm(
   fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
   random = ~ time_years,
   subject = "RID",
-  data = long_data
+  data = long_data_in
 )
 ```
 
@@ -1962,7 +1966,7 @@ mlcmm_m1 <- multlcmm(
   subject = "RID",
   classmb = ~ 1,
   ng = 2,
-  data = long_data,
+  data = long_data_in,
   B = random(mlcmm_m0_2)
 )
 ```
@@ -2045,16 +2049,16 @@ ggplot(pp, aes(prob1, prob2)) +
 # JLCMM: NFL
 
 ```{r}
-surv <- survfit(Surv(surv_data$time_to_event, surv_data$event) ~ 1)
+surv <- survfit(Surv(surv_data_in$time_to_event, surv_data_in$event) ~ 1)
 
 plot(log(surv$time), log(-log(surv$surv)), main="Weibull Check")
 ```
 
 ```{r}
 # merging the longitudinal and survival data for jlcmm
-jlcmm_data <- surv_data %>%
+jlcmm_data <- surv_data_in %>%
   dplyr::select(RID, event, time_to_event) %>%
-  merge(long_data, by = "RID")
+  merge(long_data_in, by = "RID")
 ```
 
 ## M0 (1 latent class)
@@ -2873,10 +2877,10 @@ times <- c(3, 4, 5, 6, 7, 8)
 # We define a function to compute time-dependent AUC for Cox models using timeROC
 get_cox_auc <- function(model, times) {
   
-  T <- surv_data$time_to_event
-  delta <- surv_data$event
+  T <- surv_data_out$time_to_event
+  delta <- surv_data_out$event
   
-  lp <- predict(model, newdata = surv_data, type = "lp")
+  lp <- predict(model, newdata = surv_data_out, type = "lp")
   
   timeROC::timeROC(
     T = T,
@@ -2911,10 +2915,11 @@ auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
 ```{r}
 # We construct prediction datasets for the joint models by merging the  longitudinal and survival data
 newdata <- dplyr::left_join(
-  long_data,
-  dplyr::select(surv_data, RID, age_at_baseline, time_to_event, event),
+  long_data_out,
+  dplyr::select(surv_data_out, RID, age_at_baseline, time_to_event, event),
   by = "RID"
 )
+
 ```
 
 ```{r}
@@ -3042,13 +3047,13 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 ```
 
 ```{r}
-auc_jlcmm_m1_nfl <- jlcmm_timeAUC(jlcmm_m1_nfl, jlcmm_data,
+auc_jlcmm_m1_nfl <- jlcmm_timeAUC(jlcmm_m1_nfl, newdata,
                                   "RID", "time_years", "time_to_event", "event",
                                   2, c(3, 4, 5, 6, 7, 8))
 ```
 
 ```{r}
-auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
+auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, newdata,
                                    "RID", "time_years", "time_to_event", "event",
                                    2, c(3, 4, 5, 6, 7, 8))
 ```
@@ -3180,7 +3185,7 @@ brier_cox <- pec(
    object = cox_models,
    formula = Surv(time_to_event, event) ~ 
      age_at_baseline + PTGENDER + APOE4_status,
-   data = surv_data,
+   data = surv_data_out,
    times = times,
    cens.model = "cox"
  )
