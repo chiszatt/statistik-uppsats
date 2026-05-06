@@ -515,17 +515,13 @@ To define the outcome for the survival analyses, the study focuses on time to in
 
 ### P-tau181
 
-P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was collected by ????. In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements.
-
-The biomarker measurements are recorded on a scale of ??? and are observed 3647 times across the 1,190 included participants. Values range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. Overall, the distribution of the variable is highly right-skewed and not normally distributed.
+P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was collected by ????. In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements. The biomarker measurements are recorded on a scale of ??? and are observed 3647 times across the 1,190 included participants.
 
 P-tau181 is used differently across the modelling frameworks. In the standard Cox proportional hazards (Cox PH) models, baseline p-tau181 values are included as a covariate to assess their association with subsequent risk of progression to AD/dementia. In the joint models, p-tau181 is modelled longitudinally using a linear mixed-effects submodel, where repeated measurements over time are used to describe individual biomarker trajectories. These longitudinal trajectories are then linked to the survival submodel (Cox component), allowing for assessment of how changes in p-tau181 over time are associated with the hazard of progression.
 
 ### NfL
 
-NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by ???. Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements.
-
-The biomarker is observed 3647 times across the 1,191 included individuals. Values are recorded on a continuous scale and range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Overall, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed.
+NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by ???. Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements. The biomarker is observed 3647 times across the 1,191 included individuals.
 
 NfL is also used in different ways across the modelling frameworks. In the standard Cox proportional hazards (Cox PH) models, baseline NfL values are included as a covariate to assess their association with risk of progression to AD/dementia. In the joint models, NfL is modelled longitudinally using a linear mixed-effects submodel based on repeated measurements over time. These trajectories are then linked to the survival submodel (Cox component), allowing for estimation of how longitudinal changes in NfL are associated with the hazard of progression.
 
@@ -554,6 +550,26 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 # Pre-processing
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
+
+## Biomarker distributions
+
+Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
+
+![](figures/hist_p_tau.png)
+
+The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
+
+![](figures/hist_nfl.png)
+
+The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
+
+![](figures/hist_log_p_tau.png)
+
+In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
+
+![](figures/hist_log_nfl.png)
+
+The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
 
 # Results
 
