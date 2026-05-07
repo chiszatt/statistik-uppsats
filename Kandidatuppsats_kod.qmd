@@ -624,18 +624,6 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 
 # Survival data with out-sample individuals
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
-
-# Number of unique individuals in in-sample data
-length(unique(surv_data_in$RID))
-
-# Number of unique individuals in out-sample data
-length(unique(surv_data_out$RID))
-
-# Event distribution in in-sample data
-table(surv_data_in$event)
-
-# Event distribution in out-sample data
-table(surv_data_out$event)
 ```
 
 ```{r}
