@@ -534,19 +534,19 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
 
-![](figures/hist_p_tau.png)
+![](figures/hist_p_tau.png){width="400"}
 
 The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
 
-![](figures/hist_nfl.png)
+![](figures/hist_nfl.png){width="400"}
 
 The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
 
-![](figures/hist_log_p_tau.png)
+![](figures/hist_log_p_tau.png){width="400"}
 
 In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
 
-![](figures/hist_log_nfl.png)
+![](figures/hist_log_nfl.png){width="400"}
 
 The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
 
@@ -672,6 +672,24 @@ Predictive performance was evaluated using time-dependent AUC and Brier Score at
     2.  Joint models
     3.  Joint latent models
 3.  Predictive performance
+
+## Model diagnostics (p-tau181)
+
+![](figures/residuals_vs_fitted_ptau.png){width="400"}
+
+Residuals for NfL
+
+![](figures/residuals_vs_fitted_nfl.png){width="400"}
+
+Normality assessment
+
+P-tau181
+
+![](figures/qq_ptau.png){width="400"}
+
+NfL
+
+![](figures/qq_nfl.png){width="400"}
 
 # Discussion
 
