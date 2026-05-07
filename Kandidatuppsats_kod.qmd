@@ -1198,9 +1198,9 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
 #### Cox comparison table
 
 ```{r}
-# Building Cox Comparison Table
-# Extracting Model Output
-extract_model <- function(model) {
+# Building Cox comparison table
+# Extracting model output
+extract_model_cox <- function(model) {
   s <- summary(model)
 
   data.frame(
@@ -1213,26 +1213,26 @@ extract_model <- function(model) {
   )
 }
 
-# Formatting HR And CI
+# Formatting HR and CI
 format_hr_ci <- function(hr, low, high) {
   paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
 }
 
-# Formatting P Values
+# Formatting P-values
 format_p <- function(x) {
   ifelse(is.na(x), NA,
          ifelse(x < 0.001, "<0.001", round(x, 3)))
 }
 
-# Extracting Models
-ptau <- extract_model(surv_model_ptau_bl)
-nfl  <- extract_model(surv_model_nfl_bl)
-both <- extract_model(surv_model_both_bl)
+# Extracting models
+ptau_cox <- extract_model_cox(surv_model_ptau_bl)
+nfl_cox  <- extract_model_cox(surv_model_nfl_bl)
+both_cox <- extract_model_cox(surv_model_both_bl)
 
-# Building Variable Set
-all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
+# Building variable set
+all_vars_cox <- unique(c(ptau_cox$Variable, nfl_cox$Variable, both_cox$Variable))
 
-# Safe Value Extraction
+# Value extraction
 get_value <- function(df, var, col) {
   out <- rep(NA, length(var))
 
@@ -1245,36 +1245,36 @@ get_value <- function(df, var, col) {
   out
 }
 
-# Building Final Table
-table <- data.frame(
-  Variable = all_vars,
+# Building final table
+table_cox <- data.frame(
+  Variable = all_vars_cox,
 
-  Cox_PTau_HR_95_CI = format_hr_ci(
-    get_value(ptau, all_vars, "HR"),
-    get_value(ptau, all_vars, "CI_low"),
-    get_value(ptau, all_vars, "CI_high")
+  PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau_cox, all_vars_cox, "HR"),
+    get_value(ptau_cox, all_vars_cox, "CI_low"),
+    get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  Cox_PTau_P = format_p(get_value(ptau, all_vars, "P")),
+  PTau_P = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
-  Cox_NfL_HR_95_CI = format_hr_ci(
-    get_value(nfl, all_vars, "HR"),
-    get_value(nfl, all_vars, "CI_low"),
-    get_value(nfl, all_vars, "CI_high")
+  NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl_cox, all_vars_cox, "HR"),
+    get_value(nfl_cox, all_vars_cox, "CI_low"),
+    get_valu(nfl_cox, all_vars_cox, "CI_high")
   ),
-  Cox_NfL_P = format_p(get_value(nfl, all_vars, "P")),
+  NfL_P = format_p(get_value(nfl_cox, all_vars_cox, "P")),
 
-  Cox_Both_HR_95_CI = format_hr_ci(
-    get_value(both, all_vars, "HR"),
-    get_value(both, all_vars, "CI_low"),
-    get_value(both, all_vars, "CI_high")
+  Both_HR_95_CI = format_hr_ci(
+    get_value(both_cox, all_vars_cox, "HR"),
+    get_value(both_cox, all_vars_cox, "CI_low"),
+    get_value(both_cox, all_vars_cox, "CI_high")
   ),
-  Cox_Both_P = format_p(get_value(both, all_vars, "P")),
+  Both_P = format_p(get_value(both_cox, all_vars_cox, "P")),
 
   row.names = NULL
 )
 
-# Showing Table
-table
+# Showing table
+table_cox
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1485,9 +1485,9 @@ summary(multi_joint_model)
 ### Joint model comparison table
 
 ```{r}
-# Building Joint Model Comparison Table
-# Extracting Models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
-extract_model <- function(model) {
+# Building joint model comparison table
+# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
+extract_model_jm <- function(model) {
 
   s <- summary(model)$Survival
 
@@ -1503,67 +1503,44 @@ extract_model <- function(model) {
   )
 }
 
-# Formatting HR And CI
-format_hr_ci <- function(hr, low, high) {
-  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
-}
+# Extracting models
+ptau_jm <- extract_model_jm(joint_model_ptau)
+nfl_jm <- extract_model_jm(joint_model_nfl)
+both_jm <- extract_model_jm(multi_joint_model)
 
-# Formatting P Values
-format_p <- function(x) {
-  ifelse(is.na(x), NA,
-         ifelse(x < 0.001, "<0.001", round(x, 3)))
-}
+# Building variable set
+all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
 
-# Extracting Models
-ptau <- extract_model(joint_model_ptau)
-nfl <- extract_model(joint_model_nfl)
-both <- extract_model(multi_joint_model)
-
-# Building Variable Set
-all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
-
-# Value Extraction
-get_value <- function(df, var, col) {
-  out <- rep(NA, length(var))
-
-  for (i in seq_along(var)) {
-    idx <- which(df$Variable == var[i])
-    if (length(idx) == 1) {
-      out[i] <- df[idx, col]
-    }
-  }
-  out
-}
-
-# Building Final Table
-table_joint <- data.frame(
-  Variable = all_vars,
+# Building final table
+table_jm <- data.frame(
+  Variable = all_vars_jm,
 
   JM_PTau_HR_95_CI = format_hr_ci(
-    get_value(ptau, all_vars, "HR"),
-    get_value(ptau, all_vars, "CI_low"),
-    get_value(ptau, all_vars, "CI_high")
+    get_value(ptau_jm, all_vars_jm, "HR"),
+    get_value(ptau_jm, all_vars_jm, "CI_low"),
+    get_value(ptau_jm, all_vars_jm, "CI_high")
   ),
-  JM_PTau_P = format_p(get_value(ptau, all_vars, "P")),
+  JM_PTau_P = format_p(get_value(ptau_jm, all_vars_jm, "P")),
 
   JM_NfL_HR_95_CI = format_hr_ci(
-    get_value(nfl, all_vars, "HR"),
-    get_value(nfl, all_vars, "CI_low"),
-    get_value(nfl, all_vars, "CI_high")
+    get_value(nfl_jm, all_vars_jm, "HR"),
+    get_value(nfl_jm, all_vars_jm, "CI_low"),
+    get_value(nfl_jm, all_vars_jm, "CI_high")
   ),
-  JM_NfL_P = format_p(get_value(nfl, all_vars, "P")),
+  JM_NfL_P = format_p(get_value(nfl_jm, all_vars_jm, "P")),
 
   JM_Both_HR_95_CI = format_hr_ci(
-    get_value(both, all_vars, "HR"),
-    get_value(both, all_vars, "CI_low"),
-    get_value(both, all_vars, "CI_high")
+    get_value(both_jm, all_vars_jm, "HR"),
+    get_value(both_jm, all_vars_jm, "CI_low"),
+    get_value(both_jm, all_vars_jm, "CI_high")
   ),
-  JM_Both_P = format_p(get_value(both, all_vars, "P")),
+  JM_Both_P = format_p(get_value(both_jm, all_vars_jm, "P")),
 
   row.names = NULL
 )
 
-table_joint
+# Showing table
+table_jm
 ```
 
 # Rhat value comparison table
