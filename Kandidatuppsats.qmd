@@ -383,7 +383,7 @@ An AUC value of 1 means perfect ability to distinguish between patients with and
 The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, pg. 4). IPCW weights are calculated for each individual $i = 1 , ... , n_{sample}$ at each time point $t$, such that:
 
 $$\omega_i(t) =
-\frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G_i T^*_i-} +
+\frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G_i(T^*_i-)} +
 \frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G_i(t)}$$
 
 where $G_i(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event for the $i^{th}$ individual, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., pp. 4 - 5). The commonly formulated Brier score:

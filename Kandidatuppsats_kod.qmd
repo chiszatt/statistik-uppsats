@@ -453,6 +453,11 @@ table(
 ### Constructing global (common) baseline, age at baseline, event and time-to-event variables
 
 ```{r}
+test <- surv_data %>%
+  mutate(EXAMDATE_dx_lag = lag(EXAMDATE_dx))
+```
+
+```{r}
 surv_data <- surv_data %>%
   group_by(RID) %>%
   summarise(
@@ -481,7 +486,22 @@ surv_data <- surv_data %>%
         event == 1 & unique(baseline_dx) != "Dementia" ~
           as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - EXAMDATE_baseline)/365,
         TRUE ~
-          as.numeric(last_followup - EXAMDATE_baseline)/365))
+          as.numeric(last_followup - EXAMDATE_baseline)/365),
+
+#     Creating a lagged variable for EXAMDATE_dx
+      previous_EXAMDATE_dx = lag(EXAMDATE_dx),
+
+#     Creating a time_to_event variable for sensitivity analysis due to interval censored data
+#     0 if dementia dx at baseline
+#     Midpoint between dementia dx EXAMDATE and previous dx EXAMDATE for events
+#     Or date of censuring for censured individuals
+      time_to_event_intervall = case_when(
+        event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
+        event == 1 & unique(baseline_dx) != "Dementia" ~
+          as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"] - EXAMDATE_baseline))/365,
+        TRUE ~
+          as.numeric(last_followup - EXAMDATE_baseline)/365)
+)
 ```
 
 ```{r}
@@ -2850,13 +2870,7 @@ summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
 
 ## TO DO
 
-Check sensitivity to starting values by using gridsearch()
-
 External validation: what do these classes look like? Do they just represent different genotypes? How do we check this and are they truly valid LATENT classes?
-
-Adjusted LRT (Lo-Mendell-Rubin test)
-
-Bootstrap LRT???
 
 # Comparing models using time-dependent AUC
 
@@ -3235,7 +3249,116 @@ brier_multi_jm
 ## Time-dependent Brier score for latent class joint models
 
 ```{r}
+brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, times, landmark) {
+  
+#   Initiating a data frame to save the results in at each horizon time
+  output <- data.frame(
+    times = times,
+    Brier = NA,
+    IBS = NA
+  )
+  
+#   Calculating the dynamic survival predictions from joint models using dynpred() in the lcmm package
+  dynpreds <- dynpred(
+    model,
+    newdata = data,
+    var.time = time_var,
+    horizon = times,
+    landmark = landmark
+    )
 
+#   Extracting the predicted survival probabilities 
+  preds <- dynpreds$pred["pred"]
+#   Extracting the unique identifiers (RID) relating to the predicitons
+  ids <- dynpreds$pred[ID]
+#   Extracting the horizon relating to the predicitons
+  horizons <- dynpreds$pred["horizon"]
+  
+#   Creatng a data frame of predictions, horizons and IDs
+  dfpred <- data.frame(id = ids, horizon = horizons, pred = preds)
+  
+#   Fetching the true event times and events 
+  dftrue <- unique(data[c(ID, surv_time_var, event_var)])
+  names(dftrue) <- c(ID, "time", "event")
+  
+#   Merging prediction df with true df
+  merged <- merge(dfpred, dftrue, by = ID)
+  
+#   Saving censoring indicator (1 - event indicator), times remain the same as event/censured times from the event indicator
+  merged$cens_event  <- 1 - merged$event
+  
+#  Estimting the censoring distribution with the Kaplan-Meier estimate
+  km_cens <- survfit(Surv(merged$time, merged$cens_event) ~ 1)
+  
+#   Function to evaluate estimate of censuring probability
+  Ghat <- function(t) {
+    sapply(t, function(x) {
+      idx <- max(which(km_cens$time <= x))
+      if (length(idx) == 0) return(1)
+      km_cens$surv[idx]
+    })
+  }
+  
+  brier_one_time <- function(t) {
+    
+#    Saving all rows belonging to horizon t
+    sub <- merged[merged$horizon == t, ]
+#    Saving the observed survival status
+    status_t <- as.numeric(sub$time > t)
+#    Saving the predicted survival probability: 1 - pred since dynpred outputs cumulative risk (event probability) instead of survival probabilities 
+    pred_t <- 1 - sub$pred
+
+#    Calculating the IPCW weights
+    w <- ifelse(sub$time > t,
+                1 / Ghat(t),
+                ifelse(sub$event == 1 & sub$time <= t,
+                       1 / Ghat(sub$time),
+                       0))
+    
+#     Calculating the IPCW-adjusted Brier score
+    mean(w * (status_t - pred_t)^2, na.rm = TRUE)
+  }
+  
+#   Calculating the Brier score for each horizon
+  brier_scores <- sapply(times, brier_one_time)
+#   Saving to output
+  output$Brier <- brier_scores
+  
+#   Integrated Brier Score (IBS)
+  IBS <- sum(diff(times) *
+               (brier_scores[-1] + brier_scores[-length(brier_scores)]) / 2) /
+         (max(times) - landmark)
+#   Saving to output
+  output$IBS <- IBS
+  
+  return(output)
+}
+```
+
+```{r}
+brier_jlcmm_m1_nfl <- brier_jlcmm(
+  model = jlcmm_m1_nfl,
+  data = newdata,
+  ID = "RID",
+  time_var = "time_years",
+  surv_time_var = "time_to_event",
+  event_var = "event",
+  times = c(2, 3, 4, 5, 6),
+  landmark = 1
+)
+```
+
+```{r}
+brier_jlcmm_m2_ptau <- brier_jlcmm(
+  model = jlcmm_m2_ptau,
+  data = newdata,
+  ID = "RID",
+  time_var = "time_years",
+  surv_time_var = "time_to_event",
+  event_var = "event",
+  times = c(2, 3, 4, 5, 6),
+  landmark = 1
+)
 ```
 
 ## Table of the results
