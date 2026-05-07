@@ -1195,7 +1195,82 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
       test = "LRT")
 ```
 
-#### Cox comparison table
+### Test of the assumption of proportional hazards
+
+# Check global violation
+
+```{r}
+##### For the standard Cox PH model
+cox.zph(surv_model)
+
+##### For the Cox PH models with baseline values of each biomarker 
+# With p-tau181 baseline values
+cox.zph(surv_model_ptau_bl)
+# With NfL baseline values
+cox.zph(surv_model_nfl_bl)
+# With both p-tau181 and NfL baseline values
+cox.zph(surv_model_both_bl)
+```
+
+#### Removing age-at-baseline due to evidence of non-proportional hazards
+
+```{r}
+# Cox survival-models with covariates but excluding age-at-baseline
+# Standard cox model 
+surv_model_final <- coxph(
+  Surv(time_to_event, event) ~ PTGENDER + APOE4_status,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_final)
+
+# Including p-tau181
+surv_model_ptau_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_ptau_bl_final)
+
+# Including NfL
+surv_model_nfl_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_nfl_bl_final)
+
+# Inlcuding both p-tau181 and NfL
+surv_model_both_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_both_bl_final) 
+```
+
+```{r}
+# Re-checking the proportional hazards assumption
+##### For the standard Cox PH model
+cox.zph(surv_model_final)
+
+##### For the Cox PH models with baseline values of each biomarker 
+# With p-tau181 baseline values
+cox.zph(surv_model_ptau_bl_final)
+# With NfL baseline values
+cox.zph(surv_model_nfl_bl_final)
+# With both p-tau181 and NfL baseline values
+cox.zph(surv_model_both_bl_final)
+```
+
+### Cox comparison table
 
 ```{r}
 # Building Cox comparison table
@@ -1225,9 +1300,9 @@ format_p <- function(x) {
 }
 
 # Extracting models
-ptau_cox <- extract_model_cox(surv_model_ptau_bl)
-nfl_cox  <- extract_model_cox(surv_model_nfl_bl)
-both_cox <- extract_model_cox(surv_model_both_bl)
+ptau_cox <- extract_model_cox(surv_model_ptau_bl_final)
+nfl_cox  <- extract_model_cox(surv_model_nfl_bl_final)
+both_cox <- extract_model_cox(surv_model_both_bl_final)
 
 # Building variable set
 all_vars_cox <- unique(c(ptau_cox$Variable, nfl_cox$Variable, both_cox$Variable))
@@ -1249,69 +1324,33 @@ get_value <- function(df, var, col) {
 table_cox <- data.frame(
   Variable = all_vars_cox,
 
-  PTau_HR_95_CI = format_hr_ci(
+  "PTau HR (95% CI)" = format_hr_ci(
     get_value(ptau_cox, all_vars_cox, "HR"),
     get_value(ptau_cox, all_vars_cox, "CI_low"),
     get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  PTau_P = format_p(get_value(ptau_cox, all_vars_cox, "P")),
+  "PTau P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
-  NfL_HR_95_CI = format_hr_ci(
+  "NfL HR (95% CI)" = format_hr_ci(
     get_value(nfl_cox, all_vars_cox, "HR"),
     get_value(nfl_cox, all_vars_cox, "CI_low"),
-    get_valu(nfl_cox, all_vars_cox, "CI_high")
+    get_value(nfl_cox, all_vars_cox, "CI_high")
   ),
-  NfL_P = format_p(get_value(nfl_cox, all_vars_cox, "P")),
+  "NfL P" = format_p(get_value(nfl_cox, all_vars_cox, "P")),
 
-  Both_HR_95_CI = format_hr_ci(
+  "Both HR (95% CI)" = format_hr_ci(
     get_value(both_cox, all_vars_cox, "HR"),
     get_value(both_cox, all_vars_cox, "CI_low"),
     get_value(both_cox, all_vars_cox, "CI_high")
   ),
-  Both_P = format_p(get_value(both_cox, all_vars_cox, "P")),
+  "Both P" = format_p(get_value(both_cox, all_vars_cox, "P")),
 
-  row.names = NULL
+  row.names = NULL, 
+  check.names = FALSE
 )
 
 # Showing table
 table_cox
-```
-
-### Test of the assumption of proportional hazards
-
-# Check global violation
-
-```{r}
-##### For the standard Cox PH model
-cox.zph(surv_model)
-
-##### For the Cox PH models with baseline values of each biomarker 
-# With p-tau181 baseline values
-cox.zph(surv_model_ptau_bl)
-# With NfL baseline values
-cox.zph(surv_model_nfl_bl)
-# With both p-tau181 and NfL baseline values
-cox.zph(surv_model_both_bl)
-```
-
-### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
-
-To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
-
-```{r}
-# We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
-surv_model_tv <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + tt(age_at_baseline),
-  data = surv_data_in,
-  tt = function(x, t, ...) x * log(t)
-)
-
-summary(surv_model_tv)
-
-AIC(surv_model, surv_model_tv)
-
-logLik(surv_model)
-logLik(surv_model_tv)
 ```
 
 # Two separate joint models
@@ -1323,7 +1362,7 @@ logLik(surv_model_tv)
 ```{r}
 # Joint model for p-tau181 using package JMbayes2 (bayesian approach)
 joint_model_ptau <- jm(
-  surv_model,
+  surv_model_final,
   long_model_ptau,
   time_var = "time_years",
   n_chains = 3L,
@@ -1340,7 +1379,7 @@ summary(joint_model_ptau)
 
 ```{r}
 joint_model_ptau <- jm(
-  surv_model,
+  surv_model_final,
   long_model_ptau,
   time_var = "time_years",
   n_chains = 3L,
@@ -1364,7 +1403,7 @@ ggtraceplot(joint_model_ptau, "alphas")
 ```{r}
 # Joint model for NfL using package JMbayes2 (bayesian approach)
 joint_model_nfl <- jm(
-  surv_model,
+  surv_model_final,
   long_model_nfl,
   time_var = "time_years",
   n_chains = 3L,
@@ -1450,7 +1489,7 @@ fForms <- list(
 - High Rhat for time_years, try with 25,000 iterations
 
 ```{r}
-multi_joint_model <- jm(surv_model, mixed ,
+multi_joint_model <- jm(surv_model_final, mixed ,
                         time_var = "time_years",
                         functional_forms = fForms,
                         n_chains = 3L,
@@ -1469,7 +1508,7 @@ summary$Survival
 *With 25,000 iterations*
 
 ```{r}
-multi_joint_model <- jm(surv_model, mixed ,
+multi_joint_model <- jm(surv_model_final, mixed ,
                         time_var = "time_years",
                         functional_forms = fForms,
                         n_chains = 3L,
@@ -2857,13 +2896,13 @@ get_cox_auc <- function(model, times) {
 
 ```{r}
 # We compute time-dependent AUC for Cox model with p-tau181
-auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
+auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl_final, times)
  
 # # We compute time-dependent AUC for Cox model with NfL
-auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
+auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl_final, times)
 
 # We compute time-dependent AUC for Cox model with both p-tau181 and NfL 
-auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
+auc_both_bl <- get_cox_auc(surv_model_both_bl_final, times)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -3136,9 +3175,9 @@ ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
  
 # We specify Cox models for comparison
 cox_models <- list(
-   "Cox p-tau" = surv_model_ptau_bl,
-   "Cox NfL" = surv_model_nfl_bl,
-   "Cox both" = surv_model_both_bl
+   "Cox p-tau" = surv_model_ptau_bl_final,
+   "Cox NfL" = surv_model_nfl_bl_final,
+   "Cox both" = surv_model_both_bl_final
  )
  
 # We compute Brier score using pec for Cox models
