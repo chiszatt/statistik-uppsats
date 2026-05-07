@@ -83,16 +83,16 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```{r}
 # Charley
 
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
 
-ptau_data = UGOTPTAU181
+#ptau_data = UGOTPTAU181
 
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
-demographics = PTDEMOG
+#demographics = PTDEMOG
 
-apoe = APOERES
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -632,6 +632,18 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 
 # Survival data with out-sample individuals
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
+
+# Number of unique individuals in in-sample data
+length(unique(surv_data_in$RID))
+
+# Number of unique individuals in out-sample data
+length(unique(surv_data_out$RID))
+
+# Event distribution in in-sample data
+table(surv_data_in$event)
+
+# Event distribution in out-sample data
+table(surv_data_out$event)
 ```
 
 ## ...
