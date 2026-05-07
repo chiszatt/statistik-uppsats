@@ -2766,7 +2766,7 @@ summary(mult_jlcmm_m2)
 postprob(mult_jlcmm_m2)
 ```
 
-## Comparing M0, M1, M2, M3
+## Comparing M0, M1, M2
 
 ```{r}
 summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
@@ -3032,7 +3032,7 @@ results_table_AUC <- data.frame(
   Model = c("Cox ptau-181", "Cox NfL", "Cox both",
             "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
   
-  AUC_3y = c(auc_ptau_bl[1],
+  AUC_2y = c(auc_ptau_bl[1],
              auc_nfl_bl[1],
              auc_both_bl[1],
              auc_ptau_jm[1],
@@ -3041,7 +3041,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m2_ptau[1,3],
              auc_jlcmm_m2_nfl[1,3]),
   
-  AUC_4y = c(auc_ptau_bl[2],
+  AUC_3y = c(auc_ptau_bl[2],
              auc_nfl_bl[2],
              auc_both_bl[2],
              auc_ptau_jm[2],
@@ -3050,7 +3050,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m2_ptau[2,3],
              auc_jlcmm_m2_nfl[2,3]),
   
-  AUC_5y = c(auc_ptau_bl[3],
+  AUC_4y = c(auc_ptau_bl[3],
              auc_nfl_bl[3],
              auc_both_bl[3],
              auc_ptau_jm[3],
@@ -3059,7 +3059,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m2_ptau[3,3],
              auc_jlcmm_m2_nfl[3,3]),
   
-  AUC_6y = c(auc_ptau_bl[4],
+  AUC_5y = c(auc_ptau_bl[4],
              auc_nfl_bl[4],
              auc_both_bl[4],
              auc_ptau_jm[4],
@@ -3068,7 +3068,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m2_ptau[4,3],
              auc_jlcmm_m2_nfl[4,3]),
   
-  AUC_7y = c(auc_ptau_bl[5],
+  AUC_6y = c(auc_ptau_bl[5],
              auc_nfl_bl[5],
              auc_both_bl[5],
              auc_ptau_jm[5],
@@ -3194,6 +3194,77 @@ brier_multi_jm
 ```
 
 ## Time-dependent Brier score for latent class joint models
+
+```{r}
+predict_mjlcmm(mult_jlcmm_m1, newdata, "RID", 1, times)
+```
+
+```{r}
+# Defining a function to compute Weibull survival predictions
+Sg_weibull <- function(t, alpha0, alpha1) {
+  lambda <- exp(alpha0)
+  shape <- exp(alpha1)
+  return(exp(-lambda * t^shape))
+}
+
+
+# Defining a function to predict cumulative hazard for multivariate joint latent class models (these cannot be passed to dynpred in the lcmm package)
+predict_mjlcmm <- function(model, data, ID, landmark, times) {
+  
+#   Extracting number of individuals to make predictions for
+  N <- length(unique(data$ID))
+#   Extracting the nuber of classes
+  G <- model$ng
+#   Number of horizons
+  n_h <- length(times)
+  
+#   Extracting the posterior probabilities
+  post_prob <- model$pprob
+
+#     Extracting the parameters
+  alpha0 <- sapply(1:G, function(g) {
+                   model$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(g))]})
+  alpha1 <- sapply(1:G, function(g) {
+                   model$best[paste0("event1 +/-sqrt(Weibull2) class ", as.character(g))]})
+  
+#   Initiating a matrix to save the predictions for each individual at each horizon
+  S_pred <- matrix(0, nrow = N, ncol = n_h)
+  
+#   Looping over each individual
+  for (i in 1:N) {
+#     For each horizon
+    for (j in 1:n_h) {
+      time <- times[j]
+#       Saving the class-specific survival functions
+      Sg <- numeric(G)
+      for (g in 1:G) {
+        Sg[g] <- Sg_weibull(
+          t = time,
+          alpha0 = alpha0[g],
+          alpha1 = alpha1[g]
+        )
+      }
+      
+#       Claculating the surviva prediction for individual i based on mixture of the class-specific survival functions
+      S_pred[i, j] <- sum(model$pprob[i, paste0("pprobYT", as.character(j))] * Sg)
+    }
+#     Returning the survival predictions for each individual at each time point
+    return(S_pred)
+}}
+```
+
+```{r}
+mult_jlcmm_m1$best
+```
+
+```{r}
+mult_jlcmm_m1$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(1))]
+mult_jlcmm_m1$best["event1 +/-sqrt(Weibull2) class 1"]
+
+mult_jlcmm_m1$best["event1 +/-sqrt(Weibull1) class 2"]
+mult_jlcmm_m1$best["event1 +/-sqrt(Weibull2) class 2"]
+
+```
 
 ```{r}
 brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, times, landmark) {
