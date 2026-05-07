@@ -3091,20 +3091,20 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 ```
 
 ```{r}
+# Computing AUC for 2 class joint latent class mixed model for NfL
 auc_jlcmm_m1_nfl <- jlcmm_timeAUC(jlcmm_m1_nfl, jlcmm_data,
                                   "RID", "time_years", "time_to_event", "event",
                                   1, times)
-```
 
-```{r}
+# Computing AUC for 2 class joint latent class mixed model for ptau
+auc_jlcmm_m1_ptau <- jlcmm_timeAUC(jlcmm_m1_ptau, jlcmm_data,
+                                   "RID", "time_years", "time_to_event", "event",
+                                   1, times)
+
+# Computing AUC for 3 class joint latent class mixed model for ptau
 auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, jlcmm_data,
                                    "RID", "time_years", "time_to_event", "event",
                                    1, times)
-```
-
-```{r}
-#  model must be jlcmm for dynpred()
-# AUC_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data, "RID", "time_to_event", "event", 0, times)
 ```
 
 ## Table of the results
@@ -3366,6 +3366,7 @@ brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, tim
 ```
 
 ```{r}
+# Computing Brier scores for 2 class jlcmm for NfL
 brier_jlcmm_m1_nfl <- brier_jlcmm(
   model = jlcmm_m1_nfl,
   data = newdata,
@@ -3376,9 +3377,20 @@ brier_jlcmm_m1_nfl <- brier_jlcmm(
   times = c(2, 3, 4, 5, 6),
   landmark = 1
 )
-```
 
-```{r}
+# Computing Brier scores for 2 class jlcmm for ptau
+brier_jlcmm_m1_ptau <- brier_jlcmm(
+  model = jlcmm_m1_ptau,
+  data = newdata,
+  ID = "RID",
+  time_var = "time_years",
+  surv_time_var = "time_to_event",
+  event_var = "event",
+  times = c(2, 3, 4, 5, 6),
+  landmark = 1
+)
+
+# Computing Brier scores for 3 class jlcmm for ptau
 brier_jlcmm_m2_ptau <- brier_jlcmm(
   model = jlcmm_m2_ptau,
   data = newdata,
@@ -3404,7 +3416,11 @@ results_table_Brier <- data.frame(
 
   JM_p_tau = brier_ptau_jm,
   JM_NfL = brier_nfl_jm,
-  JM_both = brier_multi_jm
+  # JM_both = brier_multi_jm,
+  
+  JLCMM_2_NfL = brier_jlcmm_m1_nfl$Brier,
+  JLCMM_2_ptau = brier_jlcmm_m1_ptau$Brier
+  # JLCMM_3_ptau = brier_jlcmm_m2_ptau$Brier
 )
 round(results_table_Brier, 3)
 ```
@@ -3412,30 +3428,35 @@ round(results_table_Brier, 3)
 ## Plot of the results
 
 ```{r}
-# We reshape all AUC results into long format for plotting
-all_table <- data.frame(
-  Time = times,
-  Cox_p_tau = cox_brier$`Cox p-tau`,
-  Cox_NfL = cox_brier$`Cox NfL`,
-  Cox_both = cox_brier$`Cox both`,
-  JM_p_tau = brier_ptau_jm,
-  JM_NfL = brier_nfl_jm
-)
-
-plot_data <- all_table %>%
+plot_data <- results_table_Brier %>%
   pivot_longer(
     cols = -Time,
     names_to = "Model",
     values_to = "Brier"
   )
 
-# plot
-ggplot(plot_data, aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
+# plot for the Cox models
+ggplot(plot_data %>% filter(grepl("Cox", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(size = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
   theme_minimal() +
   labs(
-    title = "Time-dependent Brier Score: Cox vs Joint Models",
+    title = "Time-dependent Brier Score for the Cox Models",
+    x = "Time",
+    y = "Brier score"
+  )
+
+# plot for the joint models
+ggplot(plot_data %>% filter(grepl("J", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(size = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(
+    title = "Time-dependent Brier Score for the Joint Models",
     x = "Time",
     y = "Brier score"
   )
