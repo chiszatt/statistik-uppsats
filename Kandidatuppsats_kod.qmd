@@ -57,6 +57,7 @@ library(kableExtra)
 ```
 
 ```{r}
+# Set seed for reproducibility
 set.seed(123)
 ```
 
@@ -87,16 +88,16 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```{r}
 # Charley
 
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
 
-ptau_data = UGOTPTAU181
+#ptau_data = UGOTPTAU181
 
-diagnosis_data = DXSUM
+#diagnosis_data = DXSUM
 
-demographics = PTDEMOG
+#demographics = PTDEMOG
 
-apoe = APOERES
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -570,18 +571,6 @@ hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
 ```{r}
-# cube-root transformed
-ggplot(long_data, aes(sqrt(sqrt(PLASMA_NFL)))) +
-  geom_histogram(binwidth = 0.1, colour = "white") +
-  theme_classic()
-
-# cube-root transformed
-ggplot(long_data, aes(sqrt(sqrt(PLASMAPTAU181)))) +
-  geom_histogram(binwidth = 0.1, colour = "white") +
-  theme_classic()
-```
-
-```{r}
 # Transforming the baseline values in the survival data
 surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
 surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
@@ -640,11 +629,11 @@ surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 
 ```{r}
 # Checking the number of individuals and event distribution for the in-sample observations
-length(surv_data_in)
+length(unique(surv_data_in$RID))
 table(surv_data_in$event)
 
 # Checking the number of individuals and event distribution for the out-sample observations
-length(surv_data_out)
+length(unique(surv_data_out$RID))
 table(surv_data_out$event)
 ```
 
@@ -717,30 +706,6 @@ testResiduals(lognormal_residuals_ptau)
 #testResiduals(student_residuals_ptau)
 ```
 
-```{r}
-# LME model for p-tau181 with splines 
-library(splines)
-
-fit_spline_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ ns(time_years, df = 3),
-  random = ~ time_years | RID,
-  data = long_data_in,
-  method = "REML"
-)
-
-res_ptau <- residuals(fit_spline_ptau, type = "pearson")
-fit_ptau <- fitted(fit_spline_ptau)
-
-plot(fit_ptau, res_ptau,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h = 0, col = "red", lty = 2)
-
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-```
-
 #### Shapiro-Wilk test
 
 ```{r}
@@ -750,7 +715,6 @@ shapiro.test(lme_residuals_log_ptau$fittedResiduals)
 shapiro.test(lme_residuals_cubed_ptau$fittedResiduals)
 shapiro.test(lognormal_residuals_ptau$fittedResiduals)
 #shapiro.test(student_residuals_ptau$fittedResiduals)
-shapiro.test(res_ptau)
 ```
 
 #### AIC and log-likelihood
@@ -763,7 +727,6 @@ logLik(fit_lme_cubed_ptau)
 logLik(fit_gamma_ptau)
 logLik(fit_lognormal_ptau)
 #logLik(fit_student_ptau)
-logLik(fit_spline_ptau)
 ```
 
 ### NfL
@@ -817,30 +780,6 @@ testResiduals(lognormal_residuals_nfl)
 #testResiduals(student_residuals_nfl)
 ```
 
-```{r}
-# LME model for NfL with splines 
-library(splines)
-
-fit_spline_nfl <- lme(
-  fixed = log_PLASMA_NFL ~ ns(time_years, df = 3),
-  random = ~ time_years | RID,
-  data = long_data_in,
-  method = "REML"
-)
-
-res_nfl <- residuals(fit_spline_nfl, type = "pearson")
-fit_nfl <- fitted(fit_spline_nfl)
-
-plot(fit_nfl, res_nfl,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h = 0, col = "red", lty = 2)
-
-qqnorm(res_nfl, main = "QQ plot: NfL residuals")
-qqline(res_nfl, col = "red")
-```
-
 #### Shapiro-Wilk test
 
 ```{r}
@@ -850,7 +789,6 @@ shapiro.test(lme_residuals_log_nfl$fittedResiduals)
 shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
 shapiro.test(lognormal_residuals_nfl$fittedResiduals)
 #shapiro.test(student_residuals_nfl$fittedResiduals)
-shapiro.test(res_nfl)
 ```
 
 #### AIC and log-likelihood
@@ -863,8 +801,6 @@ logLik(fit_lme_cubed_nfl)
 logLik(fit_gamma_nfl)
 logLik(fit_lognormal_nfl)
 #logLik(fit_student_nfl)
-logLik(fit_spline_nfl)
-
 ```
 
 Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor! Tror det är bäst att kolla på residualerna och QQ-plotsen
@@ -1262,9 +1198,9 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
 #### Cox comparison table
 
 ```{r}
-# Building Cox Comparison Table
-# Extracting Model Output
-extract_model <- function(model) {
+# Building Cox comparison table
+# Extracting model output
+extract_model_cox <- function(model) {
   s <- summary(model)
 
   data.frame(
@@ -1277,26 +1213,26 @@ extract_model <- function(model) {
   )
 }
 
-# Formatting HR And CI
+# Formatting HR and CI
 format_hr_ci <- function(hr, low, high) {
   paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
 }
 
-# Formatting P Values
+# Formatting P-values
 format_p <- function(x) {
   ifelse(is.na(x), NA,
          ifelse(x < 0.001, "<0.001", round(x, 3)))
 }
 
-# Extracting Models
-ptau <- extract_model(surv_model_ptau_bl)
-nfl  <- extract_model(surv_model_nfl_bl)
-both <- extract_model(surv_model_both_bl)
+# Extracting models
+ptau_cox <- extract_model_cox(surv_model_ptau_bl)
+nfl_cox  <- extract_model_cox(surv_model_nfl_bl)
+both_cox <- extract_model_cox(surv_model_both_bl)
 
-# Building Variable Set
-all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
+# Building variable set
+all_vars_cox <- unique(c(ptau_cox$Variable, nfl_cox$Variable, both_cox$Variable))
 
-# Safe Value Extraction
+# Value extraction
 get_value <- function(df, var, col) {
   out <- rep(NA, length(var))
 
@@ -1309,36 +1245,36 @@ get_value <- function(df, var, col) {
   out
 }
 
-# Building Final Table
-table <- data.frame(
-  Variable = all_vars,
+# Building final table
+table_cox <- data.frame(
+  Variable = all_vars_cox,
 
-  Cox_PTau_HR_95_CI = format_hr_ci(
-    get_value(ptau, all_vars, "HR"),
-    get_value(ptau, all_vars, "CI_low"),
-    get_value(ptau, all_vars, "CI_high")
+  PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau_cox, all_vars_cox, "HR"),
+    get_value(ptau_cox, all_vars_cox, "CI_low"),
+    get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  Cox_PTau_P = format_p(get_value(ptau, all_vars, "P")),
+  PTau_P = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
-  Cox_NfL_HR_95_CI = format_hr_ci(
-    get_value(nfl, all_vars, "HR"),
-    get_value(nfl, all_vars, "CI_low"),
-    get_value(nfl, all_vars, "CI_high")
+  NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl_cox, all_vars_cox, "HR"),
+    get_value(nfl_cox, all_vars_cox, "CI_low"),
+    get_valu(nfl_cox, all_vars_cox, "CI_high")
   ),
-  Cox_NfL_P = format_p(get_value(nfl, all_vars, "P")),
+  NfL_P = format_p(get_value(nfl_cox, all_vars_cox, "P")),
 
-  Cox_Both_HR_95_CI = format_hr_ci(
-    get_value(both, all_vars, "HR"),
-    get_value(both, all_vars, "CI_low"),
-    get_value(both, all_vars, "CI_high")
+  Both_HR_95_CI = format_hr_ci(
+    get_value(both_cox, all_vars_cox, "HR"),
+    get_value(both_cox, all_vars_cox, "CI_low"),
+    get_value(both_cox, all_vars_cox, "CI_high")
   ),
-  Cox_Both_P = format_p(get_value(both, all_vars, "P")),
+  Both_P = format_p(get_value(both_cox, all_vars_cox, "P")),
 
   row.names = NULL
 )
 
-# Showing Table
-table
+# Showing table
+table_cox
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1549,9 +1485,9 @@ summary(multi_joint_model)
 ### Joint model comparison table
 
 ```{r}
-# Building Joint Model Comparison Table
-# Extracting Models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
-extract_model <- function(model) {
+# Building joint model comparison table
+# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
+extract_model_jm <- function(model) {
 
   s <- summary(model)$Survival
 
@@ -1567,73 +1503,50 @@ extract_model <- function(model) {
   )
 }
 
-# Formatting HR And CI
-format_hr_ci <- function(hr, low, high) {
-  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
-}
+# Extracting models
+ptau_jm <- extract_model_jm(joint_model_ptau)
+nfl_jm <- extract_model_jm(joint_model_nfl)
+both_jm <- extract_model_jm(multi_joint_model)
 
-# Formatting P Values
-format_p <- function(x) {
-  ifelse(is.na(x), NA,
-         ifelse(x < 0.001, "<0.001", round(x, 3)))
-}
+# Building variable set
+all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
 
-# Extracting Models
-ptau <- extract_model(joint_model_ptau)
-nfl <- extract_model(joint_model_nfl)
-both <- extract_model(multi_joint_model)
+# Building final table
+table_jm <- data.frame(
+  Variable = all_vars_jm,
 
-# Building Variable Set
-all_vars <- unique(c(ptau$Variable, nfl$Variable, both$Variable))
-
-# Value Extraction
-get_value <- function(df, var, col) {
-  out <- rep(NA, length(var))
-
-  for (i in seq_along(var)) {
-    idx <- which(df$Variable == var[i])
-    if (length(idx) == 1) {
-      out[i] <- df[idx, col]
-    }
-  }
-  out
-}
-
-# Building Final Table
-table_joint <- data.frame(
-  Variable = all_vars,
-
-  JM_PTau_HR_95_CI = format_hr_ci(
-    get_value(ptau, all_vars, "HR"),
-    get_value(ptau, all_vars, "CI_low"),
-    get_value(ptau, all_vars, "CI_high")
+  PTau_HR_95_CI = format_hr_ci(
+    get_value(ptau_jm, all_vars_jm, "HR"),
+    get_value(ptau_jm, all_vars_jm, "CI_low"),
+    get_value(ptau_jm, all_vars_jm, "CI_high")
   ),
-  JM_PTau_P = format_p(get_value(ptau, all_vars, "P")),
+  PTau_P = format_p(get_value(ptau_jm, all_vars_jm, "P")),
 
-  JM_NfL_HR_95_CI = format_hr_ci(
-    get_value(nfl, all_vars, "HR"),
-    get_value(nfl, all_vars, "CI_low"),
-    get_value(nfl, all_vars, "CI_high")
+  NfL_HR_95_CI = format_hr_ci(
+    get_value(nfl_jm, all_vars_jm, "HR"),
+    get_value(nfl_jm, all_vars_jm, "CI_low"),
+    get_value(nfl_jm, all_vars_jm, "CI_high")
   ),
-  JM_NfL_P = format_p(get_value(nfl, all_vars, "P")),
+  NfL_P = format_p(get_value(nfl_jm, all_vars_jm, "P")),
 
-  JM_Both_HR_95_CI = format_hr_ci(
-    get_value(both, all_vars, "HR"),
-    get_value(both, all_vars, "CI_low"),
-    get_value(both, all_vars, "CI_high")
+  Both_HR_95_CI = format_hr_ci(
+    get_value(both_jm, all_vars_jm, "HR"),
+    get_value(both_jm, all_vars_jm, "CI_low"),
+    get_value(both_jm, all_vars_jm, "CI_high")
   ),
-  JM_Both_P = format_p(get_value(both, all_vars, "P")),
+  Both_P = format_p(get_value(both_jm, all_vars_jm, "P")),
 
   row.names = NULL
 )
 
-table_joint
+# Showing table
+table_jm
 ```
 
-# Rhat value comparison table
+## Rhat value comparison table
 
 ```{r}
-# Extract Rhat for each model (survival component)
+# Extracting Rhat for each model (survival component)
 extract_rhat_surv <- function(model) {
 
   s <- summary(model)$Survival
@@ -1645,12 +1558,12 @@ extract_rhat_surv <- function(model) {
   )
 }
 
-# Apply to each model
+# Applying to each model
 ptau_surv <- extract_rhat_surv(joint_model_ptau)
 nfl_surv <- extract_rhat_surv(joint_model_nfl)
 multi_surv <- extract_rhat_surv(multi_joint_model)
 
-# Combine with UNIQUE model labels
+# Combining with model labels to form a table 
 rhat_survival_table <- bind_rows(
   ptau_surv %>% mutate(Model = "Surv_PTau"),
   nfl_surv %>% mutate(Model = "Surv_NfL"),
@@ -1661,10 +1574,13 @@ rhat_survival_table <- bind_rows(
     values_from = Rhat
   ) %>%
   mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Showing table
+rhat_survival_table
 ```
 
 ```{r}
-# Extract Rhat for longitudinal outcome (JMbayes2 Outcome1)
+# Extracting Rhat for longitudinal outcome 
 extract_rhat_long <- function(model) {
 
   s <- summary(model)$Outcome1
@@ -1676,12 +1592,12 @@ extract_rhat_long <- function(model) {
   )
 }
 
-# Apply to each model
+# Applying to each model
 ptau_long <- extract_rhat_long(joint_model_ptau)
 nfl_long <- extract_rhat_long(joint_model_nfl)
 multi_long <- extract_rhat_long(multi_joint_model)
 
-# Combine with UNIQUE model labels
+# Combining with model labels to form a table
 rhat_longitudinal_table <- bind_rows(
   ptau_long %>% mutate(Model = "Long_PTau"),
   nfl_long %>% mutate(Model = "Long_NfL"),
@@ -1693,6 +1609,7 @@ rhat_longitudinal_table <- bind_rows(
   ) %>%
   mutate(across(where(is.numeric), ~round(.x, 3)))
 
+# Showing table
 rhat_longitudinal_table
 ```
 

@@ -534,19 +534,19 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
 
-![](figures/hist_p_tau.png)
+![](figures/hist_p_tau.png){width="400"}
 
 The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
 
-![](figures/hist_nfl.png)
+![](figures/hist_nfl.png){width="400"}
 
 The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
 
-![](figures/hist_log_p_tau.png)
+![](figures/hist_log_p_tau.png){width="400"}
 
 In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
 
-![](figures/hist_log_nfl.png)
+![](figures/hist_log_nfl.png){width="400"}
 
 The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
 
@@ -673,6 +673,28 @@ Predictive performance was evaluated using time-dependent AUC and Brier Score at
     3.  Joint latent models
 3.  Predictive performance
 
+## Model diagnostics (p-tau181)
+
+![](figures/residuals_vs_fitted_ptau.png){width="400"}
+
+Residuals for NfL
+
+![](figures/residuals_vs_fitted_nfl.png){width="400"}
+
+Normality assessment
+
+P-tau181
+
+![](figures/qq_ptau.png){width="400"}
+
+NfL
+
+![](figures/qq_nfl.png){width="400"}
+
+```{r}
+knitr::kable(readRDS("tables/cox_table.rds"))
+```
+
 # Discussion
 
 ## Main findings/summary
@@ -687,9 +709,19 @@ Predictive performance was evaluated using time-dependent AUC and Brier Score at
 
 *How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?*
 
+Kanske problem vi stötte på?
+
 ## Further research
 
 *Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?*
+
+Since the exact dates of Alzheimer’s disease onset are not available in the dataset and only diagnostic status at each visit is recorded, the event times for progression to dementia were consequently approximated based on observed follow-up visits. In other words, participants were treated as right-censored at the time of their last known assessment, rather than as interval-censored. However, it is highly likely that disease progression occurred between visits rather than exactly at the recorded observation times, which introduces a potential bias in the estimated event times.
+
+Despite this, interval-censoring was not implemented given the level of this thesis and its time constraints. Properly accounting for interval-censored event times would require more complex statistical methods, for which standard Cox proportional hazards models would no longer be directly applicable. **This pragmatic approximation is also commonly used in previous literature (källa), which supports the approach taken in this study.**
+
+As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval-censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
+
+Furthermore, as plasma biomarker research is still emerging and longitudinal data with many repeated measurements per individual remain limited, future studies should aim to replicate and extend this analysis once larger cohorts with more frequent longitudinal sampling become available. This would improve the precision of both trajectory estimation and the assessment of associations between biomarker dynamics and disease progression.
 
 # Bibliography (APA-style)
 
