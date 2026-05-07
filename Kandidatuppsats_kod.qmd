@@ -56,6 +56,10 @@ library(timeROC)
 library(kableExtra)
 ```
 
+```{r}
+set.seed(123)
+```
+
 ## Loading the data
 
 The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Disease Neuroimaging Initiative (ADNI). The data sets include longitudinal ptau-181 and NfL measurements, diagnosis, demographic and genetic data.
@@ -632,6 +636,16 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 
 # Survival data with out-sample individuals
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
+```
+
+```{r}
+# Checking the number of individuals and event distribution for the in-sample observations
+length(surv_data_in)
+table(surv_data_in$event)
+
+# Checking the number of individuals and event distribution for the out-sample observations
+length(surv_data_out)
+table(surv_data_out$event)
 ```
 
 ## ...
