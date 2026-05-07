@@ -691,6 +691,10 @@ NfL
 
 ![](figures/qq_nfl.png){width="400"}
 
+```{r}
+knitr::kable(readRDS("tables/cox_table.rds"))
+```
+
 # Discussion
 
 ## Main findings/summary
@@ -705,9 +709,19 @@ NfL
 
 *How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?*
 
+Kanske problem vi stötte på?
+
 ## Further research
 
 *Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?*
+
+Since the exact dates of Alzheimer’s disease onset are not available in the dataset and only diagnostic status at each visit is recorded, the event times for progression to dementia were consequently approximated based on observed follow-up visits. In other words, participants were treated as right-censored at the time of their last known assessment, rather than as interval-censored. However, it is highly likely that disease progression occurred between visits rather than exactly at the recorded observation times, which introduces a potential bias in the estimated event times.
+
+Despite this, interval-censoring was not implemented given the level of this thesis and its time constraints. Properly accounting for interval-censored event times would require more complex statistical methods, for which standard Cox proportional hazards models would no longer be directly applicable. **This pragmatic approximation is also commonly used in previous literature (källa), which supports the approach taken in this study.**
+
+As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval-censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
+
+Furthermore, as plasma biomarker research is still emerging and longitudinal data with many repeated measurements per individual remain limited, future studies should aim to replicate and extend this analysis once larger cohorts with more frequent longitudinal sampling become available. This would improve the precision of both trajectory estimation and the assessment of associations between biomarker dynamics and disease progression.
 
 # Bibliography (APA-style)
 
