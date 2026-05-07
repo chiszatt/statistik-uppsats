@@ -629,11 +629,11 @@ surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 
 ```{r}
 # Checking the number of individuals and event distribution for the in-sample observations
-length(surv_data_in)
+length(unique(surv_data_in$RID))
 table(surv_data_in$event)
 
 # Checking the number of individuals and event distribution for the out-sample observations
-length(surv_data_out)
+length(unique(surv_data_out$RID))
 table(surv_data_out$event)
 ```
 
