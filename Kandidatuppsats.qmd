@@ -69,23 +69,9 @@ In the context of AD, as well as diseases in general, the term "biomarker" is co
 
 AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattson, N., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6). Specifically, recent breakthroughs in technology (Rissin et al., 2010) have allowed for quantification of biomarkers at much smaller concentrations than previous methods, typically being up to 1000 times more sensitive (Chang et al., 2012, pg. 2). Using this method, biomarkers can be detected peripherally from their origin where concentrations are much smaller. These advances mean that more invasive procedures can be substituted with blood tests.
 
--- PREVIOUS PTAU SECTION —
-
-***The NIA-AA (Jack et al.) updated their criteria for the clinical diagnosis and staging of AD in 2024 to reflect the importance of blood-based biomarkers in the diagnosis process.*** According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). ***Plasma p-tau has had good performance as a standalone biomarker, compared with CSF p-tau which is usually used in conjunction with other biomarkers (Jack et al., p. 5151).***
-
--- \^\^\^ —
-
--- PTAU & NFL —
-
 According to the NIA-AA, there are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024). One such core biomarker is tau protein phosphorylated at the threonine-181 position (p-tau181), where concentrations are expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Another core biomarker of interest in the diagnosis of AD pathology is neurofilament light chain (NfL), which is instead a marker of neuronal injury not specific to AD (Jack et al., p. 5158). NfL is usually present inside neurons, and therefore concentrations are expected to be higher in individuals with neuronal injury symptomatic of AD (Clark, C., 2021, p. 7). Research suggests that it may be used as a prognostic marker of cognitive decline and may also support the diagnosis of other diseases, including frontotemporal dementia, whilst p-tau181 is more useful for differentiating AD from other neurodegenerative conditions (WHO, 2024, p. 7).
 
--- \^\^ —
-
-***Even though both biomarkers provide complementary information, it has been suggested that phosphorylated tau markers may be more useful for differentiating Alzheimer’s disease from other neurodegenerative conditions (WHO, 2024, p. 7).***
-
-These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study.Blood samples from the ADNI cohort have been retrospectively analysed using the recently developed method in order to quantify the levels of p-tau181 and NfL in 2020 and 2018 respectively (Zetterberg & Blennow, 2020; Blennow, 2018).
-
-***Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. The current phase, ADNI4, began in 2022 and is expected to be completed in 2027. Its main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of Alzheimer’s disease (ADNI, n.d.)***
+These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. Blood samples from the ADNI cohort have been retrospectively analysed using the recently developed method in order to quantify the levels of p-tau181 and NfL in 2020 and 2018 respectively (Zetterberg & Blennow, 2020; Blennow, 2018).
 
 ## Research Context
 
@@ -165,27 +151,15 @@ $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
 where $\mathbf{x}^T$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this analysis, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline p-tau181 and NfL values.
 
-### Model Assumptions and Evaluation
+### Model Assumptions
 
 - What do we assume about the censoring process?
 
 A key assumption of this model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, as it allows the baseline hazard function to be dropped from the partial likelihood (Moore, p. 94). However, according to Moore, undefined.
 
+### Concordance Index
+
 The concordance index (C index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the C index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Seo Young Park et al., 2017, p. 1701).
-
-...
-
-------------------------------------------------------------------------
-
-**I think we should get rid of these subsections: I have now merged some of the most relevant information with other sections, so we can remove this if we are both happy to do so.**
-
-## Joint models
-
-In AD research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and their evolution may be directly related to disease progression. Joint models provide a unified framework for simultaneously analyzing longitudinal biomarker data and time-to-event outcomes. The key idea is to link a longitudinal submodel describing biomarker trajectories with a survival submodel describing disease progression. An extension of the joint model allows for the modelling of latent classes within the population.
-
-\*\* Longitudinal data in this analysis is defined as $n$ repeated measurements of p-tau181 and NfL on $N$ individuals in the ADNI1, ADNIGO and ADNI2 cohorts. $TAU_{i, t}$ and $NFL_{i, t}$ denote the measured concentrations of p-tau181 and NfL respectively for the $i^{th}$ individual at time $t$ occasion. Assuming that the expected concentration of the biomarkers varies with both time and individual level covariates, the mean responses have the notation $\mu_{TAU:\text{ } i, t} = E(TAU_{i, t})$ and $\mu_{NFL:\text{ } i, t} = E(NFL_{i, t})$. \*\*
-
-------------------------------------------------------------------------
 
 ## Joint Modelling of Longitudinal and Survival Data
 
@@ -251,7 +225,7 @@ This prior structure mainly acts as regularisation while allowing the data to dr
 
 ### The Gelman-Rubin Statistic
 
-Convergence within the framework of bayesian joint modeling can be evaluated by running multiple chains from different starting values (Peng, 2022, chapter 7.4.2). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng, chapter 7.4.2).
+Convergence within the framework of Bayesian joint modeling can be evaluated by running multiple chains from different starting values (Peng, 2022, chapter 7.4.2). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng, chapter 7.4.2).
 
 The Gelman-Rubin statistic R formalizes this idea (Peng, chapter 7.4.2). Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
@@ -303,7 +277,7 @@ $$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alp
 
 ### Model Assumptions
 
-In JLCMM, the marker and the time-to-event are considered to be conditionally independent given the latent classes and the random effects in the longitudinal model account for the correlation between repeated measures (Proust-Lima et al., pg. 122, 2018), whereas in regular joint models the marker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., pg. 62-63). The conditional independence assumptions for the JLCMM are then as follows;
+In JLCMM, the marker and the time-to-event are considered to be conditionally independent given the latent classes and the random effects in the longitudinal model account for the correlation between repeated measures (Proust-Lima et al., 2018, pg. 122), whereas in regular joint models the marker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., pg. 62-63). The conditional independence assumptions for the JLCMM are then as follows;
 
 1.  Correlations between observations of the longitudinal biomarker are modelled by the random effects, $b_i$, in the longitudinal model.
 
@@ -319,11 +293,11 @@ Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distribute
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular joint model (Rizopoulos, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes, which is computationally advantageous when compared with the estimation of joint models which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects (Proust-Lima et al., p. 5). For JLCMM, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., p. 5).
+The log-likelihood for the JLCMM is much more tractable than for the regular joint model (Rizopoulos, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of joint models which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., p. 5).
 
 **... MARQUADT ALGO ... ???**
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is best modeled by the Weibull or by a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., pg. 5). Therefore, it is necessary to assess whether the hazard is best modeled by the Weibull or by a flexible baseline hazard model.
 
 **MORE... Weibull in estimation.**
 
@@ -331,11 +305,18 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-According to Proust-Lima et al. (p. 7), one aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**). RESULTS FROM SIMULATION STUDY (MORGAN ET AL.) Ensuring good discrimination between classes is another important component of selecting the number of classes in the final model. Class discrimination can be assessed by analysis of the posterior class membership probability, given by:
+According to Proust-Lima et al. (p. 7), one aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**), which is the preferred criterion for mixture models. RESULTS FROM SIMULATION STUDY (MORGAN ET AL.) Ensuring good discrimination between classes is another important component of selecting the number of classes in the final model. Class discrimination can be assessed by analysis of the posterior class membership probability, given by (Proust-Lima et al., pg. 7):
 
-$$$$
+$$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
+= \frac{
+\widehat\pi_{i,g}f(Y_i | c_i=g; \widehat\theta_G)\lambda_i(T_i | c_i=g; \widehat\theta_G)S_i(T_i | c_i=g; \widehat\theta_G)
+}
+{
+\sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
 
-Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7), typically 0.7, 0.8 or 0.9. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may
+Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7), typically 0.7, 0.8 or 0.9 is a way to assess the ability of the model to adequately discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination.
+
+**Class sizes are also important, as classes that are made up of less than** $5\%$ **of the total sample population may**
 
 One measure of the discriminative power of a latent class structure is relative entropy (Ramaswamy et al., 1993 in Morgan et al., 2016, p. 150), which takes values between 0 and 1 and is calculated as follows:
 
@@ -347,9 +328,7 @@ $$EN(G) = 1 -
 Nlog(G)
 }$$
 
-where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$. Relative entropy values closer to 1 demonstrate good discriminative ability of the model, where, for one class latent models, $EN(1) = 1$.
-
-**\*CONEPTUALLY, WHAT DOES THIS MEASURE???\***
+where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$. Relative entropy values closer to 1 demonstrate good discriminative ability of the model, where, for one class latent models, $EN(1) = 1$. **\*CONEPTUALLY, WHAT DOES THIS MEASURE???\***
 
 **Integrated Classification Likelihood Criterion**
 
@@ -377,9 +356,9 @@ When a time-dependent framework is adopted, the disease status is evaluated at e
 
 **QUESTIONS:**
 
-1.  When is $Z_i$ used after defining it?
+1.  **When is** $Z_i$ **used after defining it?**
 
-2.  What is the difference between $\delta_i$ and $D_i(t)$? Does $\delta_i$ refer to whether the event happens at all, whereas $D_i(t)$ refers to whether the event has occured by time $t$? If they are different, where is $\delta_i$ referenced after being defined?
+2.  **What is the difference between** $\delta_i$ **and** $D_i(t)$**? Does** $\delta_i$ **refer to whether the event happens at all, whereas** $D_i(t)$ **refers to whether the event has occured by time** $t$**? If they are different, where is** $\delta_i$ **referenced after being defined?**
 
 The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., p. 2).
 
@@ -441,7 +420,7 @@ $$BS(t+\Delta t,t)=E\left[(I(T < t+\Delta t)-\Pi(t+\Delta t \mid t))^2 \mid T \g
 
 In contrast to the time-dependent AUC, a lower value indicates better predictive performance (Yang et al., p. 6).
 
-# Description of Data
+# Data
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1 and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were in the data set (ADNI, 2026).
 
@@ -481,7 +460,7 @@ Introducing the study, it's aims and the type of information gathered.
 
 **IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
 
-## Introducing variables... biomarkers
+## Variables
 
 *Information about the variables we will use and why, what they can show, how are they recorded*
 
@@ -653,6 +632,16 @@ For the two class model, the coefficient for the fixed effects in the class memb
 ## Comparison of Predictive Performance
 
 Predictive performance was evaluated using time-dependent AUC and Brier Score at yearly time points from 1 to 5 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in a table.
+
+1.  3 + measurements
+    1.  Cox models
+    2.  Joint models
+    3.  Joint latent models
+2.  1 + measurements
+    1.  Cox models
+    2.  Joint models
+    3.  Joint latent models
+3.  Predictive performance
 
 # Discussion
 
