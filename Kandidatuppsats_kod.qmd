@@ -87,17 +87,12 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-
-#ptau_data = UGOTPTAU181
-
-#diagnosis_data = DXSUM
-
-#demographics = PTDEMOG
-
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -230,11 +225,11 @@ diff <- diff %>% filter(diff == TRUE)
 # checking how many of these are baseline visits
 table(diff$VISCODE2)
 
-# # checking which observations have the same examdate for nfl and ptau
-# common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
+# checking which observations have the same examdate for nfl and ptau
+common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 
-# # checking the observations with different exam dates
-# long_data[-common, ]
+# checking the observations with different exam dates
+long_data[-common, ]
 ```
 
 - There are 5 observations with time differences greater than 30 days
@@ -259,20 +254,6 @@ diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
 - Can create a new variable for a common EXAMDATE in order to define the baseline date from this
 
 ```{r}
-# testing the method
-diff_examdate <- long_data %>%
-  mutate(
-    time_diff = EXAMDATE_nfl - EXAMDATE_ptau,
-    EXAMDATE_new = case_when(
-      time_diff == 0 ~ EXAMDATE_nfl,
-      TRUE ~ EXAMDATE_ptau + 0.5 * time_diff
-    )
-  ) %>%
-  filter(time_diff != 0) %>%
-  relocate(where(~ inherits(.x, "Date")), time_diff, .after = EXAMDATE_new)
-```
-
-```{r}
 # creating a common EXAMDATE from two cases
 # 1: EXAMDATE_nfl == EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl
 # 2: EXAMDATE_nfl != EXAMDATE_ptau -> EXAMDATE == EXAMDATE_nfl + the difference between the two dates
@@ -284,8 +265,6 @@ long_data <- long_data %>%
     EXAMDATE_baseline = min(EXAMDATE),
     time_years = as.numeric(EXAMDATE - EXAMDATE_baseline) / 365.25) %>%
   ungroup()
-
-
 ```
 
 ### Baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
@@ -429,13 +408,15 @@ surv_data <- surv_data %>% filter(RID %in% keep)
 length(keep)
 ```
 
+## Selecting participants with at least 1 measurement
+
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
 #keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
 #long_data <- long_data %>% filter(RID %in% keep)
 #surv_data <- surv_data %>% filter(RID %in% keep)
 
-# We check number of individuals with at least 3 measurements 
+# We check number of individuals with at least 1 measurement
 #length(keep)
 ```
 
@@ -631,10 +612,14 @@ surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 # Checking the number of individuals and event distribution for the in-sample observations
 length(unique(surv_data_in$RID))
 table(surv_data_in$event)
+# Fraction of individuals who experience the event in in-sample
+128/528
 
 # Checking the number of individuals and event distribution for the out-sample observations
 length(unique(surv_data_out$RID))
 table(surv_data_out$event)
+# Fraction of individuals who experience the event in out-sample
+49/176
 ```
 
 ## ...
@@ -2918,19 +2903,69 @@ auc_multi_jm <- get_jm_auc(multi_joint_model, times)
 
 ## Time-dependent AUC for latent class joint models
 
-Landmark: the time at which predictions are made
+#### Function for getting predictions from multivariate joint latent class model
 
-Horizon: the predict event within $h$ years
+```{r}
+# Defining a function to predict S(t) for multivariate joint latent class models (these cannot be passed to dynpred in the lcmm package)
+predict_mjlcmm <- function(model, data, ID, landmark, times) {
+  
+#   Extracting the unique ID's
+  ids <- unique(data[[ID]])
+#   Extracting number of individuals to make predictions for
+  N <- length(unique(data[[ID]]))
+#   Extracting the nuber of classes
+  G <- model$ng
+#   Number of horizons
+  n_h <- length(times)
+  print(n_h)
+  
+#   Extracting the posterior probabilities (given a two class model)
+  post_prob <- model$pprob[, 3:4]
+  
+#   Extracting the Weibull hazard parameters from the model object 
+  scale <- sapply(1:G, function(g) {
+                   exp(model$best[paste0("event1 +/-sqrt(Weibull2) class ", as.character(g))])})
+  shape <- sapply(1:G, function(g) {
+                   exp(model$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(g))])})
+  
+#   Initiating a matrix to save the predictions for each individual at each horizon
+  S_pred <- matrix(0, nrow = N, ncol = n_h)
+  
+#   Saving the class-specific survivals at the landmark time
+  S_land <- sapply(1:G, function(g)
+    exp(-(landmark / scale[g])^shape[g]))
+  
+#   Looping over all indiivudals
+  for(i in 1:N) {
+    
+#     GEtting the posterior probabilities for each individual
+    pp_i <- post_prob[i, ]
+    
+#     Looping over the horizons
+    for(j in 1:n_h) {
+      t <- times[j]
+    
+#      Getting the conditional class-specific survivals
+      Sg <- sapply(1:G, function(g)
+        exp(-((t) / scale[g])^shape[g]) / S_land[g])
 
-Threshold: e.g if risk \> 0.5 -\> conversion
+#      Calculating the survival for inidivudal i based on their posterior probabilities and the class-specific survival functions
+      S_pred[i, j] <- sum(pp_i * Sg)
+    }
+  }  
+#   COnverting to a data frame
+  S_pred <- as.data.frame(S_pred)
+#   Attaching the ID's
+  S_pred <- S_pred %>% mutate(RID = ids)
+#   Returning the survival predictions for each individual at each time point
+  return(S_pred)
+  }
+```
 
-ROC evaluates the model (sensitivity and specificity) at all possible thresholds, plotting sensitivity (y axis) vs 1 - specificity (x axis)
-
-We can fix the landmark, or the horizon
-
-Fixing the landmark, varying the horizon: how well does the model predict over different horizons? Does prediction accuracy change with horizon, e.g model predicts well over short horizons but not long.
-
-Fiing the horizon, varying the landmark: how well does the model predict conversion within $h$ years as more longitudinal data is gathered?
+```{r}
+# Testing getting predictions
+preds_mjlcmm_m1 <- predict_mjlcmm(mult_jlcmm_m1, jlcmm_data, "RID", 1, times)
+```
 
 #### Function for extracting time-dependent AUC
 
@@ -3194,77 +3229,6 @@ brier_multi_jm
 ```
 
 ## Time-dependent Brier score for latent class joint models
-
-```{r}
-predict_mjlcmm(mult_jlcmm_m1, newdata, "RID", 1, times)
-```
-
-```{r}
-# Defining a function to compute Weibull survival predictions
-Sg_weibull <- function(t, alpha0, alpha1) {
-  lambda <- exp(alpha0)
-  shape <- exp(alpha1)
-  return(exp(-lambda * t^shape))
-}
-
-
-# Defining a function to predict cumulative hazard for multivariate joint latent class models (these cannot be passed to dynpred in the lcmm package)
-predict_mjlcmm <- function(model, data, ID, landmark, times) {
-  
-#   Extracting number of individuals to make predictions for
-  N <- length(unique(data$ID))
-#   Extracting the nuber of classes
-  G <- model$ng
-#   Number of horizons
-  n_h <- length(times)
-  
-#   Extracting the posterior probabilities
-  post_prob <- model$pprob
-
-#     Extracting the parameters
-  alpha0 <- sapply(1:G, function(g) {
-                   model$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(g))]})
-  alpha1 <- sapply(1:G, function(g) {
-                   model$best[paste0("event1 +/-sqrt(Weibull2) class ", as.character(g))]})
-  
-#   Initiating a matrix to save the predictions for each individual at each horizon
-  S_pred <- matrix(0, nrow = N, ncol = n_h)
-  
-#   Looping over each individual
-  for (i in 1:N) {
-#     For each horizon
-    for (j in 1:n_h) {
-      time <- times[j]
-#       Saving the class-specific survival functions
-      Sg <- numeric(G)
-      for (g in 1:G) {
-        Sg[g] <- Sg_weibull(
-          t = time,
-          alpha0 = alpha0[g],
-          alpha1 = alpha1[g]
-        )
-      }
-      
-#       Claculating the surviva prediction for individual i based on mixture of the class-specific survival functions
-      S_pred[i, j] <- sum(model$pprob[i, paste0("pprobYT", as.character(j))] * Sg)
-    }
-#     Returning the survival predictions for each individual at each time point
-    return(S_pred)
-}}
-```
-
-```{r}
-mult_jlcmm_m1$best
-```
-
-```{r}
-mult_jlcmm_m1$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(1))]
-mult_jlcmm_m1$best["event1 +/-sqrt(Weibull2) class 1"]
-
-mult_jlcmm_m1$best["event1 +/-sqrt(Weibull1) class 2"]
-mult_jlcmm_m1$best["event1 +/-sqrt(Weibull2) class 2"]
-
-```
 
 ```{r}
 brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, times, landmark) {
