@@ -73,7 +73,7 @@ According to the NIA-AA, there are several core biomarkers used in the diagnosis
 
 These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. Blood samples from the ADNI cohort have been retrospectively analysed using the recently developed method in order to quantify the levels of p-tau181 and NfL in 2020 and 2018 respectively (Zetterberg & Blennow, 2020; Blennow, 2018).
 
-## Research Context
+## Research Context 
 
 *Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
@@ -675,24 +675,217 @@ Predictive performance was evaluated using time-dependent AUC and Brier Score at
 
 ## Model diagnostics (p-tau181)
 
-![](figures/residuals_vs_fitted_ptau.png){width="400"}
+```{r}
+dir.create("figures", showWarnings = FALSE)
 
-Residuals for NfL
+png("figures/hist_p_tau.png", width = 400, height = 300)
+hist(long_data$PLASMAPTAU181,
+     main = "PLASMAPTAU181",
+     xlab = "PLASMAPTAU181"
+     )
+dev.off()
 
-![](figures/residuals_vs_fitted_nfl.png){width="400"}
+png("figures/hist_nfl.png", width = 400, height = 300)
+hist(long_data$PLASMA_NFL,
+     main = "PLASMA_NFL",
+     xlab = "PLASMA_NFL" 
+     )
+dev.off()
+```
 
-Normality assessment
+\![\](figures/hist_p_tau.png
 
-P-tau181
-
-![](figures/qq_ptau.png){width="400"}
-
-NfL
-
-![](figures/qq_nfl.png){width="400"}
+\![\](figures/hist_nfl.png
 
 ```{r}
-knitr::kable(readRDS("tables/cox_table.rds"))
+png("figures/hist_log_p_tau.png", width = 400, height = 300)
+hist(long_data$log_PLASMAPTAU181,
+     main = "log-transformed PLASMAPTAU181",
+     xlab = "log_PLASMAPTAU181"
+     )
+dev.off()
+
+png("figures/hist_log_nfl.png", width = 400, height = 300)
+hist(long_data$log_PLASMA_NFL,
+     main = "log-transformed PLASMA_NFL",
+     xlab = "log_PLASMA_NFL" 
+     )
+dev.off()
+```
+
+\![\](figures/hist_log_p_tau.png
+
+\![\](figures/hist_log_nfl.png
+
+```{r}
+png("figures/residuals_vs_fitted_ptau.png", width = 400, height = 300)
+plot(fitted_vals_ptau, res_ptau,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for p-tau181")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
+
+png("figures/residuals_vs_fitted_nfl.png", width = 400, height = 300)
+plot(fitted_vals_nfl, res_nfl,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for NfL")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
+```
+
+\![\](figures/residuals_vs_fitted_ptau.png
+
+\![\](figures/residuals_vs_fitted_nfl.png
+
+```{r}
+png("figures/qq_ptau.png", width = 400, height = 300)
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
+dev.off()
+
+png("figures/qq_nfl.png", width = 400, height = 300)
+qqnorm(res_nfl, main = "QQ plot: NfL residuals")
+qqline(res_nfl, col = "red")
+dev.off()
+```
+
+\![\](figures/qq_ptau.png
+
+\![\](figures/qq_nfl.png
+
+```{r}
+png("figures/convergence_plot_ptau.png", width = 400, height = 300)
+ggtraceplot(joint_model_ptau, "alphas")
+dev.off()
+
+png("figures/convergence_plot_nfl.png", width = 400, height = 300)
+ggtraceplot(joint_model_nfl, "alphas")
+dev.off()
+
+png("figures/convergence_plot_multi.png", width = 400, height = 300)
+ggtraceplot(multi_joint_model, "alphas")
+dev.off()
+```
+
+\![\](figures/convergence_plot_ptau.png
+
+\![\](figures/convergence_plot_nfl.png
+
+\![\](figures/convergence_plot_multi.png
+
+```{r}
+png("figures/auc_plot_cox.png", width = 400, height = 300)
+ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
+dev.off()
+
+png("figures/auc_plot_jm.png", width = 400, height = 300)
+ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC comparison",
+    x = "Time (years)",
+    y = "AUC"
+  )
+dev.off()
+```
+
+\![\](figures/auc_plot_cox.png
+
+\![\](figures/auc_plot_jm.png
+
+```{r}
+png("figures/Brier_plot_cox.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("Cox", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(size = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(
+    title = "Time-dependent Brier Score for the Cox Models",
+    x = "Time",
+    y = "Brier score"
+  )
+dev.off()
+
+png("figures/Brier_plot_jm.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("J", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(size = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(
+    title = "Time-dependent Brier Score for the Joint Models",
+    x = "Time",
+    y = "Brier score"
+  )
+dev.off()
+```
+
+\![\](figures/Brier_plot_cox.png
+
+\![\](figures/Brier_plot_jm.png
+
+KODEN NEDAN SKA EJ TAS BORT, BEHÖVS VARA KVAR FÖR ATT LÄSA IN TABELLERNA (men den ovan för grafer kan tas bort efter att man har gjort den, krävs bara att man skriver de specifika texterna)
+
+```{r, echo=FALSE}
+dir.create("tables", showWarnings = FALSE)
+
+saveRDS(table_ph, "tables/table_ph.rds")
+knitr::kable(readRDS("tables/table_ph.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(table_ph_final, "tables/table_ph_final.rds")
+knitr::kable(readRDS("tables/table_ph_final.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(table_cox, "tables/table_cox.rds")
+knitr::kable(readRDS("tables/table_cox.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(table_jm, "tables/table_jm.rds")
+knitr::kable(readRDS("tables/table_jm.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+knitr::kable(readRDS("tables/rhat_survival_table.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+knitr::kable(readRDS("tables/results_table_AUC.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+knitr::kable(readRDS("tables/results_table_AUC.rds"))
+```
+
+```{r, echo=FALSE}
+saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+knitr::kable(readRDS("tables/results_table_Brier.rds"))
 ```
 
 # Discussion

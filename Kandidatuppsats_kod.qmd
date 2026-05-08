@@ -1180,7 +1180,103 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
       test = "LRT")
 ```
 
-#### Cox comparison table
+### Test of the assumption of proportional hazards 
+
+```{r}
+# Extracting p-values from cox.zph models
+extract_ph_p <- function(model, model_name) {
+  test <- cox.zph(model)
+  df <- as.data.frame(test$table)
+  
+  data.frame(
+    variable = rownames(df),
+    p_value = round(df$p, 3),
+    model = model_name
+  )
+}
+
+# Combining all Cox PH models into one dataset
+ph_all <- rbind(
+  extract_ph_p(surv_model, "Standard"),
+  extract_ph_p(surv_model_ptau_bl, "p-tau181 baseline"),
+  extract_ph_p(surv_model_nfl_bl, "NfL baseline"),
+  extract_ph_p(surv_model_both_bl, "Both baseline")
+)
+
+# Forming a table where each model has its own column
+table_ph <- ph_all %>%
+  dplyr::select(variable, model, p_value) %>%
+  tidyr::pivot_wider(names_from = model, values_from = p_value)
+
+# Displaying final table
+table_ph
+```
+
+#### Removing age-at-baseline due to evidence of non-proportional hazards
+
+```{r}
+# Cox survival-models with covariates but excluding age-at-baseline
+# Standard cox model 
+surv_model_final <- coxph(
+  Surv(time_to_event, event) ~ PTGENDER + APOE4_status,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_final)
+
+# Including p-tau181
+surv_model_ptau_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_ptau,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_ptau_bl_final)
+
+# Including NfL
+surv_model_nfl_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_nfl_bl_final)
+
+# Inlcuding both p-tau181 and NfL
+surv_model_both_bl_final <- coxph(
+  Surv(time_to_event, event) ~
+    PTGENDER + APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+summary(surv_model_both_bl_final) 
+```
+
+#### Final test of the assumption of proportional hazards
+
+```{r}
+# Combining all final Cox PH models into one dataset
+ph_all_final <- rbind(
+  extract_ph_p(surv_model_final, "Standard"),
+  extract_ph_p(surv_model_ptau_bl_final, "p-tau181 baseline"),
+  extract_ph_p(surv_model_nfl_bl_final, "NfL baseline"),
+  extract_ph_p(surv_model_both_bl_final, "Both baseline")
+)
+
+# Forming a table where each final model has its own column
+table_ph_final <- ph_all_final %>%
+  dplyr::select(variable, model, p_value) %>%
+  tidyr::pivot_wider(names_from = model, values_from = p_value)
+
+# Displaying final PH table 
+table_ph_final
+```
+
+### Cox comparison table
 
 ```{r}
 # Building Cox comparison table
@@ -1210,9 +1306,9 @@ format_p <- function(x) {
 }
 
 # Extracting models
-ptau_cox <- extract_model_cox(surv_model_ptau_bl)
-nfl_cox  <- extract_model_cox(surv_model_nfl_bl)
-both_cox <- extract_model_cox(surv_model_both_bl)
+ptau_cox <- extract_model_cox(surv_model_ptau_bl_final)
+nfl_cox  <- extract_model_cox(surv_model_nfl_bl_final)
+both_cox <- extract_model_cox(surv_model_both_bl_final)
 
 # Building variable set
 all_vars_cox <- unique(c(ptau_cox$Variable, nfl_cox$Variable, both_cox$Variable))
@@ -1234,69 +1330,33 @@ get_value <- function(df, var, col) {
 table_cox <- data.frame(
   Variable = all_vars_cox,
 
-  PTau_HR_95_CI = format_hr_ci(
+  "PTau HR (CI)" = format_hr_ci(
     get_value(ptau_cox, all_vars_cox, "HR"),
     get_value(ptau_cox, all_vars_cox, "CI_low"),
     get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  PTau_P = format_p(get_value(ptau_cox, all_vars_cox, "P")),
+  "PTau P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
-  NfL_HR_95_CI = format_hr_ci(
+  "NfL HR (CI)" = format_hr_ci(
     get_value(nfl_cox, all_vars_cox, "HR"),
     get_value(nfl_cox, all_vars_cox, "CI_low"),
-    get_valu(nfl_cox, all_vars_cox, "CI_high")
+    get_value(nfl_cox, all_vars_cox, "CI_high")
   ),
-  NfL_P = format_p(get_value(nfl_cox, all_vars_cox, "P")),
+  "NfL P" = format_p(get_value(nfl_cox, all_vars_cox, "P")),
 
-  Both_HR_95_CI = format_hr_ci(
+  "Both HR (CI)" = format_hr_ci(
     get_value(both_cox, all_vars_cox, "HR"),
     get_value(both_cox, all_vars_cox, "CI_low"),
     get_value(both_cox, all_vars_cox, "CI_high")
   ),
-  Both_P = format_p(get_value(both_cox, all_vars_cox, "P")),
+  "Both P" = format_p(get_value(both_cox, all_vars_cox, "P")),
 
-  row.names = NULL
+  row.names = NULL, 
+  check.names = FALSE
 )
 
 # Showing table
 table_cox
-```
-
-### Test of the assumption of proportional hazards
-
-# Check global violation
-
-```{r}
-##### For the standard Cox PH model
-cox.zph(surv_model)
-
-##### For the Cox PH models with baseline values of each biomarker 
-# With p-tau181 baseline values
-cox.zph(surv_model_ptau_bl)
-# With NfL baseline values
-cox.zph(surv_model_nfl_bl)
-# With both p-tau181 and NfL baseline values
-cox.zph(surv_model_both_bl)
-```
-
-### Test of time-varying coefficient Cox models for age at baseline due to evidence of non-proportional hazards
-
-To confirm that age at baseline has a time-dependent effect that violates the proportional hazards assumption in the Cox models, a Cox model with a time-varying effect of age at baseline is fitted.
-
-```{r}
-# We fit a time-varying coefficient Cox model where age at baseline is modeled as time-varying
-surv_model_tv <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + PTGENDER + APOE4_status + tt(age_at_baseline),
-  data = surv_data_in,
-  tt = function(x, t, ...) x * log(t)
-)
-
-summary(surv_model_tv)
-
-AIC(surv_model, surv_model_tv)
-
-logLik(surv_model)
-logLik(surv_model_tv)
 ```
 
 # Two separate joint models
@@ -1306,9 +1366,9 @@ logLik(surv_model_tv)
 - High Rhat for time_years, try with 20,000 iterations
 
 ```{r}
-# Joint model for p-tau181 using package JMbayes2 (bayesian approach)
+# Joint model for p-tau181 
 joint_model_ptau <- jm(
-  surv_model,
+  surv_model_final,
   long_model_ptau,
   time_var = "time_years",
   n_chains = 3L,
@@ -1321,35 +1381,17 @@ joint_model_ptau <- jm(
 summary(joint_model_ptau)
 ```
 
-#### 20000 iterations
-
-```{r}
-joint_model_ptau <- jm(
-  surv_model,
-  long_model_ptau,
-  time_var = "time_years",
-  n_chains = 3L,
-  n_iter = 20000L,
-  n_burnin = 1000L
-  )
-```
-
-```{r}
-summary(joint_model_ptau)
-```
-
 ```{r}
 # Checking convergence 
-library(ggplot2)
 ggtraceplot(joint_model_ptau, "alphas")
 ```
 
 ## Fitted joint model for NfL
 
 ```{r}
-# Joint model for NfL using package JMbayes2 (bayesian approach)
+# Joint model for NfL 
 joint_model_nfl <- jm(
-  surv_model,
+  surv_model_final,
   long_model_nfl,
   time_var = "time_years",
   n_chains = 3L,
@@ -1364,7 +1406,6 @@ summary(joint_model_nfl)
 
 ```{r}
 # Checking convergence 
-library(ggplot2)
 ggtraceplot(joint_model_nfl, "alphas")
 ```
 
@@ -1435,7 +1476,7 @@ fForms <- list(
 - High Rhat for time_years, try with 25,000 iterations
 
 ```{r}
-multi_joint_model <- jm(surv_model, mixed ,
+multi_joint_model <- jm(surv_model_final, mixed ,
                         time_var = "time_years",
                         functional_forms = fForms,
                         n_chains = 3L,
@@ -1447,22 +1488,8 @@ summary(multi_joint_model)
 ```
 
 ```{r}
-summary <- summary(multi_joint_model)
-summary$Survival
-```
-
-*With 25,000 iterations*
-
-```{r}
-multi_joint_model <- jm(surv_model, mixed ,
-                        time_var = "time_years",
-                        functional_forms = fForms,
-                        n_chains = 3L,
-                        n_iter = 25000L,
-                        n_burnin = 2000L
-                        )
-
-summary(multi_joint_model)
+# Checking convergence 
+ggtraceplot(multi_joint_model, "alphas")
 ```
 
 # ...
@@ -1500,28 +1527,29 @@ all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
 table_jm <- data.frame(
   Variable = all_vars_jm,
 
-  PTau_HR_95_CI = format_hr_ci(
+  "PTau HR (CI)" = format_hr_ci(
     get_value(ptau_jm, all_vars_jm, "HR"),
     get_value(ptau_jm, all_vars_jm, "CI_low"),
     get_value(ptau_jm, all_vars_jm, "CI_high")
   ),
-  PTau_P = format_p(get_value(ptau_jm, all_vars_jm, "P")),
+  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
 
-  NfL_HR_95_CI = format_hr_ci(
+  "NfL HR (CI)" = format_hr_ci(
     get_value(nfl_jm, all_vars_jm, "HR"),
     get_value(nfl_jm, all_vars_jm, "CI_low"),
     get_value(nfl_jm, all_vars_jm, "CI_high")
   ),
-  NfL_P = format_p(get_value(nfl_jm, all_vars_jm, "P")),
+  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
 
-  Both_HR_95_CI = format_hr_ci(
+  "Both HR (CI)" = format_hr_ci(
     get_value(both_jm, all_vars_jm, "HR"),
     get_value(both_jm, all_vars_jm, "CI_low"),
     get_value(both_jm, all_vars_jm, "CI_high")
   ),
-  Both_P = format_p(get_value(both_jm, all_vars_jm, "P")),
+  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
 
-  row.names = NULL
+  row.names = NULL,
+  check.names = FALSE
 )
 
 # Showing table
@@ -1550,9 +1578,9 @@ multi_surv <- extract_rhat_surv(multi_joint_model)
 
 # Combining with model labels to form a table 
 rhat_survival_table <- bind_rows(
-  ptau_surv %>% mutate(Model = "Surv_PTau"),
-  nfl_surv %>% mutate(Model = "Surv_NfL"),
-  multi_surv %>% mutate(Model = "Surv_Multi")
+  ptau_surv %>% mutate(Model = "PTau"),
+  nfl_surv %>% mutate(Model = "NfL"),
+  multi_surv %>% mutate(Model = "Multi")
 ) %>%
   pivot_wider(
     names_from = Model,
@@ -2842,13 +2870,13 @@ get_cox_auc <- function(model, times) {
 
 ```{r}
 # We compute time-dependent AUC for Cox model with p-tau181
-auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl, times)
+auc_ptau_bl <- get_cox_auc(surv_model_ptau_bl_final, times)
  
 # # We compute time-dependent AUC for Cox model with NfL
-auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl, times)
+auc_nfl_bl <- get_cox_auc(surv_model_nfl_bl_final, times)
 
 # We compute time-dependent AUC for Cox model with both p-tau181 and NfL 
-auc_both_bl <- get_cox_auc(surv_model_both_bl, times)
+auc_both_bl <- get_cox_auc(surv_model_both_bl_final, times)
 ```
 
 ## Time-dependent AUC for fitted joint models
@@ -2869,7 +2897,6 @@ newdata <- dplyr::left_join(
 ```
 
 ```{r}
-library(JMbayes2)
 # We define a function to compute time-dependent AUC for joint models using tvAUC
 get_jm_auc <- function(model, times) {
   
@@ -3171,9 +3198,9 @@ ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
  
 # We specify Cox models for comparison
 cox_models <- list(
-   "Cox p-tau" = surv_model_ptau_bl,
-   "Cox NfL" = surv_model_nfl_bl,
-   "Cox both" = surv_model_both_bl
+   "Cox p-tau" = surv_model_ptau_bl_final,
+   "Cox NfL" = surv_model_nfl_bl_final,
+   "Cox both" = surv_model_both_bl_final
  )
  
 # We compute Brier score using pec for Cox models
@@ -3186,10 +3213,9 @@ brier_cox <- pec(
    cens.model = "cox"
  )
  
- cox_brier <- lapply(brier_cox$AppErr, function(x)
+cox_brier <- lapply(brier_cox$AppErr, function(x)
    approx(brier_cox$time, x, xout = times)$y
  )
-cox_brier
 ```
 
 ## Time-dependent Brier score for fitted joint models
@@ -3413,5 +3439,3 @@ ggplot(plot_data %>% filter(grepl("J", Model)),
     y = "Brier score"
   )
 ```
-
-# Appendix
