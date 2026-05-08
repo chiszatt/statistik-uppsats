@@ -73,7 +73,7 @@ According to the NIA-AA, there are several core biomarkers used in the diagnosis
 
 These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the main focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. Blood samples from the ADNI cohort have been retrospectively analysed using the recently developed method in order to quantify the levels of p-tau181 and NfL in 2020 and 2018 respectively (Zetterberg & Blennow, 2020; Blennow, 2018).
 
-## Research Context 
+## Research Context
 
 *Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
 
@@ -534,147 +534,6 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
 
-![](figures/hist_p_tau.png){width="400"}
-
-The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
-
-![](figures/hist_nfl.png){width="400"}
-
-The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
-
-![](figures/hist_log_p_tau.png){width="400"}
-
-In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
-
-![](figures/hist_log_nfl.png){width="400"}
-
-The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
-
-# Results
-
-*Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
-
-## Cox models with baseline values of p-tau181
-
-A Cox proportional hazards model including baseline p-tau181 was first fitted. Checking the proportional hazards assumption showed a violation for age at baseline ($\chi^2$ = 8.78, df = 1, p = 0.003), while no violations were found for sex ($\chi^2$ = 0.001, df = 1, p = 0.972), APOE-$\epsilon 4$ status ($\chi^2$ = 2.50, df = 2, p = 0.286), or baseline p-tau181 ($\chi^2$ = 0.14, df = 1, p = 0.705). The global test was borderline non-significant ($\chi^2$ = 10.70, df = 5, p = 0.058).
-
-A time-varying Cox model showed a significant time-dependent effect of age (p \< 0.05) and a slightly better fit compared to the standard model (AIC: 2067 vs. 2078; log-likelihood: -1029.5 vs. -1035.0). Despite this, the standard Cox model was kept for the joint modelling step, since time effects are mainly handled through the longitudinal biomarker processes in that framework.
-
-In the final Cox model, baseline p-tau181 was a strong predictor of progression (HR = 2.41, 95% CI: 1.87-3.10, p \< 0.001). Age (HR = 1.03, p = 0.008) and APOE-$\epsilon 4$ status (one allele: HR = 2.35; two alleles: HR = 4.08; both p \< 0.001) were also significant predictors, while sex was not (p = 0.56). The model showed good discrimination (C-index = 0.73).
-
-## Cox model with baseline values of NfL
-
-To compare biomarkers, a Cox proportional hazards model was also fitted using baseline NfL instead of p-tau181, while keeping the same covariate structure.
-
-Assessment of the proportional hazards assumption showed a similar pattern to the p-tau181 model, with a violation for age at baseline ($\chi^2$ = 9.01, df = 1, p = 0.0027). No violations were observed for sex ($\chi^2$ = 0.0003, df = 1, p = 0.986), APOE-$\epsilon 4$ status ($\chi^2$ = 3.25, df = 2, p = 0.197), or baseline NfL ($\chi^2$ = 0.59, df = 1, p = 0.443). However, in contrast to the p-tau181 model, the global test was statistically significant ($\chi^2$ = 12.1, df = 5, p = 0.0336), indicating a slightly stronger overall deviation from the proportional hazards assumption, mainly driven by age.
-
-In the final model, baseline NfL was a significant predictor of disease progression (HR = 2.69, 95% CI: 1.90-3.82, p \< 0.001). This suggests that higher NfL levels at baseline are associated with increased risk of developing AD/dementia. APOE-$\epsilon 4$ status again showed a strong and consistent association, with a clear dose-response pattern (one allele: HR = 2.56; two alleles: HR = 5.19; both p \< 0.001). In contrast, neither age (HR = 1.01, p = 0.30) nor sex (HR = 1.00, p = 0.99) were statistically significant predictors in this model.
-
-Model performance was slightly lower compared to the p-tau181 model, with a concordance index of 0.70 versus 0.73, which suggests somewhat weaker discriminative ability for NfL in this baseline-only framework.
-
-## Cox model with baseline values of both p-tau181 and NfL
-
-To look at the independent and combined effects of the biomarkers, a Cox proportional hazards model including both baseline p-tau181 and NfL was fitted, along with the clinical covariates.
-
-Checking the proportional hazards assumption showed a violation for age at baseline ($\chi^2$ = 8.64, df = 1, p = 0.0033). No violations were seen for sex ($\chi^2$ = 0.009, df = 1, p = 0.923), APOE-$\epsilon 4$ status ($\chi^2$ = 2.73, df = 2, p = 0.256), baseline p-tau181 ($\chi^2$ = 0.35, df = 1, p = 0.555), or baseline NfL ($\chi^2$ = 0.99, df = 1, p = 0.319). The global test was not significant ($\chi^2$ = 10.63, df = 6, p = 0.101), which suggests no major overall violation of the assumption.
-
-In the combined model, both biomarkers remained significant independent predictors of progression. Higher baseline p-tau181 was associated with increased risk (HR = 2.17, 95% CI: 1.66-2.84, p \< 0.001), as was higher baseline NfL (HR = 2.07, 95% CI: 1.45-2.94, p \< 0.001). This suggests that both biomarkers add independent prognostic information when included in the same model.
-
-APOE-$\epsilon 4$ status was still a strong predictor, with a clear dose-response pattern (one allele: HR = 2.30; two alleles: HR = 4.21; both p \< 0.001). Age (HR = 1.01, p = 0.47) and sex (HR = 0.94, p = 0.67) were not significant in this model.
-
-Model performance improved slightly compared to the single-biomarker models, with a concordance index of 0.74, suggesting that combining p-tau181 and NfL gives a small gain in predictive ability.
-
-## Joint model for p-tau181
-
-Next, a joint model was fitted to simultaneously analyse the longitudinal trajectory of p-tau181 and its association with time to progression to AD/dementia. A standard Cox model and a linear mixed-effects model were therefore first specified.
-
-\*\*Lägga in vad testet av assumption om PH visade för standard cox ph modellen.
-
-for the LME model, even after log-transformation of p-tau181, the residual diagnostics showed some minor deviations from the model assumptions, including slight heteroskedasticity and some departures in the tails of the QQ-plots. However, as the LME model is used as part of a joint modeling framework rather than being interpreted on its own, the main requirement is that it provides a reasonable description of the underlying longitudinal process, rather than a perfect fit in terms of residual diagnostics. Thus, these deviations were not considered serious, and the model was considered to provide a reasonable fit and to be representative of the population, indicating that it is suitable for use within the joint modeling framework.
-
-To assess the sensitivity of the results, alternative LME models with gamma, lognormal or student t-distributions of p-tau181, as well as with splines, were also fitted. These yielded similar results, which suggests that the conclusions are robust despite the observed residual issues.
-
-The longitudinal submodel showed that p-tau181 levels increased over time (time_years: estimate = 0.029, 95% credible interval: 0.018-0.041, p \< 0.05), indicating a clear upward trajectory of the biomarker prior to disease progression. Males had slightly higher p-tau181 levels compared to females (estimate = 0.118, p = 0.005), while both APOE-$\epsilon 4$ one-allele and two-allele carriers showed higher levels of p-tau181 compared to non-carriers (both p \< 0.05). This confirms that p-tau181 is strongly influenced by genetic risk factors and increases progressively over time. In the survival submodel, baseline age showed a small and non-significant association with progression risk (estimate = 0.022, p = 0.146), while sex was also non-significant (estimate = -0.138, p = 0.427). In contrast, APOE-$\epsilon 4$ status remained a strong predictor of disease progression, with clear dose-dependent effects (one allele: estimate = 0.777; two alleles: estimate = 1.287; both p \< 0.05).
-
-The association parameter linking longitudinal p-tau181 to the risk of progression was strongly positive (estimate = 1.371, 95% credible interval: 0.989-1.773, p \< 0.05). This indicates that higher p-tau181 levels over time are associated with a substantially increased hazard of developing AD/dementia.
-
-Model diagnostics showed generally good convergence, with $\widehat R$ values close to 1.00 for most parameters. However, one parameter (residual variance in the longitudinal submodel) showed signs of poorer convergence ($\widehat R$ = 1.38), whuch suggests slightly slower mixing. After increasing the number of iterations from 11000 to 20,000, convergence improved, and all parameters showed acceptable $\widehat R$ values.
-
-\*\*\*Lägga till graferna för convergence också (traceplots och density plots)
-
-## Joint model for NfL
-
-Additionally, a joint model was fitted to analyse the longitudinal trajectory of NfL and its association with time to progression to AD/dementia.
-
-The longitudinal submodel showed a clear increase in NfL over time (time_years: estimate = 0.041, 95% credible interval: 0.034-0.048, p \< 0.05), which indicates a steady and relatively strong rise in NfL levels prior to disease progression. There was no evidence of associations with sex (estimate = 0.007, p = 0.845) or APOE-$\epsilon 4$ status in the longitudinal process (all p \> 0.05), which suggests that NfL trajectories are largely independent of genetic risk factors.
-
-In the survival submodel, APOE-$\epsilon 4$ status remained a strong predictor of progression, with clear dose-dependent effects (one allele: estimate = 0.952; two alleles: estimate = 1.611; both p \< 0.05). In contrast, age (estimate = -0.007, P = 0.666) and sex were not significantly associated with risk in this model.
-
-Most importantly, the association between longitudinal NfL and risk of progression was strong and statistically significant (estimate = 1.649, 95% credible interval: 1.195-2.107, p \< 0.05). This indicates that higher NfL levels over time are strongly linked to increased hazard of developing AD/dementia.
-
-Model convergence was generally good, with $\widehat R$ values close to 1.00 for most parameters.
-
-## Multivariate joint model for both p-tau181 and NfL
-
-?
-
-## Joint latent class mixed model for p-tau181
-
-- Complementary log-log plot showed curvature, Weibull assumes a linear log-log plot.
-
-- Weibull baseline hazard was compared against a flexible baseline hazard using "3-quant-piecewise"
-
-- BIC was lower for Weibull (5582) than for flexible hazard (5595), suggesting that Weibull fits the data better, despite slight violations of the log-log plot
-
-In order to assess whether latent classes can be distinguished solely from p-tau181 trajectories, latent class mixed models were first fit. A one class model was fit and the random effects structure was decided by comparing $BIC$, log-likelihoods and running a likelihood ratio test between the model with both a random intercept and random slope and a model with only a random intercept. The $BIC$ for the more complex model increased compared to the intercept only model and the likelihood ratio test gave $\lambda_{LR} = 0.92$ on 2 degrees of freedom ($p = 0.63$), therefore the intercept only random effects structure was chosen.
-
-A latent mixed-effects model with two classes was estimated on the longitudinal ptau181 data which produced significant coefficients for the longitudinal model ($p < 0.01$) but not for the class-membership model ($p = 1.00$). Additionally, the $BIC$ increased when compared to the one class model and the posterior probabilities show no clear differentiation between classes, with the average posterior probability being $0.50$ for both classes. Similarly, the three class model had significant coefficients for the longitudinal model ($p < 0.01$), whereas the coefficients for the intercepts of the class membership model were insignificant ($p = 0.98, p = 0.97$). Further, the model assigned no-one to class three, $97\%$ to class one and $3\%$ to class two, showing poor discriminatory power. Considering the results of the models with two and three classes, it was decided not to run the four class model. The conclusion is that the model cannot determine any number of latent classes through p-tau181 trajectories alone.
-
-The longitudinal p-tau181 trajectories were then modeled jointly with the survival process for G assumed latent classes with the joint latent class mixed-effects model.
-
-## Joint latent class mixed model for NfL
-
-First, latent class mixed-effects models were fit and the random effects were decided based off of the one class model, as was done with p-tau181. Both models gave statistically significant coefficients for the fixed effects (p \< 0.001). Since BIC is the recommended metric when determining the random effects structure (Proust-Lima et al., Y**EAR, P.**), only a random intercept was chosen, as the simpler model had a lower BIC (1503.4) compared with the more complex model (1506.1).
-
-Modelling the longitudinal NfL measurements with a two class linear mixed-effects model produced significant coefficients for the fixed effetcs in the longitudinal submodel (intercept class1: p = 0.034, intercept class2: p = 0.033, slope: p \< 0.001) but the intercept in the class membership model was not significant (p = 0.9997). Comparing BIC for the one class and two class (1516.5) models supports the conclusion that the model cannot disern two latent classes from the data. Additionally, the entropy of the two class model was calculated to be 0.0003 - further evidence against two latent classes. The model had poor class discrimination, with the posterior probabilities clustering around 0.50, showing indistinguishable classification between the two classes. Since the model with two latent classes showed no improvement compared to the one class model, it was decided against fitting further models with more classes. 
-
-Latent class mixed-effects models with APOE-$\epsilon 4$ status and gender as covariates in the class membership model were fit. Interestingly, these models sufficiently discriminated classes within the sample population, giving further support to the inclusion of these covariates in the other models in this paper. One, two, three and four class models were fit. The BIC decreased with added classes (1 class: 1506.1, 2 class: 1323.9, 3 class: 1316.7, 4 class: 1279.5) whilst the log-likelihood increased (1 class: -733.4, 2 class: -622.6, 3 class: -592.8, 4 class: -551.2). However, the classifications based of off posterior probabilities shows that for the three and four class only a very small percentage have been assigned to one of the classes (two class model, class2: 0.71 %, four class model, class4: 1.99 %), therefore, this suggests that two classes are sufficient in explaining most of the variance in the sample population.
-
-Next, joint latent class models were fit to jointly model the longitudinal NFL biomarker trajectories and the time-to-diagnosis process, given G latent classes. Two one class joint latent class models were fit, one with only a random intercept, and another including both random intercept and slope. Both models has significant score test statistics for the conditional independence assumption (p \< 0.001), suggesting that the data supports more than one latent class in the sample population. All parameters in both models were significant for both the longitudinal submodel and the survival submodel (p \< 0.001). Despite a significant likelihood ratio test between the more complex model and the simpler model (p = 0.006), the BIC for the simpler model was lower (2998.4 vs 3001.2). Therefore, for model parsimony, only a random intercept was included in the random effects structure.
-
-Additionally, two and three class models were fit. The score test statistic for the two class model became non-significant, meaning that the data supports the hypothesis that there is independence between the longitudinal outcome and the survival outcome, suggesting that the correlation is captured solely through class membership. All parameters in the longitudinal submodel, the survival submodel and the class membership submodel were significant (p \< 0.001). Analysis of the posterior class membership probabilities reveals that the model assigned 75 % of individuals to class 1 and 25 % of individuals to class 2, resulting in meaningful class sizes. Further, the model discriminated well between classes. The mean posterior probability for class 1 was 0.90 and 0.94 for class two, whilst the percentage of posterior probabilities that were over 0.80 were 83 % for class 1 and 89 % for class 2. 
-
-For the three class model, the score test statistic was again non-significant, however, there were also some non-significant model parameters. For the third class, the intercept was insignificant for the class membership model (p = 0.075), as well as both parameters in the proportional hazards model (p = 0.99). Upon inspection of classification from posterior probabilities, the model assigned just 2 % of individuals to class 2. It is suspect whether this could be considered a meaningfully large group, and whether individuals are arbitrarily assigned to this group. According to the model, the mean probability of being assigned to class 2 for those in assigned to class 2 was 0.85, and for class 3 it was 0.74, a clear reduction in certainty compared to the two class model. 
-
-The four class model did not converge on first try, and considering the poorer results from the three class model compared with the two class model, it was decided to discontinue fitting a model with four classes. The BIC for the two class model (2931.6) was an improvement on the one class model (2998.4), whilst the three class model performed better than the one class model, but worse than the two class model. Entropy was higher for the two class model (0.68) compared with the three class model (0.52). The comparison of these models suggests that the two class model best captures the joint longitudinal NfL and survival process.
-
-```{r}
-# printing the summary metrics
-# jlcmm_nfl_summary %>% kbl() %>% kable_styling()
-```
-
-## Multivariate joint latent class mixed model for p-tau181 and NfL
-
-Again, a multivariate latent class mixed-effects model was first fit on the longitudinal p-tau181 and NfL measurements before fitting the joint model. The likelihood ratio test between the model with both a random intercept and slope and the model with only a random intercept gave $\lambda_{LR} = 1.27$ on 2 degrees of freedom ($p = 0.0008$). Both models had statistically significant parameters for the linear link functions for the multivariate latent class model ($p < 0.01$).
-
-For the two class model, the coefficient for the fixed effects in the class membership model was insignificant ($p = 0.99$), as were the coefficients in the longitudinal model ($p = 0.98, p = 0.53, p = 0.58$) but the parameters of the link functions were all significant ($p < 0.01$). Posterior probabilities for both classes clustered around $0.50$ and posterior classification for class one was $55\%$ and $45\%$ for class two, showing very poor discrimination between classes. A three class model did not immediately converge, and considering the poor discrimination of the two class model it was decided to not attempt to continue fitting the three and four class models.
-
-## Comparison of Predictive Performance
-
-Predictive performance was evaluated using time-dependent AUC and Brier Score at yearly time points from 1 to 5 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in a table.
-
-1.  3 + measurements
-    1.  Cox models
-    2.  Joint models
-    3.  Joint latent models
-2.  1 + measurements
-    1.  Cox models
-    2.  Joint models
-    3.  Joint latent models
-3.  Predictive performance
-
-## Model diagnostics (p-tau181)
-
 ```{r}
 dir.create("figures", showWarnings = FALSE)
 
@@ -684,7 +543,13 @@ hist(long_data$PLASMAPTAU181,
      xlab = "PLASMAPTAU181"
      )
 dev.off()
+```
 
+\![\](figures/hist_p_tau.png)
+
+The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
+
+```{r}
 png("figures/hist_nfl.png", width = 400, height = 300)
 hist(long_data$PLASMA_NFL,
      main = "PLASMA_NFL",
@@ -693,9 +558,9 @@ hist(long_data$PLASMA_NFL,
 dev.off()
 ```
 
-\![\](figures/hist_p_tau.png
-
 \![\](figures/hist_nfl.png
+
+The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
 
 ```{r}
 png("figures/hist_log_p_tau.png", width = 400, height = 300)
@@ -704,7 +569,13 @@ hist(long_data$log_PLASMAPTAU181,
      xlab = "log_PLASMAPTAU181"
      )
 dev.off()
+```
 
+\![\](figures/hist_log_p_tau.png
+
+In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
+
+```{r}
 png("figures/hist_log_nfl.png", width = 400, height = 300)
 hist(long_data$log_PLASMA_NFL,
      main = "log-transformed PLASMA_NFL",
@@ -713,9 +584,66 @@ hist(long_data$log_PLASMA_NFL,
 dev.off()
 ```
 
-\![\](figures/hist_log_p_tau.png
-
 \![\](figures/hist_log_nfl.png
+
+The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
+
+# Results
+
+*Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
+
+## Including Participants With 3 Or More Measurements 
+
+### Cox models 
+
+To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline were fitted. Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Table 1.
+
+**Table 1: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models.**
+
+```{r, echo=FALSE}
+dir.create("tables", showWarnings = FALSE)
+
+saveRDS(table_ph, "tables/table_ph.rds")
+knitr::kable(readRDS("tables/table_ph.rds"))
+```
+
+At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant p-values for sex, APOE4 status, and the biomarker variables. In contrast, age at baseline consistently showed significant p-values, indicating a violation of the assumption.
+
+The GLOBAL test evaluates the proportional hazards assumption jointly across all covariates and is influenced by covariate-specific departures from the assumption. Consistent with the violation observed for age at baseline, it showed significant or borderline significant p-values in the standard and single-biomarker models.
+
+Given this violation, age at baseline was excluded from the final Cox models. The refitted models therefore yielded the p-values presented in Table 2.
+
+**Table 2: p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models.**
+
+```{r, echo=FALSE}
+saveRDS(table_ph_final, "tables/table_ph_final.rds")
+knitr::kable(readRDS("tables/table_ph_final.rds"))
+```
+
+After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
+
+As the proportional hazards assumption was met in the refitted models, the results can be interpreted in terms of hazard ratios, which are, together with 95% confidence intervals and p-values, presented in Table 3 for the Cox models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline.
+
+**Table 3: hazard ratios with 95% confidence intervals and p-values from the Cox models including baseline biomarkers**
+
+```{r, echo=FALSE}
+saveRDS(table_cox, "tables/table_cox.rds")
+knitr::kable(readRDS("tables/table_cox.rds"))
+```
+
+Table 3 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE ε4 status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of ε4 alleles carried. Individuals carrying one ε4 allele had approximately a twofold increased hazard across models, whereas individuals carrying two ε4 alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one ε4 allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two ε4 alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
+
+Both baseline p-tau181 and baseline NfL were significantly associated with an increased risk of progression in separate models, with p-values below 0.001. However, NfL showed a slightly stronger association with progression risk than p-tau181 (HR = 2.39 vs. HR = 2.04), indicating a modestly higher effect estimate for NfL. At the same time, the confidence interval for NfL was somewhat wider, suggesting slightly greater uncertainty in its effect estimate compared with p-tau181.
+
+In the Cox model including both biomarkers simultaneously, the results were similar, with both p-tau181 and NfL remaining significantly associated with progression. The effect estimates were however slightly attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 1.81 and NfL showing a hazard ratio of 1.98. This indicates that both biomarkers retained independent prognostic value. The confidence intervals for both variables were somewhat wider than in the univariable models, reflecting increased uncertainty in the joint model due to shared variance between the biomarkers.
+
+### Joint models 
+
+The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL.
+
+To be more precise, a longitudinal submodel was specified for each biomarker together with a survival submodel, the latter taking the form of a standard Cox model. As indicated in Table 2, the proportional hazards assumption was satisfied for this model. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL. Figure 1 presents fitted values versus residuals from the LME model for p-tau181, while Figure 2 shows the corresponding Q-Q plot assessing normality. Similarly, Figure 3 presents fitted values versus residuals from the LME model for NfL, while Figure 4 shows the corresponding Q-Q plot.
+
+**Figure 1: fitted values versus residuals from the LME model for p-tau181**
 
 ```{r}
 png("figures/residuals_vs_fitted_ptau.png", width = 400, height = 300)
@@ -725,7 +653,26 @@ plot(fitted_vals_ptau, res_ptau,
      main = "Residuals vs Fitted for p-tau181")
 abline(h = 0, col = "red", lty = 2)
 dev.off()
+```
 
+\![\](figures/residuals_vs_fitted_ptau.png
+
+**Figure 2: Q-Q plot of the LME model for p-tau181**
+
+```{r}
+png("figures/qq_ptau.png", width = 400, height = 300)
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
+dev.off()
+```
+
+\![\](figures/qq_ptau.png
+
+The plot of residuals versus fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern.
+
+**Figure 3: fitted values versus residuals from the LME model for NfL**
+
+```{r}
 png("figures/residuals_vs_fitted_nfl.png", width = 400, height = 300)
 plot(fitted_vals_nfl, res_nfl,
      xlab = "Fitted values",
@@ -735,45 +682,105 @@ abline(h = 0, col = "red", lty = 2)
 dev.off()
 ```
 
-\![\](figures/residuals_vs_fitted_ptau.png
-
 \![\](figures/residuals_vs_fitted_nfl.png
 
-```{r}
-png("figures/qq_ptau.png", width = 400, height = 300)
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-dev.off()
+**Figure 4: Q-Q plot of the LME model for NfL**
 
+```{r}
 png("figures/qq_nfl.png", width = 400, height = 300)
 qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
 dev.off()
 ```
 
-\![\](figures/qq_ptau.png
-
 \![\](figures/qq_nfl.png
 
-```{r}
+“The same pattern was observed for the LME model of NfL, where the plot of residuals versus fitted values showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot showed similar results to that of p-tau181.
+
+Consequently, both models were considered to provide a reasonable fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+
+Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. To ensure proper model convergence, the $α$-parameters were plotted, starting with those for the joint model of p-tau181, presented in Figure 5.
+
+**Figure 5: Estimated** $α$**-parameters for the joint model of p-tau181**
+
+```{r, echo=FALSE}
 png("figures/convergence_plot_ptau.png", width = 400, height = 300)
 ggtraceplot(joint_model_ptau, "alphas")
-dev.off()
-
-png("figures/convergence_plot_nfl.png", width = 400, height = 300)
-ggtraceplot(joint_model_nfl, "alphas")
-dev.off()
-
-png("figures/convergence_plot_multi.png", width = 400, height = 300)
-ggtraceplot(multi_joint_model, "alphas")
 dev.off()
 ```
 
 \![\](figures/convergence_plot_ptau.png
 
+...
+
+**Figure 6: Estimated** $α$**-parameters for the joint model of NfL**
+
+```{r}
+png("figures/convergence_plot_nfl.png", width = 400, height = 300)
+ggtraceplot(joint_model_nfl, "alphas")
+dev.off()
+```
+
 \![\](figures/convergence_plot_nfl.png
 
+....
+
+**Figure 7: Estimated** $α$**-parameters for the multivariate joint model**
+
+```{r}
+png("figures/convergence_plot_multi.png", width = 400, height = 300)
+ggtraceplot(multi_joint_model, "alphas")
+dev.off()
+```
+
 \![\](figures/convergence_plot_multi.png
+
+...
+
+Additionally, convergence of the models was assessed by examining the Rhat values of the survival outcome and the longitudinal outcome in each joint model, presented in table 4.
+
+**Table 4: Rhat values of the survival outcome in the joint models**
+
+```{r, echo=FALSE}
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+knitr::kable(readRDS("tables/rhat_survival_table.rds"))
+```
+
+...
+
+**Table 5: Rhat values of the longitudinal outcome in the joint models**
+
+```{r, echo=FALSE}
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
+```
+
+...
+
+Subsequently, the estimated hazard ratios from the joint models are presented in Table 6, together with 95% confidence intervals and p-values.
+
+**Table 6: hazard ratios with 95% confidence intervals and p-values from the joint models**
+
+```{r, echo=FALSE}
+saveRDS(table_jm, "tables/table_jm.rds")
+knitr::kable(readRDS("tables/table_jm.rds"))
+```
+
+LÄGG IN TOLKNING AV HR, CI OCH P HÄR\*\*\*\*
+
+### Latent Class Joint models 
+
+## Including Participants With 1 Or More Measurements 
+
+### Cox models 
+
+### Joint models 
+
+### Latent Class Joint models 
+
+## Predictive performance
+
+Predictive performance was evaluated using time-dependent AUC and Brier score at yearly time points from 2 to 6 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in Table.
 
 ```{r}
 png("figures/auc_plot_cox.png", width = 400, height = 300)
@@ -804,6 +811,11 @@ dev.off()
 \![\](figures/auc_plot_cox.png
 
 \![\](figures/auc_plot_jm.png
+
+```{r, echo=FALSE}
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+knitr::kable(readRDS("tables/results_table_AUC.rds"))
+```
 
 ```{r}
 png("figures/Brier_plot_cox.png", width = 400, height = 300)
@@ -839,50 +851,6 @@ dev.off()
 
 \![\](figures/Brier_plot_jm.png
 
-KODEN NEDAN SKA EJ TAS BORT, BEHÖVS VARA KVAR FÖR ATT LÄSA IN TABELLERNA (men den ovan för grafer kan tas bort efter att man har gjort den, krävs bara att man skriver de specifika texterna)
-
-```{r, echo=FALSE}
-dir.create("tables", showWarnings = FALSE)
-
-saveRDS(table_ph, "tables/table_ph.rds")
-knitr::kable(readRDS("tables/table_ph.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(table_ph_final, "tables/table_ph_final.rds")
-knitr::kable(readRDS("tables/table_ph_final.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(table_cox, "tables/table_cox.rds")
-knitr::kable(readRDS("tables/table_cox.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(table_jm, "tables/table_jm.rds")
-knitr::kable(readRDS("tables/table_jm.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
-knitr::kable(readRDS("tables/rhat_survival_table.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
-knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
-knitr::kable(readRDS("tables/results_table_AUC.rds"))
-```
-
-```{r, echo=FALSE}
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
-knitr::kable(readRDS("tables/results_table_AUC.rds"))
-```
-
 ```{r, echo=FALSE}
 saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 knitr::kable(readRDS("tables/results_table_Brier.rds"))
@@ -890,7 +858,7 @@ knitr::kable(readRDS("tables/results_table_Brier.rds"))
 
 # Discussion
 
-## Main findings/summary
+## Main Findings/Summary
 
 *Summarise the results.*
 
@@ -904,7 +872,7 @@ knitr::kable(readRDS("tables/results_table_Brier.rds"))
 
 Kanske problem vi stötte på?
 
-## Further research
+## Further Research
 
 *Suggest what kinds of questions this analysis leaves us with? What more can be done/looked at?*
 
