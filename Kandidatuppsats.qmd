@@ -107,9 +107,9 @@ This study investigates the prediction of AD/dementia progression using longitud
 
 *How will we accomplish this? –\> Introduce the methods we will use.*
 
-To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to dementia due to AD. Second, univariate joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker separately and their association with the survival outcome. Third, multivariate joint models will be used to jointly model both biomarker trajectories simultaneously, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying possible latent subgroups. A univariate joint latent class model will be fit for NfL and p-tau181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and p-tau181 simultaneously. All models will be adjusted for relevant covariates.
+To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to dementia due to AD. Second, univariate joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker separately and their association with the survival outcome. Third, multivariate joint models will be used to jointly model both biomarker trajectories simultaneously, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying possible latent subgroups. A univariate joint latent class model will be fit for NfL and p-tau181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and p-tau181 simultaneously. All models will also be adjusted for relevant covariates. The significance level will be set at 0.05 for all analyses.
 
-To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. The significance level will be set at 0.05 for all analyses.
+To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Subsequently, the data will be divided into in-data and out-data, where the in-data are used for model development and the out-data are reserved for evaluation of the models predictive performance. This is done to ensure an unbiased assessment of how well the models generalise to unseen data.
 
 More specifically, model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to AD progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and horizons of 2, 3, 4, 5, and 6 years were selected to capture short- to mid-term progression.
 
@@ -227,9 +227,7 @@ The primary estimation approach that has been proposed for joint models is (semi
 
 An alternative is a Bayesian estimation approach, which differs from the frequentist framework in that, while the frequentist approach treats parameters as fixed but unknown quantities estimated solely from the data, the Bayesian approach treats parameters as random variables and combines a prior distribution with the observed data to obtain a posterior distribution (Carlin & Louis, 2008). From this perspective, joint modelling can be done in a more direct way, often avoiding many of the complex approximations that are typically required in frequentist methods. At the same time, when weakly ninformative priors are used, the resulting estimates are often very similar to those obtained from maximum likelihood approaches (Wu et al., 2008; Brown et al., 2003, p. 222).
 
-**\*\*Kanske kort beskrivning om generella skillnaden mellan bayesian vs frequentist? -\> fokusera på bayesiansk istället, kanske inte viktigt med frekventist här \*\***
-
-With the R package JMbayes, joint models can be fitted under a Bayesian approach using Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC is a stochastic procedure that repeatedly generates random samples to characterize the distribution of parameters of interest, which in a Bayesian setting corresponds to the posterior distribution. These samples are generated by a Markov chain, which can be viewed as a directed random walk through the parameter space where each step depends only on the current state, and where parameter values are sampled in proportion to their probability. In this way, the chain gradually reconstructs the target distribution even when it is not available in closed form. Convergence refers to the point at which the Markov chain has reached its stationary distribution, meaning that the generated samples can be treated as representative of the posterior distribution and used for inference through Monte Carlo integration.(Hamra, MacLehose, & Richardson, 2013, p. 628).
+With the R package JMbayes, joint models can be fitted under a Bayesian approach using Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC is a stochastic procedure that repeatedly generates random samples to characterize the distribution of parameters of interest, which in a Bayesian setting corresponds to the posterior distribution. These samples are generated by a Markov chain, which can be viewed as a directed random walk through the parameter space where each step depends only on the current state, and where parameter values are sampled in proportion to their probability. In this way, the chain gradually reconstructs the target distribution even when it is not available in closed form. Convergence refers to the point at which the Markov chain has reached its stationary distribution, meaning that the generated samples can be treated as representative of the posterior distribution and used for inference through Monte Carlo integration (Hamra, MacLehose, & Richardson, 2013, p. 628).
 
 Regarding the prior distribution in the Bayesian framework, JMbayes uses weakly informative priors that support stable estimation while allowing the data to primarily drive inference.More specifically, regression coefficients are typically assigned independent normal priors with mean zero and large variance, while variance components follow inverse Gamma priors. The dependence structure of the random effects is defined through a correlation matrix and standard deviations, where the correlation matrix follows an LKJ prior and the standard deviations follow half Student t priors (Rizopoulos, 2018).
 
@@ -267,7 +265,7 @@ Subsequently, the Gelman-Rubin statistic is:
 
 $$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
-As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1, often around 1.1 or 1.2. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, chapter 7.4.2).
+As the number of iterations L increases and the between-chain variation B decreases, R approaches 1. Thus, chains are typically run until R is near 1. Being a unit-free ratio, R provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, chapter 7.4.2).
 
 ## Joint Latent Class Mixed Model
 
@@ -528,23 +526,21 @@ Initially coded numerically based on the number of $\epsilon 4$ alleles, the var
 
 APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical models. In the standard Cox proportional hazards (Cox PH) models, it is used to assess whether genetic risk is associated with progression to AD/dementia. In the joint models, APOE-$\epsilon 4$ status is included as a fixed covariate in both submodels. In the survival submodel (Cox component), it allows for estimation of genotype-specific differences in the hazard of progression. In the longitudinal submodel (linear mixed-effects component), it is included as a baseline covariate to account for potential differences in biomarker levels between genotype groups.
 
-# Pre-processing
+# Pre-Processing
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
-## Biomarker distributions
+## Biomarker Distributions
 
-Values of p-tau181 ranged from a minimum of 0.4 to a maximum of 451.4. The median was 16.3, with the first quartile at 11.1 and the third quartile at 23.6. Similarly, the values of NfL ranged from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. In other words, both NfL and p-tau181 exhibited highly right-skewed distributions.
+The values of p-tau181 ranged from 0.4 to 451.4, with a median of 16.3, a first quartile of 11.1 and a third quartile of 23.6. Similarly, NfL values ranged from 6.4 to 408, with a median of 37.9, a first quartile of 27.8 and a third quartile of 52.5. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
 
-The log-transformation of p-tau181 produced a distribution that more closely approximated a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remained, although it was not considered substantial.
+Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix 1. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix 2 demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.The spread of values was reduced and observations were more symmetrically distributed around the centre.
 
-![](figures/hist_log_p_tau.png){width="400"}
+Subsequently, the log-transformed variables were considered appropriate for inclusion in the statistical models.
 
-In comparison, the distribution of NfL more closely approximated a normal distribution after log-transformation. The observations appeared less dispersed and were more concentrated around the center of the distribution.
+## Correlation Between Biomarkers 
 
-![](figures/hist_log_nfl.png){width="400"}
-
-The two log-transformed biomarkers were therefore considered appropriate for inclusion in the statistical models.
+## Division Into In And Out Datasets 
 
 # Results
 
@@ -596,29 +592,31 @@ The evaluation of the association between biomarkers and progression to dementia
 
 To be more precise, a longitudinal submodel was specified for each biomarker together with a survival submodel, the latter taking the form of a standard Cox model. As indicated in Table 2, the proportional hazards assumption was satisfied for this model. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
-Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity (see Appendix 1). The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (see Appendix 2). The same pattern was observed for the LME model of NfL, where plotting the residuals against the fitted values showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (see Appendix 3). The Q-Q plot showed similar results to that of p-tau181 (see Appendix 4). Consequently, both models were considered to provide a reasonable fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 3. The slight deviations in the tails of the Q-Q plot, shown in Appendix 4, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix 5 showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix 6 showed similar results to those observed for p-tau181. Consequently, both models were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
-Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. To ensure proper model convergence, the $α$-parameters were plotted, starting with those for the joint model of p-tau181, presented in Figure 5.
+Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
 
-**Figure 5: Estimated** $α$**-parameters for the joint model of p-tau181**
+To ensure proper model convergence, trace plots of the $α$-parameter were examined for each joint model, starting with those for the joint model of p-tau181, presented in Figure 1.
+
+**Figure 1: trace plot of the** $α$**-parameter for the joint model of p-tau181.**
 
 ![](figures/convergence_plot_ptau.png){width="400"}
 
-...
+The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence. A similar pattern was observed for the joint model of NfL, as shown in Figure 2.
 
-**Figure 6: Estimated** $α$**-parameters for the joint model of NfL**
+**Figure 2: trace plot of the** $α$**-parameter for the joint model of NfL.**
 
 ![](figures/convergence_plot_nfl.png)
 
-....
+The chains likewise fluctuated around a stable mean value with good mixing, indicating convergence of the $α$-parameter comparable to the joint model of p-tau181. Finally, the multivariate joint model also exhibited a similar overall behaviour, as shown in Figure 3.
 
-**Figure 7: Estimated** $α$**-parameters for the multivariate joint model**
+**Figure 3: trace plot of the** $α$**-parameter for the multivariate joint model**
 
 ![](figures/convergence_plot_multi.png)
 
-...
+Compared to the single-biomarker models, the trace plot for the multivariate joint model shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameter. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
-Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, presented in table 4.
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 4.
 
 **Table 4:** $\widehat{\mathbf{R}}$ **values of the survival outcome in the joint models**
 
@@ -626,7 +624,9 @@ Additionally, convergence of the models was assessed by examining the $\widehat{
 knitr::kable(readRDS("tables/rhat_survival_table.rds"))
 ```
 
-...
+The $\widehat{R}$ values for the survival outcomes are all very close to 1, ranging from 1.000 to 1.007 across all joint models. This indicates good convergence of the MCMC chains for the survival components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
+
+While Table 4 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each joint model are shown in Table 5.
 
 **Table 5:** $\widehat{\mathbf{R}}$ **values of the longitudinal outcome in the joint models**
 
@@ -634,9 +634,9 @@ knitr::kable(readRDS("tables/rhat_survival_table.rds"))
 knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
-...
+In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all joint models, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. However, a higher value is observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.089. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
 
-Subsequently, the estimated hazard ratios from the joint models are presented in Table 6, together with 95% confidence intervals and p-values.
+Subsequently, the hazard ratios from the joint models were estimated and are presented in Table 6, along with 95% confidence intervals and p-values.
 
 **Table 6: hazard ratios with 95% confidence intervals and p-values from the joint models**
 
@@ -682,7 +682,7 @@ knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds"))
 
 ### Joint Latent Class Mixed Models
 
-## Predictive performance
+## Predictive Performance
 
 Predictive performance was evaluated using time-dependent AUC and Brier score at yearly time points from 2 to 6 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in Table.
 
@@ -828,18 +828,26 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Appendix
 
-## Appendix 1: fitted values versus residuals from the LME model for p-tau181
+## Appendix 1: distribution of p-tau181 after log-transformation
+
+![](figures/hist_log_p_tau.png){width="400"}
+
+## Appendix 2: distribution of NfL after log-transformation
+
+![](figures/hist_log_nfl.png){width="400"}
+
+## Appendix 3: fitted values versus residuals from the LME model for p-tau181
 
 ![](figures/residuals_vs_fitted_ptau.png){width="400"}
 
-## Appendix 2: Q-Q plot of the LME model for p-tau181
+## Appendix 4: Q-Q plot of the LME model for p-tau181
 
 ![](figures/qq_ptau.png){width="400"}
 
-## Appendix 3: fitted values versus residuals from the LME model for NfL
+## Appendix 5: fitted values versus residuals from the LME model for NfL
 
 ![](figures/residuals_vs_fitted_nfl.png){width="400"}
 
-## Appendix 4: Q-Q plot of the LME model for NfL
+## Appendix 6: Q-Q plot of the LME model for NfL
 
 ![](figures/qq_nfl.png){width="400"}
