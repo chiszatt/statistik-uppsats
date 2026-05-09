@@ -749,7 +749,7 @@ shapiro.test(lognormal_residuals_ptau$fittedResiduals)
 
 ```{r}
 # Comparing p-tau181 models with AIC and log likelihood
-AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau, fit_spline_ptau)
+AIC(fit_lme_log_ptau, fit_lme_cubed_ptau, fit_gamma_ptau, fit_lognormal_ptau)
 logLik(fit_lme_log_ptau)
 logLik(fit_lme_cubed_ptau)
 logLik(fit_gamma_ptau)
@@ -823,7 +823,7 @@ shapiro.test(lognormal_residuals_nfl$fittedResiduals)
 
 ```{r}
 # Comparing NfL-models with AIC and log likelihood
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl, fit_spline_nfl)
+AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
 logLik(fit_lme_log_nfl)
 logLik(fit_lme_cubed_nfl)
 logLik(fit_gamma_nfl)
