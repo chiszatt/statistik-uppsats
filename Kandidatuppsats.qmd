@@ -111,7 +111,7 @@ To address the research questions, a series of models will be implemented and co
 
 To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. The significance level will be set at 0.05 for all analyses.
 
-More specifically, model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to AD progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, time horizons of 1, 2, 3, 4, and 5 years were selected to capture short- to mid-term progression.
+More specifically, model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to AD progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and horizons of 2, 3, 4, 5, and 6 years were selected to capture short- to mid-term progression.
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
@@ -132,6 +132,8 @@ The modelling approaches will be applied to data obtained from the ADNI and hand
 *Måste förkortas och göras mer sammanhängande*
 
 ## Survival Analysis
+
+Suggested shorter version:
 
 As all modeling approaches considered in this study aim to model time to progression to AD, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.). The event of interest may include death, disease onset, relapse or recovery. However, this type of data analysis faces two main challenges. First, survival times are often skewed rather than normally distributed. Second, for some individuals the exact event time is unknown because the event has not occurred by the end of follow-up or because participants are lost to follow-up. This is referred to as censoring. Therefore, specialized statistical methods are required in order to appropriately incorporate both complete and censored observations when estimating survival-related quantities (Ranganathan, Deo & Pramesh, p. ?)
 
@@ -534,57 +536,19 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
 
-```{r}
-dir.create("figures", showWarnings = FALSE)
-
-png("figures/hist_p_tau.png", width = 400, height = 300)
-hist(long_data$PLASMAPTAU181,
-     main = "PLASMAPTAU181",
-     xlab = "PLASMAPTAU181"
-     )
-dev.off()
-```
-
-\![\](figures/hist_p_tau.png)
+![](figures/hist_p_tau.png){width="400"}
 
 The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
 
-```{r}
-png("figures/hist_nfl.png", width = 400, height = 300)
-hist(long_data$PLASMA_NFL,
-     main = "PLASMA_NFL",
-     xlab = "PLASMA_NFL" 
-     )
-dev.off()
-```
-
-\![\](figures/hist_nfl.png
+![](figures/hist_nfl.png){width="400"}
 
 The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
 
-```{r}
-png("figures/hist_log_p_tau.png", width = 400, height = 300)
-hist(long_data$log_PLASMAPTAU181,
-     main = "log-transformed PLASMAPTAU181",
-     xlab = "log_PLASMAPTAU181"
-     )
-dev.off()
-```
-
-\![\](figures/hist_log_p_tau.png
+![](figures/hist_log_p_tau.png){width="400"}
 
 In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
 
-```{r}
-png("figures/hist_log_nfl.png", width = 400, height = 300)
-hist(long_data$log_PLASMA_NFL,
-     main = "log-transformed PLASMA_NFL",
-     xlab = "log_PLASMA_NFL" 
-     )
-dev.off()
-```
-
-\![\](figures/hist_log_nfl.png
+![](figures/hist_log_nfl.png){width="400"}
 
 The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
 
@@ -592,18 +556,15 @@ The two log-transformed biomarkers are therefore considered appropriate for incl
 
 *Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
 
-## Including Participants With 3 Or More Measurements 
+## Including Participants With 3 Or More Measurements
 
-### Cox models 
+### Cox models
 
 To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline were fitted. Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Table 1.
 
 **Table 1: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models.**
 
 ```{r, echo=FALSE}
-dir.create("tables", showWarnings = FALSE)
-
-saveRDS(table_ph, "tables/table_ph.rds")
 knitr::kable(readRDS("tables/table_ph.rds"))
 ```
 
@@ -616,7 +577,6 @@ Given this violation, age at baseline was excluded from the final Cox models. Th
 **Table 2: p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models.**
 
 ```{r, echo=FALSE}
-saveRDS(table_ph_final, "tables/table_ph_final.rds")
 knitr::kable(readRDS("tables/table_ph_final.rds"))
 ```
 
@@ -627,7 +587,6 @@ As the proportional hazards assumption was met in the refitted models, the resul
 **Table 3: hazard ratios with 95% confidence intervals and p-values from the Cox models including baseline biomarkers**
 
 ```{r, echo=FALSE}
-saveRDS(table_cox, "tables/table_cox.rds")
 knitr::kable(readRDS("tables/table_cox.rds"))
 ```
 
@@ -637,7 +596,7 @@ Both baseline p-tau181 and baseline NfL were significantly associated with an in
 
 In the Cox model including both biomarkers simultaneously, the results were similar, with both p-tau181 and NfL remaining significantly associated with progression. The effect estimates were however slightly attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 1.81 and NfL showing a hazard ratio of 1.98. This indicates that both biomarkers retained independent prognostic value. The confidence intervals for both variables were somewhat wider than in the univariable models, reflecting increased uncertainty in the joint model due to shared variance between the biomarkers.
 
-### Joint models 
+### Joint models
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL.
 
@@ -645,55 +604,21 @@ To be more precise, a longitudinal submodel was specified for each biomarker tog
 
 **Figure 1: fitted values versus residuals from the LME model for p-tau181**
 
-```{r}
-png("figures/residuals_vs_fitted_ptau.png", width = 400, height = 300)
-plot(fitted_vals_ptau, res_ptau,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted for p-tau181")
-abline(h = 0, col = "red", lty = 2)
-dev.off()
-```
-
-\![\](figures/residuals_vs_fitted_ptau.png
+![](figures/residuals_vs_fitted_ptau.png){width="400"}
 
 **Figure 2: Q-Q plot of the LME model for p-tau181**
 
-```{r}
-png("figures/qq_ptau.png", width = 400, height = 300)
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-dev.off()
-```
-
-\![\](figures/qq_ptau.png
+![](figures/qq_ptau.png){width="400"}
 
 The plot of residuals versus fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern.
 
 **Figure 3: fitted values versus residuals from the LME model for NfL**
 
-```{r}
-png("figures/residuals_vs_fitted_nfl.png", width = 400, height = 300)
-plot(fitted_vals_nfl, res_nfl,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted for NfL")
-abline(h = 0, col = "red", lty = 2)
-dev.off()
-```
-
-\![\](figures/residuals_vs_fitted_nfl.png
+![](figures/residuals_vs_fitted_nfl.png){width="400"}
 
 **Figure 4: Q-Q plot of the LME model for NfL**
 
-```{r}
-png("figures/qq_nfl.png", width = 400, height = 300)
-qqnorm(res_nfl, main = "QQ plot: NfL residuals")
-qqline(res_nfl, col = "red")
-dev.off()
-```
-
-\![\](figures/qq_nfl.png
+![](figures/qq_nfl.png){width="400"}
 
 “The same pattern was observed for the LME model of NfL, where the plot of residuals versus fitted values showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot showed similar results to that of p-tau181.
 
@@ -703,37 +628,19 @@ Thus, joint models including longitudinal measurements of p-tau181, NfL, or both
 
 **Figure 5: Estimated** $α$**-parameters for the joint model of p-tau181**
 
-```{r, echo=FALSE}
-png("figures/convergence_plot_ptau.png", width = 400, height = 300)
-ggtraceplot(joint_model_ptau, "alphas")
-dev.off()
-```
-
-\![\](figures/convergence_plot_ptau.png
+![](figures/convergence_plot_ptau.png){width="400"}
 
 ...
 
 **Figure 6: Estimated** $α$**-parameters for the joint model of NfL**
 
-```{r}
-png("figures/convergence_plot_nfl.png", width = 400, height = 300)
-ggtraceplot(joint_model_nfl, "alphas")
-dev.off()
-```
-
-\![\](figures/convergence_plot_nfl.png
+![](figures/convergence_plot_nfl.png)
 
 ....
 
 **Figure 7: Estimated** $α$**-parameters for the multivariate joint model**
 
-```{r}
-png("figures/convergence_plot_multi.png", width = 400, height = 300)
-ggtraceplot(multi_joint_model, "alphas")
-dev.off()
-```
-
-\![\](figures/convergence_plot_multi.png
+![](figures/convergence_plot_multi.png)
 
 ...
 
@@ -742,7 +649,6 @@ Additionally, convergence of the models was assessed by examining the Rhat value
 **Table 4: Rhat values of the survival outcome in the joint models**
 
 ```{r, echo=FALSE}
-saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
 knitr::kable(readRDS("tables/rhat_survival_table.rds"))
 ```
 
@@ -751,7 +657,6 @@ knitr::kable(readRDS("tables/rhat_survival_table.rds"))
 **Table 5: Rhat values of the longitudinal outcome in the joint models**
 
 ```{r, echo=FALSE}
-saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
 knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
@@ -762,97 +667,42 @@ Subsequently, the estimated hazard ratios from the joint models are presented in
 **Table 6: hazard ratios with 95% confidence intervals and p-values from the joint models**
 
 ```{r, echo=FALSE}
-saveRDS(table_jm, "tables/table_jm.rds")
 knitr::kable(readRDS("tables/table_jm.rds"))
 ```
 
 LÄGG IN TOLKNING AV HR, CI OCH P HÄR\*\*\*\*
 
-### Latent Class Joint models 
+### Joint Latent Class Mixed Models
 
-## Including Participants With 1 Or More Measurements 
+## Including Participants With 1 Or More Measurements
 
-### Cox models 
+### Cox models
 
-### Joint models 
+### Joint models
 
-### Latent Class Joint models 
+### Joint Latent Class Mixed Models
 
 ## Predictive performance
 
 Predictive performance was evaluated using time-dependent AUC and Brier score at yearly time points from 2 to 6 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in Table.
 
-```{r}
-png("figures/auc_plot_cox.png", width = 400, height = 300)
-ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
-  geom_line(linewidth = 0.5) +
-  geom_point(aes(shape = Model), size = 2) +
-  ylim(0, 1) +
-  labs(
-    title = "Time-dependent AUC comparison",
-    x = "Time (years)",
-    y = "AUC"
-  )
-dev.off()
+![](figures/auc_plot_cox.png){width="400"}
 
-png("figures/auc_plot_jm.png", width = 400, height = 300)
-ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
-  geom_line(linewidth = 0.5) +
-  geom_point(aes(shape = Model), size = 2) +
-  ylim(0, 1) +
-  labs(
-    title = "Time-dependent AUC comparison",
-    x = "Time (years)",
-    y = "AUC"
-  )
-dev.off()
-```
-
-\![\](figures/auc_plot_cox.png
-
-\![\](figures/auc_plot_jm.png
+![](figures/auc_plot_jm.png){width="400"}
 
 ```{r, echo=FALSE}
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 knitr::kable(readRDS("tables/results_table_AUC.rds"))
 ```
 
 ```{r}
-png("figures/Brier_plot_cox.png", width = 400, height = 300)
-ggplot(plot_data %>% filter(grepl("Cox", Model)),
-       aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 0.5) +
-  geom_point(aes(shape = Model), size = 2) +
-  ylim(0, 1) +
-  theme_minimal() +
-  labs(
-    title = "Time-dependent Brier Score for the Cox Models",
-    x = "Time",
-    y = "Brier score"
-  )
-dev.off()
 
-png("figures/Brier_plot_jm.png", width = 400, height = 300)
-ggplot(plot_data %>% filter(grepl("J", Model)),
-       aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 0.5) +
-  geom_point(aes(shape = Model), size = 2) +
-  ylim(0, 1) +
-  theme_minimal() +
-  labs(
-    title = "Time-dependent Brier Score for the Joint Models",
-    x = "Time",
-    y = "Brier score"
-  )
-dev.off()
 ```
 
-\![\](figures/Brier_plot_cox.png
+![](figures/Brier_plot_cox.png){width="400"}
 
-\![\](figures/Brier_plot_jm.png
+![](figures/Brier_plot_jm.png){width="400"}
 
 ```{r, echo=FALSE}
-saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 knitr::kable(readRDS("tables/results_table_Brier.rds"))
 ```
 

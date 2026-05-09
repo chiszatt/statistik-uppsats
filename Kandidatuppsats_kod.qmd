@@ -540,6 +540,29 @@ hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
 ```
 
 ```{r}
+# Creating a folder to save plots
+dir.create("figures", showWarnings = FALSE)
+
+# Saving ptau histogram
+png("figures/hist_p_tau.png", width = 400, height = 300)
+hist(long_data$PLASMAPTAU181,
+     main = "PLASMAPTAU181",
+     xlab = "PLASMAPTAU181"
+     )
+dev.off()
+```
+
+```{r}
+# Saving NfL histogram
+png("figures/hist_nfl.png", width = 400, height = 300)
+hist(long_data$PLASMA_NFL,
+     main = "PLASMA_NFL",
+     xlab = "PLASMA_NFL" 
+     )
+dev.off()
+```
+
+```{r}
 # We log transform the biomarkers 
 long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
 long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
@@ -549,6 +572,26 @@ long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
 # We re-check the distribution of each biomarker  
 hist(long_data$log_PLASMAPTAU181, main="log_PLASMAPTAU181")
 hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
+```
+
+```{r}
+#  Saving log transformed ptau histogram
+png("figures/hist_log_p_tau.png", width = 400, height = 300)
+hist(long_data$log_PLASMAPTAU181,
+     main = "log-transformed PLASMAPTAU181",
+     xlab = "log_PLASMAPTAU181"
+     )
+dev.off()
+```
+
+```{r}
+#  Saving log transformed NfL histogram
+png("figures/hist_log_nfl.png", width = 400, height = 300)
+hist(long_data$log_PLASMA_NFL,
+     main = "log-transformed PLASMA_NFL",
+     xlab = "log_PLASMA_NFL" 
+     )
+dev.off()
 ```
 
 ```{r}
@@ -626,7 +669,7 @@ table(surv_data_out$event)
 
 # Longitudinal models
 
-## Comparing longitudinal models
+## Comparing link functions for longitudinal models
 
 Suggested models:
 
@@ -951,6 +994,17 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
+# Saving the plot of residuals vs fitted for ptau
+png("figures/residuals_vs_fitted_ptau.png", width = 400, height = 300)
+plot(fitted_vals_ptau, res_ptau,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for p-tau181")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
+```
+
+```{r}
 # residuals of the NfL LME model
 res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
@@ -963,6 +1017,17 @@ plot(fitted_vals_nfl, res_nfl,
      ylab = "Residuals",
      main = "Residuals vs Fitted for NFL")
 abline(h = 0, col = "red", lty = 2)
+```
+
+```{r}
+# Saving the residuals vs fitted plot for nfl
+png("figures/residuals_vs_fitted_nfl.png", width = 400, height = 300)
+plot(fitted_vals_nfl, res_nfl,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for NfL")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
 ```
 
 #### Shapiro-Wilk test
@@ -987,6 +1052,19 @@ qqline(res_ptau, col = "red")
 # For NFL 
 qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
+```
+
+```{r}
+#  Saving the QQ-plots
+png("figures/qq_ptau.png", width = 400, height = 300)
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
+dev.off()
+
+png("figures/qq_nfl.png", width = 400, height = 300)
+qqnorm(res_nfl, main = "QQ plot: NfL residuals")
+qqline(res_nfl, col = "red")
+dev.off()
 ```
 
 # Survival models
@@ -1212,6 +1290,14 @@ table_ph <- ph_all %>%
 table_ph
 ```
 
+```{r}
+#  Creating a directory to save tables into
+dir.create("tables", showWarnings = FALSE)
+
+# Saving table with PHT results
+saveRDS(table_ph, "tables/table_ph.rds")
+```
+
 #### Removing age-at-baseline due to evidence of non-proportional hazards
 
 ```{r}
@@ -1274,6 +1360,11 @@ table_ph_final <- ph_all_final %>%
 
 # Displaying final PH table 
 table_ph_final
+```
+
+```{r}
+# Saving the final PH table
+saveRDS(table_ph_final, "tables/table_ph_final.rds")
 ```
 
 ### Cox comparison table
@@ -1359,6 +1450,11 @@ table_cox <- data.frame(
 table_cox
 ```
 
+```{r}
+# Savig the cox models comparison table
+saveRDS(table_cox, "tables/table_cox.rds")
+```
+
 # Two separate joint models
 
 ## Fitted joint model for p-tau181
@@ -1384,6 +1480,13 @@ summary(joint_model_ptau)
 ggtraceplot(joint_model_ptau, "alphas")
 ```
 
+```{r}
+# Saving the convergence plot
+png("figures/convergence_plot_ptau.png", width = 400, height = 300)
+ggtraceplot(joint_model_ptau, "alphas")
+dev.off()
+```
+
 ## Fitted joint model for NfL
 
 ```{r}
@@ -1405,6 +1508,13 @@ summary(joint_model_nfl)
 ```{r}
 # Checking convergence 
 ggtraceplot(joint_model_nfl, "alphas")
+```
+
+```{r}
+# Saving the convergence plot
+png("figures/convergence_plot_nfl.png", width = 400, height = 300)
+ggtraceplot(joint_model_nfl, "alphas")
+dev.off()
 ```
 
 ### Traceplots
@@ -1490,6 +1600,13 @@ summary(multi_joint_model)
 ggtraceplot(multi_joint_model, "alphas")
 ```
 
+```{r}
+# Saving the convergence plot
+png("figures/convergence_plot_multi.png", width = 400, height = 300)
+ggtraceplot(multi_joint_model, "alphas")
+dev.off()
+```
+
 # ...
 
 ### Joint model comparison table
@@ -1554,6 +1671,11 @@ table_jm <- data.frame(
 table_jm
 ```
 
+```{r}
+# Saving the joint model comparison table
+saveRDS(table_jm, "tables/table_jm.rds")
+```
+
 ## Rhat value comparison table
 
 ```{r}
@@ -1591,6 +1713,11 @@ rhat_survival_table
 ```
 
 ```{r}
+# Saving the rhat table
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+```
+
+```{r}
 # Extracting Rhat for longitudinal outcome 
 extract_rhat_long <- function(model) {
 
@@ -1622,6 +1749,11 @@ rhat_longitudinal_table <- bind_rows(
 
 # Showing table
 rhat_longitudinal_table
+```
+
+```{r}
+# Saving the rhat table
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
 ```
 
 # Latent Class Mixed Models
@@ -2997,11 +3129,6 @@ predict_mjlcmm <- function(model, data, ID, landmark, times) {
   }
 ```
 
-```{r}
-# Testing getting predictions
-preds_mjlcmm_m1 <- predict_mjlcmm(mult_jlcmm_m1, jlcmm_data, "RID", 1, times)
-```
-
 #### Function for extracting time-dependent AUC
 
 1.  Confidence intervals
@@ -3024,7 +3151,7 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
 
 #   Calculating the survival predictions previously defined function
   if(class(model) == "mpjlcmm") {
-    dynpreds <- predict_mjlcmm(
+    dfpred <- predict_mjlcmm(
       model = model,
       data = newdata,
       ID = ID,
@@ -3035,24 +3162,14 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
   
 #   Calculating the dynamic survival predictions from joint models using dynpred() in the lcmm package
   if(class(model) == "Jointlcmm") {
-    dynpreds <- dynpred(
+    dfpred <- dynpred(
       model = model,
       newdata = newdata,
       var.time = time_var,
       horizon = times,
       landmark = landmark
-      )
+      )$pred
   }
-
-#   Extracting the predicted survival probabilities 
-  preds <- dynpreds$pred["pred"]
-#   Extracting the unique identifiers (RID) relating to the predicitons
-  ids <- dynpreds$pred[ID]
-#   Extracting the horizon relating to the predicitons
-  horizons <- dynpreds$pred["horizon"]
-  
-#   Creatng a data frame of predictions, horizons and IDs
-  dfpred <- data.frame(id = ids, horizon = horizons, pred = preds)
   
 #   Fetching the true events for each ID for each time point
   dftrue <- unique(newdata[c(ID, surv_time_var, event_var)])
@@ -3106,11 +3223,6 @@ auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, newdata,
                                    "RID", "time_years", "time_to_event", "event",
                                    1, times)
 
-# Computing AUC for 2 class multivariate joint latent class mixed model for ptau & NfL
-auc_jlcmm_m2_ptau <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data,
-                                   "RID", "time_years", "time_to_event", "event",
-                                   1, times)
-
 # ON IN-SAMPLE DATA
 # Computing AUC for 2 class multivariate joint latent class mixed model for ptau & NfL
 auc_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data,
@@ -3133,7 +3245,7 @@ results_table_AUC <- data.frame(
              auc_nfl_jm[1],
              auc_multi_jm[1],
              auc_jlcmm_m2_ptau[1,3],
-             auc_jlcmm_m2_nfl[1,3]),
+             auc_jlcmm_m1_nfl[1,3]),
   
   AUC_3y = c(auc_ptau_bl[2],
              auc_nfl_bl[2],
@@ -3142,7 +3254,7 @@ results_table_AUC <- data.frame(
              auc_nfl_jm[2],
              auc_multi_jm[2],
              auc_jlcmm_m2_ptau[2,3],
-             auc_jlcmm_m2_nfl[2,3]),
+             auc_jlcmm_m1_nfl[2,3]),
   
   AUC_4y = c(auc_ptau_bl[3],
              auc_nfl_bl[3],
@@ -3151,7 +3263,7 @@ results_table_AUC <- data.frame(
              auc_nfl_jm[3],
              auc_multi_jm[3],
              auc_jlcmm_m2_ptau[3,3],
-             auc_jlcmm_m2_nfl[3,3]),
+             auc_jlcmm_m1_nfl[3,3]),
   
   AUC_5y = c(auc_ptau_bl[4],
              auc_nfl_bl[4],
@@ -3160,7 +3272,7 @@ results_table_AUC <- data.frame(
              auc_nfl_jm[4],
              auc_multi_jm[4],
              auc_jlcmm_m2_ptau[4,3],
-             auc_jlcmm_m2_nfl[4,3]),
+             auc_jlcmm_m1_nfl[4,3]),
   
   AUC_6y = c(auc_ptau_bl[5],
              auc_nfl_bl[5],
@@ -3169,11 +3281,16 @@ results_table_AUC <- data.frame(
              auc_nfl_jm[5],
              auc_multi_jm[5],
              auc_jlcmm_m2_ptau[5,3],
-             auc_jlcmm_m2_nfl[5,3])
+             auc_jlcmm_m1_nfl[5,3])
 )
 
 results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
 results_table_AUC
+```
+
+```{r}
+# Saving the AUC results table
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 ```
 
 ## Plot of the results
@@ -3193,12 +3310,13 @@ plot_data <- data.frame(
     auc_nfl_jm,
     auc_multi_jm,
     auc_jlcmm_m2_ptau$AUC,
-    auc_jlcmm_m2_nfl$AUC
+    auc_jlcmm_m1_nfl$AUC
   )
 ) 
 
 # Plot of Cox models
-ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
+ggplot(plot_data %>% filter(grepl("Cox", Model)),
+       aes(x = Time, y = AUC, color = Model)) +
   geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
   ylim(0, 1) +
@@ -3206,10 +3324,12 @@ ggplot(plot_data[1:18, ], aes(x = Time, y = AUC, color = Model)) +
     title = "Time-dependent AUC comparison",
     x = "Time (years)",
     y = "AUC"
-  )
+  ) +
+  theme_minimal()
 
 # Plot of joint models
-ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
+ggplot(plot_data %>% filter(grepl("J", Model)),
+       aes(x = Time, y = AUC, color = Model)) +
   geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
   ylim(0, 1) +
@@ -3217,7 +3337,38 @@ ggplot(plot_data[18:48, ], aes(x = Time, y = AUC, color = Model)) +
     title = "Time-dependent AUC comparison",
     x = "Time (years)",
     y = "AUC"
-  )
+  ) +
+  theme_minimal()
+```
+
+```{r}
+png("figures/auc_plot_cox.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("Cox", Model)),
+       aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC Comparison for Cox Models",
+    x = "Time (years)",
+    y = "AUC"
+  ) +
+  theme_minimal()
+dev.off()
+
+png("figures/auc_plot_jm.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("J", Model)),
+       aes(x = Time, y = AUC, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  labs(
+    title = "Time-dependent AUC Comparison for Joint Models",
+    x = "Time (years)",
+    y = "AUC"
+  ) +
+  theme_minimal()
+dev.off()
 ```
 
 # Comparing models using time-depending Brier score
@@ -3451,6 +3602,11 @@ results_table_Brier <- data.frame(
 round(results_table_Brier, 3)
 ```
 
+```{r}
+# Saving the table of the Brier score results
+saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+```
+
 ## Plot of the results
 
 ```{r}
@@ -3464,12 +3620,12 @@ plot_data <- results_table_Brier %>%
 # plot for the Cox models
 ggplot(plot_data %>% filter(grepl("Cox", Model)),
        aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 0.5) +
+  geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
   ylim(0, 1) +
   theme_minimal() +
   labs(
-    title = "Time-dependent Brier Score for the Cox Models",
+    title = "Time-dependent Brier Score for Cox Models",
     x = "Time",
     y = "Brier score"
   )
@@ -3477,13 +3633,48 @@ ggplot(plot_data %>% filter(grepl("Cox", Model)),
 # plot for the joint models
 ggplot(plot_data %>% filter(grepl("J", Model)),
        aes(x = Time, y = Brier, color = Model)) +
-  geom_line(size = 0.5) +
+  geom_line(linewidth = 0.5) +
   geom_point(aes(shape = Model), size = 2) +
   ylim(0, 1) +
   theme_minimal() +
   labs(
-    title = "Time-dependent Brier Score for the Joint Models",
+    title = "Time-dependent Brier Score for Joint Models",
     x = "Time",
     y = "Brier score"
   )
+```
+
+```{r}
+# Saving plots of the Brier score results
+png("figures/Brier_plot_cox.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("Cox", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(
+    title = "Time-dependent Brier Score for Cox Models",
+    x = "Time",
+    y = "Brier score"
+  ) +
+  theme_minimal()
+
+dev.off()
+
+png("figures/Brier_plot_jm.png", width = 400, height = 300)
+ggplot(plot_data %>% filter(grepl("J", Model)),
+       aes(x = Time, y = Brier, color = Model)) +
+  geom_line(linewidth = 0.5) +
+  geom_point(aes(shape = Model), size = 2) +
+  ylim(0, 1) +
+  theme_minimal() +
+  labs(
+    title = "Time-dependent Brier Score for Joint Models",
+    x = "Time",
+    y = "Brier score"
+  ) +
+  theme_minimal()
+
+dev.off()
 ```
