@@ -534,23 +534,17 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 ## Biomarker distributions
 
-Values of p-tau181 range from a minimum of 0.4 to a maximum of 451.4. The median is 16.3, with the first quartile at 11.1 and the third quartile at 23.6. In other words, the distribution of the variable is highly right-skewed and non-normally distributed, as displayed by the histogram over p-tau181 below.
+Values of p-tau181 ranged from a minimum of 0.4 to a maximum of 451.4. The median was 16.3, with the first quartile at 11.1 and the third quartile at 23.6. Similarly, the values of NfL ranged from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. In other words, both NfL and p-tau181 exhibited highly right-skewed distributions.
 
-![](figures/hist_p_tau.png){width="400"}
-
-The values of NfL range from a minimum of 6.4 to a maximum of 408, with a median of 37.9, a first quartile of 27.8, and a third quartile of 52.5. Thus, both NfL and p-tau181 exhibit highly right-skewed distributions, although NfL appears to be slightly less skewed in the histogram over the variable.
-
-![](figures/hist_nfl.png){width="400"}
-
-The log-transformation of p-tau181 produces a distribution that more closely approximates a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remains, although it is not considered substantial.
+The log-transformation of p-tau181 produced a distribution that more closely approximated a normal distribution, with a greater concentration of observations around the center. However, some residual left-skewness remained, although it was not considered substantial.
 
 ![](figures/hist_log_p_tau.png){width="400"}
 
-In comparison, the distribution of NfL more closely approximates a normal distribution after log-transformation. The observations appear less dispersed and are more concentrated around the center of the distribution.
+In comparison, the distribution of NfL more closely approximated a normal distribution after log-transformation. The observations appeared less dispersed and were more concentrated around the center of the distribution.
 
 ![](figures/hist_log_nfl.png){width="400"}
 
-The two log-transformed biomarkers are therefore considered appropriate for inclusion in the statistical models.
+The two log-transformed biomarkers were therefore considered appropriate for inclusion in the statistical models.
 
 # Results
 
@@ -600,29 +594,9 @@ In the Cox model including both biomarkers simultaneously, the results were simi
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL.
 
-To be more precise, a longitudinal submodel was specified for each biomarker together with a survival submodel, the latter taking the form of a standard Cox model. As indicated in Table 2, the proportional hazards assumption was satisfied for this model. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL. Figure 1 presents fitted values versus residuals from the LME model for p-tau181, while Figure 2 shows the corresponding Q-Q plot assessing normality. Similarly, Figure 3 presents fitted values versus residuals from the LME model for NfL, while Figure 4 shows the corresponding Q-Q plot.
+To be more precise, a longitudinal submodel was specified for each biomarker together with a survival submodel, the latter taking the form of a standard Cox model. As indicated in Table 2, the proportional hazards assumption was satisfied for this model. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
-**Figure 1: fitted values versus residuals from the LME model for p-tau181**
-
-![](figures/residuals_vs_fitted_ptau.png){width="400"}
-
-**Figure 2: Q-Q plot of the LME model for p-tau181**
-
-![](figures/qq_ptau.png){width="400"}
-
-The plot of residuals versus fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern.
-
-**Figure 3: fitted values versus residuals from the LME model for NfL**
-
-![](figures/residuals_vs_fitted_nfl.png){width="400"}
-
-**Figure 4: Q-Q plot of the LME model for NfL**
-
-![](figures/qq_nfl.png){width="400"}
-
-“The same pattern was observed for the LME model of NfL, where the plot of residuals versus fitted values showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot showed similar results to that of p-tau181.
-
-Consequently, both models were considered to provide a reasonable fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity (see Appendix 1). The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (see Appendix 2). The same pattern was observed for the LME model of NfL, where plotting the residuals against the fitted values showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (see Appendix 3). The Q-Q plot showed similar results to that of p-tau181 (see Appendix 4). Consequently, both models were considered to provide a reasonable fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
 Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. To ensure proper model convergence, the $α$-parameters were plotted, starting with those for the joint model of p-tau181, presented in Figure 5.
 
@@ -853,3 +827,19 @@ Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimagi
 Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). Statistical evaluation of diagnostic performance: Topics in ROC analysis (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b11031>
 
 # Appendix
+
+## Appendix 1: fitted values versus residuals from the LME model for p-tau181
+
+![](figures/residuals_vs_fitted_ptau.png){width="400"}
+
+## Appendix 2: Q-Q plot of the LME model for p-tau181
+
+![](figures/qq_ptau.png){width="400"}
+
+## Appendix 3: fitted values versus residuals from the LME model for NfL
+
+![](figures/residuals_vs_fitted_nfl.png){width="400"}
+
+## Appendix 4: Q-Q plot of the LME model for NfL
+
+![](figures/qq_nfl.png){width="400"}
