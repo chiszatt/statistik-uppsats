@@ -1581,8 +1581,6 @@ fForms <- list(
 
 ## Fitted multivariate joint model
 
-- High Rhat for time_years, try with 25,000 iterations
-
 ```{r}
 multi_joint_model <- jm(surv_model_final, mixed ,
                         time_var = "time_years",
