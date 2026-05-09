@@ -644,9 +644,9 @@ Thus, joint models including longitudinal measurements of p-tau181, NfL, or both
 
 ...
 
-Additionally, convergence of the models was assessed by examining the Rhat values of the survival outcome and the longitudinal outcome in each joint model, presented in table 4.
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, presented in table 4.
 
-**Table 4: Rhat values of the survival outcome in the joint models**
+**Table 4:** $\widehat{\mathbf{R}}$ **values of the survival outcome in the joint models**
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/rhat_survival_table.rds"))
@@ -654,7 +654,7 @@ knitr::kable(readRDS("tables/rhat_survival_table.rds"))
 
 ...
 
-**Table 5: Rhat values of the longitudinal outcome in the joint models**
+**Table 5:** $\widehat{\mathbf{R}}$ **values of the longitudinal outcome in the joint models**
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
@@ -673,6 +673,20 @@ knitr::kable(readRDS("tables/table_jm.rds"))
 LÄGG IN TOLKNING AV HR, CI OCH P HÄR\*\*\*\*
 
 ### Joint Latent Class Mixed Models
+
+Latent class mixed models were fit on the longitudinal ptau-181 and NfL measurements in order to assess whether the model can distinguish latent classes from the biomarker trajectories alone. None of these models could adequately separate the sample population into meaningful latent classes, suggesting that ptau-181 and NfL biomarker trajectories alone do not hold enough information to be able to distinguish heterogenous disease sub-types. Multivariate latent class models were estimated on ptau-181 and NfL measurements simultaneously. Again, the models could not discriminate valid latent classes from this data alone. Interestingly, incorporating the survival data resulted in JLCMM's that could meaningfully classify individuals into latent classes.
+
+**JLCMM PTAU**
+
+The random effects structure was decided by a likelihood ratio test between one class model with random intercept and one with both a random intercept and slope. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model was a better fit for the data.
+
+The results from the one, two and three class JLCMM's are presented below.
+
+**XXX TABLES XXX**
+
+**JLCMM NFL**
+
+Again, a the results of a likelihood ratio test between two models was used to determine the random effects structure. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
 
 ## Including Participants With 1 Or More Measurements
 

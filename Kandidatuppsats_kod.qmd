@@ -2515,6 +2515,21 @@ summary(jlcmm_m0_2)
 summarytable(jlcmm_m0_1, jlcmm_m0_2)
 ```
 
+```{r}
+# log likelihood for the full model
+l = jlcmm_m0_2$loglik
+
+# log likelihood for the reduced model
+l_0 = jlcmm_m0_1$loglik
+
+# computing the LR test statistic
+LR = - 2 * (l_0 - l)
+
+# computing the p-value given the null hypothesis is true (the reduced model is the true model)
+pchisq(LR, 2, lower.tail = FALSE)
+LR
+```
+
 ## M1 (2 latent classes)
 
 ```{r}
@@ -3451,7 +3466,8 @@ brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, tim
   
 #   Calculating the survival predictions previously defined function
   if(class(model) == "mpjlcmm") {
-    dfpred <- predict_mjlcmm(
+    dfpred <- predict_mjlcmm
+    (
       model = model,
       data = data,
       ID = ID,
