@@ -678,15 +678,27 @@ Latent class mixed models were fit on the longitudinal ptau-181 and NfL measurem
 
 **JLCMM PTAU**
 
-The random effects structure was decided by a likelihood ratio test between one class model with random intercept and one with both a random intercept and slope. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model was a better fit for the data.
+The random effects structure was decided by a likelihood ratio test between one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
 
-The results from the one, two and three class JLCMM's are presented below.
+The log-likelihoods, BIC and entropy of the one, two, three and four class JLCMM for ptau-181 are presented below:
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_ptau.rds"))
+```
 
 **XXX TABLES XXX**
 
 **JLCMM NFL**
 
-Again, a the results of a likelihood ratio test between two models was used to determine the random effects structure. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
+Again, a the results of a likelihood ratio test between two models was used to determine the random effects structure. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model with only a random intercept was a better fit for the data.
+
+The log-likelihoods, BIC and entropy of the one, two and three class JLCMM's for NfL were as follows:
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds"))
+```
+
+**XXX TABLES XXX**
 
 ## Including Participants With 1 Or More Measurements
 

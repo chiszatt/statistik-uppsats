@@ -2375,8 +2375,12 @@ postprob(jlcmm_m2_nfl)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
-                                                which = c("G", "loglik", "BIC", "entropy"))
+summarytable_nfl <- summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
+                                which = c("G", "loglik", "BIC", "entropy"))
+```
+
+```{r}
+saveRDS(summarytable_nfl, "tables/summary_jlcmm_nfl.rds")
 ```
 
 ```{r}
@@ -2712,7 +2716,7 @@ summary(jlcmm_m2_ptau_piecewise)
 ```{r}
 # Fitting a four class joint latent class mixed model
 # Results from gridsearch() and B = random(jlcmm_m0_1) are very similar, global maximum found with random start from the 1 class model
-jlcmm_m1_ptau <- jlcmm(
+jlcmm_m3_ptau <- jlcmm(
   fixed = log_PLASMAPTAU181 ~ time_years,
   random = ~ 1,
   mixture = ~ 1,
@@ -2736,8 +2740,13 @@ postprob(jlcmm_m3_ptau)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable(jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
-             which = c("G", "loglik", "BIC", "entropy"))
+summarytable_ptau <- summarytable(
+  jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
+  which = c("G", "loglik", "BIC", "entropy"))
+```
+
+```{r}
+saveRDS(summarytable_ptau, "tables/summary_jlcmm_ptau.rds")
 ```
 
 ```{r}
