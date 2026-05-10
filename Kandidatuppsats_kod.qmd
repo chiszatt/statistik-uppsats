@@ -2311,6 +2311,18 @@ summary(jlcmm_m1_nfl_piecewise)
 ```
 
 ```{r}
+postprob_m1_nfl <- data.frame(
+  "Class" = c("Class1", "Class2"),
+  "Prob1" = c(0.90, 0.03),
+  "Prob2" = c(0.10, 0.97),
+  "Prob > 0.7 (%)" = c(93.6, 96.0),
+  "Prob > 0.8 (%)" = c(82.4, 95.2),
+  "Prob > 0.9 (%)" = c(60.3, 92.8),
+  check.names = FALSE
+)
+```
+
+```{r}
 postprob_m1_nfl <- postprob(jlcmm_m1_nfl)[1:2]
 ```
 
@@ -2377,28 +2389,44 @@ postprob(jlcmm_m2_nfl)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable_nfl <- as.data.frame(summarytable(
-  jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl, which = c("loglik", "BIC", "entropy")))
-
-# renaming the models for the table output
-row.names(summarytable_nfl) <- c("1 class model", "2 class model", "3 class model")
-
+summarytable_nfl <- data.frame(
+  "Candidate model" = c("Model1", "Model2", "Model3"),
+  "G" = c(1, 2, 3),
+  "Log Likelihood" = c(jlcmm_m0_1$loglik,
+                       jlcmm_m1_nfl$loglik,
+                       jlcmm_m2_nfl$loglik),
+  "BIC" = c(jlcmm_m0_1$BIC,
+            jlcmm_m1_nfl$BIC,
+            jlcmm_m2_nfl$BIC),
+  "Entropy" = c(1.00, 0.69, 0.52),
+  "Class1" = c(100.00, 76.33, 73.48),
+  "Class2" = c(NA, 23.67, 1.89),
+  "CLass3" = c(NA, NA, 24.62),
+  check.names = FALSE
+)
 ```
 
 ```{r}
 saveRDS(summarytable_nfl, "tables/summary_jlcmm_nfl.rds")
 ```
 
+## Class Descriptions
+
 ```{r}
 # # saving which class each individual was predicted to be in
-class_preds <- jlcmm_m2_nfl$pprobY
+class_preds <- jlcmm_m1_nfl$pprobY
 
-# merging with genotype data
+# merging with genotype and demographic data
 class_preds <- class_preds %>%
-  merge(apoe %>% dplyr::select(RID, APOE4_status), by = "RID")
+  merge((apoe %>% dplyr::select(RID, APOE4_status)), by = "RID") %>% 
+  merge((surv_data %>% dplyr::select(RID, event, age_at_baseline, PTGENDER)), by = "RID")
+```
 
+```{r}
 # checking the distribution of genotype by class
 table(class_preds$class, class_preds$APOE4_status)
+# checking the distribution of gender by class
+table(class_preds$class, class_preds$PTGENDER)
 ```
 
 ## Visualisation
@@ -2599,7 +2627,19 @@ summary(jlcmm_m1_ptau)
 ```
 
 ```{r}
-postprob_m1_ptau <- postprob(jlcmm_m1_ptau)[1:2]
+postprob(jlcmm_m1_ptau)
+```
+
+```{r}
+postprob_m1_ptau <- data.frame(
+  "Class" = c("Class1", "Class2"),
+  "Prob1" = c(0.97, 0.12),
+  "Prob2" = c(0.03, 0.88),
+  "Prob > 0.7 (%)" = c(93.8, 91.0),
+  "Prob > 0.8 (%)" = c(91.47, 76.19),
+  "Prob > 0.9 (%)" = c(91.47, 52.63),
+  check.names = FALSE
+)
 ```
 
 ```{r}
@@ -2673,7 +2713,20 @@ summary(jlcmm_m2_ptau)
 ```
 
 ```{r}
-postprob_m2_ptau <- postprob(jlcmm_m2_ptau)[1:2]
+postprob(jlcmm_m2_ptau)
+```
+
+```{r}
+postprob_m2_ptau <- data.frame(
+  "Class" = c("Class1", "Class2", "Class3"),
+  "Prob1" = c(0.74, 0.05, 0.01),
+  "Prob2" = c(0.24, 0.82, 0.04),
+  "Prob3" = c(0.02, 0.12, 0.95),
+  "Prob > 0.7 (%)" = c(65.0, 45.0, 15.0),
+  "Prob > 0.8 (%)" = c(86.1, 62.8, 28.7),
+  "Prob > 0.9 (%)" = c(93.2, 87.9, 84.1),
+  check.names = FALSE
+)
 ```
 
 ```{r}
@@ -2760,21 +2813,35 @@ postprob(jlcmm_m3_ptau)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable_ptau <- as.data.frame(summarytable(
-  jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
-  which = c("loglik", "BIC", "entropy")))
-
-# renaming the models for the table output
-row.names(summarytable_ptau) <- c("1 class model", "2 class model", "3 class model", "4 class model")
+summarytable_ptau <- data.frame(
+  "Candidate model" = c("Model1", "Model2", "Model3", "Model4"),
+  "G" = c(1, 2, 3, 4),
+  "Log Likelihood" = c(jlcmm_m0_1$loglik,
+                       jlcmm_m1_ptau$loglik,
+                       jlcmm_m2_ptau$loglik,
+                       jlcmm_m3_ptau$loglik),
+  "BIC" = c(jlcmm_m0_1$BIC,
+            jlcmm_m1_ptau$BIC,
+            jlcmm_m2_ptau$BIC,
+            jlcmm_m3_ptau$BIC),
+  "Entropy" = c(1.00, 0.65, 0.66, 0.71),
+  "Class1" = c(100.00, 24.43, 25, 67.42),
+  "Class2" = c(NA, 75.57, 71.21, 3.03),
+  "CLass3" = c(NA, NA, 3.79, 22.92),
+  "Class4" = c(NA, NA, NA, 6.53),
+  check.names = FALSE
+)
 ```
 
 ```{r}
 saveRDS(summarytable_ptau, "tables/summary_jlcmm_ptau.rds")
 ```
 
+## Class Descriptions
+
 ```{r}
 # # saving which class each individual was predicted to be in
-class_preds <- jlcmm_m2_ptau$pprobY
+class_preds <- jlcmm_m1_ptau$pprobY
 
 # merging with genotype data
 class_preds <- class_preds %>%
@@ -2931,7 +2998,19 @@ summary(mult_jlcmm_m1)
 ```
 
 ```{r}
-postprob_ptau_nfl <- postprob(mult_jlcmm_m1)[1:2]
+postprob(mult_jlcmm_m1)
+```
+
+```{r}
+postprob_ptau_nfl <- data.frame(
+  "Class" = c("Class1", "Class2"),
+  "Prob1" = c(0.96, 0.10),
+  "Prob2" = c(0.04, 0.90),
+  "Prob > 0.7 (%)" = c(93.8, 94.5),
+  "Prob > 0.8 (%)" = c(93.0, 82.8),
+  "Prob > 0.9 (%)" = c(91.4, 60.5),
+  check.names = FALSE
+)
 ```
 
 ```{r}
@@ -2979,12 +3058,24 @@ postprob(mult_jlcmm_m2)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable_ptau_nfl <- summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
-             which = c("loglik", "BIC", "entropy"))
+summarytable_ptau_nfl <- data.frame(
+  "Candidate model" = c("Model1", "Model2", "Model3"),
+  "G" = c(1, 2, 3),
+  "Log Likelihood" = c(mult_jlcmm_m0_1$loglik,
+                       mult_jlcmm_m1$loglik,
+                       mult_jlcmm_m2$loglik),
+  "BIC" = c(mult_jlcmm_m0_1$BIC,
+            mult_jlcmm_m1$BIC,
+            mult_jlcmm_m2$BIC),
+  "Entropy" = c(1.00, 0.69, 0.47),
+  "Class1" = c(100.00, 24.24, 1.89),
+  "Class2" = c(NA, 75.78, 25),
+  "CLass3" = c(NA, NA, 73.11),
+  check.names = FALSE
+)
+```
 
-# renaming the models for the table output
-row.names(summarytable_ptau_nfl) <- c("1 class model", "2 class model", "3 class model")
-
+```{r}
 saveRDS(summarytable_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
 
