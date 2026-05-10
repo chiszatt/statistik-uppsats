@@ -2931,7 +2931,11 @@ summary(mult_jlcmm_m1)
 ```
 
 ```{r}
-postprob(mult_jlcmm_m1)
+postprob_ptau_nfl <- postprob(mult_jlcmm_m1)[1:2]
+```
+
+```{r}
+saveRDS(postprob_ptau_nfl, "tables/postprob_ptau_nfl.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2975,9 +2979,13 @@ postprob(mult_jlcmm_m2)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
-             which = c("G", "loglik", "BIC", "entropy"))
+summarytable_ptau_nfl <- summarytable(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2,
+             which = c("loglik", "BIC", "entropy"))
 
+# renaming the models for the table output
+row.names(summarytable_ptau_nfl) <- c("1 class model", "2 class model", "3 class model")
+
+saveRDS(summarytable_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
 
 ## Visualisation
