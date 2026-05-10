@@ -776,21 +776,33 @@ As expected, Table ? demonstrates that predictive performance is highest at two-
 
 ### Time-Depending Brier Score 
 
-Additionally, predictive performance was evaluated using the time-dependent Brier score, with Figure ? providing an initial overview of the Cox models across the follow-up period.
+Additionally, predictive performance was evaluated using the time-dependent Brier score, with Figure ? providing an initial overview of the Brier scores for the Cox models across the follow-up period.
 
 **Figure ?: Time-dependent Brier score curves for the Cox models**
 
 ![](figures/Brier_plot_cox.png){width="400"}
 
-Figure ?:
+Overall, the Brier scores remain low for all Cox models throughout the follow-up period, indicating good overall predictive accuracy. At the two-year follow-up, all models demonstrate their lowest Brier scores, around 0.05. However, a gradual increase in Brier score is observed over time, reaching approximately 0.15 at six years, suggesting that predictions become less precise at longer follow-up times.
+
+Differences between the Cox models are relatively small across the follow-up period. A slight difference appear at the later follow up-points, where the Cox model including baseline values of both biomarkers shows a slightly lower Brier score than the single-biomarker models. The two single-biomarker models display very similar trajectories over time.
+
+Figure 2 presents the corresponding time-dependent Brier scores for the joint models and latent class joint models.
+
+**Figure ?: Time-dependent Brier score curves for the joint models and latent class joint models**
 
 ![](figures/Brier_plot_jm.png){width="400"}
+
+Similar to the Cox models, the Brier scores are lowest at earlier follow-up times and increase gradually over time. At the two-year follow-up, however, the latent class joint models show slightly lower Brier scores than the other joint models and the Cox models. Differences between the joint models are otherwise small and become less pronounced over follow-up time, with Brier scores converging to around 0.15 across models at six years.
+
+The same pattern can be observed in Table ?, which presents the time-dependent Brier score values for each model at each follow-up time point.
 
 **Table ?: Time-dependent Brier score by model and follow-up time point**
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/results_table_Brier.rds"))
 ```
+
+Table ? confirms that at the two-year follow-up, all Cox and joint models have low Brier scores, with the latent class joint models showing the lowest values. Brier scores increase gradually over time for all models, and by six years they converge around 0.14-0.16, with only minor differences between models. The Cox model including both baseline biomarkers and the joint models generally perform slightly better than the single-biomarker Cox models, confirming the patterns observed in the figures.
 
 # Discussion
 
