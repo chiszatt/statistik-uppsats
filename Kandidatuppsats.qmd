@@ -770,6 +770,26 @@ Latent class sizes for the two class model are reasonable, and good class discri
 
 ![](figures/longitudinal-jlcmm-nfl.png){width="400"}
 
+**MULTIVARIATE JLCMM**
+
+The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC and entropy were minimised for the two class model.
+
+**Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements**
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_ptau_nfl.rds")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+Assessment of the posterior probabilities for the two class model shows both reasonable class sizes and good class discrimination.
+
+**Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements**
+
+```{r}
+knitr::kable(readRDS("tables/postprob_ptau_nfl.rds")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
 ## Including Participants With One or More Biomarker Measurements
 
 ### Cox models
