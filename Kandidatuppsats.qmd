@@ -147,7 +147,7 @@ To quantify the association between biomarkers and disease progression, relative
 
 $$S(t) = [S_0(t)]^{\psi}$$
 
-where $\psi$ is the proportional hazards constant (Moore, 2016, pp. 43 - 44). This relationship can be re-expressed in terms of their hazard functions to give:
+where $\psi$ is the proportional hazards constant (Moore, 2016, pp. 43-44). This relationship can be re-expressed in terms of their hazard functions to give:
 
 $$h(t) = \psi h_0(t)$$
 
@@ -313,7 +313,7 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 **MORE... Weibull in estimation.**
 
-### **Class Enumeration**
+### Class Enumeration
 
 Choosing the number of latent classes, also called class enumeration, is one of the challenges of model selection for joint latent class mixture models. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
@@ -484,7 +484,7 @@ Under this section, all variables used in the analysis will be described, along 
 
 The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
 
-The variable was retrieved from the dataset DXSUM in ADNIMERGE2, for which the data were collected by ???. Across the 1190 included participants, there are 29,743 observations in total, consisting of 10,812 CN, 14,649 MCI, and 4,282 dementia diagnoses. The observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
+The variable was retrieved from the dataset DXSUM in ADNIMERGE2. For the 1190 included participants, the observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
 
 To define the outcome for the survival analyses, the study focuses on time to incident dementia, where participants are classified as either non-demented or demented. The first recorded diagnosis of dementia is used to define the event, while participants without a dementia diagnosis are censored at their last available visit. This definition is applied consistently in both the standard Cox proportional hazards (Cox PH) models and the survival submodel (Cox component) of the joint models.
 
@@ -494,19 +494,19 @@ To define the outcome for the survival analyses, the study focuses on time to in
 
 ### P-tau181
 
-P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was collected by ????. In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements. The biomarker measurements are recorded on a scale of ??? and are observed 3647 times across the 1,190 included participants.
+P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was analyzed by the University of Gothenburg (ADNI, n.d.-b). In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements. The biomarker measurements are observed 3647 times across the 1190 included participants. However, the unit of measurement is not specified in the dataset documentation.
 
 P-tau181 is used differently across the modelling frameworks. In the standard Cox proportional hazards (Cox PH) models, baseline p-tau181 values are included as a covariate to assess their association with subsequent risk of progression to AD/dementia. In the joint models, p-tau181 is modelled longitudinally using a linear mixed-effects submodel, where repeated measurements over time are used to describe individual biomarker trajectories. These longitudinal trajectories are then linked to the survival submodel (Cox component), allowing for assessment of how changes in p-tau181 over time are associated with the hazard of progression.
 
 ### NfL
 
-NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by ???. Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements. The biomarker is observed 3647 times across the 1,191 included individuals.
+NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by the Blennow Lab (ADNI, n.d.-b). Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements. The biomarker is observed 3647 times across the 1191 included individuals. Once again, however, the unit of measurement is not specified in the dataset documentation.
 
 NfL is also used in different ways across the modelling frameworks. In the standard Cox proportional hazards (Cox PH) models, baseline NfL values are included as a covariate to assess their association with risk of progression to AD/dementia. In the joint models, NfL is modelled longitudinally using a linear mixed-effects submodel based on repeated measurements over time. These trajectories are then linked to the survival submodel (Cox component), allowing for estimation of how longitudinal changes in NfL are associated with the hazard of progression.
 
 ### Age
 
-Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG, for which the data was collected by ???.
+Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG.
 
 The variable is initially coded numerically as the year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants, and is then transformed into age at visit and age at baseline visit, which are more suitable for use in the analyses.
 
@@ -530,27 +530,55 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
-## Biomarker Distributions
+## Biomarker Distributions and Outliers 
 
 The values of p-tau181 ranged from 0.4 to 451.4, with a median of 16.3, a first quartile of 11.1 and a third quartile of 23.6. Similarly, NfL values ranged from 6.4 to 408, with a median of 37.9, a first quartile of 27.8 and a third quartile of 52.5. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
 
-Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix 1. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix 2 demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.The spread of values was reduced and observations were more symmetrically distributed around the centre.
+Moreover, when examining observations with large Pearson residuals, specifically those exceeding three standard deviations from the mean, clear individual-level patterns were observed. For example, p-tau181 for one individual increased from 124 to 238 over time, and another individual showed consistently high values, ranging from 110 to 139. Similar patterns were observed for NfL, where one individual increased from 246 to 306, while another remained relatively stable at elevated levels between 121 and 134.8. Accordingly, and given that the values fall within plausible biological ranges, these observations were not treated as outliers but were retained in the analysis. However, due to their magnitude, these values may still have influenced the results and were therefore considered in the interpretation.
 
-Subsequently, the log-transformed variables were considered appropriate for inclusion in the statistical models.
+Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix 1. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix 2 demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution. The spread of values was reduced and observations were more symmetrically distributed around the centre.
+
+Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
 
 ## Correlation Between Biomarkers 
 
-## Division Into In And Out Datasets 
+The correlation between p-tau181 and NfL was also calculated. The estimated correlation coefficient was 0.247, indicating a weak positive association between the two biomarkers. To be more precise, it suggests that individuals with higher levels of one biomarker tend to have slightly higher levels of the other, although the relationship is not particularly strong. Consequently, the biomarkers share a limited amount of common variation while still providing partly distinct information.
+
+The presence of a positive correlation nevertheless supports the relevance of a multivariate joint modelling framework, as such an approach allows the dependence between the biomarkers to be accounted for while simultaneously evaluating their individual and combined associations with the outcome of interest.
+
+## Missing values 
+
+All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
+
+## Definition of Baseline Date and Number of Events 
+
+The baseline date was defined as earliest available examination date across biomarkers.
+
+**\*\* Add info about how the examination dates for p-tau181 and NfL did not always coincide, and how we handled that**
+
+When restricting the analysis to participants with three or more biomarker measurements, the number of participants who experienced the event of dementia was 177, while the remaining 527 participants were censored. There were also 66 participants who experienced the event at baseline, and these were removed since they had no valid follow-up time and could not contribute to the estimation of time-to-event outcomes.
+
+In comparison, when including participants with one or more biomarker measurements, the number of participants who experienced the event of dementia increased to 198, with 736 participants remaining censored. This larger sample therefore captures more observed dementia events, although some participants contributed fewer repeated biomarker observations over time.
+
+## Division Into In And Out-Datasets 
+
+The analyzed data were split so that the in-dataset comprised three quarters of the total data and the out-dataset comprised one quarter.
+
+When limiting the participants to those with three or more measurements of the biomarkers, the sample size of the in-dataset was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-dataset, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored.
+
+In comparison, when restricting the analysis to participants with at least one biomarker measurement, the in-dataset consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-dataset included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
 
 # Results
 
 *Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
 
-## Including Participants With 3 Or More Measurements
+The results are structured in two parts. Part 1 includes participants with three or more biomarker measurements, while Part 2 repeats the same analyses including all participants with at least one biomarker measurement.
+
+## Including Participants With Three or More Biomarker Measurements
 
 ### Cox models
 
-To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline were fitted. Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Table 1.
+To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Table 1.
 
 **Table 1: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models.**
 
@@ -644,7 +672,11 @@ Subsequently, the hazard ratios from the joint models were estimated and are pre
 knitr::kable(readRDS("tables/table_jm.rds"))
 ```
 
-LÄGG IN TOLKNING AV HR, CI OCH P HÄR\*\*\*\*
+Table 6 presents the hazard ratios estimated from the joint models. Similar to the Cox proportional hazards models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE ε4 status showed a clear and consistent association with progression risk, with higher hazards observed as the number of ε4 alleles increased. Individuals carrying one ε4 allele had an approximately twofold increased hazard across models, while individuals carrying two ε4 alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one ε4 allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
+
+Both longitudinal p-tau181 and longitudinal NfL were significantly associated with an increased risk of progression in the separate joint models, with p-values below 0.001. Similar to the Cox models, NfL showed a slightly stronger association with progression risk than p-tau181, with hazard ratios of 3.45 and 3.33, respectively. The confidence intervals for both biomarkers were relatively narrow, suggesting reasonably precise and stable effect estimates.
+
+In the multivariate joint model including both biomarkers simultaneously, both p-tau181 and NfL remained significantly associated with progression. However, the estimated effects were attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 2.30 and NfL showing a hazard ratio of 2.36. This attenuation suggests that the biomarkers capture partly overlapping information related to disease progression, while still retaining independent prognostic value. The confidence intervals for both biomarkers were somewhat wider in the multivariate model, reflecting increased uncertainty due to the correlation between the longitudinal biomarker processes.
 
 ### Joint Latent Class Mixed Models
 
@@ -674,11 +706,35 @@ knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds"))
 
 **XXX TABLES XXX**
 
-## Including Participants With 1 Or More Measurements
+## Including Participants With One or More Biomarker  Measurements
 
 ### Cox models
 
+**\*\*Lägga till kort om att PH assumption fortfarande såg bra ut, att age at baseline fortfarande bröt mot antagandet och därför togs bort även här.**
+
+When comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, we observe that the inclusion of individuals with fewer repeated observations primarily increases sample size and statistical power, while having limited impact on the direction of the estimated effects for the strongest biological predictors.
+
+Across both model specifications, APOE ε4 remains the strongest and most stable genetic predictor of progression. Hazard ratios are very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals are of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.
+
+For the biomarkers, both ptau and NfL are consistently associated with progression, but NfL shows stronger effects and slightly lower uncertainty than ptau across both cohorts. For example, in single-biomarker models, NfL shows higher hazard ratios than ptau and generally slightly narrower confidence intervals, indicating more precise estimation of its association.
+
+When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both model specifications. Effect sizes are slightly lower compared to single-biomarker models, and confidence intervals are somewhat wider, consistent with shared variance between biomarkers, but the relative ranking between ptau and NfL is unchanged.
+
+In contrast, sex shows no association with progression in any of the models, ith hazard ratios close to one and confidence intervals of similar width across both cohorts, indicating stable but non-informative estimates.
+
 ### Joint models
+
+**\*\*Lägga till kort om att residualerna och QQ-plots inte ändrades drastikt, att convergence fortfarande ser bra ut.**
+
+When extending the comparison to the joint models, a similar overall pattern is observed, with consistent findings across model specifications and stable confidence interval widths, indicating preserved precision across analyses. There is a clearer separation in effect magnitudes between biomarkers, while uncertainty remains broadly comparable between models.
+
+In the joint models, APOE $ε4$ remains a strong and stable predictor of progression. Hazard ratios are slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remain well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
+
+For the longitudinal biomarkers, a clearer separation between ptau and NfL is observed. In both model settings, NfL consistently shows a stronger association with progression than ptau. In the first joint model, ptau has a hazard ratio around 3.3, while NfL is around 3.5, and in the more inclusive model these increase to approximately 4.5 for ptau and 5.5 for NfL. NfL also tends to show slightly narrower confidence intervals than ptau, indicating lower uncertainty in its estimated association.
+
+When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both joint model specifications. Effect sizes are slightly lower compared to models with single biomarkers, and confidence intervals are correspondingly wider, consistent with shared variance between biomarkers.
+
+Sex also remains non-significant across all joint models, with no meaningful differences between model specifications.
 
 ### Joint Latent Class Mixed Models
 
@@ -736,7 +792,9 @@ Furthermore, as plasma biomarker research is still emerging and longitudinal dat
 
 # Bibliography (APA-style)
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.). *About ADNI*. <https://adni.loni.usc.edu/about/>
+Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.-a). *About ADNI*. <https://adni.loni.usc.edu/about/>
+
+- (n.d.-b). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
 
 Alzheimer’s Association (n.d.). Mild cognitive impairment (MCI). <https://www.alz.org/alzheimers-dementia/what-is-dementia/related_conditions/mild-cognitive-impairment>
 
