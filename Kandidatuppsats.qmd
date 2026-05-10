@@ -824,25 +824,67 @@ Sex also remains non-significant across all joint models, with no meaningful dif
 
 ## Predictive Performance
 
-Predictive performance was evaluated using time-dependent AUC and Brier score at yearly time points from 2 to 6 years of follow-up and visualized as performance curves over time. To facilitate interpretation, results are also summarized in Table.
+### Time-Dependent AUC
+
+Predictive performance was first evaluated using time-dependent AUC at yearly time points from 2 to 6 years of follow-up. Since including participants with at least one biomarker measurement did not significantly affect the precision of the model estimates, the evaluation of predictive performance was performed only for the models estimated using participants with three or more measurements. In other words, performance was not re-evaluated for the alternative specification including all participants with at least one measurement.
+
+Figure ? provides an initial overview of the time-dependent AUC of the Cox models across the follow-up period.
+
+**Figure ?: Time-dependent AUC curves for the Cox models**
 
 ![](figures/auc_plot_cox.png){width="400"}
 
+Overall, all Cox models demonstrated relatively stable predictive performance over time, with AUC values consistently approximately between 0.80 and 0.875, indicating good discriminative ability throughout the study period.
+
+The Cox model including both baseline biomarker values showed the highest predictive performance across all evaluated time points. In contrast, the single-marker models demonstrated slightly lower and somewhat more variable performance over time. The trajectories of the Cox NfL and Cox ptau-181 models were broadly similar, although the NfL-only model appeared to perform slightly better during later follow-up.
+
+Turning to the joint models and latent class joint models, Figure ? presents the time-dependent AUC across the follow-up period for these models.
+
 ![](figures/auc_plot_jm.png){width="400"}
+
+Compared with the Cox models based only on baseline biomarker values, the joint modelling approaches generally demonstrated stronger predictive performance during earlier follow-up, with AUC values reaching up to 0.90 at the two-year time point. However, over longer follow-up, the differences between approaches became less pronounced as all models converged toward a stable, slightly lower performance range, with AUC values approximately between 0.80 and 0.87.
+
+The joint model including multiple longitudinal biomarkers showed the strongest and most consistent predictive performance across follow-up. During the first two years of follow-up, the single-biomarker joint models also performed well. However, their performance gradually declined relative to the latent class single-biomarker joint models over time. Regardless of modelling approach, models based on longitudinal trajectories of NfL consistently performed slightly better than those based on longitudinal trajectories of p-tau181. Table ?, which presents the time-dependent AUC values for each model at each follow-up time point, confirms these findings.
+
+**Table ?: Time-dependent AUC by model and follow-up time point**
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/results_table_AUC.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
+### Time-Dependent Brier Score
+
+As expected, Table ? demonstrates that predictive performance is highest at two-year follow-up, particularly for joint models including multiple biomarkers. In contrast, models based on single biomarkers show lower performance, with Cox models based on baseline biomarkers performing least well. At later follow-up time points, differences between models are less pronounced, with AUC values converging to a narrower range between approximately 0.77 and 0.87, reflecting more similar performance across models.
+
+Additionally, predictive performance was evaluated using the time-dependent Brier score, with Figure ? providing an initial overview of the Brier scores for the Cox models across the follow-up period.
+
+**Figure ?: Time-dependent Brier score curves for the Cox models**
+
 ![](figures/Brier_plot_cox.png){width="400"}
 
+Overall, the Brier scores remain low for all Cox models throughout the follow-up period, indicating good overall predictive accuracy. At the two-year follow-up, all models demonstrate their lowest Brier scores, around 0.05. However, a gradual increase in Brier score is observed over time, reaching approximately 0.15 at six years, suggesting that predictions become less precise at longer follow-up times.
+
+Differences between the Cox models are relatively small across the follow-up period. A slight difference appear at the later follow up-points, where the Cox model including baseline values of both biomarkers shows a slightly lower Brier score than the single-biomarker models. The two single-biomarker models display very similar trajectories over time.
+
+Figure ? presents the corresponding time-dependent Brier scores for the joint models and latent class joint models.
+
+**Figure ?: Time-dependent Brier score curves for the joint models and latent class joint models**
+
 ![](figures/Brier_plot_jm.png){width="400"}
+
+Similar to the Cox models, the Brier scores are lowest at earlier follow-up times and increase gradually over time. At the two-year follow-up, however, the latent class joint models show slightly lower Brier scores than the other joint models and the Cox models. Differences between the joint models are otherwise small and become less pronounced over follow-up time, with Brier scores converging to around 0.15 across models at six years.
+
+The same pattern can be observed in Table ?, which presents the time-dependent Brier score values for each model at each follow-up time point.
+
+**Table ?: Time-dependent Brier score by model and follow-up time point**
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/results_table_Brier.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
+
+Table ? confirms that at the two-year follow-up, all Cox and joint models have low Brier scores, with the latent class joint models showing the lowest values. Brier scores increase gradually over time for all models, and by six years they converge around 0.14-0.16, with only minor differences between models. The Cox model including both baseline biomarkers and the joint models generally perform slightly better than the single-biomarker Cox models, confirming the patterns observed in the figures.
 
 # Discussion
 
