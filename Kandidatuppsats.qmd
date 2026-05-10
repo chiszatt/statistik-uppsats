@@ -50,6 +50,8 @@ format:
     toc: false
     colorlinks: false
     number-sections: true
+    fig-pos: "H"
+    tbl-pos: "H"     
 editor: visual
 ---
 
@@ -61,6 +63,13 @@ editor: visual
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+options(knitr.table.format = "latex")
+knitr::opts_chunk$set(tab.pos = "H")
+```
+
+```{r}
+library(dplyr)
+library(kableExtra)
 ```
 
 # Introduction
@@ -534,7 +543,7 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
-## Biomarker Distributions and Outliers 
+## Biomarker Distributions and Outliers
 
 The values of p-tau181 ranged from 0.4 to 451.4, with a median of 16.3, a first quartile of 11.1 and a third quartile of 23.6. Similarly, NfL values ranged from 6.4 to 408, with a median of 37.9, a first quartile of 27.8 and a third quartile of 52.5. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
 
@@ -544,17 +553,17 @@ Following log-transformation, p-tau181 exhibited a distribution that more closel
 
 Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
 
-## Correlation Between Biomarkers 
+## Correlation Between Biomarkers
 
 The correlation between p-tau181 and NfL was also calculated. The estimated correlation coefficient was 0.247, indicating a weak positive association between the two biomarkers. To be more precise, it suggests that individuals with higher levels of one biomarker tend to have slightly higher levels of the other, although the relationship is not particularly strong. Consequently, the biomarkers share a limited amount of common variation while still providing partly distinct information.
 
 The presence of a positive correlation nevertheless supports the relevance of a multivariate joint modelling framework, as such an approach allows the dependence between the biomarkers to be accounted for while simultaneously evaluating their individual and combined associations with the outcome of interest.
 
-## Missing values 
+## Missing values
 
 All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
 
-## Definition of Baseline Date and Number of Events 
+## Definition of Baseline Date and Number of Events
 
 The baseline date was defined as earliest available examination date across biomarkers.
 
@@ -564,7 +573,7 @@ When restricting the analysis to participants with three or more biomarker measu
 
 In comparison, when including participants with one or more biomarker measurements, the number of participants who experienced the event of dementia increased to 198, with 736 participants remaining censored. This larger sample therefore captures more observed dementia events, although some participants contributed fewer repeated biomarker observations over time.
 
-## Division Into In And Out-Datasets 
+## Division Into In And Out-Datasets
 
 The analyzed data were split so that the in-dataset comprised three quarters of the total data and the out-dataset comprised one quarter.
 
@@ -587,7 +596,8 @@ To evaluate the association between biomarkers and progression to dementia due t
 **Table 1: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models.**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_ph.rds"))
+knitr::kable(readRDS("tables/table_ph.rds"))  %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant p-values for sex, APOE4 status, and the biomarker variables. In contrast, age at baseline consistently showed significant p-values, indicating a violation of the assumption.
@@ -599,7 +609,8 @@ Given this violation, age at baseline was excluded from the final Cox models. Th
 **Table 2: p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models.**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_ph_final.rds"))
+knitr::kable(readRDS("tables/table_ph_final.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
@@ -609,7 +620,8 @@ As the proportional hazards assumption was met in the refitted models, the resul
 **Table 3: hazard ratios with 95% confidence intervals and p-values from the Cox models including baseline biomarkers**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_cox.rds"))
+knitr::kable(readRDS("tables/table_cox.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 Table 3 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE ε4 status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of ε4 alleles carried. Individuals carrying one ε4 allele had approximately a twofold increased hazard across models, whereas individuals carrying two ε4 alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one ε4 allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two ε4 alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -653,7 +665,8 @@ Additionally, convergence of the models was assessed by examining the $\widehat{
 **Table 4:** $\widehat{\mathbf{R}}$ **values of the survival outcome in the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/rhat_survival_table.rds"))
+knitr::kable(readRDS("tables/rhat_survival_table.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 The $\widehat{R}$ values for the survival outcomes are all very close to 1, ranging from 1.000 to 1.007 across all joint models. This indicates good convergence of the MCMC chains for the survival components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
@@ -663,7 +676,8 @@ While Table 4 presents the $\widehat{R}$ values for the survival outcomes, the c
 **Table 5:** $\widehat{\mathbf{R}}$ **values of the longitudinal outcome in the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/rhat_longitudinal_table.rds"))
+knitr::kable(readRDS("tables/rhat_longitudinal_table.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all joint models, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. However, a higher value is observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.089. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
@@ -673,7 +687,8 @@ Subsequently, the hazard ratios from the joint models were estimated and are pre
 **Table 6: hazard ratios with 95% confidence intervals and p-values from the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_jm.rds"))
+knitr::kable(readRDS("tables/table_jm.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 Table 6 presents the hazard ratios estimated from the joint models. Similar to the Cox proportional hazards models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE ε4 status showed a clear and consistent association with progression risk, with higher hazards observed as the number of ε4 alleles increased. Individuals carrying one ε4 allele had an approximately twofold increased hazard across models, while individuals carrying two ε4 alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one ε4 allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -688,29 +703,74 @@ Latent class mixed models were fit on the longitudinal ptau-181 and NfL measurem
 
 **JLCMM PTAU**
 
-The random effects structure was decided by a likelihood ratio test between one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
+The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
 
-The log-likelihoods, BIC and entropy of the one, two, three and four class JLCMM for ptau-181 are presented below:
+**Table 7: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_ptau.rds"))
+knitr::kable(readRDS("tables/summary_jlcmm_ptau.rds")) %>%
+  kable_styling(latex_options = "hold_position")
 ```
 
-**XXX TABLES XXX**
+The results show that both log-likelihood and entropy increase with additional latent classes, yet the BIC is minimised for the model with two latent classes. Given the inconclusive results from analysis of log-likelihood, BIC and entropy for the four models, the posterior probabilities were additionally analysed in order to decide the number of latent classes.
+
+The posterior classification table shows the number of individuals assigned to each class, whereas the mean posterior probabilities show, for inidividuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
+
+**Table 8: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements**
+
+```{r}
+knitr::kable(readRDS("tables/postprob_m1_ptau.rds")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+**Table 9: posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements**
+
+```{r}
+knitr::kable(readRDS("tables/postprob_m2_ptau.rds")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+For the two class model, the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to the two latent classes. Comparison with the three class model shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes.
+
+**Figure 4: class-specific survival curves for the two class JLCMM for longitudinal ptau-181 measurements**
+
+![](figures/class-specific-survival-jlcmm-ptau.png){width="400"}
+
+**Figure 5: class-specific ptau-181 trajectories for the two-class JLCMM**
+
+![](figures/longitudinal-jlcmm-ptau.png){width="400"}
 
 **JLCMM NFL**
 
 Again, a the results of a likelihood ratio test between two models was used to determine the random effects structure. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model with only a random intercept was a better fit for the data.
 
-The log-likelihoods, BIC and entropy of the one, two and three class JLCMM's for NfL were as follows:
+**Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds"))
+knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds")) %>%
+  kable_styling(latex_options = "hold_position")
 ```
 
-**XXX TABLES XXX**
+Analysis of the log-likelihood, BIC and entropy alone suggests that the two class model in this instance provides the best method for discriminating latent classes given longitudinal NfL measurements and time-to-diagnosis data. The log-likelihood increases most between the one class and the two class model, and only increases very slightly between the two class and the three class model. The BIC is minimised and entropy is maxmised for the two class model. The posterior probabilities are also analysed in order to ensure good class discrimination.
 
-## Including Participants With One or More Biomarker  Measurements
+**Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements**
+
+```{r}
+knitr::kable(readRDS("tables/postprob_m1_nfl.rds")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities. This is evidence for the two class model and that the data supports two latent classes.
+
+**Figure 6: class-specific survival curves for the two class JLCMM for longitudinal NfL measurements**
+
+![](figures/class-specific-survival-jlcmm-nfl.png){width="400"}
+
+**Figure 7: class-specific NfL trajectories for the two class JLCMM**
+
+![](figures/longitudinal-jlcmm-nfl.png){width="400"}
+
+## Including Participants With One or More Biomarker Measurements
 
 ### Cox models
 
@@ -751,11 +811,8 @@ Predictive performance was evaluated using time-dependent AUC and Brier score at
 ![](figures/auc_plot_jm.png){width="400"}
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/results_table_AUC.rds"))
-```
-
-```{r}
-
+knitr::kable(readRDS("tables/results_table_AUC.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 ![](figures/Brier_plot_cox.png){width="400"}
@@ -763,7 +820,8 @@ knitr::kable(readRDS("tables/results_table_AUC.rds"))
 ![](figures/Brier_plot_jm.png){width="400"}
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/results_table_Brier.rds"))
+knitr::kable(readRDS("tables/results_table_Brier.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 # Discussion

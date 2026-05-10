@@ -2311,7 +2311,11 @@ summary(jlcmm_m1_nfl_piecewise)
 ```
 
 ```{r}
-postprob(jlcmm_m1_nfl)
+postprob_m1_nfl <- postprob(jlcmm_m1_nfl)[1:2]
+```
+
+```{r}
+saveRDS(postprob_m1_nfl, "tables/postprob_m1_nfl.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2373,23 +2377,16 @@ postprob(jlcmm_m2_nfl)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable_nfl <- summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
-                                which = c("G", "loglik", "BIC", "entropy"))
+summarytable_nfl <- as.data.frame(summarytable(
+  jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl, which = c("loglik", "BIC", "entropy")))
+
+# renaming the models for the table output
+row.names(summarytable_nfl) <- c("1 class model", "2 class model", "3 class model")
+
 ```
 
 ```{r}
 saveRDS(summarytable_nfl, "tables/summary_jlcmm_nfl.rds")
-```
-
-```{r}
-
-# saving the summary metrics as a data frame
-jlcmm_nfl_summary <- as.data.frame(summarytable(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl,
-                                                which = c("G", "loglik", "BIC", "entropy")))
-
-# renaming the models for the table output
-row.names(jlcmm_nfl_summary) <- c("1 class model", "2 class model", "3 class model")
-
 ```
 
 ```{r}
@@ -2455,11 +2452,28 @@ table(class_preds$class, class_preds$APOE4_status)
 plot(jlcmm_m1_nfl, which = "survival")
 ```
 
+```{r}
+png("figures/class-specific-survival-jlcmm-nfl.png", width = 400, height = 300)
+plot(jlcmm_m1_nfl, which = "survival",
+     main = "",
+     xlab = "Time (years)", ylab = "Survival Probability")
+dev.off()
+```
+
 ### Longitudinal trajectory by class
 
 ```{r}
 # longitudinal trajectory by class
-plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit")
+plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
+     ylim = c(2.5,4.2))
+```
+
+```{r}
+png("figures/longitudinal-jlcmm-nfl.png", width = 400, height = 300)
+plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
+     main = "",
+     xlab = "Time (years)", ylab = "NfL")
+dev.off()
 ```
 
 # JLCMM: PTAU
@@ -2585,7 +2599,11 @@ summary(jlcmm_m1_ptau)
 ```
 
 ```{r}
-postprob(jlcmm_m1_ptau)
+postprob_m1_ptau <- postprob(jlcmm_m1_ptau)[1:2]
+```
+
+```{r}
+saveRDS(postprob_m1_ptau, "tables/postprob_m1_ptau.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2655,7 +2673,11 @@ summary(jlcmm_m2_ptau)
 ```
 
 ```{r}
-postprob(jlcmm_m2_ptau)
+postprob_m2_ptau <- postprob(jlcmm_m2_ptau)[1:2]
+```
+
+```{r}
+saveRDS(postprob_m2_ptau, "tables/postprob_m2_ptau.rds")
 ```
 
 ```{r}
@@ -2738,9 +2760,12 @@ postprob(jlcmm_m3_ptau)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable_ptau <- summarytable(
+summarytable_ptau <- as.data.frame(summarytable(
   jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau,
-  which = c("G", "loglik", "BIC", "entropy"))
+  which = c("loglik", "BIC", "entropy")))
+
+# renaming the models for the table output
+row.names(summarytable_ptau) <- c("1 class model", "2 class model", "3 class model", "4 class model")
 ```
 
 ```{r}
@@ -2786,11 +2811,27 @@ table(class_preds$class, class_preds$APOE4_status)
 plot(jlcmm_m2_ptau, which = "survival")
 ```
 
+```{r}
+png("figures/class-specific-survival-jlcmm-ptau.png", width = 400, height = 300)
+plot(jlcmm_m1_nfl, which = "survival",
+     main = "",
+     xlab = "Time (years)", ylab = "Survival Probability")
+dev.off()
+```
+
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m2_ptau, var.time = "time_years", which = "fit")
+plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
+```
+
+```{r}
+png("figures/longitudinal-jlcmm-ptau.png", width = 400, height = 300)
+plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit",
+     main = "",
+     xlab = "Time (years)", ylab = "ptau-181")
+dev.off()
 ```
 
 # MJLCMM: NFL & PTAU
