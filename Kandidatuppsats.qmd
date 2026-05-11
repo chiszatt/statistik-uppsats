@@ -1025,3 +1025,24 @@ knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
 ## Appendix 7: Q-Q plot of the LME model for NfL
 
 ![](figures/qq_nfl.png){width="400"}
+
+## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_ptau_full.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_nfl_full.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181 and NfL
+
+```{r}
+knitr::kable(readRDS("tables/summary_jlcmm_ptau_nfl_full.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```

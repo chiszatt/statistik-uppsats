@@ -67,22 +67,22 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Loading data
-#Milou
- # NfL data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-  nfl_data <- BLENNOWPLASMANFLLONG
- # # P-tau181 data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-  ptau_data <- UGOTPTAU181
- # # Diagnosis data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-  diagnosis_data <- DXSUM
- # # Demographics data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-  demographics <- PTDEMOG
- # # Apoe data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-  apoe <- APOERES
+# Milou
+# NfL data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+#  nfl_data <- BLENNOWPLASMANFLLONG
+# # # P-tau181 data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+#  ptau_data <- UGOTPTAU181
+# # # Diagnosis data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+#  diagnosis_data <- DXSUM
+# # # Demographics data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+#  demographics <- PTDEMOG
+# # # Apoe data
+#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+#  apoe <- APOERES
 ```
 
 ```{r}
@@ -400,24 +400,22 @@ table(
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
-
-# We check number of individuals with at least 3 measurements 
-length(keep)
+# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+# long_data <- long_data %>% filter(RID %in% keep)
+# surv_data <- surv_data %>% filter(RID %in% keep)
+# # We check number of individuals with at least 3 measurements
+# length(keep)
 ```
 
 ## Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
-
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-#length(keep)
+length(keep)
 ```
 
 ### Checking individuals final diagnoses for the reduced data set
@@ -474,19 +472,20 @@ surv_data <- surv_data %>%
         TRUE ~
           as.numeric(last_followup - EXAMDATE_baseline)/365),
 
-# #     Creating a lagged variable for EXAMDATE_dx
-#       previous_EXAMDATE_dx = lag(EXAMDATE_dx),
-# 
-# #     Creating a time_to_event variable for sensitivity analysis due to interval censored data
-# #     0 if dementia dx at baseline
-# #     Midpoint between dementia dx EXAMDATE and previous dx EXAMDATE for events
-# #     Or date of censuring for censured individuals
-#       time_to_event_intervall = case_when(
-#         event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
-#         event == 1 & unique(baseline_dx) != "Dementia" ~
-#           as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"] - EXAMDATE_baseline))/365,
-#         TRUE ~
-#           as.numeric(last_followup - EXAMDATE_baseline)/365)
+#     Sensitivity: event time = midpoint between last clean exam and dementia dx exam
+    time_to_event_midpoint = case_when(
+      event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
+      event == 1 & unique(baseline_dx) != "Dementia" ~ {
+        dx_date <- min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
+        prev_date <- max(EXAMDATE_dx[DIAGNOSIS_dx != "Dementia" & 
+                                     EXAMDATE_dx < dx_date], 
+                         na.rm = TRUE)
+        # Midpoint between last clean visit and dementia dx visit
+        as.numeric((prev_date + (dx_date - prev_date) / 2) - EXAMDATE_baseline) / 365
+      },
+      TRUE ~
+        as.numeric(last_followup - EXAMDATE_baseline) / 365
+    )
 )
 ```
 
@@ -1136,33 +1135,10 @@ surv_model_ptau_bl <- coxph(
 summary(surv_model_ptau_bl)
 ```
 
-#### Removing PTGENDER
-
-```{r}
-# Cox survival-models, with covariates including baseline values of each biomarker 
-# For p-tau181 without PTGENDER
-surv_model_ptau_bl_reduced <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau,
-  data = surv_data_in,
-  x = TRUE
-  )
-
-summary(surv_model_ptau_bl_reduced)
-```
-
-#### Comparing models
-
-Testing the significance of gender in the Cox proportional hazard model shows that there is no evidence of an improved fit compared with a reduced model with only age at baseline and APOE- $\epsilon 4$ status and baseline ptau-181 value as covariates.
-
-```{r}
-anova(surv_model_ptau_bl, surv_model_ptau_bl_reduced, test = "LRT")
-```
-
 ### NfL
 
 ```{r}
-# For NfL with PTGENDER
+# For baseline NfL with covariates
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
@@ -1171,42 +1147,6 @@ surv_model_nfl_bl <- coxph(
 )
 
 summary(surv_model_nfl_bl)
-```
-
-#### Removing PTGENDER
-
-```{r}
-# For NfL without PTGENDER
-surv_model_nfl_bl_reduced1 <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_nfl_bl_reduced1)
-```
-
-#### Removing age at baseline
-
-```{r}
-# For NfL without PTGENDER and age at baseline
-surv_model_nfl_bl_reduced2 <- coxph(
-  Surv(time_to_event, event) ~
-    APOE4_status + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_nfl_bl_reduced2)
-```
-
-#### Comparing models
-
-Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate. Additionally, there is no support for including age at baseline in the model with only baseline NfL values.
-
-```{r}
-anova(surv_model_nfl_bl, surv_model_nfl_bl_reduced1, surv_model_nfl_bl_reduced2, test = "LRT")
 ```
 
 ### PTAU and NfL
@@ -1221,41 +1161,6 @@ surv_model_both_bl <- coxph(
 )
 
 summary(surv_model_both_bl) 
-```
-
-#### Removing PTGENDER
-
-```{r}
-# Without PTGENDER
-surv_model_both_bl_reduced1 <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_both_bl_reduced1)
-```
-
-#### Removing age at baseline
-
-```{r}
-# Without PTGENDER and age at baseline
-surv_model_both_bl_reduced2 <- coxph(
-  Surv(time_to_event, event) ~
-    APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_both_bl_reduced2)
-```
-
-#### Comparing models
-
-```{r}
-anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduced2,
-      test = "LRT")
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1367,6 +1272,68 @@ table_ph_final
 saveRDS(table_ph_final, "tables/table_ph_final.rds")
 ```
 
+### Removing PTGENDER to run likelihood-ratio tests
+
+```{r}
+# Cox survival-models, with covariates including baseline values of each biomarker
+
+# For p-tau181 without PTGENDER
+surv_model_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status,
+  data = surv_data_in,
+  x = TRUE
+  )
+
+anova_surv <- anova(surv_model_final, surv_model_reduced, test = "LRT")
+chi_surv <- anova_surv[2,2]
+
+# For p-tau181 without PTGENDER
+surv_model_ptau_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_ptau,
+  data = surv_data_in,
+  x = TRUE
+  )
+
+anova_ptau <- anova(surv_model_ptau_bl_final, surv_model_ptau_bl_reduced, test = "LRT")
+chi_ptau <- anova_ptau[2,2]
+
+# For NfL without PTGENDER
+surv_model_nfl_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+anova_nfl <- anova(surv_model_nfl_bl_final, surv_model_nfl_bl_reduced, test = "LRT")
+chi_nfl <- anova_nfl[2,2]
+
+# Without PTGENDER
+surv_model_both_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+anova_both <- anova(surv_model_both_bl_final, surv_model_both_bl_reduced, test = "LRT")
+chi_both <- anova_both[2,2]
+```
+
+```{r}
+anova_ptau
+anova_nfl
+anova_both
+```
+
+```{r}
+# Saving a table of results from the likelihood ratio tests
+surv_lrt_table <- data.frame(
+  "Model" = c("ptau-181 baseline", "NfL baseline", "ptau-181 and NfL baseline"),
+  "Test statistic" = c(chi_ptau, chi_nfl, chi_both),
+  "P-value" = c(0.98, 0.95, 0.73),
+  check.names = FALSE
+  )
+```
+
 ### Cox comparison table
 
 ```{r}
@@ -1455,66 +1422,79 @@ table_cox
 saveRDS(table_cox, "tables/table_cox.rds")
 ```
 
+### Concordance Index Table
+
+```{r}
+# Saving the c-index table
+c_index_table <- data.frame(
+  "Model" = c("Cox ptau-181", "Cox NfL", "Cox ptau-181 & NfL"),
+  "C-Index" = c(0.679, 0.673, 0.681),
+  check.names = FALSE)
+  
+saveRDS(c_index_table, "tables/c_index_table.rds")
+
+```
+
 # Two separate joint models
 
 ## Fitted joint model for p-tau181
 
 ```{r}
-# Joint model for p-tau181 
-joint_model_ptau <- jm(
-  surv_model_final,
-  long_model_ptau,
-  time_var = "time_years",
-  n_chains = 3L,
-  n_iter = 11000L,
-  n_burnin = 1000L
-  )
+# # Joint model for p-tau181 
+# joint_model_ptau <- jm(
+#   surv_model_final,
+#   long_model_ptau,
+#   time_var = "time_years",
+#   n_chains = 3L,
+#   n_iter = 11000L,
+#   n_burnin = 1000L
+#   )
 ```
 
 ```{r}
-summary(joint_model_ptau)
+# summary(joint_model_ptau)
 ```
 
 ```{r}
 # Checking convergence 
-ggtraceplot(joint_model_ptau, "alphas")
+# ggtraceplot(joint_model_ptau, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-png("figures/convergence_plot_ptau.png", width = 400, height = 300)
-ggtraceplot(joint_model_ptau, "alphas")
-dev.off()
+# png("figures/convergence_plot_ptau.png", width = 400, height = 300)
+# ggtraceplot(joint_model_ptau, "alphas")
+# dev.off()
 ```
 
 ## Fitted joint model for NfL
 
 ```{r}
-# Joint model for NfL 
-joint_model_nfl <- jm(
-  surv_model_final,
-  long_model_nfl,
-  time_var = "time_years",
-  n_chains = 3L,
-  n_iter = 11000L,
-  n_burnin = 1000L
-  )
+# # Joint model for NfL 
+# joint_model_nfl <- jm(
+#   surv_model_final,
+#   long_model_nfl,
+#   time_var = "time_years",
+#   n_chains = 3L,
+#   n_iter = 11000L,
+#   n_burnin = 1000L
+#   )
 ```
 
 ```{r}
-summary(joint_model_nfl)
+# summary(joint_model_nfl)
 ```
 
 ```{r}
 # Checking convergence 
-ggtraceplot(joint_model_nfl, "alphas")
+# ggtraceplot(joint_model_nfl, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-png("figures/convergence_plot_nfl.png", width = 400, height = 300)
-ggtraceplot(joint_model_nfl, "alphas")
-dev.off()
+# png("figures/convergence_plot_nfl.png", width = 400, height = 300)
+# ggtraceplot(joint_model_nfl, "alphas")
+# dev.off()
 ```
 
 ### Traceplots
@@ -1526,16 +1506,16 @@ dev.off()
 
 ```{r}
 # For p-tau181
-traceplot(joint_model_ptau, parm = "betas")
-traceplot(joint_model_ptau, parm = "alphas")
-traceplot(joint_model_ptau, parm = "sigmas")
+# traceplot(joint_model_ptau, parm = "betas")
+# traceplot(joint_model_ptau, parm = "alphas")
+# traceplot(joint_model_ptau, parm = "sigmas")
 ```
 
 ```{r}
 # For NfL
-traceplot(joint_model_nfl, parm = "betas")
-traceplot(joint_model_nfl, parm = "alphas")
-traceplot(joint_model_nfl, parm = "sigmas")
+# traceplot(joint_model_nfl, parm = "betas")
+# traceplot(joint_model_nfl, parm = "alphas")
+# traceplot(joint_model_nfl, parm = "sigmas")
 ```
 
 ### Density plots
@@ -1547,16 +1527,16 @@ traceplot(joint_model_nfl, parm = "sigmas")
 
 ```{r}
 # For p-tau181
-densplot(joint_model_ptau, parm = "betas")
-densplot(joint_model_ptau, parm = "alphas")
-densplot(joint_model_ptau, parm = "sigmas")
+# densplot(joint_model_ptau, parm = "betas")
+# densplot(joint_model_ptau, parm = "alphas")
+# densplot(joint_model_ptau, parm = "sigmas")
 ```
 
 ```{r}
 # For NfL
-densplot(joint_model_nfl, parm = "betas")
-densplot(joint_model_nfl, parm = "alphas")
-densplot(joint_model_nfl, parm = "sigmas")
+# densplot(joint_model_nfl, parm = "betas")
+# densplot(joint_model_nfl, parm = "alphas")
+# densplot(joint_model_nfl, parm = "sigmas")
 ```
 
 # Multivariate joint model
@@ -1582,177 +1562,52 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-multi_joint_model <- jm(surv_model_final, mixed ,
-                        time_var = "time_years",
-                        functional_forms = fForms,
-                        n_chains = 3L,
-                        n_iter = 20000L,
-                        n_burnin = 2000L
-                        )
-
-summary(multi_joint_model)
+# multi_joint_model <- jm(surv_model_final, mixed ,
+#                         time_var = "time_years",
+#                         functional_forms = fForms,
+#                         n_chains = 3L,
+#                         n_iter = 20000L,
+#                         n_burnin = 2000L
+#                         )
+# 
+# summary(multi_joint_model)
 ```
 
 ```{r}
 # Checking convergence 
-ggtraceplot(multi_joint_model, "alphas")
+# ggtraceplot(multi_joint_model, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-png("figures/convergence_plot_multi.png", width = 400, height = 300)
-ggtraceplot(multi_joint_model, "alphas")
-dev.off()
+# png("figures/convergence_plot_multi.png", width = 400, height = 300)
+# ggtraceplot(multi_joint_model, "alphas")
+# dev.off()
 ```
-
-# ...
 
 ### Joint model comparison table
 
-```{r}
-# Building joint model comparison table
-# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
-extract_model_jm <- function(model) {
-
-  s <- summary(model)$Survival
-
-  data.frame(
-    Variable = rownames(s),
-
-    HR = exp(s[, "Mean"]),
-    CI_low = exp(s[, "2.5%"]),
-    CI_high = exp(s[, "97.5%"]),
-
-    P = s[, "P"],
-    row.names = NULL
-  )
-}
-
-# Extracting models
-ptau_jm <- extract_model_jm(joint_model_ptau)
-nfl_jm <- extract_model_jm(joint_model_nfl)
-both_jm <- extract_model_jm(multi_joint_model)
-
-# Building variable set
-all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
-
-# Building final table
-table_jm <- data.frame(
-  Variable = all_vars_jm,
-
-  "PTau HR (CI)" = format_hr_ci(
-    get_value(ptau_jm, all_vars_jm, "HR"),
-    get_value(ptau_jm, all_vars_jm, "CI_low"),
-    get_value(ptau_jm, all_vars_jm, "CI_high")
-  ),
-  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
-
-  "NfL HR (CI)" = format_hr_ci(
-    get_value(nfl_jm, all_vars_jm, "HR"),
-    get_value(nfl_jm, all_vars_jm, "CI_low"),
-    get_value(nfl_jm, all_vars_jm, "CI_high")
-  ),
-  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
-
-  "Both HR (CI)" = format_hr_ci(
-    get_value(both_jm, all_vars_jm, "HR"),
-    get_value(both_jm, all_vars_jm, "CI_low"),
-    get_value(both_jm, all_vars_jm, "CI_high")
-  ),
-  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
-
-  row.names = NULL,
-  check.names = FALSE
-)
-
-# Showing table
-table_jm
-```
+`{# {r} # # Building joint model comparison table # # Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio # extract_model_jm <- function(model) { #  #   s <- summary(model)$Survival #  #   data.frame( #     Variable = rownames(s), #  #     HR = exp(s[, "Mean"]), #     CI_low = exp(s[, "2.5%"]), #     CI_high = exp(s[, "97.5%"]), #  #     P = s[, "P"], #     row.names = NULL #   ) # } #  # # Extracting models # ptau_jm <- extract_model_jm(joint_model_ptau) # nfl_jm <- extract_model_jm(joint_model_nfl) # both_jm <- extract_model_jm(multi_joint_model) #  # # Building variable set # all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable)) #  # # Building final table # table_jm <- data.frame( #   Variable = all_vars_jm, #  #   "PTau HR (CI)" = format_hr_ci( #     get_value(ptau_jm, all_vars_jm, "HR"), #     get_value(ptau_jm, all_vars_jm, "CI_low"), #     get_value(ptau_jm, all_vars_jm, "CI_high") #   ), #   "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")), #  #   "NfL HR (CI)" = format_hr_ci( #     get_value(nfl_jm, all_vars_jm, "HR"), #     get_value(nfl_jm, all_vars_jm, "CI_low"), #     get_value(nfl_jm, all_vars_jm, "CI_high") #   ), #   "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")), #  #   "Both HR (CI)" = format_hr_ci( #     get_value(both_jm, all_vars_jm, "HR"), #     get_value(both_jm, all_vars_jm, "CI_low"), #     get_value(both_jm, all_vars_jm, "CI_high") #   ), #   "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")), #  #   row.names = NULL, #   check.names = FALSE # ) #  # # Showing table # table_jm`
 
 ```{r}
 # Saving the joint model comparison table
-saveRDS(table_jm, "tables/table_jm.rds")
+# saveRDS(table_jm, "tables/table_jm.rds")
 ```
 
 ## Rhat value comparison table
 
-```{r}
-# Extracting Rhat for each model (survival component)
-extract_rhat_surv <- function(model) {
-
-  s <- summary(model)$Survival
-
-  data.frame(
-    Variable = rownames(s),
-    Rhat = s[, "Rhat"],
-    row.names = NULL
-  )
-}
-
-# Applying to each model
-ptau_surv <- extract_rhat_surv(joint_model_ptau)
-nfl_surv <- extract_rhat_surv(joint_model_nfl)
-multi_surv <- extract_rhat_surv(multi_joint_model)
-
-# Combining with model labels to form a table 
-rhat_survival_table <- bind_rows(
-  ptau_surv %>% mutate(Model = "PTau"),
-  nfl_surv %>% mutate(Model = "NfL"),
-  multi_surv %>% mutate(Model = "Multi")
-) %>%
-  pivot_wider(
-    names_from = Model,
-    values_from = Rhat
-  ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
-
-# Showing table
-rhat_survival_table
-```
+`{# {r} # # Extracting Rhat for each model (survival component) # extract_rhat_surv <- function(model) { #  #   s <- summary(model)$Survival #  #   data.frame( #     Variable = rownames(s), #     Rhat = s[, "Rhat"], #     row.names = NULL #   ) # } #  # # Applying to each model # ptau_surv <- extract_rhat_surv(joint_model_ptau) # nfl_surv <- extract_rhat_surv(joint_model_nfl) # multi_surv <- extract_rhat_surv(multi_joint_model) #  # # Combining with model labels to form a table  # rhat_survival_table <- bind_rows( #   ptau_surv %>% mutate(Model = "PTau"), #   nfl_surv %>% mutate(Model = "NfL"), #   multi_surv %>% mutate(Model = "Multi") # ) %>% #   pivot_wider( #     names_from = Model, #     values_from = Rhat #   ) %>% #   mutate(across(where(is.numeric), ~round(.x, 3))) #  # # Showing table # rhat_survival_table`
 
 ```{r}
 # Saving the rhat table
-saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+# saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
 ```
 
-```{r}
-# Extracting Rhat for longitudinal outcome 
-extract_rhat_long <- function(model) {
+`{# {r} # # Extracting Rhat for longitudinal outcome  # extract_rhat_long <- function(model) { #  #   s <- summary(model)$Outcome1 #  #   data.frame( #     Variable = rownames(s), #     Rhat = s[, "Rhat"], #     row.names = NULL #   ) # } #  # # Applying to each model # ptau_long <- extract_rhat_long(joint_model_ptau) # nfl_long <- extract_rhat_long(joint_model_nfl) # multi_long <- extract_rhat_long(multi_joint_model) #  # # Combining with model labels to form a table # rhat_longitudinal_table <- bind_rows( #   ptau_long %>% mutate(Model = "Long_PTau"), #   nfl_long %>% mutate(Model = "Long_NfL"), #   multi_long %>% mutate(Model = "Long_Multi") # ) %>% #   pivot_wider( #     names_from = Model, #     values_from = Rhat #   ) %>% #   mutate(across(where(is.numeric), ~round(.x, 3))) #  # # Showing table # rhat_longitudinal_table`
 
-  s <- summary(model)$Outcome1
+`{# {r} # # Saving the rhat table # saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")`
 
-  data.frame(
-    Variable = rownames(s),
-    Rhat = s[, "Rhat"],
-    row.names = NULL
-  )
-}
-
-# Applying to each model
-ptau_long <- extract_rhat_long(joint_model_ptau)
-nfl_long <- extract_rhat_long(joint_model_nfl)
-multi_long <- extract_rhat_long(multi_joint_model)
-
-# Combining with model labels to form a table
-rhat_longitudinal_table <- bind_rows(
-  ptau_long %>% mutate(Model = "Long_PTau"),
-  nfl_long %>% mutate(Model = "Long_NfL"),
-  multi_long %>% mutate(Model = "Long_Multi")
-) %>%
-  pivot_wider(
-    names_from = Model,
-    values_from = Rhat
-  ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
-
-# Showing table
-rhat_longitudinal_table
-```
-
-```{r}
-# Saving the rhat table
-saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
-```
+# ...
 
 # Latent Class Mixed Models
 
@@ -2389,25 +2244,68 @@ postprob(jlcmm_m2_nfl)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable_nfl <- data.frame(
-  "Candidate model" = c("Model1", "Model2", "Model3"),
-  "G" = c(1, 2, 3),
-  "Log Likelihood" = c(jlcmm_m0_1$loglik,
-                       jlcmm_m1_nfl$loglik,
-                       jlcmm_m2_nfl$loglik),
-  "BIC" = c(jlcmm_m0_1$BIC,
-            jlcmm_m1_nfl$BIC,
-            jlcmm_m2_nfl$BIC),
-  "Entropy" = c(1.00, 0.69, 0.52),
-  "Class1" = c(100.00, 76.33, 73.48),
-  "Class2" = c(NA, 23.67, 1.89),
-  "CLass3" = c(NA, NA, 24.62),
+#  Function for extracting the class proportions from each model
+get_class_proportions <- function(model) {
+#   Getting the number of classes
+  G <- model$ng
+#   Calculating the class proportions (number of individuals assigned to a class / number of inidividuals * 100)
+  props <- table(model$pprob$class) / nrow(model$pprob) * 100
+  
+#   Creating a vector to store the proportions in, with NA for extra classes
+  out <- rep(NA, G)
+  out[1:G] <- as.numeric(props)
+  names(out) <- paste0("Class", 1:G)
+  
+#   Returning results
+  return(round(out, 2))
+}
+
+# Function for extracting entropy
+get_entropy <- function(model) {
+  G <- model$ng
+  N <- nrow(model$pprob)
+  
+  if (G == 1) return(1.00)
+
+  pprobs <- model$pprob[, 3:(2 + G)]
+#   computing entropy
+  entropy <- -sum(pprobs * log(pprobs + 0.0001))
+  
+#   scaling to between 0-1
+  entropy_r2 <- 1 - (entropy / (N * log(G)))
+  
+  return(round(entropy_r2, 3))
+}
+```
+
+```{r}
+models <- list(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl)
+
+# Find max number of classes across all models
+G_max <- max(sapply(models, function(m) m$ng))
+
+# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
+props <- do.call(rbind, lapply(models, function(m) {
+  p <- get_class_proportions(m)
+  padded <- c(p, rep(NA, G_max - length(p)))
+  return(padded)
+}))
+
+colnames(props) <- paste0("Class", 1:G_max, " (%)")
+
+summary_jlcmm_nfl_full <- data.frame(
+  "Candidate model" = paste0("Model", 1:length(models)),
+  "G" = sapply(models, function(m) m$ng),
+  "Log Likelihood" = sapply(models, function(m) m$loglik),
+  "BIC" = sapply(models, function(m) m$BIC),
+  "Entropy" = sapply(models, get_entropy),
+  props,
   check.names = FALSE
 )
 ```
 
 ```{r}
-saveRDS(summarytable_nfl, "tables/summary_jlcmm_nfl.rds")
+saveRDS(summary_jlcmm_nfl_full, "tables/summary_jlcmm_nfl_full.rds")
 ```
 
 ## Class Descriptions
@@ -2813,28 +2711,33 @@ postprob(jlcmm_m3_ptau)
 ## Comparing M0, M1, M2, M3
 
 ```{r}
-summarytable_ptau <- data.frame(
-  "Candidate model" = c("Model1", "Model2", "Model3", "Model4"),
-  "G" = c(1, 2, 3, 4),
-  "Log Likelihood" = c(jlcmm_m0_1$loglik,
-                       jlcmm_m1_ptau$loglik,
-                       jlcmm_m2_ptau$loglik,
-                       jlcmm_m3_ptau$loglik),
-  "BIC" = c(jlcmm_m0_1$BIC,
-            jlcmm_m1_ptau$BIC,
-            jlcmm_m2_ptau$BIC,
-            jlcmm_m3_ptau$BIC),
-  "Entropy" = c(1.00, 0.65, 0.66, 0.71),
-  "Class1" = c(100.00, 24.43, 25, 67.42),
-  "Class2" = c(NA, 75.57, 71.21, 3.03),
-  "CLass3" = c(NA, NA, 3.79, 22.92),
-  "Class4" = c(NA, NA, NA, 6.53),
+models <- list(jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau)
+
+# Find max number of classes across all models
+G_max <- max(sapply(models, function(m) m$ng))
+
+# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
+props <- do.call(rbind, lapply(models, function(m) {
+  p <- get_class_proportions(m)
+  padded <- c(p, rep(NA, G_max - length(p)))
+  return(padded)
+}))
+
+colnames(props) <- paste0("Class", 1:G_max, " (%)")
+
+summary_jlcmm_ptau_full <- data.frame(
+  "Candidate model" = paste0("Model", 1:length(models)),
+  "G" = sapply(models, function(m) m$ng),
+  "Log Likelihood" = sapply(models, function(m) m$loglik),
+  "BIC" = sapply(models, function(m) m$BIC),
+  "Entropy" = sapply(models, get_entropy),
+  props,
   check.names = FALSE
 )
 ```
 
 ```{r}
-saveRDS(summarytable_ptau, "tables/summary_jlcmm_ptau.rds")
+saveRDS(summary_jlcmm_ptau_full, "tables/summary_jlcmm_ptau_full.rds")
 ```
 
 ## Class Descriptions
@@ -3058,25 +2961,33 @@ postprob(mult_jlcmm_m2)
 ## Comparing M0, M1, M2
 
 ```{r}
-summarytable_ptau_nfl <- data.frame(
-  "Candidate model" = c("Model1", "Model2", "Model3"),
-  "G" = c(1, 2, 3),
-  "Log Likelihood" = c(mult_jlcmm_m0_1$loglik,
-                       mult_jlcmm_m1$loglik,
-                       mult_jlcmm_m2$loglik),
-  "BIC" = c(mult_jlcmm_m0_1$BIC,
-            mult_jlcmm_m1$BIC,
-            mult_jlcmm_m2$BIC),
-  "Entropy" = c(1.00, 0.69, 0.47),
-  "Class1" = c(100.00, 24.24, 1.89),
-  "Class2" = c(NA, 75.78, 25),
-  "CLass3" = c(NA, NA, 73.11),
+models <- list(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2)
+
+# Find max number of classes across all models
+G_max <- max(sapply(models, function(m) m$ng))
+
+# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
+props <- do.call(rbind, lapply(models, function(m) {
+  p <- get_class_proportions(m)
+  padded <- c(p, rep(NA, G_max - length(p)))
+  return(padded)
+}))
+
+colnames(props) <- paste0("Class", 1:G_max, " (%)")
+
+summary_jlcmm_ptau_nfl_full <- data.frame(
+  "Candidate model" = paste0("Model", 1:length(models)),
+  "G" = sapply(models, function(m) m$ng),
+  "Log Likelihood" = sapply(models, function(m) m$loglik),
+  "BIC" = sapply(models, function(m) m$BIC),
+  "Entropy" = sapply(models, get_entropy),
+  props,
   check.names = FALSE
 )
 ```
 
 ```{r}
-saveRDS(summarytable_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
+saveRDS(summary_jlcmm_ptau_nfl_full, "tables/summary_jlcmm_ptau_nfl_full.rds")
 ```
 
 ## Visualisation
@@ -3193,7 +3104,7 @@ newdata <- dplyr::left_join(
 get_jm_auc <- function(model, times) {
   
   aucs <- sapply(times, function(t) {
-    
+  
     tmp <- tvAUC(
       model,
       newdata = newdata,
