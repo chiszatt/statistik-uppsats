@@ -5,10 +5,10 @@ format:
       text: |
         \begin{titlepage}
         \raggedleft
-        \vspace*{2cm}
+        \vspace*{0.5cm}
         
         {\Huge\bfseries Kandidatuppsats\par}
-        \vspace{1.5cm}
+        \vspace{0.5cm}
         
         {\Large Statistiska Instiutionen\par}
         \vspace{3cm}
@@ -25,7 +25,13 @@ format:
         \vspace{3cm}
         
         {\Huge Charlotte Emily Iszatt & Milou Rossi\par}
+        \vspace{0.1cm}
         
+        {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
+        \vspace{0.5cm}
+        
+        {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
+
         \vfill
         
         \end{titlepage}
@@ -43,6 +49,8 @@ format:
         
         {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
         \vspace{3cm}
+        {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+        
         
         \vfill
         
@@ -120,6 +128,7 @@ This study investigates the prediction of AD/dementia progression using longitud
 
 To address the research questions, a series of statistical models will be implemented. In all models, time to progression to dementia due to AD, defined by the first recorded diagnosis of dementia, is the survival outcome.
 
+<<<<<<< HEAD
 First, Cox proportional hazards (Cox PH) models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, univariate joint models will be applied to link each biomarker’s longitudinal trajectory to the survival outcome. Third, multivariate joint models will jointly model both biomarker trajectories to capture their combined and potentially correlated effects on disease progression. Finally, latent class joint models will be used to identify subgroups with distinct longitudinal patterns and associated progression risks. Both univariate and multivariate latent class models will be evaluated.
 
 All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ status. In the joint models, these covariates will be included in both submodels to account for potential confounding when estimating the association between biomarker trajectories and disease progression. The significance level will be set at 0.05 for all analyses.
@@ -127,6 +136,11 @@ All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ s
 Subsequently, the different modelling frameworks will be compared, as well as the estimated associations of p-tau181 and NfL with disease progression. This will be done by evaluating their predictive performance. To ensure an unbiased assessment of model performance and generalisability, the data will be split into in-sample and out-of-sample sets, where the in-sample data are used for model development and the out-of-sample data are reserved for evaluation.
 
 Model performance will be assessed using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression.
+=======
+To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Subsequently, the data will be divided into in-sample data and out-of-sample data, where the in-sample data are used for model development and the out–of-sample data are reserved for model evaluation. This is done to ensure an unbiased assessment of how well the models generalise to unseen data.
+
+Model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to AD progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and horizons of 2, 3, 4, 5, and 6 years were selected to capture short- to mid-term progression.
+>>>>>>> 93569414dcc3d05282641bac2c790b81676e7277
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
@@ -135,6 +149,8 @@ There is a wide range of biomarkers for AD that could be investigated in this co
 Furthermore, additional modelling approaches could have been considered given the aims of the study. However, due to the limited time and scope of this thesis, including more modelling frameworks would have reduced the ability to study each approach in enough detail. Therefore, a smaller set of models was selected to allow for a more detailed and meaningful comparison. The chosen models were based on their methodological relevance and their ability to capture different aspects of the data, providing an overview of different approaches for modelling longitudinal biomarker data and survival outcomes.
 
 The modelling approaches will be applied to data from the ADNI dataset, in accordance with its data use and access policies (ADNI, n.d.-b).
+
+***Data used in the preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). The current goals include validating biomarkers for clinical trials, improving the generalizability of ADNI data by increasing diversity in the participant cohort, and to provide data concerning the diagnosis and progression of Alzheimer’s disease to the scientific community. For up-to-date information, see adni.loni.usc.edu.***
 
 # Statistical Theory
 
@@ -451,39 +467,7 @@ The inclusion criteria required participants to have recorded diagnostic visits 
 
 **REPORT ON TRANSITIONS...**
 
-## ADNI
-
-*Explain the different protocols and what they mean for data analysis, if we can compare across protocols etc.*
-
-All protocols allow enrollment for individuals aged 55-90.
-
-- ADNI1
-
-800 subjects (200 controls, 400 MCI, 200 mild AD) recruited at around 50 sites in the United States and Canada
-
-- ADNI2
-
-Cognitively normal, significant memory concern, early MCI, late MCI, mild AD
-
-Inclusion criteria for rollover participants: originally diagnosed as either MCI (early or late) or CN
-
-- ADNI3
-
-700 - 800 rollover participants
-
-370 - 1200 newly enrolled
-
-Three cohorts: CN, MCI, mild AD
-
-- ADNI4
-
-Introducing the study, it's aims and the type of information gathered.
-
-**IMPORTANT: REMEMBER WE NEED TO REFERENCE ADNI PROPERLY.**
-
 ## Variables
-
-*Information about the variables we will use and why, what they can show, how are they recorded*
 
 Under this section, all variables used in the analysis will be described, along with the reasons for their importance.
 
@@ -537,6 +521,14 @@ APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical mod
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
+- *There are 52 individuals with two measurements recorded on the same exam date.*
+
+- *How should we deal with these? Average the measurements? Remove the observations?*
+
+1.  *Describe the measurements, their differences and averages*
+
+- *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
+
 ## Biomarker Distributions and Outliers
 
 The values of p-tau181 ranged from 0.4 to 451.4, with a median of 16.3, a first quartile of 11.1 and a third quartile of 23.6. Similarly, NfL values ranged from 6.4 to 408, with a median of 37.9, a first quartile of 27.8 and a third quartile of 52.5. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
@@ -585,7 +577,9 @@ The results are structured in two parts. Part 1 includes participants with three
 
 ### Cox PH Models
 
-To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox PH models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox PH model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Appendix 1.
+To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox PH models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Additional covariates were gender, age at baseline and APOE genotype. Initially fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
+
+Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox PH model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Appendix 1.
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant p-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant p-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant p-values.
 
@@ -609,19 +603,28 @@ knitr::kable(readRDS("tables/table_cox.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
-Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of $ε4$ alleles carried. Individuals carrying one $ε4$ allele had approximately a twofold increased hazard across models, whereas individuals carrying two $ε4$ alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two $ε4$ alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
+Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (**APPENDIX X**) these variables were included due to clinical relevance.
+
+In contrast, APOE-$ε4$ status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of $ε4$ alleles carried. Individuals carrying one $ε4$ allele had approximately a twofold increased hazard across models, whereas individuals carrying two $ε4$ alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two $ε4$ alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
 
 Both baseline p-tau181 and baseline NfL were significantly associated with an increased risk of progression in separate models, with p-values below 0.001. However, NfL showed a slightly stronger association with progression risk than p-tau181 (HR = 2.39 vs. HR = 2.04), indicating a modestly higher effect estimate for NfL. At the same time, the confidence interval for NfL was somewhat wider, suggesting slightly greater uncertainty in its effect estimate compared with p-tau181.
 
 In the Cox PH model including both biomarkers simultaneously, the results were similar, with both p-tau181 and NfL remaining significantly associated with progression. The effect estimates were however slightly attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 1.81 and NfL showing a hazard ratio of 1.98. This indicates that both biomarkers retained independent prognostic value. The confidence intervals for both variables were somewhat wider than in the univariable models, reflecting increased uncertainty in the joint model due to shared variance between the biomarkers.
 
+Initial compariosn of model performance by assessment of the concordance indices for all cox models was done. The results presented in **table ?** show that the concordance index evaluates all three models similarly.
+
+**Table ?: concordance indices for all fitted Cox PH models with baseline biomarker values**
+
+```{r}
+knitr::kable(readRDS("tables/c_index_table.rds")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
 ### Joint Models
 
-The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data.
+The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
-To be more precise, a longitudinal submodel was specified for each biomarker together with a survival submodel, the latter taking the form of a standard Cox PH model. As indicated in Table 2, the proportional hazards assumption was satisfied for this model. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
-
-Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 4. The slight deviations in the tails of the Q-Q plot, shown in Appendix 5, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix 6 showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix 7 showed similar results to those observed for p-tau181. Consequently, both models were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 4. The slight deviations in the tails of the Q-Q plot, shown in Appendix 5, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix 6 showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix 7 showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
 Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
 
@@ -684,7 +687,9 @@ In the multivariate joint model including both biomarkers simultaneously, both p
 
 ### Joint Latent Class Mixed Models
 
-First, latent class mixed models were fit on the longitudinal ptau-181 and NfL measurements in order to assess whether latent classes could be distinguished from the biomarker trajectories. None of these models could adequately separate the sample population into meaningful latent classes, suggesting that ptau-181 and NfL biomarker trajectories alone do not hold enough information to be able to distinguish heterogenous disease sub-types. Multivariate latent class models were estimated on ptau-181 and NfL measurements simultaneously. Again, this model could not discriminate valid latent classes. Interestingly, incorporating the survival data resulted in JLCMMs that could meaningfully classify individuals into latent classes, the results of which follow below.
+For all models, a Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution.
+
+Firstly, latent class mixed models were fit on the longitudinal ptau-181 and NfL measurements in order to assess whether latent classes could be distinguished from the biomarker trajectories. None of these models could adequately separate the sample population into meaningful latent classes, suggesting that ptau-181 and NfL biomarker trajectories alone do not hold enough information to be able to distinguish heterogenous disease sub-types. Multivariate latent class models were estimated on ptau-181 and NfL measurements simultaneously. Again, this model could not discriminate valid latent classes. Interestingly, incorporating the survival data resulted in JLCMMs that could meaningfully classify individuals into latent classes, the results of which follow below.
 
 **JLCMM PTAU**
 
@@ -806,6 +811,8 @@ When both biomarkers are included simultaneously, the same pattern remains, with
 Sex also remains non-significant across all joint models, with no meaningful differences between model specifications.
 
 ### Joint Latent Class Mixed Models
+
+The JLCMM with longitudinal ptau-181 measurements
 
 ## Predictive Performance
 
@@ -999,6 +1006,13 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/table_ph.rds"))  %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+## Appendix X: results from the likelihood ratio test for the Cox PH models with and without gender as a covariate
+
+```{r}
+knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
