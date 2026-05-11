@@ -536,12 +536,6 @@ Following log-transformation, p-tau181 exhibited a distribution that more closel
 
 Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
 
-## Correlation Between Biomarkers
-
-The correlation between p-tau181 and NfL was also calculated. The estimated correlation coefficient was 0.247, indicating a weak positive association between the two biomarkers. To be more precise, it suggests that individuals with higher levels of one biomarker tend to have slightly higher levels of the other, although the relationship is not particularly strong. Consequently, the biomarkers share a limited amount of common variation while still providing partly distinct information.
-
-The presence of a positive correlation nevertheless supports the relevance of a multivariate joint modelling framework, as such an approach allows the dependence between the biomarkers to be accounted for while simultaneously evaluating their individual and combined associations with the outcome of interest.
-
 ## Missing values
 
 All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
@@ -563,6 +557,12 @@ The analyzed data were split so that the in-dataset comprised three quarters of 
 When limiting the participants to those with three or more measurements of the biomarkers, the sample size of the in-dataset was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-dataset, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored.
 
 In comparison, when restricting the analysis to participants with at least one biomarker measurement, the in-dataset consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-dataset included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
+
+## Correlation Between Numerical Variables 
+
+Finally, a correlation matrix was computed for the numerical variables in the in-sample dataset to assess potential multicollinearity, and the results are presented in Appendix X. The correlations were generally low to moderate, indicating no issues with multicollinearity and supporting their inclusion in the models.
+
+It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34, indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
 
 # Results
 
