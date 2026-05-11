@@ -1619,27 +1619,151 @@ fForms <- list(
 
 ### Joint model comparison table
 
-`{# {r} # # Building joint model comparison table # # Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio # extract_model_jm <- function(model) { #  #   s <- summary(model)$Survival #  #   data.frame( #     Variable = rownames(s), #  #     HR = exp(s[, "Mean"]), #     CI_low = exp(s[, "2.5%"]), #     CI_high = exp(s[, "97.5%"]), #  #     P = s[, "P"], #     row.names = NULL #   ) # } #  # # Extracting models # ptau_jm <- extract_model_jm(joint_model_ptau) # nfl_jm <- extract_model_jm(joint_model_nfl) # both_jm <- extract_model_jm(multi_joint_model) #  # # Building variable set # all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable)) #  # # Building final table # table_jm <- data.frame( #   Variable = all_vars_jm, #  #   "PTau HR (CI)" = format_hr_ci( #     get_value(ptau_jm, all_vars_jm, "HR"), #     get_value(ptau_jm, all_vars_jm, "CI_low"), #     get_value(ptau_jm, all_vars_jm, "CI_high") #   ), #   "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")), #  #   "NfL HR (CI)" = format_hr_ci( #     get_value(nfl_jm, all_vars_jm, "HR"), #     get_value(nfl_jm, all_vars_jm, "CI_low"), #     get_value(nfl_jm, all_vars_jm, "CI_high") #   ), #   "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")), #  #   "Both HR (CI)" = format_hr_ci( #     get_value(both_jm, all_vars_jm, "HR"), #     get_value(both_jm, all_vars_jm, "CI_low"), #     get_value(both_jm, all_vars_jm, "CI_high") #   ), #   "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")), #  #   row.names = NULL, #   check.names = FALSE # ) #  # # Showing table # table_jm`
+```{r}
+# Building joint model comparison table
+# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)),
+# where Mean is the posterior mean of the log-hazard ratio
+extract_model_jm <- function(model) {
+
+  s <- summary(model)$Survival
+
+  data.frame(
+    Variable = rownames(s),
+
+    HR = exp(s[, "Mean"]),
+    CI_low = exp(s[, "2.5%"]),
+    CI_high = exp(s[, "97.5%"]),
+
+    P = s[, "P"],
+    row.names = NULL
+  )
+}
+
+# Extracting models
+ptau_jm <- extract_model_jm(joint_model_ptau)
+nfl_jm <- extract_model_jm(joint_model_nfl)
+both_jm <- extract_model_jm(multi_joint_model)
+
+# Building variable set
+all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
+
+# Building final table
+table_jm <- data.frame(
+  Variable = all_vars_jm,
+
+  "PTau HR (CI)" = format_hr_ci(
+    get_value(ptau_jm, all_vars_jm, "HR"),
+    get_value(ptau_jm, all_vars_jm, "CI_low"),
+    get_value(ptau_jm, all_vars_jm, "CI_high")
+  ),
+  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
+
+  "NfL HR (CI)" = format_hr_ci(
+    get_value(nfl_jm, all_vars_jm, "HR"),
+    get_value(nfl_jm, all_vars_jm, "CI_low"),
+    get_value(nfl_jm, all_vars_jm, "CI_high")
+  ),
+  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
+
+  "Both HR (CI)" = format_hr_ci(
+    get_value(both_jm, all_vars_jm, "HR"),
+    get_value(both_jm, all_vars_jm, "CI_low"),
+    get_value(both_jm, all_vars_jm, "CI_high")
+  ),
+  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
+
+  row.names = NULL,
+  check.names = FALSE
+)
+
+# Showing table
+table_jm
+```
 
 ```{r}
 # Saving the joint model comparison table
-# saveRDS(table_jm, "tables/table_jm.rds")
+saveRDS(table_jm, "tables/table_jm.rds")
 ```
 
 ## Rhat value comparison table
 
-`{# {r} # # Extracting Rhat for each model (survival component) # extract_rhat_surv <- function(model) { #  #   s <- summary(model)$Survival #  #   data.frame( #     Variable = rownames(s), #     Rhat = s[, "Rhat"], #     row.names = NULL #   ) # } #  # # Applying to each model # ptau_surv <- extract_rhat_surv(joint_model_ptau) # nfl_surv <- extract_rhat_surv(joint_model_nfl) # multi_surv <- extract_rhat_surv(multi_joint_model) #  # # Combining with model labels to form a table  # rhat_survival_table <- bind_rows( #   ptau_surv %>% mutate(Model = "PTau"), #   nfl_surv %>% mutate(Model = "NfL"), #   multi_surv %>% mutate(Model = "Multi") # ) %>% #   pivot_wider( #     names_from = Model, #     values_from = Rhat #   ) %>% #   mutate(across(where(is.numeric), ~round(.x, 3))) #  # # Showing table # rhat_survival_table`
+```{r}
+# Extracting Rhat for each model (survival component)
+extract_rhat_surv <- function(model) {
+
+  s <- summary(model)$Survival
+
+  data.frame(
+    Variable = rownames(s),
+    Rhat = s[, "Rhat"],
+    row.names = NULL
+  )
+}
+
+# Applying to each model
+ptau_surv <- extract_rhat_surv(joint_model_ptau)
+nfl_surv <- extract_rhat_surv(joint_model_nfl)
+multi_surv <- extract_rhat_surv(multi_joint_model)
+
+# Combining with model labels to form a table
+rhat_survival_table <- bind_rows(
+  ptau_surv %>% mutate(Model = "PTau"),
+  nfl_surv %>% mutate(Model = "NfL"),
+  multi_surv %>% mutate(Model = "Multi")
+) %>%
+  pivot_wider(
+    names_from = Model,
+    values_from = Rhat
+  ) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Showing table
+rhat_survival_table
+```
 
 ```{r}
 # Saving the rhat table
-# saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
 ```
 
-`{# {r} # # Extracting Rhat for longitudinal outcome  # extract_rhat_long <- function(model) { #  #   s <- summary(model)$Outcome1 #  #   data.frame( #     Variable = rownames(s), #     Rhat = s[, "Rhat"], #     row.names = NULL #   ) # } #  # # Applying to each model # ptau_long <- extract_rhat_long(joint_model_ptau) # nfl_long <- extract_rhat_long(joint_model_nfl) # multi_long <- extract_rhat_long(multi_joint_model) #  # # Combining with model labels to form a table # rhat_longitudinal_table <- bind_rows( #   ptau_long %>% mutate(Model = "Long_PTau"), #   nfl_long %>% mutate(Model = "Long_NfL"), #   multi_long %>% mutate(Model = "Long_Multi") # ) %>% #   pivot_wider( #     names_from = Model, #     values_from = Rhat #   ) %>% #   mutate(across(where(is.numeric), ~round(.x, 3))) #  # # Showing table # rhat_longitudinal_table`
+```{r}
+# Extracting Rhat for longitudinal outcome
+extract_rhat_long <- function(model) {
 
-`{# {r} # # Saving the rhat table # saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")`
+  s <- summary(model)$Outcome1
 
-# ...
+  data.frame(
+    Variable = rownames(s),
+    Rhat = s[, "Rhat"],
+    row.names = NULL
+  )
+}
+
+# Applying to each model
+ptau_long <- extract_rhat_long(joint_model_ptau)
+nfl_long <- extract_rhat_long(joint_model_nfl)
+multi_long <- extract_rhat_long(multi_joint_model)
+
+# Combining with model labels to form a table
+rhat_longitudinal_table <- bind_rows(
+  ptau_long %>% mutate(Model = "Long_PTau"),
+  nfl_long %>% mutate(Model = "Long_NfL"),
+  multi_long %>% mutate(Model = "Long_Multi")
+) %>%
+  pivot_wider(
+    names_from = Model,
+    values_from = Rhat
+  ) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Showing table
+rhat_longitudinal_table
+```
+
+```{r}
+# Saving the rhat table
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+```
 
 # Latent Class Mixed Models
 
