@@ -24,7 +24,7 @@ format:
         {\large \today\par}
         \vspace{3cm}
         
-        {\Huge Charlotte Emily Iszatt & Milou Rossi\par}
+        {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
         \vspace{0.1cm}
         
         {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
@@ -75,6 +75,17 @@ knitr::opts_chunk$set(warnings = FALSE)
 knitr::opts_chunk$set(message = FALSE)
 options(knitr.table.format = "latex")
 knitr::opts_chunk$set(tab.pos = "H")
+```
+
+```{r}
+# set-up for tables
+kable_standard <- function(df, caption = NULL, ...) {
+  kable(df, booktabs = TRUE, caption = caption, ...) %>%
+    kable_styling(
+      latex_options = c("hold_position", "scale_down"),
+      full_width = FALSE
+    )
+}
 ```
 
 ```{r}
@@ -574,8 +585,7 @@ Given this violation, age at baseline was excluded from the final Cox PH models.
 **Table 1: p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models.**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_ph_final.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
 After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
@@ -585,8 +595,7 @@ As the proportional hazards assumption was met in the refitted models, the resul
 **Table 2: hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_cox.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/table_cox.rds"))
 ```
 
 Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (**APPENDIX X**) these variables were included due to clinical relevance.
@@ -602,8 +611,7 @@ Initial compariosn of model performance by assessment of the concordance indices
 **Table ?: concordance indices for all fitted Cox PH models with baseline biomarker values**
 
 ```{r}
-knitr::kable(readRDS("tables/c_index_table.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/c_index_table.rds"))
 ```
 
 ### Joint Models
@@ -639,8 +647,7 @@ Additionally, convergence of the models was assessed by examining the $\widehat{
 **Table 3:** $\widehat{\mathbf{R}}$ **values of the survival outcome in the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/rhat_survival_table.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
 The $\widehat{R}$ values for the survival outcomes are all very close to 1, ranging from 1.000 to 1.007 across all joint models. This indicates good convergence of the MCMC chains for the survival components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
@@ -650,8 +657,7 @@ While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the c
 **Table 4:** $\widehat{\mathbf{R}}$ **values of the longitudinal outcome in the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/rhat_longitudinal_table.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
 In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all joint models, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. However, a higher value is observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.089. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
@@ -661,8 +667,7 @@ Subsequently, the hazard ratios from the joint models were estimated and are pre
 **Table 5: hazard ratios with 95% confidence intervals and p-values from the joint models**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_jm.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/table_jm.rds"))
 ```
 
 Table 5 presents the hazard ratios estimated from the joint models. Similar to the Cox PH models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a clear and consistent association with progression risk, with higher hazards observed as the number of $ε4$ alleles increased. Individuals carrying one $ε4$ allele had an approximately twofold increased hazard across models, while individuals carrying two $ε4$ alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -684,8 +689,7 @@ The random effects structure was decided by a likelihood ratio test between a on
 **Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_ptau.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
 The results show that both log-likelihood and entropy increase with additional latent classes, yet the BIC is minimised for the model with two latent classes. Given the inconclusive results from this comparison, the posterior probabilities were additionally analysed in order to decide the number of latent classes.
@@ -695,15 +699,13 @@ The posterior classification table shows the number of individuals assigned to e
 **Table 7: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/postprob_m1_ptau.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/postprob_m1_ptau.rds"))
 ```
 
 **Table 8: posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/postprob_m2_ptau.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/postprob_m2_ptau.rds"))
 ```
 
 For the two class model (table 7), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 8) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes from the longitudinal ptau-181 measurements and the time-to-dementia data.
@@ -723,8 +725,7 @@ Again, the results of a likelihood ratio test between two models was used to det
 **Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_nfl.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
 Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests that the two class model in this instance provides the best method for discriminating latent classes given longitudinal NfL measurements and time-to-diagnosis data. The log-likelihood increases most between the one class and the two class model, and only increases very slightly between the two class and the three class model. The BIC is minimised and entropy is maxmised for the two class model. The posterior probabilities are also analysed in order to ensure good class discrimination.
@@ -732,8 +733,7 @@ Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests th
 **Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/postprob_m1_nfl.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/postprob_m1_nfl.rds"))
 ```
 
 Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (table 11). This is evidence for the two class model and that the data supports two latent classes.
@@ -753,8 +753,7 @@ The ptau-181 and NfL measurements were also modeled simultaneously with a multiv
 **Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-191 and NfL measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_ptau_nfl.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl.rds"))
 ```
 
 Assessment of the posterior probabilities for the two class model shows both reasonable class sizes and good class discrimination.
@@ -762,8 +761,7 @@ Assessment of the posterior probabilities for the two class model shows both rea
 **Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-191 and NfL measurements**
 
 ```{r}
-knitr::kable(readRDS("tables/postprob_ptau_nfl.rds")) %>%
-  kable_styling(latex_options = "hold_position")
+kable_standard(readRDS("tables/postprob_ptau_nfl.rds"))
 ```
 
 ## Including Participants With One or More Biomarker Measurements
@@ -827,8 +825,7 @@ The joint model including multiple longitudinal biomarkers showed the strongest 
 **Table ?: Time-dependent AUC by model and follow-up time point**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/results_table_AUC.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
 ### Time-Dependent Brier Score
@@ -858,8 +855,7 @@ The same pattern can be observed in Table ?, which presents the time-dependent B
 **Table ?: Time-dependent Brier score by model and follow-up time point**
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/results_table_Brier.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/results_table_Brier.rds"))
 ```
 
 Table ? confirms that at the two-year follow-up, all Cox and joint models have low Brier scores, with the latent class joint models showing the lowest values. Brier scores increase gradually over time for all models, and by six years they converge around 0.14-0.16, with only minor differences between models. The Cox PH model including both baseline biomarkers and the joint models generally perform slightly better than the single-biomarker Cox PH models, confirming the patterns observed in the figures.
@@ -991,15 +987,13 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 ## Appendix 1: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models
 
 ```{r, echo=FALSE}
-knitr::kable(readRDS("tables/table_ph.rds"))  %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/table_ph.rds"))
 ```
 
 ## Appendix X: results from the likelihood ratio test for the Cox PH models with and without gender as a covariate
 
 ```{r}
-knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
 ## Appendix 2: distribution of p-tau181 after log-transformation
@@ -1029,20 +1023,43 @@ knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
 ## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_ptau_full.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
 ```
 
-## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
+## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_nfl_full.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
+```
+
+## Appendix X: summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for ptau-181
+
+```{r}
+kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
+```
+
+## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL
+
+```{r}
+kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
+```
+
+## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```
 
 ## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181 and NfL
 
 ```{r}
-knitr::kable(readRDS("tables/summary_jlcmm_ptau_nfl_full.rds")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
+kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl_full.rds"))
+```
+
+## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181 and NfL
+
+```{r}
+kable_standard(readRDS("tables/pprob_m1_ptau_nfl_full.rds"))
 ```

@@ -400,22 +400,22 @@ table(
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-# long_data <- long_data %>% filter(RID %in% keep)
-# surv_data <- surv_data %>% filter(RID %in% keep)
-# # We check number of individuals with at least 3 measurements
-# length(keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
+# We check number of individuals with at least 3 measurements
+length(keep)
 ```
 
 ## Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
-# We check number of individuals with at least 1 measurement
-length(keep)
+# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+# long_data <- long_data %>% filter(RID %in% keep)
+# surv_data <- surv_data %>% filter(RID %in% keep)
+# # We check number of individuals with at least 1 measurement
+# length(keep)
 ```
 
 ### Checking individuals final diagnoses for the reduced data set
@@ -1440,7 +1440,7 @@ saveRDS(c_index_table, "tables/c_index_table.rds")
 ## Fitted joint model for p-tau181
 
 ```{r}
-# # Joint model for p-tau181 
+# Joint model for p-tau181
 # joint_model_ptau <- jm(
 #   surv_model_final,
 #   long_model_ptau,
@@ -2166,23 +2166,48 @@ summary(jlcmm_m1_nfl_piecewise)
 ```
 
 ```{r}
-postprob_m1_nfl <- data.frame(
-  "Class" = c("Class1", "Class2"),
-  "Prob1" = c(0.90, 0.03),
-  "Prob2" = c(0.10, 0.97),
-  "Prob > 0.7 (%)" = c(93.6, 96.0),
-  "Prob > 0.8 (%)" = c(82.4, 95.2),
-  "Prob > 0.9 (%)" = c(60.3, 92.8),
-  check.names = FALSE
-)
+# Defining a function to extract the posterior probability metrics as presenting in postprob() but in one table
+get_pprob_table <- function(model) {
+  G <- model$ng
+  pprobs <- model$pprob
+  
+#  Mean posterior probabilities per class 
+  mean_pprob <- do.call(rbind, lapply(1:G, function(g) {
+    # Individuals assigned to class g
+    members <- pprobs[pprobs$class == g, 3:(2 + G)]
+    colMeans(members)
+  }))
+  
+  rownames(mean_pprob) <- paste0("Class", 1:G)
+  colnames(mean_pprob) <- paste0("Prob", 1:G)
+  
+#  Percentage of indiviudals above posterior probability thresholds per class
+  thresholds <- c(0.7, 0.8, 0.9)
+  
+  threshold_table <- do.call(rbind, lapply(1:G, function(g) {
+#    Extracting individuals whose highest posterior probability is for class g
+    pprob_g <- pprobs[pprobs$class == g, 2 + g]
+    sapply(thresholds, function(t)
+      round(mean(pprob_g > t) * 100, 2))
+  }))
+  
+  rownames(threshold_table) <- paste0("Class", 1:G)
+  colnames(threshold_table) <- paste0("Prob > ", thresholds, " (%)")
+  
+#  Combine into one table
+  out <- cbind(
+    as.data.frame(round(mean_pprob, 4)),
+    as.data.frame(threshold_table)
+  )
+  
+  return(out)
+}
 ```
 
 ```{r}
-postprob_m1_nfl <- postprob(jlcmm_m1_nfl)[1:2]
-```
-
-```{r}
-saveRDS(postprob_m1_nfl, "tables/postprob_m1_nfl.rds")
+# Saving the posterior probability table for the 2 class jlcmm for nfl
+pprob_m1_nfl <- get_pprob_table(jlcmm_m1_nfl)
+saveRDS(pprob_m1_nfl, "tables/pprob_m1_nfl.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2293,7 +2318,7 @@ props <- do.call(rbind, lapply(models, function(m) {
 
 colnames(props) <- paste0("Class", 1:G_max, " (%)")
 
-summary_jlcmm_nfl_full <- data.frame(
+summary_jlcmm_nfl <- data.frame(
   "Candidate model" = paste0("Model", 1:length(models)),
   "G" = sapply(models, function(m) m$ng),
   "Log Likelihood" = sapply(models, function(m) m$loglik),
@@ -2305,7 +2330,7 @@ summary_jlcmm_nfl_full <- data.frame(
 ```
 
 ```{r}
-saveRDS(summary_jlcmm_nfl_full, "tables/summary_jlcmm_nfl_full.rds")
+saveRDS(summary_jlcmm_nfl, "tables/summary_jlcmm_nfl.rds")
 ```
 
 ## Class Descriptions
@@ -2529,19 +2554,9 @@ postprob(jlcmm_m1_ptau)
 ```
 
 ```{r}
-postprob_m1_ptau <- data.frame(
-  "Class" = c("Class1", "Class2"),
-  "Prob1" = c(0.97, 0.12),
-  "Prob2" = c(0.03, 0.88),
-  "Prob > 0.7 (%)" = c(93.8, 91.0),
-  "Prob > 0.8 (%)" = c(91.47, 76.19),
-  "Prob > 0.9 (%)" = c(91.47, 52.63),
-  check.names = FALSE
-)
-```
-
-```{r}
-saveRDS(postprob_m1_ptau, "tables/postprob_m1_ptau.rds")
+# Saving the posterior probability table for the 2 class jlcmm for ptau
+pprob_m1_ptau <- get_pprob_table(jlcmm_m1_ptau)
+saveRDS(pprob_m1_ptau, "tables/pprob_m1_ptau.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2611,24 +2626,14 @@ summary(jlcmm_m2_ptau)
 ```
 
 ```{r}
+# Checking the posterior probabilities for the 3 class model
 postprob(jlcmm_m2_ptau)
 ```
 
 ```{r}
-postprob_m2_ptau <- data.frame(
-  "Class" = c("Class1", "Class2", "Class3"),
-  "Prob1" = c(0.74, 0.05, 0.01),
-  "Prob2" = c(0.24, 0.82, 0.04),
-  "Prob3" = c(0.02, 0.12, 0.95),
-  "Prob > 0.7 (%)" = c(65.0, 45.0, 15.0),
-  "Prob > 0.8 (%)" = c(86.1, 62.8, 28.7),
-  "Prob > 0.9 (%)" = c(93.2, 87.9, 84.1),
-  check.names = FALSE
-)
-```
-
-```{r}
-saveRDS(postprob_m2_ptau, "tables/postprob_m2_ptau.rds")
+# Saving the posterior probability table for the 3 class jlcmm for ptau
+pprob_m2_ptau <- get_pprob_table(jlcmm_m2_ptau)
+saveRDS(pprob_m2_ptau, "tables/pprob_m2_ptau.rds")
 ```
 
 ```{r}
@@ -2725,7 +2730,7 @@ props <- do.call(rbind, lapply(models, function(m) {
 
 colnames(props) <- paste0("Class", 1:G_max, " (%)")
 
-summary_jlcmm_ptau_full <- data.frame(
+summary_jlcmm_ptau <- data.frame(
   "Candidate model" = paste0("Model", 1:length(models)),
   "G" = sapply(models, function(m) m$ng),
   "Log Likelihood" = sapply(models, function(m) m$loglik),
@@ -2737,7 +2742,7 @@ summary_jlcmm_ptau_full <- data.frame(
 ```
 
 ```{r}
-saveRDS(summary_jlcmm_ptau_full, "tables/summary_jlcmm_ptau_full.rds")
+saveRDS(summary_jlcmm_ptau, "tables/summary_jlcmm_ptau.rds")
 ```
 
 ## Class Descriptions
@@ -2905,19 +2910,9 @@ postprob(mult_jlcmm_m1)
 ```
 
 ```{r}
-postprob_ptau_nfl <- data.frame(
-  "Class" = c("Class1", "Class2"),
-  "Prob1" = c(0.96, 0.10),
-  "Prob2" = c(0.04, 0.90),
-  "Prob > 0.7 (%)" = c(93.8, 94.5),
-  "Prob > 0.8 (%)" = c(93.0, 82.8),
-  "Prob > 0.9 (%)" = c(91.4, 60.5),
-  check.names = FALSE
-)
-```
-
-```{r}
-saveRDS(postprob_ptau_nfl, "tables/postprob_ptau_nfl.rds")
+# Saving the posterior probability table for the 2 class jlcmm for ptau and NfL
+pprob_m1_ptau_nfl <- get_pprob_table(jlcmm_m2_ptau)
+saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2975,7 +2970,7 @@ props <- do.call(rbind, lapply(models, function(m) {
 
 colnames(props) <- paste0("Class", 1:G_max, " (%)")
 
-summary_jlcmm_ptau_nfl_full <- data.frame(
+summary_jlcmm_ptau_nfl <- data.frame(
   "Candidate model" = paste0("Model", 1:length(models)),
   "G" = sapply(models, function(m) m$ng),
   "Log Likelihood" = sapply(models, function(m) m$loglik),
@@ -2987,7 +2982,7 @@ summary_jlcmm_ptau_nfl_full <- data.frame(
 ```
 
 ```{r}
-saveRDS(summary_jlcmm_ptau_nfl_full, "tables/summary_jlcmm_ptau_nfl_full.rds")
+saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
 
 ## Visualisation
@@ -3031,10 +3026,6 @@ saveRDS(summary_jlcmm_ptau_nfl_full, "tables/summary_jlcmm_ptau_nfl_full.rds")
 # # longitudnal trajectories by class
 # plot(mult_jlcmm_m2, outcome = 1, which = "fit")
 ```
-
-## TO DO
-
-External validation: what do these classes look like? Do they just represent different genotypes? How do we check this and are they truly valid LATENT classes?
 
 # Comparing models using time-dependent AUC
 
