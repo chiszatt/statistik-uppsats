@@ -457,7 +457,7 @@ The data used in this analysis comes from the ADNI cohort under the ADNI1 and AD
 
 The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database, which include various datasets all containing different variables related to the study of Alzheimer's.
 
-The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals with three cohorts with a final diagnosis of cognitively normal (CN) participants (n = 358), participants with mild cogntive impairment (MCI, n = 421) and with dementia due to AD (n = 411). Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768 with final diagnoses of CN (n = 241), MCI (290) or AD dementia (n = 237). In the reduced sample size, 67 individuals were included who had dementia diagnoses at baseline and 178 individuals transitioned from either CN or MCI to AD dementia.
+The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
 
 **REPORT ON TRANSITIONS...**
 
@@ -469,9 +469,9 @@ Under this section, all variables used in the analysis will be described, along 
 
 The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
 
-The variable was retrieved from the dataset DXSUM in ADNIMERGE2. For the 1190 included participants, the observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
+The variable was retrieved from the DXSUM dataset in ADNIMERGE2. For the 1190 included participants, observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
 
-To define the outcome for the survival analyses, the study focuses on time to incident dementia, where participants are classified as either non-demented or demented. The first recorded diagnosis of dementia is used to define the event, while participants without a dementia diagnosis are censored at their last available visit. This definition is applied consistently in both the standard Cox PH models and the survival submodel (Cox component) of the joint models.
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states.
 
 *Skriva något om hur regelbundna besöken är.*
 
@@ -479,37 +479,29 @@ To define the outcome for the survival analyses, the study focuses on time to in
 
 ### P-tau181
 
-P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was analyzed by the University of Gothenburg (ADNI, n.d.-b). In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements. The biomarker measurements are observed 3647 times across the 1190 included participants. However, the unit of measurement is not specified in the dataset documentation.
+P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. It was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b).
 
-P-tau181 is used differently across the modelling frameworks. In the standard Cox PH models, baseline p-tau181 values are included as a covariate to assess their association with subsequent risk of progression to AD/dementia. In the joint models, p-tau181 is modelled longitudinally using a LME submodel, where repeated measurements over time are used to describe individual biomarker trajectories. These longitudinal trajectories are then linked to the survival submodel (Cox component), allowing for assessment of how changes in p-tau181 over time are associated with the hazard of progression.
+In contrast to the diagnostic data, p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits lack corresponding biomarker measurements. The dataset contains 3647 p-tau181 measurements across 1190 participants. However, the unit of measurement is not specified in the dataset documentation.
 
 ### NfL
 
-NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by the Blennow Lab (ADNI, n.d.-b). Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements. The biomarker is observed 3647 times across the 1191 included individuals. Once again, however, the unit of measurement is not specified in the dataset documentation.
+NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were collected by the Blennow Lab (ADNI, n.d.-b).
 
-NfL is also used in different ways across the modelling frameworks. In the standard Cox PH models, baseline NfL values are included as a covariate to assess their association with risk of progression to AD/dementia. In the joint models, NfL is modelled longitudinally using a LME submodel based on repeated measurements over time. These trajectories are then linked to the survival submodel (Cox component), allowing for estimation of how longitudinal changes in NfL are associated with the hazard of progression.
+Similar to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, resulting in some diagnostic visits without corresponding biomarker measurements. The dataset contains 3647 NfL measurements across the 1190 included participants. As for p-tau181, the unit of measurement is not specified in the dataset documentation.
 
 ### Age
 
-Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG.
-
-The variable is initially coded numerically as the year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants, and is then transformed into age at visit and age at baseline visit, which are more suitable for use in the analyses.
-
-In the standard Cox PH models, age at baseline (age_at_baseline) is included as a fixed covariate to adjust for differences in baseline risk of progression to AD/dementia. In the joint models, age at baseline is likewise included as a fixed covariate in the survival submodel (Cox PH component), ensuring appropriate adjustment for baseline age when estimating the association between longitudinal biomarker trajectories and risk of progression.
+Additionally, age is included as a covariate when predicting progression to dementia, to examine how dementia risk changes with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
 
 ### Gender
 
-Another covariate of interest when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This variable is binary, with two categories: male and female. Among the 1190 participants, 543 were female and 647 were male.
-
-Sex is included as a fixed covariate in all statistical models. In the standard Cox PH models, it is used to estimate sex-specific differences in the risk of progression to AD/dementia, adjusted for other covariates. In the joint models, sex is included as a fixed covariate in both submodels. In the survival submodel (Cox PH component), it accounts for potential differences in the hazard of progression between males and females. In the longitudinal submodel (LME component), it is included as a baseline covariate to account for potential differences in biomarker levels between sexes.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
 
 ### APOE4-status
 
 Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset.
 
 Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the 1190 included participants, 672 were non-carriers, 417 were heterozygous carriers, and 101 were homozygous carriers.
-
-APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical models. In the standard Cox PH models, it is used to assess whether genetic risk is associated with progression to AD/dementia. In the joint models, APOE-$\epsilon 4$ status is included as a fixed covariate in both submodels. In the survival submodel (Cox PH component), it allows for estimation of genotype-specific differences in the hazard of progression. In the longitudinal submodel (LME component), it is included as a baseline covariate to account for potential differences in biomarker levels between genotype groups.
 
 # Pre-Processing
 
