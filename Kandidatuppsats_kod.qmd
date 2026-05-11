@@ -1135,33 +1135,10 @@ surv_model_ptau_bl <- coxph(
 summary(surv_model_ptau_bl)
 ```
 
-#### Removing PTGENDER
-
-```{r}
-# Cox survival-models, with covariates including baseline values of each biomarker 
-# For p-tau181 without PTGENDER
-surv_model_ptau_bl_reduced <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau,
-  data = surv_data_in,
-  x = TRUE
-  )
-
-summary(surv_model_ptau_bl_reduced)
-```
-
-#### Comparing models
-
-Testing the significance of gender in the Cox proportional hazard model shows that there is no evidence of an improved fit compared with a reduced model with only age at baseline and APOE- $\epsilon 4$ status and baseline ptau-181 value as covariates.
-
-```{r}
-anova(surv_model_ptau_bl, surv_model_ptau_bl_reduced, test = "LRT")
-```
-
 ### NfL
 
 ```{r}
-# For NfL with PTGENDER
+# For baseline NfL with covariates
 surv_model_nfl_bl <- coxph(
   Surv(time_to_event, event) ~
     age_at_baseline + PTGENDER + APOE4_status + baseline_value_nfl,
@@ -1170,42 +1147,6 @@ surv_model_nfl_bl <- coxph(
 )
 
 summary(surv_model_nfl_bl)
-```
-
-#### Removing PTGENDER
-
-```{r}
-# For NfL without PTGENDER
-surv_model_nfl_bl_reduced1 <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_nfl_bl_reduced1)
-```
-
-#### Removing age at baseline
-
-```{r}
-# For NfL without PTGENDER and age at baseline
-surv_model_nfl_bl_reduced2 <- coxph(
-  Surv(time_to_event, event) ~
-    APOE4_status + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_nfl_bl_reduced2)
-```
-
-#### Comparing models
-
-Testing the significance of gender in the Cox proportional hazard model for NfL again shows that there is no evidence to include gender as a covariate. Additionally, there is no support for including age at baseline in the model with only baseline NfL values.
-
-```{r}
-anova(surv_model_nfl_bl, surv_model_nfl_bl_reduced1, surv_model_nfl_bl_reduced2, test = "LRT")
 ```
 
 ### PTAU and NfL
@@ -1220,42 +1161,6 @@ surv_model_both_bl <- coxph(
 )
 
 summary(surv_model_both_bl) 
-```
-
-#### Removing PTGENDER
-
-```{r}
-
-# Without PTGENDER
-surv_model_both_bl_reduced1 <- coxph(
-  Surv(time_to_event, event) ~
-    age_at_baseline + APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_both_bl_reduced1)
-```
-
-#### Removing age at baseline
-
-```{r}
-# Without PTGENDER and age at baseline
-surv_model_both_bl_reduced2 <- coxph(
-  Surv(time_to_event, event) ~
-    APOE4_status + baseline_value_ptau + baseline_value_nfl,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_both_bl_reduced2)
-```
-
-#### Comparing models
-
-```{r}
-anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduced2,
-      test = "LRT")
 ```
 
 ### Test of the assumption of proportional hazards
@@ -1367,6 +1272,68 @@ table_ph_final
 saveRDS(table_ph_final, "tables/table_ph_final.rds")
 ```
 
+### Removing PTGENDER to run likelihood-ratio tests
+
+```{r}
+# Cox survival-models, with covariates including baseline values of each biomarker
+
+# For p-tau181 without PTGENDER
+surv_model_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status,
+  data = surv_data_in,
+  x = TRUE
+  )
+
+anova_surv <- anova(surv_model_final, surv_model_reduced, test = "LRT")
+chi_surv <- anova_surv[2,2]
+
+# For p-tau181 without PTGENDER
+surv_model_ptau_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_ptau,
+  data = surv_data_in,
+  x = TRUE
+  )
+
+anova_ptau <- anova(surv_model_ptau_bl_final, surv_model_ptau_bl_reduced, test = "LRT")
+chi_ptau <- anova_ptau[2,2]
+
+# For NfL without PTGENDER
+surv_model_nfl_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+anova_nfl <- anova(surv_model_nfl_bl_final, surv_model_nfl_bl_reduced, test = "LRT")
+chi_nfl <- anova_nfl[2,2]
+
+# Without PTGENDER
+surv_model_both_bl_reduced <- coxph(
+  Surv(time_to_event, event) ~ APOE4_status + baseline_value_ptau + baseline_value_nfl,
+  data = surv_data_in,
+  x = TRUE
+)
+
+anova_both <- anova(surv_model_both_bl_final, surv_model_both_bl_reduced, test = "LRT")
+chi_both <- anova_both[2,2]
+```
+
+```{r}
+anova_ptau
+anova_nfl
+anova_both
+```
+
+```{r}
+# Saving a table of results from the likelihood ratio tests
+surv_lrt_table <- data.frame(
+  "Model" = c("ptau-181 baseline", "NfL baseline", "ptau-181 and NfL baseline"),
+  "Test statistic" = c(chi_ptau, chi_nfl, chi_both),
+  "P-value" = c(0.98, 0.95, 0.73),
+  check.names = FALSE
+  )
+```
+
 ### Cox comparison table
 
 ```{r}
@@ -1455,12 +1422,14 @@ table_cox
 saveRDS(table_cox, "tables/table_cox.rds")
 ```
 
+### Concordance Index Table
+
 ```{r}
 # Saving the c-index table
 c_index_table <- data.frame(
   "Model" = c("Cox ptau-181", "Cox NfL", "Cox ptau-181 & NfL"),
   "C-Index" = c(0.679, 0.673, 0.681),
-  check.names = FALSE
+  check.names = FALSE)
   
 saveRDS(c_index_table, "tables/c_index_table.rds")
 
