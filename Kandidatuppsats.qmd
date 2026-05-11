@@ -5,10 +5,10 @@ format:
       text: |
         \begin{titlepage}
         \raggedleft
-        \vspace*{2cm}
+        \vspace*{0.5cm}
         
         {\Huge\bfseries Kandidatuppsats\par}
-        \vspace{1.5cm}
+        \vspace{0.5cm}
         
         {\Large Statistiska Instiutionen\par}
         \vspace{3cm}
@@ -25,6 +25,12 @@ format:
         \vspace{3cm}
         
         {\Huge Charlotte Emily Iszatt and Milou Rossi\par}
+        \vspace{0.1cm}
+        
+        {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
+        \vspace{0.5cm}
+        
+        {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
         
         \vfill
         
@@ -43,6 +49,8 @@ format:
         
         {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
         \vspace{3cm}
+        {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+        
         
         \vfill
         
@@ -131,6 +139,8 @@ There exists a wide range of biomarkers for AD that could be investigated in thi
 Additional modelling approaches could have been considered given the aims of the study. Given the limited time and scope of this thesis, however, including a larger number of modelling frameworks would have reduced the ability to investigate each approach in sufficient depth. Therefore, a smaller set of models was selected in order to allow for a more detailed and meaningful comparison. The chosen models were selected based on their methodological relevance and their ability to capture different aspects of the data, thereby providing a broad overview of alternative approaches for modelling longitudinal biomarker data and survival outcomes.
 
 The modelling approaches will be applied to data obtained from the ADNI dataset and handled in accordance with their data use and access policies (ADNI, n.d.-b).
+
+***Data used in the preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). The current goals include validating biomarkers for clinical trials, improving the generalizability of ADNI data by increasing diversity in the participant cohort, and to provide data concerning the diagnosis and progression of Alzheimer’s disease to the scientific community. For up-to-date information, see adni.loni.usc.edu.***
 
 # Statistical Theory
 
