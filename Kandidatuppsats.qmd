@@ -129,11 +129,11 @@ The choice of inclusion strategy also has important implications for statistical
 
 ## Research Aims
 
-This study investigates the prediction of AD/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches, different biomarkers as well as the number of biomarker measurements per individual. More precisely, the research questions are:
+This study investigates the prediction of progression to Alzheimer’s disease (AD)-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarkers, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
 
-1.  Which modeling approach provides the best prediction of progression to dementia due to AD when using longitudinal blood biomarker data? (Including baseline levels, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)
-2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
-3.  How does the precision of the estimated longitudinal trajectories and their associations with progression (survival outcomes) change when including individuals with different numbers of repeated measurements? (Precision analysis)
+1.  Which of the considered modelling approaches provides the best prediction of progression to Alzheimer’s disease (AD)-related dementia using longitudinal blood biomarker data?
+2.  How do these associations differ between p-tau181 and NfL?
+3.  How does the precision of estimated longitudinal trajectories and their associations with time to AD-related dementia vary with the number of repeated measurements per individual?
 
 # Methodology
 
@@ -165,7 +165,7 @@ The modelling approaches will be applied to data from the ADNI dataset, in accor
 
 **Suggested shorter version:**
 
-All of the modeling appraoches considered in this study are grounded in the survival analysis framework, where both the outcome of an event and the time from start of follow-up, or baseline time, until it's occurrence are modeled (Ranganathan, Deo & Pramesh, 2025, p. ?). In this analysis, ptau-181 and NfL levels as well as diagnosis status are known at baseline, and the event of interest is dementia diagnosis. Additionally, individuals are either right-censored, meaning that they do not develop dementia during the follow-up period, or they are interval censored, meaning that the exact date of dementia occurrence is not known. This is due to diagnoses being made yearly, and as such the exact date of transition to dementia can be at best approximated.
+All of the modeling approaches considered in this study are grounded in the survival analysis framework, where both the outcome of an event and the time from start of follow-up, or baseline time, until it's occurrence are modeled (Ranganathan, Deo & Pramesh, 2025, p. ?). In this analysis, ptau-181 and NfL levels as well as diagnosis status are known at baseline, and the event of interest is dementia diagnosis. Additionally, individuals are either right-censored, meaning that they do not develop dementia during the follow-up period, or they are interval censored, meaning that the exact date of dementia occurrence is not known. This is due to diagnoses being made yearly, and as such the exact date of transition to dementia can be at best approximated.
 
 *As all modeling approaches considered in this study aim to model time to progression to AD, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.).*
 
@@ -502,11 +502,11 @@ Similar to p-tau181, NfL measurements are available between 1 February 2007 and 
 
 ### Age
 
-Additionally, age is included as a covariate when predicting progression to dementia, to examine how dementia risk changes with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
+Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
 
 ### Gender
 
-Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This is included due to reported differences in disease risk and progression between sexes. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
 
 ### APOE4-status
 
