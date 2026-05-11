@@ -491,11 +491,11 @@ Similar to p-tau181, NfL measurements are available between 1 February 2007 and 
 
 ### Age
 
-Additionally, age is included as a covariate when predicting progression to dementia, to examine how dementia risk changes with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
+Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
 
 ### Gender
 
-Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This is included due to reported differences in disease risk and progression between sexes. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
 
 ### APOE4-status
 
