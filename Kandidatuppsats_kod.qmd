@@ -1258,6 +1258,24 @@ anova(surv_model_both_bl, surv_model_both_bl_reduced1, surv_model_both_bl_reduce
       test = "LRT")
 ```
 
+## Concordance Index Table
+
+```{r}
+c_index_table
+```
+
+```{r}
+c_index_table <- data.frame(
+  "Model" = c("Cox ptau-181", "Cox NfL", "Cox ptau-181 & NfL"),
+  "C-Index" = c(0.679, 0.673, 0.681),
+  check.names = FALSE
+)
+```
+
+```{r}
+saveRDS(c_index_table, "tables/c_index_table.rds")
+```
+
 ### Test of the assumption of proportional hazards
 
 ```{r}
@@ -2420,6 +2438,25 @@ class_preds <- jlcmm_m1_nfl$pprobY
 class_preds <- class_preds %>%
   merge((apoe %>% dplyr::select(RID, APOE4_status)), by = "RID") %>% 
   merge((surv_data %>% dplyr::select(RID, event, age_at_baseline, PTGENDER)), by = "RID")
+```
+
+```{r}
+install.packages("tableone")
+```
+
+```{r}
+library(tableone)
+
+covariates <- c("age_at_baseline", "PTGENDER", "APOE4_status")
+
+tab1 <- CreateTableOne(
+  vars = covariates,
+  strata = "class",
+  data = class_preds,
+  factorVars = c("PTGENDER", "APOE4_status")
+)
+
+print(tab1, smd = TRUE)  # SMD = standardised mean difference
 ```
 
 ```{r}
