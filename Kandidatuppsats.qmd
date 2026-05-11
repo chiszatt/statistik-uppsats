@@ -24,14 +24,14 @@ format:
         {\large \today\par}
         \vspace{3cm}
         
-        {\Huge Charlotte Emily Iszatt and Milou Rossi\par}
+        {\Huge Charlotte Emily Iszatt & Milou Rossi\par}
         \vspace{0.1cm}
         
         {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
         \vspace{0.5cm}
         
         {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
-        
+
         \vfill
         
         \end{titlepage}
@@ -118,7 +118,7 @@ The choice of inclusion strategy also has important implications for statistical
 
 ## Research Aims
 
-This study investigates the prediction of AD/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches. More precisely, the research questions are:
+This study investigates the prediction of AD/dementia progression using longitudinal biomarker data, comparing traditional and advanced statistical approaches, different biomarkers as well as the number of biomarker measurements per individual. More precisely, the research questions are:
 
 1.  Which modeling approach provides the best prediction of progression to dementia due to AD when using longitudinal blood biomarker data? (Including baseline levels, single-biomarker joint models, multivariate joint models, univariate latent class joint models and multivariate latent class joint models)
 2.  How do these associations differ between p-tau181 and NfL? (Comparison across biomarkers)
@@ -126,19 +126,23 @@ This study investigates the prediction of AD/dementia progression using longitud
 
 # Methodology
 
-To address the research questions, a series of models will be implemented and compared. First, Cox proportional hazards (Cox PH) models will be fitted using baseline biomarker levels as covariates to assess their association with progression to dementia due to AD. Second, univariate joint models will be applied to simultaneously model the longitudinal trajectories of each biomarker separately and their association with the survival outcome. Third, multivariate joint models will be used to jointly model both biomarker trajectories simultaneously, allowing for the estimation of their combined and potentially correlated effects on disease progression. Finally, a latent class joint modelling approach will be implemented to account for unobserved heterogeneity in longitudinal biomarker trajectories and risk of progression by identifying possible latent subgroups. A univariate joint latent class model will be fit for NfL and p-tau181 trajectories seperately, which is then compared with a multivariate joint latent class model which models both NfL and p-tau181 simultaneously. All models will also be adjusted for relevant covariates. The significance level will be set at 0.05 for all analyses.
+To address the research questions, a series of statistical models will be implemented. In all models, time to progression to dementia due to AD, defined by the first recorded diagnosis of dementia, is the survival outcome.
 
-To investigate differences between p-tau181 and NfL, the modelling frameworks will be applied separately for each biomarker, followed by a comparative evaluation of their predictive performance and estimated associations with clinical progression. Subsequently, the data will be divided into in-sample data and out-of-sample data, where the in-sample data are used for model development and the out–of-sample data are reserved for model evaluation. This is done to ensure an unbiased assessment of how well the models generalise to unseen data.
+First, Cox proportional hazards (Cox PH) models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, univariate joint models will be applied to link each biomarker’s longitudinal trajectory to the survival outcome. Third, multivariate joint models will jointly model both biomarker trajectories to capture their combined and potentially correlated effects on disease progression. Finally, latent class joint models will be used to identify subgroups with distinct longitudinal patterns and associated progression risks. Both univariate and multivariate latent class models will be evaluated.
 
-Model performance will be evaluated using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, the prediction horizon varies across studies, but a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects the typical disease course, where a substantial proportion of individuals with MCI convert to dementia within a few years of follow-up; around one-third of individuals with MCI due to AD progress to dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and horizons of 2, 3, 4, 5, and 6 years were selected to capture short- to mid-term progression.
+All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ status. In the joint models, these covariates will be included in both submodels to account for potential confounding when estimating the association between biomarker trajectories and disease progression. The significance level will be set at 0.05 for all analyses.
+
+Subsequently, the different modelling frameworks will be compared, as well as the estimated associations of p-tau181 and NfL with disease progression. This will be done by evaluating their predictive performance. To ensure an unbiased assessment of model performance and generalisability, the data will be split into in-sample and out-of-sample sets, where the in-sample data are used for model development and the out-of-sample data are reserved for evaluation.
+
+Model performance will be assessed using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression.
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
-There exists a wide range of biomarkers for AD that could be investigated in this context. However, given that plasma-based biomarkers have only relatively recently gained attention in research, their inclusion was considered both timely and relevant. Accordingly, the two biomarkers included in the analyses are p-tau181 and NfL. They were selected due to their established relevance in the prediction of dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. Even though other clinically relevant biomarkers are available, they were not included due to the limited availability of sufficiently large longitudinal datasets with repeated measurements. In this study, priority was given to data quality and longitudinal depth rather than the number of biomarkers considered. In addition, the selected biomarkers represent biologically distinct processes: p-tau181 is more specifically associated with AD pathology, while NfL reflects more general neuroaxonal damage and is not disease-specific. This contrast makes them particularly informative for comparative analyses of biomarker behaviour and predictive performance in dementia progression.
+There is a wide range of biomarkers for AD that could be investigated in this context. However, given the relatively recent focus on plasma-based biomarkers in research, their inclusion was considered timely and relevant. Accordingly, the two biomarkers included in the analyses are p-tau181 and NfL. They were selected due to their established relevance for predicting dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. In addition, they reflect two distinct pathological processes, making them suitable for comparative analyses of disease progression.
 
-Additional modelling approaches could have been considered given the aims of the study. Given the limited time and scope of this thesis, however, including a larger number of modelling frameworks would have reduced the ability to investigate each approach in sufficient depth. Therefore, a smaller set of models was selected in order to allow for a more detailed and meaningful comparison. The chosen models were selected based on their methodological relevance and their ability to capture different aspects of the data, thereby providing a broad overview of alternative approaches for modelling longitudinal biomarker data and survival outcomes.
+Furthermore, additional modelling approaches could have been considered given the aims of the study. However, due to the limited time and scope of this thesis, including more modelling frameworks would have reduced the ability to study each approach in enough detail. Therefore, a smaller set of models was selected to allow for a more detailed and meaningful comparison. The chosen models were based on their methodological relevance and their ability to capture different aspects of the data, providing an overview of different approaches for modelling longitudinal biomarker data and survival outcomes.
 
-The modelling approaches will be applied to data obtained from the ADNI dataset and handled in accordance with their data use and access policies (ADNI, n.d.-b).
+The modelling approaches will be applied to data from the ADNI dataset, in accordance with its data use and access policies (ADNI, n.d.-b).
 
 ***Data used in the preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). The current goals include validating biomarkers for clinical trials, improving the generalizability of ADNI data by increasing diversity in the participant cohort, and to provide data concerning the diagnosis and progression of Alzheimer’s disease to the scientific community. For up-to-date information, see adni.loni.usc.edu.***
 
@@ -150,7 +154,7 @@ The modelling approaches will be applied to data obtained from the ADNI dataset 
 
 **Suggested shorter version:**
 
-All of the modeling appraoches considered in this study are grounded in the survival analysis framework, where both the outcome of an event and the time from start of follow-up, or baseline time, until it's occurrence are modeled (Ranganathan, Deo & Pramesh, 2025, p. ?). In this analysis, ptau-181 and NfL levels as well as diagnosis status are known at baseline, and the event of interest is dementia diagnosis. Additionally, individuals are either right-censored, meaning that they do not develop dementia during the follow-up period, or they are interval censored, meaning that the exact date of dementia occurrence is not known. This is due to diagnoses being made yearly, and as such the exact date of transition to dementia can be at best approximated.**\*\*\* Jag tror inte att man ska tillämpa teorin på egna datan under teori-delen, utan teori-delen ska bara vara beskrvining av teori-bakgrunden, fakta liksom.**
+All of the modeling appraoches considered in this study are grounded in the survival analysis framework, where both the outcome of an event and the time from start of follow-up, or baseline time, until it's occurrence are modeled (Ranganathan, Deo & Pramesh, 2025, p. ?). In this analysis, ptau-181 and NfL levels as well as diagnosis status are known at baseline, and the event of interest is dementia diagnosis. Additionally, individuals are either right-censored, meaning that they do not develop dementia during the follow-up period, or they are interval censored, meaning that the exact date of dementia occurrence is not known. This is due to diagnoses being made yearly, and as such the exact date of transition to dementia can be at best approximated.
 
 *As all modeling approaches considered in this study aim to model time to progression to AD, they are grounded in the survival analysis framework. Survival analysis, also known as time-to-event analysis, focuses on both whether an event occurs and the time from the start of follow-up until its occurrence (Ranganathan, Deo & Pramesh, 2025, p. ?). The start of follow-up, also referred to as baseline, is defined as an initial measurement taken at an early time point that serves as a reference for assessing changes over time (NCI, n.d.).*
 
@@ -453,7 +457,7 @@ The data used in this analysis comes from the ADNI cohort under the ADNI1 and AD
 
 The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database, which include various datasets all containing different variables related to the study of Alzheimer's.
 
-The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals with three cohorts with a final diagnosis of cognitively normal (CN) participants (n = 358), participants with mild cogntive impairment (MCI, n = 421) and with dementia due to AD (n = 411). Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768 with final diagnoses of CN (n = 241), MCI (290) or AD dementia (n = 237). In the reduced sample size, 67 individuals were included who had dementia diagnoses at baseline and 178 individuals transitioned from either CN or MCI to AD dementia.
+The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
 
 **REPORT ON TRANSITIONS...**
 
@@ -465,9 +469,9 @@ Under this section, all variables used in the analysis will be described, along 
 
 The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
 
-The variable was retrieved from the dataset DXSUM in ADNIMERGE2. For the 1190 included participants, the observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
+The variable was retrieved from the DXSUM dataset in ADNIMERGE2. For the 1190 included participants, observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
 
-To define the outcome for the survival analyses, the study focuses on time to incident dementia, where participants are classified as either non-demented or demented. The first recorded diagnosis of dementia is used to define the event, while participants without a dementia diagnosis are censored at their last available visit. This definition is applied consistently in both the standard Cox PH models and the survival submodel (Cox component) of the joint models.
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states.
 
 *Skriva något om hur regelbundna besöken är.*
 
@@ -475,37 +479,29 @@ To define the outcome for the survival analyses, the study focuses on time to in
 
 ### P-tau181
 
-P-tau181 is a continuous numerical variable representing one of the two plasma biomarkers used to potentially improve prediction of participants’ progression to dementia. It was retrieved from the dataset UGOPTAU181 in ADNIMERGE2, for which the data was analyzed by the University of Gothenburg (ADNI, n.d.-b). In contrast to the diagnostic data, the p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that there are diagnostic visits without corresponding p-tau181 measurements. The biomarker measurements are observed 3647 times across the 1190 included participants. However, the unit of measurement is not specified in the dataset documentation.
+P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. It was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b).
 
-P-tau181 is used differently across the modelling frameworks. In the standard Cox PH models, baseline p-tau181 values are included as a covariate to assess their association with subsequent risk of progression to AD/dementia. In the joint models, p-tau181 is modelled longitudinally using a LME submodel, where repeated measurements over time are used to describe individual biomarker trajectories. These longitudinal trajectories are then linked to the survival submodel (Cox component), allowing for assessment of how changes in p-tau181 over time are associated with the hazard of progression.
+In contrast to the diagnostic data, p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits lack corresponding biomarker measurements. The dataset contains 3647 p-tau181 measurements across 1190 participants. However, the unit of measurement is not specified in the dataset documentation.
 
 ### NfL
 
-NfL, a continuous numerical variable, represents the other plasma biomarker with potential to improve prediction of participants’ progression to dementia. It was retrieved from the dataset "BLENNOWPLASMANFLLONG" in ADNIMERGE2 and the data was collected by the Blennow Lab (ADNI, n.d.-b). Similarly to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits do not have corresponding biomarker measurements. The biomarker is observed 3647 times across the 1191 included individuals. Once again, however, the unit of measurement is not specified in the dataset documentation.
+NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were collected by the Blennow Lab (ADNI, n.d.-b).
 
-NfL is also used in different ways across the modelling frameworks. In the standard Cox PH models, baseline NfL values are included as a covariate to assess their association with risk of progression to AD/dementia. In the joint models, NfL is modelled longitudinally using a LME submodel based on repeated measurements over time. These trajectories are then linked to the survival submodel (Cox component), allowing for estimation of how longitudinal changes in NfL are associated with the hazard of progression.
+Similar to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, resulting in some diagnostic visits without corresponding biomarker measurements. The dataset contains 3647 NfL measurements across the 1190 included participants. As for p-tau181, the unit of measurement is not specified in the dataset documentation.
 
 ### Age
 
-Additionally, the participants’ age is included as a covariate when predicting progression to dementia, to examine how the risk of dementia changes with age. This variable, together with the following variable, were retrieved from the dataset PTDEMOG.
-
-The variable is initially coded numerically as the year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants, and is then transformed into age at visit and age at baseline visit, which are more suitable for use in the analyses.
-
-In the standard Cox PH models, age at baseline (age_at_baseline) is included as a fixed covariate to adjust for differences in baseline risk of progression to AD/dementia. In the joint models, age at baseline is likewise included as a fixed covariate in the survival submodel (Cox PH component), ensuring appropriate adjustment for baseline age when estimating the association between longitudinal biomarker trajectories and risk of progression.
+Additionally, age is included as a covariate when predicting progression to dementia, to examine how dementia risk changes with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
 
 ### Gender
 
-Another covariate of interest when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This variable is binary, with two categories: male and female. Among the 1190 participants, 543 were female and 647 were male.
-
-Sex is included as a fixed covariate in all statistical models. In the standard Cox PH models, it is used to estimate sex-specific differences in the risk of progression to AD/dementia, adjusted for other covariates. In the joint models, sex is included as a fixed covariate in both submodels. In the survival submodel (Cox PH component), it accounts for potential differences in the hazard of progression between males and females. In the longitudinal submodel (LME component), it is included as a baseline covariate to account for potential differences in biomarker levels between sexes.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
 
 ### APOE4-status
 
 Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset.
 
 Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the 1190 included participants, 672 were non-carriers, 417 were heterozygous carriers, and 101 were homozygous carriers.
-
-APOE-$\epsilon 4$ status is included as a fixed covariate in all statistical models. In the standard Cox PH models, it is used to assess whether genetic risk is associated with progression to AD/dementia. In the joint models, APOE-$\epsilon 4$ status is included as a fixed covariate in both submodels. In the survival submodel (Cox PH component), it allows for estimation of genotype-specific differences in the hazard of progression. In the longitudinal submodel (LME component), it is included as a baseline covariate to account for potential differences in biomarker levels between genotype groups.
 
 # Pre-Processing
 
