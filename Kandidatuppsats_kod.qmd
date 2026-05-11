@@ -40,17 +40,17 @@ knitr::opts_chunk$set(echo = TRUE, output = TRUE)
 # Pre-processing
 
 ```{r, warning=FALSE}
-# loading libraries
+# Loading libraries
 library(dplyr)
 library(tidyr)
+library(corrplot)
 library(JMbayes2)
 library(JM)
-library(lme4) # decide which package will we use for lme
-library(nlme) # decide which package will we use for lme
+library(nlme) 
 library(survival)
 library(ggplot2)
 library(glmmTMB)
-library(DHARMa) # for running residual diagnostics on GLMM
+library(DHARMa) 
 library(lcmm)
 library(timeROC)
 library(kableExtra)
@@ -69,20 +69,20 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 # Loading data
 # Milou
 # NfL data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-#  nfl_data <- BLENNOWPLASMANFLLONG
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+  nfl_data <- BLENNOWPLASMANFLLONG
 # # # P-tau181 data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-#  ptau_data <- UGOTPTAU181
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+  ptau_data <- UGOTPTAU181
 # # # Diagnosis data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-#  diagnosis_data <- DXSUM
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+  diagnosis_data <- DXSUM
 # # # Demographics data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-#  demographics <- PTDEMOG
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+  demographics <- PTDEMOG
 # # # Apoe data
-#  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-#  apoe <- APOERES
+  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+  apoe <- APOERES
 ```
 
 ```{r}
@@ -333,13 +333,6 @@ sapply(long_data, function(x) sum(is.na(x)))
 sapply(surv_data, function(x) sum(is.na(x)))
 ```
 
-## Checking correlation between biomarkers
-
-```{r}
-# Correlation between the biomarkers 
-cor(long_data$PLASMAPTAU181, long_data$PLASMA_NFL, use = "complete.obs")
-```
-
 ## Merging selected demographic variables (age and gender) and APOE4 status
 
 ```{r}
@@ -360,7 +353,6 @@ apoe <- apoe %>%
 
 apoe$APOE4_status <- factor(apoe$APOE4_status,
                             levels = c("0 alleles", "1 allele", "2 alleles"))
-
 ```
 
 ```{r}
@@ -664,7 +656,47 @@ table(surv_data_out$event)
 49/176
 ```
 
-## ...
+## Checking correlation between the biomarkers as well as the numerical variables going to be used in the models
+
+```{r}
+# Correlation between the biomarkers 
+cor(long_data_in$PLASMAPTAU181, long_data_in$PLASMA_NFL, use = "complete.obs")
+```
+
+```{r}
+# Saving the numerical variables used in the Cox PH models
+cox_vars <- surv_data_in[, c("age_at_baseline",
+                              "baseline_value_ptau",
+                              "baseline_value_nfl")]
+
+# Computing correlation matrix for Cox model variables
+cox_cor <- cor(cox_vars, use = "complete.obs")
+
+# Visualising correlations
+corrplot(cox_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+
+
+# Saving the numerical variables used in the LME models
+lme_vars <- long_data_in[, c("time_years",
+                             "log_PLASMAPTAU181",
+                             "log_PLASMA_NFL")]
+
+# Computing correlation matrix for LME model variables
+lme_cor <- cor(lme_vars, use = "complete.obs")
+
+# Visualising correlations 
+corrplot(lme_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+```
 
 # Longitudinal models
 
@@ -1070,7 +1102,7 @@ dev.off()
 
 ## For the different cox PH models and the separate joint models
 
-## Fitted standard Cox PH models (for the joint models)
+## Fitted standard Cox PH model (for the joint models)
 
 #### With all genotype levels
 
