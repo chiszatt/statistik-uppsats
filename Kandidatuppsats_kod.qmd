@@ -1309,12 +1309,6 @@ chi_both <- anova_both[2,2]
 ```
 
 ```{r}
-anova_ptau
-anova_nfl
-anova_both
-```
-
-```{r}
 # Saving a table of results from the likelihood ratio tests
 surv_lrt_table <- data.frame(
   "Model" = c("ptau-181 baseline", "NfL baseline", "ptau-181 and NfL baseline"),
@@ -1325,7 +1319,8 @@ surv_lrt_table <- data.frame(
 ```
 
 ```{r}
-surv_lrt_table
+# Saving the cox models comparison table
+saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
 ```
 
 ### Cox comparison table

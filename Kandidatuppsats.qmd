@@ -593,7 +593,7 @@ knitr::kable(readRDS("tables/table_cox.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
-Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (**TABLE FOR THESE RESULTS**) these variables were included due to clinical relevance.
+Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (**APPENDIX, table??**) these variables were included due to clinical relevance.
 
 In contrast, APOE-$ε4$ status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of $ε4$ alleles carried. Individuals carrying one $ε4$ allele had approximately a twofold increased hazard across models, whereas individuals carrying two $ε4$ alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two $ε4$ alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
 
@@ -998,6 +998,13 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ```{r, echo=FALSE}
 knitr::kable(readRDS("tables/table_ph.rds"))  %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+## Appendix X: results from the likelihood ratio test for the Cox PH models with and without gender as a covariate
+
+```{r}
+knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
