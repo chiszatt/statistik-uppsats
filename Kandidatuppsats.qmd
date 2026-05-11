@@ -108,7 +108,7 @@ Additionally, for understanding the natural history of a disease, researchers in
 
 Similarly, in an article from 2026, researchers applied a multi-dimensional joint latent class model to capture heterogeneity in the trajectories of three cognitive domains from the time of Alzheimer’s dementia diagnosis: memory, language, and executive functioning (Scollard et al., p. 383). They identified five latent classes differentiated by overall level of impairment, ranging from high to low, and rate of decline, from slow to fast. Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research. Since there is evidence to support AD as a heterogeneous disease with differing disease trajectories (**SOURCE**), a latent class joint model could be employed to assess whether individuals can be categorised into meaningful classes based on NfL and p-tau181 trajectories alongside survival data.
 
-Thus, the question arises as to which modeling approach is best suited for predicting progression to AD dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD, specifically focusing on plasma biomarkers such as NfL and p-tau.
+Thus, the question arises as to which modeling approach is best suited for predicting progression to AD dementia when considering the added value of longitudinal biomarker information. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD, specifically focusing on plasma biomarkers such as NfL and p-tau. **Frågan är även om NfL alltid ger bättre prediction än P-tau181, oavsett metod.**
 
 Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to AD explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, p. 591-592).
 
@@ -557,11 +557,9 @@ In comparison, when restricting the analysis to participants with at least one b
 
 *Present the results from our analyses. Do not interpret results here! That should be done in the discussion.*
 
-The results are structured in two parts. Part 1 includes participants with three or more biomarker measurements, while Part 2 repeats the same analyses including all participants with at least one biomarker measurement.
+## Cox PH Models
 
-## Including Participants With Three or More Biomarker Measurements
-
-### Cox PH Models
+### Including Participants With Three or More Biomarker Measurements
 
 To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox PH models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Additional covariates were gender, age at baseline and APOE genotype. Initially fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
@@ -606,7 +604,23 @@ knitr::kable(readRDS("tables/c_index_table.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
-### Joint Models
+### Including Participants With At Least One Biomarker Measurement
+
+**\*\*Lägga till kort om att PH assumption fortfarande såg bra ut, att age at baseline fortfarande bröt mot antagandet och därför togs bort även här.**
+
+**Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, we observe that the inclusion of individuals with fewer repeated observations primarily increases sample size and statistical power, while having limited impact on the direction of the estimated effects for the strongest biological predictors.**
+
+**Across both model specifications, APOE-**$ε4$ **remains the strongest and most stable genetic predictor of progression. Hazard ratios are very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals are of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.**
+
+**For the biomarkers, both ptau and NfL are consistently associated with progression, but NfL shows stronger effects and slightly lower uncertainty than ptau across both cohorts. For example, in single-biomarker models, NfL shows higher hazard ratios than ptau and generally slightly narrower confidence intervals, indicating more precise estimation of its association.**
+
+**When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both model specifications. Effect sizes are slightly lower compared to single-biomarker models, and confidence intervals are somewhat wider, consistent with shared variance between biomarkers, but the relative ranking between ptau and NfL is unchanged.**
+
+**In contrast, sex shows no association with progression in any of the models, ith hazard ratios close to one and confidence intervals of similar width across both cohorts, indicating stable but non-informative estimates.**
+
+## Joint Models
+
+### Including Participants With Three or More Biomarker Measurements
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
@@ -621,10 +635,6 @@ To ensure proper model convergence, trace plots of the $α$-parameter were exami
 ![](figures/convergence_plot_ptau.png){width="400"}
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence. A similar pattern was observed for the joint model of NfL, as shown in Figure 2.
-
-**Figure 2: trace plot of the** $α$**-parameter for the joint model of NfL.**
-
-![](figures/convergence_plot_nfl.png)
 
 The chains likewise fluctuated around a stable mean value with good mixing, indicating convergence of the $α$-parameter comparable to the joint model of p-tau181. Finally, the multivariate joint model also exhibited a similar overall behaviour, as shown in Figure 3.
 
@@ -671,7 +681,23 @@ Both longitudinal p-tau181 and longitudinal NfL were significantly associated wi
 
 In the multivariate joint model including both biomarkers simultaneously, both p-tau181 and NfL remained significantly associated with progression. However, the estimated effects were attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 2.30 and NfL showing a hazard ratio of 2.36. This attenuation suggests that the biomarkers capture partly overlapping information related to disease progression, while still retaining independent prognostic value. The confidence intervals for both biomarkers were somewhat wider in the multivariate model, reflecting increased uncertainty due to the correlation between the longitudinal biomarker processes.
 
-### Joint Latent Class Mixed Models
+### Including Participants With At Least One Biomarker Measurement
+
+**\*\*Lägga till kort om att residualerna och QQ-plots inte ändrades drastikt, att convergence fortfarande ser bra ut.**
+
+**When extending the comparison to the joint models, a similar overall pattern is observed, with consistent findings across model specifications and stable confidence interval widths, indicating preserved precision across analyses. There is a clearer separation in effect magnitudes between biomarkers, while uncertainty remains broadly comparable between models.**
+
+**In the joint models, APOE-**$ε4$ **remains a strong and stable predictor of progression. Hazard ratios are slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remain well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.**
+
+**For the longitudinal biomarkers, a clearer separation between ptau and NfL is observed. In both model settings, NfL consistently shows a stronger association with progression than ptau. In the first joint model, ptau has a hazard ratio around 3.3, while NfL is around 3.5, and in the more inclusive model these increase to approximately 4.5 for ptau and 5.5 for NfL. NfL also tends to show slightly narrower confidence intervals than ptau, indicating lower uncertainty in its estimated association.**
+
+**When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both joint model specifications. Effect sizes are slightly lower compared to models with single biomarkers, and confidence intervals are correspondingly wider, consistent with shared variance between biomarkers.**
+
+**Sex also remains non-significant across all joint models, with no meaningful differences between model specifications.**
+
+## Joint Latent Class Mixed Models
+
+### Including Participants With Three or More Biomarker Measurements
 
 For all models, a Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution.
 
@@ -765,38 +791,6 @@ Assessment of the posterior probabilities for the two class model shows both rea
 knitr::kable(readRDS("tables/postprob_ptau_nfl.rds")) %>%
   kable_styling(latex_options = "hold_position")
 ```
-
-## Including Participants With One or More Biomarker Measurements
-
-### Cox PH Models
-
-**\*\*Lägga till kort om att PH assumption fortfarande såg bra ut, att age at baseline fortfarande bröt mot antagandet och därför togs bort även här.**
-
-When comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, we observe that the inclusion of individuals with fewer repeated observations primarily increases sample size and statistical power, while having limited impact on the direction of the estimated effects for the strongest biological predictors.
-
-Across both model specifications, APOE-$ε4$ remains the strongest and most stable genetic predictor of progression. Hazard ratios are very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals are of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.
-
-For the biomarkers, both ptau and NfL are consistently associated with progression, but NfL shows stronger effects and slightly lower uncertainty than ptau across both cohorts. For example, in single-biomarker models, NfL shows higher hazard ratios than ptau and generally slightly narrower confidence intervals, indicating more precise estimation of its association.
-
-When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both model specifications. Effect sizes are slightly lower compared to single-biomarker models, and confidence intervals are somewhat wider, consistent with shared variance between biomarkers, but the relative ranking between ptau and NfL is unchanged.
-
-In contrast, sex shows no association with progression in any of the models, ith hazard ratios close to one and confidence intervals of similar width across both cohorts, indicating stable but non-informative estimates.
-
-### Joint Models
-
-**\*\*Lägga till kort om att residualerna och QQ-plots inte ändrades drastikt, att convergence fortfarande ser bra ut.**
-
-When extending the comparison to the joint models, a similar overall pattern is observed, with consistent findings across model specifications and stable confidence interval widths, indicating preserved precision across analyses. There is a clearer separation in effect magnitudes between biomarkers, while uncertainty remains broadly comparable between models.
-
-In the joint models, APOE-$ε4$ remains a strong and stable predictor of progression. Hazard ratios are slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remain well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
-
-For the longitudinal biomarkers, a clearer separation between ptau and NfL is observed. In both model settings, NfL consistently shows a stronger association with progression than ptau. In the first joint model, ptau has a hazard ratio around 3.3, while NfL is around 3.5, and in the more inclusive model these increase to approximately 4.5 for ptau and 5.5 for NfL. NfL also tends to show slightly narrower confidence intervals than ptau, indicating lower uncertainty in its estimated association.
-
-When both biomarkers are included simultaneously, the same pattern remains, with NfL consistently showing higher hazard ratios than ptau in both joint model specifications. Effect sizes are slightly lower compared to models with single biomarkers, and confidence intervals are correspondingly wider, consistent with shared variance between biomarkers.
-
-Sex also remains non-significant across all joint models, with no meaningful differences between model specifications.
-
-### Joint Latent Class Mixed Models
 
 The JLCMM with longitudinal ptau-181 measurements
 
@@ -1025,6 +1019,10 @@ knitr::kable(readRDS("tables/surv_lrt_table.rds"))  %>%
 ## Appendix 7: Q-Q plot of the LME model for NfL
 
 ![](figures/qq_nfl.png){width="400"}
+
+## Appendix X: trace plot of the $α$-parameter for the joint model of NfL
+
+## Appendix X: trace plot of the $α$-parameter for the multivariate joint model
 
 ## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
 
