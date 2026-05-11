@@ -559,8 +559,6 @@ In comparison, when restricting the analysis to participants with at least one b
 
 ## Cox PH Models
 
-### Including Participants With Three or More Biomarker Measurements
-
 To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox PH models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Additional covariates were gender, age at baseline and APOE genotype. Initially fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
 Prior to interpreting the estimated hazard ratios, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent joint models also require a standard Cox PH model, this assumption was additionally evaluated for this model. The resulting p-values are presented in Appendix 1.
@@ -604,8 +602,6 @@ knitr::kable(readRDS("tables/c_index_table.rds")) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
-### Including Participants With At Least One Biomarker Measurement
-
 **\*\*Lägga till kort om att PH assumption fortfarande såg bra ut, att age at baseline fortfarande bröt mot antagandet och därför togs bort även här.**
 
 **Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, we observe that the inclusion of individuals with fewer repeated observations primarily increases sample size and statistical power, while having limited impact on the direction of the estimated effects for the strongest biological predictors.**
@@ -619,8 +615,6 @@ knitr::kable(readRDS("tables/c_index_table.rds")) %>%
 **In contrast, sex shows no association with progression in any of the models, ith hazard ratios close to one and confidence intervals of similar width across both cohorts, indicating stable but non-informative estimates.**
 
 ## Joint Models
-
-### Including Participants With Three or More Biomarker Measurements
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
@@ -681,8 +675,6 @@ Both longitudinal p-tau181 and longitudinal NfL were significantly associated wi
 
 In the multivariate joint model including both biomarkers simultaneously, both p-tau181 and NfL remained significantly associated with progression. However, the estimated effects were attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 2.30 and NfL showing a hazard ratio of 2.36. This attenuation suggests that the biomarkers capture partly overlapping information related to disease progression, while still retaining independent prognostic value. The confidence intervals for both biomarkers were somewhat wider in the multivariate model, reflecting increased uncertainty due to the correlation between the longitudinal biomarker processes.
 
-### Including Participants With At Least One Biomarker Measurement
-
 **\*\*Lägga till kort om att residualerna och QQ-plots inte ändrades drastikt, att convergence fortfarande ser bra ut.**
 
 **When extending the comparison to the joint models, a similar overall pattern is observed, with consistent findings across model specifications and stable confidence interval widths, indicating preserved precision across analyses. There is a clearer separation in effect magnitudes between biomarkers, while uncertainty remains broadly comparable between models.**
@@ -696,8 +688,6 @@ In the multivariate joint model including both biomarkers simultaneously, both p
 **Sex also remains non-significant across all joint models, with no meaningful differences between model specifications.**
 
 ## Joint Latent Class Mixed Models
-
-### Including Participants With Three or More Biomarker Measurements
 
 For all models, a Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution.
 
