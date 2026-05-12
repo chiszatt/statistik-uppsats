@@ -69,30 +69,30 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 # Loading data
 # Milou
 # NfL data
-#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-#   nfl_data <- BLENNOWPLASMANFLLONG
+   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+   nfl_data <- BLENNOWPLASMANFLLONG
 # # # # P-tau181 data
-#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-#   ptau_data <- UGOTPTAU181
+   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+   ptau_data <- UGOTPTAU181
 # # # # Diagnosis data
-#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-#   diagnosis_data <- DXSUM
+   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+   diagnosis_data <- DXSUM
 # # # # Demographics data
-#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-#   demographics <- PTDEMOG
+   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+   demographics <- PTDEMOG
 # # # # Apoe data
-#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-#   apoe <- APOERES
+   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+   apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -525,7 +525,57 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-# Checking distribution of each biomarker
+## Summaries and distributions of the model variables 
+
+```{r}
+# Summaries of p-tau181, NfL and age at baseline
+summary(long_data[, c("PLASMAPTAU181", "PLASMA_NFL")])
+summary(surv_data$age_at_baseline)
+
+# Examination date ranges (biomarkers)
+range(long_data$EXAMDATE_ptau, na.rm = TRUE)
+range(long_data$EXAMDATE_nfl, na.rm = TRUE)
+
+# Number of measurements per participant (p-tau181)
+ptau_table <- long_data %>%
+  filter(!is.na(PLASMAPTAU181)) %>%
+  count(RID) %>%
+  count(n, name = "n_RID")
+
+ptau_table
+
+# Number of measurements per participant (NfL)
+nfl_table <- long_data %>%
+  filter(!is.na(PLASMA_NFL)) %>%
+  count(RID) %>%
+  count(n, name = "n_RID")
+
+nfl_table
+
+# Distributions of gender and APOE4 status
+table(surv_data$PTGENDER)
+table(surv_data$genotype)
+```
+
+## Checking outliers
+
+Checking for extreme observations shows there are no values 3 standard deviations below the mean, only above. An assessment of these more extreme observations suggests that they are within a reasonable range and are assumed to be correct observations.
+
+```{r}
+# We identify "extreme" values
+
+# Values greater than 3 sd above ptau mean
+long_data[scale(long_data$PLASMAPTAU181) > 3, ]
+# Values smaller than 3 sd below ptau mean
+long_data[scale(long_data$PLASMAPTAU181) < -3, ]
+
+# Values greater than 3 sd above nfl mean
+long_data[scale(long_data$PLASMA_NFL) > 3, ]
+# Values smaller than 3 sd below nfl mean
+long_data[scale(long_data$PLASMA_NFL) < -3, ]
+```
+
+## Transformation of the biomarkers
 
 ```{r}
 # We check the distribution of each biomarker
@@ -592,24 +642,6 @@ dev.off()
 # Transforming the baseline values in the survival data
 surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
 surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
-```
-
-## Checking outliers
-
-Checking for extreme observations shows there are no values 3 standard deviations below the mean, only above. An assessment of these more extreme observations suggests that they are within a reasonable range and are assumed to be correct observations.
-
-```{r}
-# We identify "extreme" values
-
-# Values greater than 3 sd above ptau mean
-long_data[scale(long_data$PLASMAPTAU181) > 3, ]
-# Values smaller than 3 sd below ptau mean
-long_data[scale(long_data$PLASMAPTAU181) < -3, ]
-
-# Values greater than 3 sd above nfl mean
-long_data[scale(long_data$PLASMA_NFL) > 3, ]
-# Values smaller than 3 sd below nfl mean
-long_data[scale(long_data$PLASMA_NFL) < -3, ]
 ```
 
 ## Rechecking longitudinal and survival data lengths
@@ -699,6 +731,27 @@ corrplot(lme_cor,
          addCoef.col = "black",
          tl.col = "black",
          tl.srt = 45)
+```
+
+```{r}
+# Saving the correlation plots 
+png("figures/corrplot_cox.png", width = 400, height = 300)
+corrplot(cox_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+dev.off()
+
+png("figures/corrplot_lme.png", width = 400, height = 300)
+corrplot(lme_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+dev.off()
 ```
 
 # Longitudinal models
@@ -1591,15 +1644,15 @@ fForms <- list(
 ## Fitted multivariate joint model
 
 ```{r}
-# multi_joint_model <- jm(surv_model_final, mixed ,
-#                         time_var = "time_years",
-#                         functional_forms = fForms,
-#                         n_chains = 3L,
-#                         n_iter = 20000L,
-#                         n_burnin = 2000L
-#                         )
-# 
-# summary(multi_joint_model)
+multi_joint_model <- jm(surv_model_final, mixed ,
+                         time_var = "time_years",
+                         functional_forms = fForms,
+                         n_chains = 3L,
+                         n_iter = 20000L,
+                         n_burnin = 2000L
+                         )
+ 
+ summary(multi_joint_model)
 ```
 
 ```{r}
@@ -1612,6 +1665,18 @@ fForms <- list(
 # png("figures/convergence_plot_multi.png", width = 400, height = 300)
 # ggtraceplot(multi_joint_model, "alphas")
 # dev.off()
+```
+
+```{r}
+multi_convergence_plots <- ggtraceplot(multi_joint_model, "alphas")
+
+png("figures/convergence_plot1_multi.png", width = 400, height = 300)
+print(multi_convergence_plots[[1]])
+dev.off()
+
+png("figures/convergence_plot2_multi.png", width = 400, height = 300)
+print(multi_convergence_plots[[2]])
+dev.off()
 ```
 
 ### Joint model comparison table
