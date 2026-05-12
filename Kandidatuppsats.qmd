@@ -514,11 +514,11 @@ Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a
 
 Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the 1190 included participants, 672 were non-carriers, 417 were heterozygous carriers, and 101 were homozygous carriers.
 
-# Data preprocessing and descriptive analysi
+# Data Pre-processing and Descriptive Analysis
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
 
-## Missing values
+## Missing Values
 
 All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
 
@@ -542,7 +542,7 @@ However, in 82 observations, discrepancies were observed between p-tau181 and Nf
 
 Related to this, sensitivity analyses were also performed in which baseline was alternatively defined as either the earliest biomarker examination date or the first diagnostic visit. These analyses showed no meaningful differences in model precision, indicating robustness to the choice of time origin.
 
-## Division Into In And Out-Datasets
+## Division Into In-Sample And Out-of-Sample Datasets
 
 The analyzed data were split so that the in-dataset comprised three quarters of the total data and the out-dataset comprised one quarter.
 
@@ -570,9 +570,8 @@ At a 5% significance level, most covariates satisfied the proportional hazards a
 
 Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models therefore yielded the p-values presented in Table 1.
 
-**Table 1: p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models.**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "P-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
 kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
@@ -580,9 +579,8 @@ After excluding age at baseline, the GLOBAL test yielded p-values above the 5% s
 
 As the proportional hazards assumption was met in the refitted models, the results can be interpreted in terms of hazard ratios, which are, together with 95% confidence intervals and p-values, presented in Table 2 for the Cox PH models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline.
 
-**Table 2: hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers"
 kable_standard(readRDS("tables/table_cox.rds"))
 ```
 
@@ -596,9 +594,8 @@ In the Cox PH model including both biomarkers simultaneously, the results were s
 
 An initial comparison of model performance by assessment of the concordance indices for all cox models was performed. The results presented in **table ?** show that the concordance index evaluates all three models similarly.
 
-**Table ?: concordance indices for all fitted Cox PH models with baseline biomarker values**
-
 ```{r}
+#| tbl-cap: "Concordance indices for all fitted Cox PH models with baseline biomarker values"
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
 
@@ -618,7 +615,7 @@ kable_standard(readRDS("tables/c_index_table.rds"))
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
 
-The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting random effects structures including a random slope. This meant that all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope with fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for ptau-181 (**appendix X**).
+The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for ptau-181 (**appendix X**).
 
 Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
@@ -642,9 +639,8 @@ Compared to the single-biomarker models, the trace plot for the multivariate joi
 
 Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 3.
 
-**Table 3:** $\widehat{\mathbf{R}}$ **values of the survival outcome in the joint models**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
 kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
@@ -652,9 +648,8 @@ The $\widehat{R}$ values for the survival outcomes are all very close to 1, rang
 
 While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each joint model are shown in Table 4.
 
-**Table 4:** $\widehat{\mathbf{R}}$ **values of the longitudinal outcome in the joint models**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
 kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
@@ -662,9 +657,8 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 Subsequently, the hazard ratios from the joint models were estimated and are presented in Table 5, along with 95% confidence intervals and p-values.
 
-**Table 5: hazard ratios with 95% confidence intervals and p-values from the joint models**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
 kable_standard(readRDS("tables/table_jm.rds"))
 ```
 
@@ -694,11 +688,12 @@ Firstly, latent class mixed models were fit on the longitudinal ptau-181 and NfL
 
 **JLCMM of longitudinal ptau-181 measurements and time-to-dementia data**
 
-The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to a lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$). Next, JLCMMs were fit with up to four classes and analysis of their log-likelihoods, BIC and entropy follow.
+The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to a lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
 
-**Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements**
+Next, JLCMMs were fit with up to four classes and analysis of their log-likelihoods, BIC and entropy follow. All parameters in all of the candidate models were significant ($p < 0.001$) and the results are presented in the **appendix (X, X, X, X).**
 
 ```{r}
+#| tbl-cap: "Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
@@ -706,15 +701,13 @@ The results show that both log-likelihood and entropy increase with additional l
 
 The posterior classification table shows the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
-**Table 7: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements**
-
 ```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements"
 kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 ```
 
-**Table 8: posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements**
-
 ```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements"
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
@@ -732,19 +725,17 @@ Figure 4 shows the class-specific survival curves. The probability of remaining 
 
 **JLCMM of longitudinal NfL measurements and time-to-dementia data**
 
-Again, the results of a likelihood ratio test between two models was used to determine the random effects structure. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model with only a random intercept was a better fit for the data.
-
-**Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements**
+Again, the results of a likelihood ratio test between two models was used to determine the random effects structure. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model with only a random intercept was a better fit for the data. Three JLCMMs were fit and all model parameters in all three models were significant ($p < 0.001$, **appendix X, X, X, X**).
 
 ```{r}
+#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
 Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests that the two class model in this instance provides the best method for discriminating latent classes given longitudinal NfL measurements and time-to-diagnosis data. The log-likelihood increases most between the one class and the two class model, and only increases very slightly between the two class and the three class model. The BIC is minimised and entropy is maxmised for the two class model. The posterior probabilities are also analysed in order to ensure good class discrimination.
 
-**Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements**
-
 ```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
@@ -760,19 +751,17 @@ Figure 6 shows the class-specific survival given from the two class JLCMM with l
 
 **Multivariate JLCMM of longitudinal ptau-181 and NfL measurements and time-to-dementia data**
 
-The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC was minimised and the entropy was maximised for the two class model.
-
-**Table 10: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-191 and NfL measurements**
+The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. All model parameters were significant ($p < 0.001$) in all candidate models, and are found in the **appendix (X, X, X)**. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC was minimised and the entropy was maximised for the two class model.
 
 ```{r}
+#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-191 and NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl.rds"))
 ```
 
 Assessment of the posterior probabilities for the two class model shows both reasonable class sizes and good class discrimination.
 
-**Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-191 and NfL measurements**
-
 ```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-191 and NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_ptau_nfl.rds"))
 ```
 
@@ -802,9 +791,8 @@ Compared with the Cox PH models based only on baseline biomarker values, the joi
 
 The joint model including multiple longitudinal biomarkers showed the strongest and most consistent predictive performance across follow-up. During the first two years of follow-up, the single-biomarker joint models also performed well. However, their performance gradually declined relative to the latent class single-biomarker joint models over time. Regardless of modelling approach, models based on longitudinal trajectories of NfL consistently performed slightly better than those based on longitudinal trajectories of p-tau181. Table ?, which presents the time-dependent AUC values for each model at each follow-up time point, confirms these findings.
 
-**Table ?: Time-dependent AUC by model and follow-up time point**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "Time-dependent AUC by model and follow-up time point"
 kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
@@ -832,9 +820,8 @@ Similar to the Cox PH models, the Brier scores are lowest at earlier follow-up t
 
 The same pattern can be observed in Table ?, which presents the time-dependent Brier score values for each model at each follow-up time point.
 
-**Table ?: Time-dependent Brier score by model and follow-up time point**
-
 ```{r, echo=FALSE}
+#| tbl-cap: "Time-dependent Brier score by model and follow-up time point"
 kable_standard(readRDS("tables/results_table_Brier.rds"))
 ```
 
@@ -980,21 +967,24 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 <!-- ![](figures/corrplot_lme.png){width="400"} -->
 
-## Appendix X: results of the likelihood ratio tests to determine the random effects structure for LME models
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Results of the likelihood ratio tests to determine the random effects structure for LME models"
 kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```
 
-## Appendix X: p-values for the proportional hazards assumption tests for all covariates in the Cox PH models
+## Appendix X
 
 ```{r, echo=FALSE}
+#| tbl-cap: "P-values for the proportional hazards assumption tests for all covariates in the Cox PH models"
 kable_standard(readRDS("tables/table_ph.rds"))
 ```
 
-## Appendix X: results of the likelihood ratio test for the Cox PH models with and without gender as a covariate
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without gender as a covariate"
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
@@ -1022,46 +1012,53 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ![](figures/convergence_plot_multi.png){width="400"}
 
-## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
 ```
 
-## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
 ```
 
-## Appendix X: summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for ptau-181
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 ```
 
-## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL"
 kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 ```
 
-## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL
+## Appendix X
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL"
 kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```
 
-## Appendix X: summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181 and NfL
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181 and NfL"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl_full.rds"))
 ```
 
-## Appendix X: summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181 and NfL
+## Appendix X
 
 ```{r}
+#| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181 and NfL"
 kable_standard(readRDS("tables/pprob_m1_ptau_nfl_full.rds"))
 ```
