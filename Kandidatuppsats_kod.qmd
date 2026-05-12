@@ -87,12 +87,12 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -525,7 +525,7 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-## Summaries and distributions of the model variables 
+## Summaries and distributions of the model variables
 
 ```{r}
 # Summaries of p-tau181, NfL and age at baseline
@@ -1401,6 +1401,7 @@ chi_both <- anova_both[2,2]
 ```
 
 ```{r}
+# Viewing the LRT results
 anova_ptau
 anova_nfl
 anova_both
@@ -1414,6 +1415,8 @@ surv_lrt_table <- data.frame(
   "P-value" = c(0.98, 0.95, 0.73),
   check.names = FALSE
   )
+
+saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
 ```
 
 ### Cox comparison table
@@ -1447,7 +1450,7 @@ format_p <- function(x) {
 
 # Extracting models
 ptau_cox <- extract_model_cox(surv_model_ptau_bl_final)
-nfl_cox  <- extract_model_cox(surv_model_nfl_bl_final)
+nfl_cox <- extract_model_cox(surv_model_nfl_bl_final)
 both_cox <- extract_model_cox(surv_model_both_bl_final)
 
 # Building variable set
@@ -1523,60 +1526,56 @@ saveRDS(c_index_table, "tables/c_index_table.rds")
 
 ```{r}
 # Joint model for p-tau181
-# joint_model_ptau <- jm(
-#   surv_model_final,
-#   long_model_ptau,
-#   time_var = "time_years",
-#   n_chains = 3L,
-#   n_iter = 11000L,
-#   n_burnin = 1000L
-#   )
-```
+joint_model_ptau <- jm(
+  surv_model_final,
+  long_model_ptau,
+  time_var = "time_years",
+  n_chains = 3L,
+  n_iter = 11000L,
+  n_burnin = 1000L
+  )
 
-```{r}
-# summary(joint_model_ptau)
+summary(joint_model_ptau)
 ```
 
 ```{r}
 # Checking convergence 
-# ggtraceplot(joint_model_ptau, "alphas")
+ggtraceplot(joint_model_ptau, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-# png("figures/convergence_plot_ptau.png", width = 400, height = 300)
-# ggtraceplot(joint_model_ptau, "alphas")
-# dev.off()
+png("figures/convergence_plot_ptau.png", width = 400, height = 300)
+ggtraceplot(joint_model_ptau, "alphas")
+dev.off()
 ```
 
 ## Fitted joint model for NfL
 
 ```{r}
 # # Joint model for NfL 
-# joint_model_nfl <- jm(
-#   surv_model_final,
-#   long_model_nfl,
-#   time_var = "time_years",
-#   n_chains = 3L,
-#   n_iter = 11000L,
-#   n_burnin = 1000L
-#   )
-```
+joint_model_nfl <- jm(
+  surv_model_final,
+  long_model_nfl,
+  time_var = "time_years",
+  n_chains = 3L,
+  n_iter = 11000L,
+  n_burnin = 1000L
+  )
 
-```{r}
-# summary(joint_model_nfl)
+summary(joint_model_nfl)
 ```
 
 ```{r}
 # Checking convergence 
-# ggtraceplot(joint_model_nfl, "alphas")
+ggtraceplot(joint_model_nfl, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-# png("figures/convergence_plot_nfl.png", width = 400, height = 300)
-# ggtraceplot(joint_model_nfl, "alphas")
-# dev.off()
+png("figures/convergence_plot_nfl.png", width = 400, height = 300)
+ggtraceplot(joint_model_nfl, "alphas")
+dev.off()
 ```
 
 ### Traceplots
@@ -1652,7 +1651,7 @@ multi_joint_model <- jm(surv_model_final, mixed ,
                          n_burnin = 2000L
                          )
  
- summary(multi_joint_model)
+summary(multi_joint_model)
 ```
 
 ```{r}
@@ -1701,130 +1700,130 @@ extract_model_jm <- function(model) {
   )
 }
 
-# # Extracting models
-# ptau_jm <- extract_model_jm(joint_model_ptau)
-# nfl_jm <- extract_model_jm(joint_model_nfl)
-# both_jm <- extract_model_jm(multi_joint_model)
-# 
-# # Building variable set
-# all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
-# 
-# # Building final table
-# table_jm <- data.frame(
-#   Variable = all_vars_jm,
-# 
-#   "PTau HR (CI)" = format_hr_ci(
-#     get_value(ptau_jm, all_vars_jm, "HR"),
-#     get_value(ptau_jm, all_vars_jm, "CI_low"),
-#     get_value(ptau_jm, all_vars_jm, "CI_high")
-#   ),
-#   "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
-# 
-#   "NfL HR (CI)" = format_hr_ci(
-#     get_value(nfl_jm, all_vars_jm, "HR"),
-#     get_value(nfl_jm, all_vars_jm, "CI_low"),
-#     get_value(nfl_jm, all_vars_jm, "CI_high")
-#   ),
-#   "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
-# 
-#   "Both HR (CI)" = format_hr_ci(
-#     get_value(both_jm, all_vars_jm, "HR"),
-#     get_value(both_jm, all_vars_jm, "CI_low"),
-#     get_value(both_jm, all_vars_jm, "CI_high")
-#   ),
-#   "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
-# 
-#   row.names = NULL,
-#   check.names = FALSE
-# )
-# 
-# # Showing table
-# table_jm
+# Extracting models
+ptau_jm <- extract_model_jm(joint_model_ptau)
+nfl_jm <- extract_model_jm(joint_model_nfl)
+both_jm <- extract_model_jm(multi_joint_model)
+
+# Building variable set
+all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
+
+# Building final table
+table_jm <- data.frame(
+  Variable = all_vars_jm,
+
+  "PTau HR (CI)" = format_hr_ci(
+    get_value(ptau_jm, all_vars_jm, "HR"),
+    get_value(ptau_jm, all_vars_jm, "CI_low"),
+    get_value(ptau_jm, all_vars_jm, "CI_high")
+  ),
+  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
+
+  "NfL HR (CI)" = format_hr_ci(
+    get_value(nfl_jm, all_vars_jm, "HR"),
+    get_value(nfl_jm, all_vars_jm, "CI_low"),
+    get_value(nfl_jm, all_vars_jm, "CI_high")
+  ),
+  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
+
+  "Both HR (CI)" = format_hr_ci(
+    get_value(both_jm, all_vars_jm, "HR"),
+    get_value(both_jm, all_vars_jm, "CI_low"),
+    get_value(both_jm, all_vars_jm, "CI_high")
+  ),
+  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
+
+  row.names = NULL,
+  check.names = FALSE
+)
+
+# Showing table
+table_jm
 ```
 
 ```{r}
 # Saving the joint model comparison table
-# saveRDS(table_jm, "tables/table_jm.rds")
+saveRDS(table_jm, "tables/table_jm.rds")
 ```
 
 ## Rhat value comparison table
 
 ```{r}
 # Extracting Rhat for each model (survival component)
-# extract_rhat_surv <- function(model) {
-# 
-#   s <- summary(model)$Survival
-# 
-#   data.frame(
-#     Variable = rownames(s),
-#     Rhat = s[, "Rhat"],
-#     row.names = NULL
-#   )
-# }
-# 
-# # Applying to each model
-# ptau_surv <- extract_rhat_surv(joint_model_ptau)
-# nfl_surv <- extract_rhat_surv(joint_model_nfl)
-# multi_surv <- extract_rhat_surv(multi_joint_model)
-# 
-# # Combining with model labels to form a table
-# rhat_survival_table <- bind_rows(
-#   ptau_surv %>% mutate(Model = "PTau"),
-#   nfl_surv %>% mutate(Model = "NfL"),
-#   multi_surv %>% mutate(Model = "Multi")
-# ) %>%
-#   pivot_wider(
-#     names_from = Model,
-#     values_from = Rhat
-#   ) %>%
-#   mutate(across(where(is.numeric), ~round(.x, 3)))
-# 
-# # Showing table
-# rhat_survival_table
+extract_rhat_surv <- function(model) {
+
+  s <- summary(model)$Survival
+
+  data.frame(
+    Variable = rownames(s),
+    Rhat = s[, "Rhat"],
+    row.names = NULL
+  )
+}
+
+# Applying to each model
+ptau_surv <- extract_rhat_surv(joint_model_ptau)
+nfl_surv <- extract_rhat_surv(joint_model_nfl)
+multi_surv <- extract_rhat_surv(multi_joint_model)
+
+# Combining with model labels to form a table
+rhat_survival_table <- bind_rows(
+  ptau_surv %>% mutate(Model = "PTau"),
+  nfl_surv %>% mutate(Model = "NfL"),
+  multi_surv %>% mutate(Model = "Multi")
+) %>%
+  pivot_wider(
+    names_from = Model,
+    values_from = Rhat
+  ) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Showing table
+rhat_survival_table
 ```
 
 ```{r}
 # Saving the rhat table
-# saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
 ```
 
 ```{r}
 # Extracting Rhat for longitudinal outcome
-# extract_rhat_long <- function(model) {
-# 
-#   s <- summary(model)$Outcome1
-# 
-#   data.frame(
-#     Variable = rownames(s),
-#     Rhat = s[, "Rhat"],
-#     row.names = NULL
-#   )
-# }
-# 
-# # Applying to each model
-# ptau_long <- extract_rhat_long(joint_model_ptau)
-# nfl_long <- extract_rhat_long(joint_model_nfl)
-# multi_long <- extract_rhat_long(multi_joint_model)
-# 
-# # Combining with model labels to form a table
-# rhat_longitudinal_table <- bind_rows(
-#   ptau_long %>% mutate(Model = "Long_PTau"),
-#   nfl_long %>% mutate(Model = "Long_NfL"),
-#   multi_long %>% mutate(Model = "Long_Multi")
-# ) %>%
-#   pivot_wider(
-#     names_from = Model,
-#     values_from = Rhat
-#   ) %>%
-#   mutate(across(where(is.numeric), ~round(.x, 3)))
-# 
-# # Showing table
-# rhat_longitudinal_table
+extract_rhat_long <- function(model) {
+
+  s <- summary(model)$Outcome1
+
+  data.frame(
+    Variable = rownames(s),
+    Rhat = s[, "Rhat"],
+    row.names = NULL
+  )
+}
+
+# Applying to each model
+ptau_long <- extract_rhat_long(joint_model_ptau)
+nfl_long <- extract_rhat_long(joint_model_nfl)
+multi_long <- extract_rhat_long(multi_joint_model)
+
+# Combining with model labels to form a table
+rhat_longitudinal_table <- bind_rows(
+  ptau_long %>% mutate(Model = "Long_PTau"),
+  nfl_long %>% mutate(Model = "Long_NfL"),
+  multi_long %>% mutate(Model = "Long_Multi")
+) %>%
+  pivot_wider(
+    names_from = Model,
+    values_from = Rhat
+  ) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Showing table
+rhat_longitudinal_table
 ```
 
 ```{r}
 # Saving the rhat table
-# saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
 ```
 
 # Latent Class Mixed Models
@@ -2374,7 +2373,7 @@ jlcmm_m1_nfl_piecewise <- jlcmm(
   subject = "RID",
   survival = Surv(time_to_event, event) ~ 1,
   data = jlcmm_data,
-  B = random(jlcmm_m0_1_piecewise)
+  B = random(jlcmm_m0_1_piecewise),
 )
 ```
 
@@ -2426,6 +2425,53 @@ get_pprob_table <- function(model) {
 # Saving the posterior probability table for the 2 class jlcmm for nfl
 pprob_m1_nfl <- get_pprob_table(jlcmm_m1_nfl)
 saveRDS(pprob_m1_nfl, "tables/pprob_m1_nfl.rds")
+```
+
+```{r}
+# defining a function to extract the model parameters
+get_jlcmm_params <- function(model) {
+  
+  p_full <- length(model$best)
+#   model$V is a vector of the upper triangle of a matrix, not the var-covar matrix itself 
+  V_mat <- matrix(0, nrow = p_full, ncol = p_full)
+  V_mat[upper.tri(V_mat, diag = TRUE)] <- model$V
+#   Fill the matrix by adding its transpose, then removing the doubled values on the diagonal
+  V_mat <- V_mat + t(V_mat) - diag(diag(V_mat))
+  
+#   Dropping unwanted values stored in model$best
+  drop <- "varcov|stderr"
+#   Creates a logical vector in orer to drop values from estimates and var-covar matrix 
+  keep <- !grepl(drop, names(model$best))
+  estimates <- model$best[keep]
+  V_mat <- V_mat[keep, keep]
+  parameters <- names(estimates)
+
+  se <- sqrt(diag(V_mat))
+  z <- estimates / se
+  p_values <- 2 * (1 - pnorm(abs(z)))
+  
+  submodel <- c("Class Membership",
+                "Survival", "Survival", "Survival", "Survival",
+                "Longitudinal", "Longitudinal", "Longitudinal")
+  
+  out <- data.frame(
+    "Submodel" = submodel,
+    "Parameter" = parameters,
+    "Estimate" = round(estimates, 3),
+    "SE" = round(se, 3),
+    "Z" = round(z, 3),
+    "P value" = round(p_values, 3),
+    check.names = FALSE
+  )
+  
+  return(out)
+}
+```
+
+```{r}
+# Saving the model estimates in a table
+jlcmm_m1_nfl_output <- get_jlcmm_params(jlcmm_m1_nfl)
+saveRDS(jlcmm_m1_nfl_output, "tables/jlcmm_m1_nfl_output.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2548,7 +2594,37 @@ summary_jlcmm_nfl <- data.frame(
 ```
 
 ```{r}
+# Saving comparison table of fit statistics
 saveRDS(summary_jlcmm_nfl, "tables/summary_jlcmm_nfl.rds")
+```
+
+```{r}
+summary(jlcmm_m1_nfl)
+```
+
+```{r}
+params_all <- do.call(rbind, lapply(names(models), function(m)
+  get_jlcmm_params(models[[nm]], model_name = m)
+))
+
+params_all %>%
+  dplyr::select(Model, parameter, estimate, lower, upper, P_value) %>%
+  mutate(
+    "95% CI" = paste0("(", Lower95, ", ", Upper95, ")"),
+    "P-value" = case_when(
+      P_value < 0.001 ~ "<0.001",
+      TRUE ~ as.character(P_value)
+    )
+  ) %>%
+  dplyr::select(Model, Parameter, Estimate, `95% CI`, `P-value`) %>%
+  kable(
+    booktabs = TRUE,
+    caption = "Parameter estimates from joint latent class models",
+    escape = FALSE
+  ) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+  # Group rows by model
+  pack_rows(index = table(params_all$Model))
 ```
 
 ## Class Descriptions
@@ -2777,21 +2853,13 @@ pprob_m1_ptau <- get_pprob_table(jlcmm_m1_ptau)
 saveRDS(pprob_m1_ptau, "tables/pprob_m1_ptau.rds")
 ```
 
+```{r}
+# Saving the model estimates in a table
+jlcmm_m1_ptau_output <- get_jlcmm_params(jlcmm_m1_ptau)
+saveRDS(jlcmm_m1_ptau_output, "tables/jlcmm_m1_ptau_output.rds")
+```
+
 ## M2 (3 latent classes)
-
-*Things to assess:*
-
-1.  *Fit 4 class model -\> does BIC improve any more or plateau?*
-
-2.  *Score test now not significant compared with the two class model*
-
-3.  *VERY small class 1*
-
-4.  *CLass 2 and 3 are not cleanly separated (look at posterior probabilities)*
-
-5.  Weibull class 3 parameters not significant at 0.05 level
-
-6.  *Plot survival curves (how?)*
 
 ```{r}
 # Running gridsearch() for a three class model
@@ -3129,8 +3197,14 @@ postprob(mult_jlcmm_m1)
 
 ```{r}
 # Saving the posterior probability table for the 2 class jlcmm for ptau and NfL
-pprob_m1_ptau_nfl <- get_pprob_table(jlcmm_m2_ptau)
+pprob_m1_ptau_nfl <- get_pprob_table(mult_jlcmm_m1)
 saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
+```
+
+```{r}
+# # Saving the model estimates in a table
+# jlcmm_m1_ptau_nfl_output_midpoint <- get_jlcmm_params(mult_jlcmm_m1)
+# saveRDS(jlcmm_m1_ptau_nfl_output_midpoint, "tables/jlcmm_m1_ptau_nfl_output_midpoint.rds")
 ```
 
 ## M2 (3 latent classes)
