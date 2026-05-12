@@ -69,30 +69,30 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 # Loading data
 # Milou
 # NfL data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-  nfl_data <- BLENNOWPLASMANFLLONG
-# # # P-tau181 data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-  ptau_data <- UGOTPTAU181
-# # # Diagnosis data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-  diagnosis_data <- DXSUM
-# # # Demographics data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-  demographics <- PTDEMOG
-# # # Apoe data
-  load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-  apoe <- APOERES
+#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+#   nfl_data <- BLENNOWPLASMANFLLONG
+# # # # P-tau181 data
+#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+#   ptau_data <- UGOTPTAU181
+# # # # Diagnosis data
+#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+#   diagnosis_data <- DXSUM
+# # # # Demographics data
+#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+#   demographics <- PTDEMOG
+# # # # Apoe data
+#   load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+#   apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -104,7 +104,6 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 - *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
 
 2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
-3.  
 
 ```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
@@ -324,6 +323,11 @@ surv_data %>% filter(is.na(VISCODE2.y))
 ```
 
 ```{r}
+# Checking for ptau-181 and NfL values = -4, this is missing data code in ADNI documentation -> no -4 coded cells
+nrow(long_data %>% filter(PLASMA_NFL == -4, PLASMAPTAU181 == -4))
+```
+
+```{r}
 # We remove missing values 
 long_data <- na.omit(long_data)
 surv_data <- na.omit(surv_data)
@@ -450,7 +454,7 @@ surv_data <- surv_data %>%
       EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
       ][1],
 
-#     last dx/nfl/ptau exam
+#      last dx/nfl/ptau exam
       last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
 
 #     1 = dementia, 0 = otherwise
@@ -472,7 +476,6 @@ surv_data <- surv_data %>%
         prev_date <- max(EXAMDATE_dx[DIAGNOSIS_dx != "Dementia" & 
                                      EXAMDATE_dx < dx_date], 
                          na.rm = TRUE)
-        # Midpoint between last clean visit and dementia dx visit
         as.numeric((prev_date + (dx_date - prev_date) / 2) - EXAMDATE_baseline) / 365
       },
       TRUE ~
@@ -1621,130 +1624,130 @@ extract_model_jm <- function(model) {
   )
 }
 
-# Extracting models
-ptau_jm <- extract_model_jm(joint_model_ptau)
-nfl_jm <- extract_model_jm(joint_model_nfl)
-both_jm <- extract_model_jm(multi_joint_model)
-
-# Building variable set
-all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
-
-# Building final table
-table_jm <- data.frame(
-  Variable = all_vars_jm,
-
-  "PTau HR (CI)" = format_hr_ci(
-    get_value(ptau_jm, all_vars_jm, "HR"),
-    get_value(ptau_jm, all_vars_jm, "CI_low"),
-    get_value(ptau_jm, all_vars_jm, "CI_high")
-  ),
-  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
-
-  "NfL HR (CI)" = format_hr_ci(
-    get_value(nfl_jm, all_vars_jm, "HR"),
-    get_value(nfl_jm, all_vars_jm, "CI_low"),
-    get_value(nfl_jm, all_vars_jm, "CI_high")
-  ),
-  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
-
-  "Both HR (CI)" = format_hr_ci(
-    get_value(both_jm, all_vars_jm, "HR"),
-    get_value(both_jm, all_vars_jm, "CI_low"),
-    get_value(both_jm, all_vars_jm, "CI_high")
-  ),
-  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
-
-  row.names = NULL,
-  check.names = FALSE
-)
-
-# Showing table
-table_jm
+# # Extracting models
+# ptau_jm <- extract_model_jm(joint_model_ptau)
+# nfl_jm <- extract_model_jm(joint_model_nfl)
+# both_jm <- extract_model_jm(multi_joint_model)
+# 
+# # Building variable set
+# all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
+# 
+# # Building final table
+# table_jm <- data.frame(
+#   Variable = all_vars_jm,
+# 
+#   "PTau HR (CI)" = format_hr_ci(
+#     get_value(ptau_jm, all_vars_jm, "HR"),
+#     get_value(ptau_jm, all_vars_jm, "CI_low"),
+#     get_value(ptau_jm, all_vars_jm, "CI_high")
+#   ),
+#   "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
+# 
+#   "NfL HR (CI)" = format_hr_ci(
+#     get_value(nfl_jm, all_vars_jm, "HR"),
+#     get_value(nfl_jm, all_vars_jm, "CI_low"),
+#     get_value(nfl_jm, all_vars_jm, "CI_high")
+#   ),
+#   "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
+# 
+#   "Both HR (CI)" = format_hr_ci(
+#     get_value(both_jm, all_vars_jm, "HR"),
+#     get_value(both_jm, all_vars_jm, "CI_low"),
+#     get_value(both_jm, all_vars_jm, "CI_high")
+#   ),
+#   "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
+# 
+#   row.names = NULL,
+#   check.names = FALSE
+# )
+# 
+# # Showing table
+# table_jm
 ```
 
 ```{r}
 # Saving the joint model comparison table
-saveRDS(table_jm, "tables/table_jm.rds")
+# saveRDS(table_jm, "tables/table_jm.rds")
 ```
 
 ## Rhat value comparison table
 
 ```{r}
 # Extracting Rhat for each model (survival component)
-extract_rhat_surv <- function(model) {
-
-  s <- summary(model)$Survival
-
-  data.frame(
-    Variable = rownames(s),
-    Rhat = s[, "Rhat"],
-    row.names = NULL
-  )
-}
-
-# Applying to each model
-ptau_surv <- extract_rhat_surv(joint_model_ptau)
-nfl_surv <- extract_rhat_surv(joint_model_nfl)
-multi_surv <- extract_rhat_surv(multi_joint_model)
-
-# Combining with model labels to form a table
-rhat_survival_table <- bind_rows(
-  ptau_surv %>% mutate(Model = "PTau"),
-  nfl_surv %>% mutate(Model = "NfL"),
-  multi_surv %>% mutate(Model = "Multi")
-) %>%
-  pivot_wider(
-    names_from = Model,
-    values_from = Rhat
-  ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
-
-# Showing table
-rhat_survival_table
+# extract_rhat_surv <- function(model) {
+# 
+#   s <- summary(model)$Survival
+# 
+#   data.frame(
+#     Variable = rownames(s),
+#     Rhat = s[, "Rhat"],
+#     row.names = NULL
+#   )
+# }
+# 
+# # Applying to each model
+# ptau_surv <- extract_rhat_surv(joint_model_ptau)
+# nfl_surv <- extract_rhat_surv(joint_model_nfl)
+# multi_surv <- extract_rhat_surv(multi_joint_model)
+# 
+# # Combining with model labels to form a table
+# rhat_survival_table <- bind_rows(
+#   ptau_surv %>% mutate(Model = "PTau"),
+#   nfl_surv %>% mutate(Model = "NfL"),
+#   multi_surv %>% mutate(Model = "Multi")
+# ) %>%
+#   pivot_wider(
+#     names_from = Model,
+#     values_from = Rhat
+#   ) %>%
+#   mutate(across(where(is.numeric), ~round(.x, 3)))
+# 
+# # Showing table
+# rhat_survival_table
 ```
 
 ```{r}
 # Saving the rhat table
-saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+# saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
 ```
 
 ```{r}
 # Extracting Rhat for longitudinal outcome
-extract_rhat_long <- function(model) {
-
-  s <- summary(model)$Outcome1
-
-  data.frame(
-    Variable = rownames(s),
-    Rhat = s[, "Rhat"],
-    row.names = NULL
-  )
-}
-
-# Applying to each model
-ptau_long <- extract_rhat_long(joint_model_ptau)
-nfl_long <- extract_rhat_long(joint_model_nfl)
-multi_long <- extract_rhat_long(multi_joint_model)
-
-# Combining with model labels to form a table
-rhat_longitudinal_table <- bind_rows(
-  ptau_long %>% mutate(Model = "Long_PTau"),
-  nfl_long %>% mutate(Model = "Long_NfL"),
-  multi_long %>% mutate(Model = "Long_Multi")
-) %>%
-  pivot_wider(
-    names_from = Model,
-    values_from = Rhat
-  ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
-
-# Showing table
-rhat_longitudinal_table
+# extract_rhat_long <- function(model) {
+# 
+#   s <- summary(model)$Outcome1
+# 
+#   data.frame(
+#     Variable = rownames(s),
+#     Rhat = s[, "Rhat"],
+#     row.names = NULL
+#   )
+# }
+# 
+# # Applying to each model
+# ptau_long <- extract_rhat_long(joint_model_ptau)
+# nfl_long <- extract_rhat_long(joint_model_nfl)
+# multi_long <- extract_rhat_long(multi_joint_model)
+# 
+# # Combining with model labels to form a table
+# rhat_longitudinal_table <- bind_rows(
+#   ptau_long %>% mutate(Model = "Long_PTau"),
+#   nfl_long %>% mutate(Model = "Long_NfL"),
+#   multi_long %>% mutate(Model = "Long_Multi")
+# ) %>%
+#   pivot_wider(
+#     names_from = Model,
+#     values_from = Rhat
+#   ) %>%
+#   mutate(across(where(is.numeric), ~round(.x, 3)))
+# 
+# # Showing table
+# rhat_longitudinal_table
 ```
 
 ```{r}
 # Saving the rhat table
-saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+# saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
 ```
 
 # Latent Class Mixed Models

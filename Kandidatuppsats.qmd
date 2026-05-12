@@ -532,7 +532,7 @@ Following log-transformation, p-tau181 exhibited a distribution that more closel
 
 Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
 
-## Processing of Examination Date and Baseline 
+## Processing of Examination Date and Baseline
 
 For the 52 participants with two biomarker measurements recorded on the same examination date, minor discrepancies were observed depending on whether the first, last, or mean value was used. The mean value was selected as the primary approach, and sensitivity analyses showed no substantial differences in model precision.
 
@@ -550,7 +550,7 @@ When limiting the participants to those with three or more measurements of the b
 
 In comparison, when restricting the analysis to participants with at least one biomarker measurement, the in-dataset consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-dataset included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
 
-## Correlation Between Numerical Model Variables 
+## Correlation Between Numerical Model Variables
 
 Finally, a correlation matrix was computed for the numerical variables in the in-sample dataset to assess potential multicollinearity, and the results are presented in Appendix X. The correlations were generally low to moderate, indicating no issues with multicollinearity and supporting their inclusion in the models.
 
@@ -707,13 +707,13 @@ The posterior classification table shows the number of individuals assigned to e
 **Table 7: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements**
 
 ```{r}
-kable_standard(readRDS("tables/postprob_m1_ptau.rds"))
+kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 ```
 
 **Table 8: posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements**
 
 ```{r}
-kable_standard(readRDS("tables/postprob_m2_ptau.rds"))
+kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
 For the two class model (table 7), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 8) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes from the longitudinal ptau-181 measurements and the time-to-dementia data.
@@ -741,7 +741,7 @@ Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests th
 **Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements**
 
 ```{r}
-kable_standard(readRDS("tables/postprob_m1_nfl.rds"))
+kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
 Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (table 11). This is evidence for the two class model and that the data supports two latent classes.
@@ -769,7 +769,7 @@ Assessment of the posterior probabilities for the two class model shows both rea
 **Table 11: posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-191 and NfL measurements**
 
 ```{r}
-kable_standard(readRDS("tables/postprob_ptau_nfl.rds"))
+kable_standard(readRDS("tables/pprob_ptau_nfl.rds"))
 ```
 
 The JLCMM with longitudinal ptau-181 measurements
@@ -968,11 +968,11 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ![](figures/hist_log_nfl.png){width="400"}
 
-## Appendix X: correlation plot over the numerical variables used in the Cox PH models 
+## Appendix X: correlation plot over the numerical variables used in the Cox PH models
 
 ![](figures/corrplot_cox.png){width="400"}
 
-## Appendix X: correlation plot over the numerical variables used in the LME models 
+## Appendix X: correlation plot over the numerical variables used in the LME models
 
 ![](figures/corrplot_lme.png){width="400"}
 
