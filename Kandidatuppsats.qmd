@@ -688,11 +688,11 @@ In the multivariate joint model including both biomarkers simultaneously, both p
 
 ## Joint Latent Class Mixed Models
 
-For all models, a Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution.
+For all models, a Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum.
 
-Firstly, latent class mixed models were fit on the longitudinal ptau-181 and NfL measurements in order to assess whether latent classes could be distinguished from the biomarker trajectories. None of these models could adequately separate the sample population into meaningful latent classes, suggesting that ptau-181 and NfL biomarker trajectories alone do not hold enough information to be able to distinguish heterogenous disease sub-types. Multivariate latent class models were estimated on ptau-181 and NfL measurements simultaneously. Again, this model could not discriminate valid latent classes. Interestingly, incorporating the survival data resulted in JLCMMs that could meaningfully classify individuals into latent classes, the results of which follow below.
+Firstly, latent class mixed models were fit on the longitudinal ptau-181 and NfL measurements in order to assess whether latent classes could be distinguished from the biomarker trajectories. None of these models could adequately separate the sample population into meaningful latent classes, suggesting that ptau-181 and NfL biomarker trajectories alone do not hold enough information to be able to distinguish heterogenous disease sub-types. Multivariate latent class models were estimated on ptau-181 and NfL measurements simultaneously. Again, this model could not discriminate valid latent classes. Interestingly, incorporating survival data into the models resulted in JLCMMs that could meaningfully classify individuals into latent classes, the results of which follow below.
 
-**JLCMM PTAU**
+**JLCMM of longitudinal ptau-181 measurements and time-to-dementia data**
 
 The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to a lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$). Next, JLCMMs were fit with up to four classes and analysis of their log-likelihoods, BIC and entropy follow.
 
@@ -718,7 +718,9 @@ kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
-For the two class model (table 7), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 8) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes from the longitudinal ptau-181 measurements and the time-to-dementia data.
+For the two class model (table 7), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 8) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
+
+Additionally, the score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but upon fitting two latent classes became non-significant ($0.122, p = 0.727$), further evidence that the data supports two latent classes in the sample population. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes from the longitudinal ptau-181 measurements and the time-to-dementia data.
 
 ::: {layout-ncol="2"}
 ![**Figure 4: class-specific survival curves for the two class JLCMM for longitudinal ptau-181 measurements**](figures/class-specific-survival-jlcmm-ptau.png)
@@ -726,9 +728,9 @@ For the two class model (table 7), the class sizes are reasonable and the mean p
 ![**Figure 5: class-specific ptau-181 trajectories for the two-class JLCMM**](figures/longitudinal-jlcmm-ptau.png)
 :::
 
-Figure 4 shows the class-specific survival curves. The probability of remaining dementria-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
+Figure 4 shows the class-specific survival curves. The probability of remaining dementia-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
 
-**JLCMM NFL**
+**JLCMM of longitudinal NfL measurements and time-to-dementia data**
 
 Again, the results of a likelihood ratio test between two models was used to determine the random effects structure. This resulted in a significant test statistic ($\chi^2 = 10.5, p = 0.005$), evidence that the simpler model with only a random intercept was a better fit for the data.
 
@@ -746,7 +748,7 @@ Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests th
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (table 11). This is evidence for the two class model and that the data supports two latent classes.
+Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (table 11). Again, the one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, the two class model was chosen due to support for two latent classes in the sample population.
 
 ::: {layout-ncol="2"}
 ![**Figure 6: class-specific survival curves for the two class JLCMM for longitudinal NfL measurements**](figures/class-specific-survival-jlcmm-nfl.png)
@@ -754,9 +756,9 @@ Latent class sizes for the two class model are reasonable, and good class discri
 ![**Figure 7: class-specific NfL trajectories for the two class JLCMM**](figures/longitudinal-jlcmm-nfl.png)
 :::
 
-Figure 6 shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in figure 5, suggesting both models have discerned the same latent classes.
+Figure 6 shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in figure 5, suggesting both models have discerned latent classes with similar time-to-diagnosis processes.
 
-**MULTIVARIATE JLCMM**
+**Multivariate JLCMM of longitudinal ptau-181 and NfL measurements and time-to-dementia data**
 
 The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC was minimised and the entropy was maximised for the two class model.
 
