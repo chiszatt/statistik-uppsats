@@ -1132,24 +1132,6 @@ surv_model <- coxph(
 summary(surv_model)
 ```
 
-#### Removing PTGENDER
-
-```{r}
-# Cox survival-models, with covariates
-# With APOE4_status
-surv_model_reduced <- coxph(
-  Surv(time_to_event, event) ~ age_at_baseline + APOE4_status,
-  data = surv_data_in,
-  x = TRUE
-)
-
-summary(surv_model_reduced)
-```
-
-```{r}
-anova(surv_model, surv_model_reduced)
-```
-
 ## Fitted Cox PH models using baseline values of each biomarker
 
 ### PTAU
