@@ -468,7 +468,7 @@ The data used in this analysis comes from the ADNI cohort under the ADNI1 and AD
 
 The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database, which include various datasets all containing different variables related to the study of Alzheimer's.
 
-The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded. This resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
+The inclusion criteria required participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who did not meet these criteria were excluded.
 
 **REPORT ON TRANSITIONS...**
 
@@ -478,41 +478,29 @@ Under this section, all variables used in the analysis will be described, along 
 
 ### Diagnosis status
 
-The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time.
-
-The variable was retrieved from the DXSUM dataset in ADNIMERGE2. For the 1190 included participants, observations range from 29 September 2005 to 7 November 2025, with the number of diagnostic visits per individual ranging from one to 95.
-
-Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states.
-
-*Skriva något om hur regelbundna besöken är.*
-
-*Lägga till om värdena när man sedan reducerar till de individer med 3 eller fler mätningar.*
+The variable of primary interest is an ordinal categorical variable representing the diagnostic status of the participants. More precisely, it includes three diagnostic states: CN, MCI, and dementia. Each participant has multiple examination dates, meaning that diagnostic status may change over time. Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The variable was retrieved from the DXSUM dataset in ADNIMERGE2.
 
 ### P-tau181
 
-P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. It was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b).
-
-In contrast to the diagnostic data, p-tau181 measurements are only available between 1 February 2007 and 6 June 2016, meaning that some diagnostic visits lack corresponding biomarker measurements. The dataset contains 3647 p-tau181 measurements across 1190 participants. However, the unit of measurement is not specified in the dataset documentation.
+P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. It was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the dataset documentation.
 
 ### NfL
 
-NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were collected by the Blennow Lab (ADNI, n.d.-b).
-
-Similar to p-tau181, NfL measurements are available between 1 February 2007 and 6 June 2016, resulting in some diagnostic visits without corresponding biomarker measurements. The dataset contains 3647 NfL measurements across the 1190 included participants. As for p-tau181, the unit of measurement is not specified in the dataset documentation.
+NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were collected by the Blennow Lab (ADNI, n.d.-b). As for p-tau181, the unit of measurement is not specified in the dataset documentation.
 
 ### Age
 
-Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant, ranging from 1915 to 1971 among the 1190 included participants. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
+Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age. The variable was retrieved from the PTDEMOG dataset and is initially recorded as year of birth for each participant. It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
 
 ### Gender
 
-Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This is included due to reported differences in disease risk and progression between sexes. This binary variable includes two categories: male and female. Among the 1190 included participants, 543 were female and 647 were male.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate. This is included due to reported differences in disease risk and progression between sexes. This binary variable includes two categories: male and female.
 
 ### APOE4-status
 
 Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset.
 
-Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the 1190 included participants, 672 were non-carriers, 417 were heterozygous carriers, and 101 were homozygous carriers.
+Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
 
 # Data Pre-processing and Descriptive Analysis
 
@@ -522,15 +510,21 @@ Initially coded numerically based on the number of $\epsilon 4$ alleles, the var
 
 All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
 
-## Biomarker Distributions and Outliers
+## Number of Participants 
 
-The values of p-tau181 ranged from 0.4 to 451.4, with a median of 16.3, a first quartile of 11.1 and a third quartile of 23.6. Similarly, NfL values ranged from 6.4 to 408, with a median of 37.9, a first quartile of 27.8 and a third quartile of 52.5. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
+The inclusion critera resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
+
+## Distributions and Outliers
+
+The 704 included participants had complete observations of p-tau181, NfL and diagnosis statuses from 1th February 2007 to 6th June 2016. Their year of birth ranged from 1916 to 1957, meaning that the age ranged from ? to ?. The number of diagnostic visits per individual ranged from one to ???, while the biomarker measurements ranged from three to five, with 223 having 3 measurements, 303 having 4 measurements and 178 having five measurements.
+
+Their values of p-tau181 ranged from 0.4 to 238.3, with a median of 15.5, a first quartile of 10.7 and a third quartile of 22.1. Similarly, their NfL values ranged from 6.9 to 408, with a median of 36.5, a first quartile of 26.9 and a third quartile of 50.2. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
 
 Moreover, when examining observations with large Pearson residuals, specifically those exceeding three standard deviations from the mean, clear individual-level patterns were observed. For example, p-tau181 for one individual increased from 124 to 238 over time, and another individual showed consistently high values, ranging from 110 to 139. Similar patterns were observed for values of NfL. Accordingly, and given that the values fall within plausible biological ranges, these observations were not treated as outliers but were retained in the analysis. However, due to their magnitude, these values may still have influenced the results and were therefore considered in the interpretation.
 
-Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix X. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix X demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.
+Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix X. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix X demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution. Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
 
-Subsequently, the log-transformed variables are considered appropriate for inclusion in the statistical models.
+Additionally, among the 704 included participants, 315 were female and 389 were male. 83 carried one allele, while 578 carried two alleles and 43 carried two alleles.
 
 ## Processing of Examination Date and Baseline
 
@@ -1009,8 +1003,6 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ![](figures/convergence_plot_nfl.png){width="400"}
 
 ## Appendix X: trace plot of the $α$-parameter for the multivariate joint model
-
-![](figures/convergence_plot_multi.png){width="400"}
 
 ## Appendix X
 
