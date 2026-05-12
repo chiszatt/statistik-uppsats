@@ -1004,6 +1004,18 @@ anova(m1, m2, type = "LRT")
 ```
 
 ```{r}
+# Saving a table of results from the likelihood ratio tests between models with only a ranodom intercept and those with random intercept and slope
+long_re_lrt_table <- data.frame(
+  "Model" = c("ptau-181", "NfL"),
+  "Test statistic" = c(1.488, 10.506),
+  "P-value" = c(0.475, 0.005),
+  check.names = FALSE
+  )
+
+saveRDS(long_re_lrt_table, "tables/long_re_lrt_table.rds")
+```
+
+```{r}
 # Mixed object for multivariate joint model
 mixed <- list(long_model_ptau, long_model_nfl)
 ```
@@ -1342,7 +1354,7 @@ anova_both
 ```
 
 ```{r}
-# Saving a table of results from the likelihood ratio tests
+# Saving a table of results from the likelihood ratio tests for cox models with and without PTGENDER
 surv_lrt_table <- data.frame(
   "Model" = c("ptau-181 baseline", "NfL baseline", "ptau-181 and NfL baseline"),
   "Test statistic" = c(chi_ptau, chi_nfl, chi_both),
