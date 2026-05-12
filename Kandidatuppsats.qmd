@@ -516,7 +516,7 @@ The inclusion critera resulted in a sample size of 1190 individuals. Additionall
 
 ## Distributions and Outliers
 
-The 704 included participants had complete observations of p-tau181, NfL and diagnosis statuses from 1th February 2007 to 6th June 2016. Their year of birth ranged from 1916 to 1957, meaning that the age ranged from ? to ?. The number of diagnostic visits per individual ranged from one to ???, while the biomarker measurements ranged from three to five, with 223 having 3 measurements, 303 having 4 measurements and 178 having five measurements.
+The 704 included participants had complete observations of p-tau181, NfL and diagnosis statuses from 1th February 2007 to 6th June 2016. Their age at baseline ranged from 55 to 94, with a median of 74. The number of diagnostic visits per individual ranged from one to ???, while the biomarker measurements ranged from three to five, with 223 having 3 measurements, 303 having 4 measurements and 178 having five measurements.
 
 Their values of p-tau181 ranged from 0.4 to 238.3, with a median of 15.5, a first quartile of 10.7 and a third quartile of 22.1. Similarly, their NfL values ranged from 6.9 to 408, with a median of 36.5, a first quartile of 26.9 and a third quartile of 50.2. These descriptive statistics indicate that both biomarkers exhibited pronounced right-skewed distributions, thereby motivating the use of transformation to better satisfy the assumption of normality.
 
