@@ -111,14 +111,6 @@ grep("381_S_10###", diagnosis_data$PTID)
 grep("381_S_10###", apoe$PTID)
 ```
 
-## Time range of examination dates for biomarkers and diagnosis status: assessment of left truncation
-
-```{r}
-range(nfl_data$EXAMDATE, na.rm = TRUE)
-range(ptau_data$EXAMDATE, na.rm = TRUE)
-range(diagnosis_data$EXAMDATE, na.rm = TRUE)
-```
-
 ## Selecting required variables
 
 Variables for the unique identifier for each individual, visit code, exam date, biomarker measurements, diagnosis and genetic data were extracted.
@@ -291,7 +283,7 @@ Any diagnoses that were made more than 50 days before the first biomarker measur
 ```{r}
 # filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
 # creating a baseline_dx variable, so we can set time_to_event = 0 if baseline_dx == DEMENTIA
-diagnosis_data <- diagnosis_data %>%
+diagnosis_data_clean <- diagnosis_data %>%
   merge(
     long_data %>% dplyr::select(RID, EXAMDATE_baseline), by = "RID"
     ) %>%
@@ -310,7 +302,7 @@ diagnosis_data <- diagnosis_data %>%
 
 ```{r}
 # We merge NFL, ptau and diagnosis data for survival data, only by RID 
-surv_data <- long_data %>% left_join(diagnosis_data, by = c("RID"))
+surv_data <- long_data %>% left_join(diagnosis_data_clean, by = c("RID"))
 ```
 
 ## Checking missing values
@@ -536,13 +528,18 @@ surv_data <- surv_data %>%
 ## Summaries and distributions of the model variables 
 
 ```{r}
-# Summaries of p-tau181, NfL and age at baseline
-summary(long_data[, c("PLASMAPTAU181", "PLASMA_NFL")])
-summary(surv_data$age_at_baseline)
+# Distribution of diagnosis
+dx_full_704 <- diagnosis_data %>%
+  filter(RID %in% surv_data$RID)
+table(dx_full_704$age_at_baseline)
 
-# Examination date ranges (biomarkers)
+# Summaries of p-tau181 and NfL
+summary(long_data[, c("PLASMAPTAU181", "PLASMA_NFL")])
+
+# Examination date ranges for p-tau181, NfL and diagnosis
 range(long_data$EXAMDATE_ptau, na.rm = TRUE)
 range(long_data$EXAMDATE_nfl, na.rm = TRUE)
+range(dx_full_704$EXAMDATE_dx, na.rm = TRUE)
 
 # Number of measurements per participant (p-tau181)
 ptau_table <- long_data %>%
