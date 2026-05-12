@@ -111,6 +111,14 @@ grep("381_S_10###", diagnosis_data$PTID)
 grep("381_S_10###", apoe$PTID)
 ```
 
+## Time range of examination dates for biomarkers and diagnosis status: assessment of left truncation
+
+```{r}
+range(nfl_data$EXAMDATE, na.rm = TRUE)
+range(ptau_data$EXAMDATE, na.rm = TRUE)
+range(diagnosis_data$EXAMDATE, na.rm = TRUE)
+```
+
 ## Selecting required variables
 
 Variables for the unique identifier for each individual, visit code, exam date, biomarker measurements, diagnosis and genetic data were extracted.
