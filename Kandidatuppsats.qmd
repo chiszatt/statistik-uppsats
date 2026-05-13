@@ -930,13 +930,6 @@ kable_standard(readRDS("tables/table_ph.rds"))
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
-## Appendix X: Cox model comparison table when including participants with at least one biomarker 
-
-```{r}
-##| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers"
-#kable_standard(readRDS("tables/table_cox2.rds"))
-```
-
 ## Appendix X: fitted values versus residuals from the LME model for p-tau181
 
 ![](figures/residuals_vs_fitted_ptau.png){width="400"}
@@ -963,10 +956,16 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ![](figures/convergence_plot_multi_ptau181.png){width="400"}
 
-
 ## Sensitivity Analysis: 1+ Biomarker Measurements
 
-## Appendix X: joint model comparison table when including participants with at least one biomarker 
+## Appendix X: Cox model comparison table when including participants with at least one biomarker
+
+```{r}
+##| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers"
+#kable_standard(readRDS("tables/table_cox2.rds"))
+```
+
+## Appendix X: joint model comparison table when including participants with at least one biomarker
 
 ```{r}
 ##| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
