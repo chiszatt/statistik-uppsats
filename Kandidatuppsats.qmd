@@ -510,7 +510,7 @@ Initially coded numerically based on the number of $\epsilon 4$ alleles, the var
 
 All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
 
-## Number of Participants 
+## Number of Participants
 
 The inclusion critera resulted in a sample size of 1190 individuals. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 768.
 
@@ -605,6 +605,8 @@ kable_standard(readRDS("tables/c_index_table.rds"))
 
 **In contrast, sex shows no association with progression in any of the models, ith hazard ratios close to one and confidence intervals of similar width across both cohorts, indicating stable but non-informative estimates.**
 
+When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of the proportional hazard test gave the same conclusions (**appendix: table??**) as well as mostly very similar hazard ratios for the cox PH and joint models (**appendix: table?? & table??**). However, the effect of the log-transformed ptau-181 and NfL measurements were somewhat reduced in the univariate joint models when the midpoint was used as the event time (**table?? vs.** **appendix: table??**). $\widehat R$ values for both the survival submodel and the longitudinal submodel were similar to the models estimated with the original exam date as the event time (**tables ?? & ?? vs. appendix tables ?? & ??**)
+
 ## Joint Models
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL.
@@ -682,18 +684,16 @@ Firstly, latent class mixed models were fit on the longitudinal ptau-181 and NfL
 
 **JLCMM of longitudinal ptau-181 measurements and time-to-dementia data**
 
-The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to a lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$).
+The random effects structure was decided by a likelihood ratio test between a one class model with random intercept and one with both a random intercept and slope, as well as analysis of the BIC. Despite a non-significant test statistic of the likelihood ratio test ($\chi^2 = 1.38, p = 0.50$), a random effects structure with only intercept was chosen due to a lower BIC for the simpler model ($BIC = 4077$) compared with the complex model ($BIC = 4088$). Next, JLCMMs were fit with up to four classes and analysis of their log-likelihoods, BIC and entropy follow. All parameters in all of the candidate models were significant ($p < 0.001$) and the results are presented in the **appendix (X, X, X, X).**
 
-Next, JLCMMs were fit with up to four classes and analysis of their log-likelihoods, BIC and entropy follow. All parameters in all of the candidate models were significant ($p < 0.001$) and the results are presented in the **appendix (X, X, X, X).**
+The results show that both log-likelihood and entropy increase with additional latent classes, yet the BIC is minimised for the model with two latent classes (**table ??**). Given the inconclusive results from this comparison, the posterior probabilities were additionally analysed in order to decide the number of latent classes. The posterior classification table shows the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
 ```{r}
 #| tbl-cap: "Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
-The results show that both log-likelihood and entropy increase with additional latent classes, yet the BIC is minimised for the model with two latent classes. Given the inconclusive results from this comparison, the posterior probabilities were additionally analysed in order to decide the number of latent classes.
-
-The posterior classification table shows the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
+For the two class model (**table ??**), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (**table ??**) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
 
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements"
@@ -705,8 +705,6 @@ kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
-For the two class model (table 7), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 8) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
-
 Additionally, the score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but upon fitting two latent classes became non-significant ($0.122, p = 0.727$), further evidence that the data supports two latent classes in the sample population. Therefore, the two class model is chosen as the best model for most accurately discerning latent classes from the longitudinal ptau-181 measurements and the time-to-dementia data.
 
 ::: {layout-ncol="2"}
@@ -715,7 +713,7 @@ Additionally, the score test statistic for the conditional independence assumpti
 ![**Figure 5: class-specific ptau-181 trajectories for the two-class JLCMM**](figures/longitudinal-jlcmm-ptau.png)
 :::
 
-Figure 4 shows the class-specific survival curves. The probability of remaining dementia-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
+**Figure ??** shows the class-specific survival curves. The probability of remaining dementia-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
 
 **JLCMM of longitudinal NfL measurements and time-to-dementia data**
 
@@ -726,14 +724,14 @@ Again, the results of a likelihood ratio test between two models was used to det
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Analysis of the log-likelihood, BIC and entropy provided in table 10 suggests that the two class model in this instance provides the best method for discriminating latent classes given longitudinal NfL measurements and time-to-diagnosis data. The log-likelihood increases most between the one class and the two class model, and only increases very slightly between the two class and the three class model. The BIC is minimised and entropy is maxmised for the two class model. The posterior probabilities are also analysed in order to ensure good class discrimination.
+Analysis of the log-likelihood, BIC and entropy provided in **table??** suggests that the two class model in this instance provides the best method for discriminating latent classes given longitudinal NfL measurements and time-to-diagnosis data. The log-likelihood increases most between the one class and the two class model, and only increases very slightly between the two class and the three class model. The BIC is minimised and entropy is maxmised for the two class model. The posterior probabilities are also analysed in order to ensure good class discrimination.
 
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (table 11). Again, the one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, the two class model was chosen due to support for two latent classes in the sample population.
+Latent class sizes for the two class model are reasonable, and good class discrimination is shown when assessing average posterior probabilities (**table ??**). Again, the one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, the two class model was chosen due to support for two latent classes in the sample population.
 
 ::: {layout-ncol="2"}
 ![**Figure 6: class-specific survival curves for the two class JLCMM for longitudinal NfL measurements**](figures/class-specific-survival-jlcmm-nfl.png)
@@ -741,25 +739,29 @@ Latent class sizes for the two class model are reasonable, and good class discri
 ![**Figure 7: class-specific NfL trajectories for the two class JLCMM**](figures/longitudinal-jlcmm-nfl.png)
 :::
 
-Figure 6 shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in figure 5, suggesting both models have discerned latent classes with similar time-to-diagnosis processes.
+**Figure ??** shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in **figure ??**, suggesting both models have discerned latent classes with similar time-to-diagnosis processes.
 
 **Multivariate JLCMM of longitudinal ptau-181 and NfL measurements and time-to-dementia data**
 
-The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. All model parameters were significant ($p < 0.001$) in all candidate models, and are found in the **appendix (X, X, X)**. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC was minimised and the entropy was maximised for the two class model.
+The ptau-181 and NfL measurements were also modeled simultaneously with a multivariate JLCMM. Models with one, two and three classes were fit with a simple random effects structure as although the BIC was reduced with a random intercept and slope, the difference was minimal at \~ $1.1$ unit decrease. All model parameters were significant ($p < 0.001$) in all candidate models, and are found in the **appendix (X, X, X)**. Although the log-likelihood decreased with increasing number of classes, the biggest decrease was between the one and two class models. Additionally, the BIC was minimised and the entropy was maximised for the two class model (**table ??**). Assessment of the posterior probabilities for the two class model (**table ??**) shows both reasonable class sizes and good class discrimination, supporting the choice of this model.
 
 ```{r}
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-191 and NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl.rds"))
 ```
 
-Assessment of the posterior probabilities for the two class model shows both reasonable class sizes and good class discrimination.
-
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-191 and NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_ptau_nfl.rds"))
 ```
 
-The JLCMM with longitudinal ptau-181 measurements
+**Sensitivity Analyses**
+
+Running same analysis was run with individuals with at least one biomarker measurement resulted in similar conclusions regarding optimal models. For the univariate JLCMM with longitudinal ptau-181 measurements, although BIC was minimised and entropy was maximised for the three class model, one class comprised of only $2.28\%$ of the sample population (**appendix:** **table ??**). Additionally, the posterior classification table showed the model had poorer classification certainty (**appendix: table??**) compared with the two class model (**appendix: table??**). Comparing the two class model on the full data set and the two class model chosen in the main analysis, classification uncertainty decreased when including individuals with fewer than three longitudinal ptau-181 measurements (**table ?? vs appendix: table ??**). When modelling longitudinal NfL measurements with this data set, the BIC was minimised for the two class model and despite the three class model having the highest entropy, class2 contained only $1.14\%$ of the sample population (**appendix: table ??**). Again, compared with the two class model estimated on the data set including only those with more than 3 longitudianal NfL measurements, classification certainty decreased (**table ?? vs. appendix: table ??**).
+
+**The multivariate model XXX. THREE CLASS MODEL SAVED NOT TWO CLASS.**
+
+Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for ptau-181 and NfL measurements (**appendix table?? & table??**). For NfL, the three class model did not converge, therefore these results are not presented. The multivariate model performed similarly to the model with the original event time (**table?? vs appendix table??**) and the two class model would be chosen also in this instance. **POSTPROB NOT REFERENCED.**
 
 ## Predictive Performance
 
@@ -1004,35 +1006,35 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ## Appendix X: trace plot of the $α$-parameter for the multivariate joint model
 
-## Appendix X
+## Sensitivity Analysis: 1+ Biomarker Measurements
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
 ```
 
-## Appendix X
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
 ```
 
-## Appendix X
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for ptau-181"
 kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 ```
 
-## Appendix X
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL"
 kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 ```
-
-## Appendix X
 
 ```{r}
 #| pos: "H"
@@ -1041,16 +1043,89 @@ kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```
 
-## Appendix X
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for ptau-181 and NfL"
 kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl_full.rds"))
 ```
 
-## Appendix X
+TABLE IS SAVED WRONG -\> IS THE THREE CLASS MODEL
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for ptau-181 and NfL"
 kable_standard(readRDS("tables/pprob_m1_ptau_nfl_full.rds"))
+```
+
+## Sensitivity Analysis: Interval Censored Events
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "P-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
+kable_standard(readRDS("tables/table_ph_final_midpoint.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers"
+kable_standard(readRDS("tables/table_cox_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Concordance indices for all fitted Cox PH models with baseline biomarker values"
+kable_standard(readRDS("tables/c_index_table_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
+kable_standard(readRDS("tables/rhat_survival_table_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
+kable_standard(readRDS("tables/rhat_longitudinal_table_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
+kable_standard(readRDS("tables/table_jm_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 measurements"
+kable_standard(readRDS("tables/summary_jlcmm_ptau_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 measurements"
+kable_standard(readRDS("tables/pprob_m1_ptau_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal ptau-181 measurements"
+kable_standard(readRDS("tables/pprob_m2_ptau_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
+kable_standard(readRDS("tables/summary_jlcmm_nfl_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
+kable_standard(readRDS("tables/pprob_m1_nfl_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal ptau-181 and NfL measurements"
+kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl_midpoint.rds"))
+```
+
+```{r}
+#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal ptau-181 and NfL measurements"
+kable_standard(readRDS("tables/pprob_m1_ptau_nfl_midpoint.rds"))
 ```
