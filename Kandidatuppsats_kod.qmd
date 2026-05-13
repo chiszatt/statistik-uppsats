@@ -3950,7 +3950,7 @@ dev.off()
 
 # Förslag på uppdelning av predictive performance plots (utifrån frågeställningarna)
 
-## För frågeställning 1: jämförelse av metoder 
+## För frågeställning 1: jämförelse av metoder (cox ph, joint latent class och joint latent class)
 
 ### Time-depending AUC
 
