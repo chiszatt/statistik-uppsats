@@ -446,11 +446,11 @@ The variable of primary interest is an ordinal categorical variable representing
 
 ### P-tau181
 
-P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. It was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the dataset documentation.
+P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia, since, as previously mentioned, it can distinguish Alzheimer’s disease from other neurodegenerative conditions. The variable was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the dataset documentation.
 
 ### NfL
 
-NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were collected by the Blennow Lab (ADNI, n.d.-b). As for p-tau181, the unit of measurement is not specified in the dataset documentation.
+NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia, as it may, as previously mentioned, serve as a prognostic marker of cognitive decline. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were processed by the Blennow Lab (ADNI, n.d.-b). As for p-tau181, the unit of measurement is not specified in the dataset documentation.
 
 ### Age
 
@@ -458,13 +458,13 @@ Additionally, age is included as a covariate when predicting progression to deme
 
 ### Gender
 
-Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between sexes. More precisely, women aged over 80 have a slightly higher chance of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b).
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between sexes. More precisely, women aged over 80 have a slightly higher chance of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b). As for age, the variable was retrieved from the PTDEMOG dataset.
 
 ### APOE4-status
 
-Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset.
+Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b).
 
-Initially coded numerically based on the number of $\epsilon 4$ alleles (ADNI, n.d.-b), the variable is subsequently recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
+Initially coded numerically based on the number of $\epsilon 4$ alleles (ADNI, n.d.-b), the variable is recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
 
 # Data Pre-processing and Descriptive Analysis
 
