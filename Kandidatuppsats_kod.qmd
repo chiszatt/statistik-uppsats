@@ -47,6 +47,7 @@ library(corrplot)
 library(JMbayes2)
 library(JM)
 library(nlme) 
+library(lme4)
 library(survival)
 library(ggplot2)
 library(glmmTMB)
@@ -87,12 +88,12 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -138,8 +139,6 @@ diagnosis_data <- diagnosis_data %>%
 ```
 
 ## Checking RID with more than one measurement recorded on the same exam date
-
-For participants with duplicate measurements on the same examination date, differences were observed depending on how they were handled: using the first measurement, the mean, or the last measurement. The mean value was used as the primary approach, and sensitivity analyses were performed to evaluate the robustness of the findings.
 
 ```{r}
 ## Checking which obs have double VISCODE2 codes
@@ -231,12 +230,6 @@ common <- which(long_data$EXAMDATE_nfl %in% long_data$EXAMDATE_ptau)
 long_data[-common, ]
 ```
 
-- There are 5 observations with time differences greater than 30 days
-
-- 231/115 days: clearly we can't say these are the same date... BUT with setting a new EXAMDATE as the midpoint between dates means the new EXAMDATE is 2 months out from EXAMDATE_nfl and EXAMDATE_ptau
-
-- Less clear what the case is with a time difference of 31 days, even 49 days
-
 ```{r}
 # calculating the difference in time between EXAMDATE_nfl and EXAMDATE_ptau
 diff <- diff %>% mutate(time_diff = EXAMDATE_nfl - EXAMDATE_ptau)
@@ -249,8 +242,6 @@ diff %>% filter(abs(time_diff) > 30) %>% dplyr::select(time_diff)
 ```
 
 ### EXAMDATE is EXAMDATE_nfl or EXAMDATE_nfl +- time difference
-
-- Can create a new variable for a common EXAMDATE in order to define the baseline date from this
 
 ```{r}
 # creating a common EXAMDATE from two cases
@@ -277,8 +268,6 @@ long_data <- long_data %>%
 ```
 
 ## Removing early diagnosis observations
-
-Any diagnoses that were made more than 50 days before the first biomarker measurements were made were removed.
 
 ```{r}
 # filtering the observations out of the diagnosis data set where EXAMDATE is much before baseline biomarker EXAMDATE
@@ -378,54 +367,26 @@ long_data$age_at_visit <- as.numeric(format(long_data$EXAMDATE_ptau, "%Y")) - lo
 surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - surv_data$PTDOBYY
 ```
 
-### Checking individual's final diagnoses for the full data set
-
-```{r}
-# final diagnoses for the full sample size
-table(
-  (surv_data %>%
-     group_by(RID) %>%
-     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
-     dplyr::select(DIAGNOSIS_dx) %>%
-     distinct()
-   )$DIAGNOSIS_dx
-  )
-```
-
 ## Selecting participants with at least 3 measurements
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 3 measurements
-length(keep)
+#length(keep)
 ```
 
 ## Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-# long_data <- long_data %>% filter(RID %in% keep)
-# surv_data <- surv_data %>% filter(RID %in% keep)
-# # We check number of individuals with at least 1 measurement
-# length(keep)
-```
-
-### Checking individuals final diagnoses for the reduced data set
-
-```{r}
-# final diagnoses for the reduced sample size
-table(
-  (surv_data %>%
-     group_by(RID) %>%
-     filter(EXAMDATE_dx == last(EXAMDATE_dx)) %>%
-     dplyr::select(DIAGNOSIS_dx) %>%
-     distinct()
-   )$DIAGNOSIS_dx
-  )
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+ long_data <- long_data %>% filter(RID %in% keep)
+ surv_data <- surv_data %>% filter(RID %in% keep)
+ # We check number of individuals with at least 1 measurement
+ length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -528,12 +489,33 @@ surv_data <- surv_data %>%
 ## Summaries and distributions of the model variables
 
 ```{r}
-# Distribution of diagnosis
+# Distribution of diagnosis assessments
 dx_full_704 <- diagnosis_data %>%
   filter(RID %in% surv_data$RID)
-table(dx_full_704$age_at_baseline)
+table(dx_full_704$DIAGNOSIS_dx)
 
-# Summaries of p-tau181 and NfL
+# Distribution of post-baseline diagnosis assessments (aligned to biomarker baseline)
+dx_post <- dx_full_704 %>%
+  left_join(
+    long_data %>%
+      dplyr::select(RID, EXAMDATE_baseline) %>%
+      distinct(),
+    by = "RID"
+  ) %>%
+  dplyr::filter(EXAMDATE_dx >= EXAMDATE_baseline)
+table(dx_post$DIAGNOSIS_dx)
+
+# Number of diagnosis assessments per participant
+dx_full_704 %>%
+  filter(!is.na(DIAGNOSIS_dx)) %>%
+  count(RID) %>%
+  summarise(
+    min = min(n),
+    median = median(n),
+    max = max(n)
+  )
+
+# Summaries of p-tau181 and NfL 
 summary(long_data[, c("PLASMAPTAU181", "PLASMA_NFL")])
 
 # Examination date ranges for p-tau181, NfL and diagnosis
@@ -541,21 +523,22 @@ range(long_data$EXAMDATE_ptau, na.rm = TRUE)
 range(long_data$EXAMDATE_nfl, na.rm = TRUE)
 range(dx_full_704$EXAMDATE_dx, na.rm = TRUE)
 
-# Number of measurements per participant (p-tau181)
+# Number of biomarker measurements per participant (p-tau181)
 ptau_table <- long_data %>%
   filter(!is.na(PLASMAPTAU181)) %>%
   count(RID) %>%
   count(n, name = "n_RID")
-
 ptau_table
 
-# Number of measurements per participant (NfL)
+# Number of biomarker measurements per participant (NfL)
 nfl_table <- long_data %>%
   filter(!is.na(PLASMA_NFL)) %>%
   count(RID) %>%
   count(n, name = "n_RID")
-
 nfl_table
+
+# Summary of age at baseline
+summary(surv_data$age_at_baseline)
 
 # Distributions of gender and APOE4 status
 table(surv_data$PTGENDER)
@@ -563,8 +546,6 @@ table(surv_data$genotype)
 ```
 
 ## Checking outliers
-
-Checking for extreme observations shows there are no values 3 standard deviations below the mean, only above. An assessment of these more extreme observations suggests that they are within a reasonable range and are assumed to be correct observations.
 
 ```{r}
 # We identify "extreme" values
@@ -589,29 +570,6 @@ hist(long_data$PLASMA_NFL, main="PLASMA_NFL")
 ```
 
 ```{r}
-# Creating a folder to save plots
-dir.create("figures", showWarnings = FALSE)
-
-# Saving ptau histogram
-png("figures/hist_p_tau.png", width = 400, height = 300)
-hist(long_data$PLASMAPTAU181,
-     main = "PLASMAPTAU181",
-     xlab = "PLASMAPTAU181"
-     )
-dev.off()
-```
-
-```{r}
-# Saving NfL histogram
-png("figures/hist_nfl.png", width = 400, height = 300)
-hist(long_data$PLASMA_NFL,
-     main = "PLASMA_NFL",
-     xlab = "PLASMA_NFL" 
-     )
-dev.off()
-```
-
-```{r}
 # We log transform the biomarkers 
 long_data$log_PLASMAPTAU181 <- log(long_data$PLASMAPTAU181)
 long_data$log_PLASMA_NFL <- log(long_data$PLASMA_NFL)
@@ -624,6 +582,9 @@ hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
 ```{r}
+# Creating a folder to save plots
+dir.create("figures", showWarnings = FALSE)
+
 #  Saving log transformed ptau histogram
 png("figures/hist_log_p_tau.png", width = 400, height = 300)
 hist(long_data$log_PLASMAPTAU181,
@@ -1301,8 +1262,6 @@ surv_model_final <- coxph(
   x = TRUE
 )
 
-summary(surv_model_final)
-
 # Including p-tau181
 surv_model_ptau_bl_final <- coxph(
   Surv(time_to_event, event) ~
@@ -1310,8 +1269,6 @@ surv_model_ptau_bl_final <- coxph(
   data = surv_data_in,
   x = TRUE
 )
-
-summary(surv_model_ptau_bl_final)
 
 # Including NfL
 surv_model_nfl_bl_final <- coxph(
@@ -1321,8 +1278,6 @@ surv_model_nfl_bl_final <- coxph(
   x = TRUE
 )
 
-summary(surv_model_nfl_bl_final)
-
 # Inlcuding both p-tau181 and NfL
 surv_model_both_bl_final <- coxph(
   Surv(time_to_event, event) ~
@@ -1330,8 +1285,6 @@ surv_model_both_bl_final <- coxph(
   data = surv_data_in,
   x = TRUE
 )
-
-summary(surv_model_both_bl_final) 
 ```
 
 #### Final test of the assumption of proportional hazards
@@ -1424,10 +1377,10 @@ surv_lrt_table <- data.frame(
 saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
 ```
 
-### Cox comparison table
+### Cox model comparison table
 
 ```{r}
-# Building Cox comparison table
+# Building Cox model comparison table
 # Extracting model output
 extract_model_cox <- function(model) {
   s <- summary(model)
@@ -1509,7 +1462,8 @@ table_cox
 
 ```{r}
 # Savig the cox models comparison table
-saveRDS(table_cox, "tables/table_cox.rds")
+saveRDS(table_cox, "tables/table_cox1.rds")
+#saveRDS(table_cox, "tables/table_cox2.rds")
 ```
 
 ### Concordance Index Table
@@ -1522,7 +1476,6 @@ c_index_table <- data.frame(
   check.names = FALSE)
   
 saveRDS(c_index_table, "tables/c_index_table.rds")
-
 ```
 
 # Two separate joint models
@@ -1539,8 +1492,6 @@ joint_model_ptau <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
-
-summary(joint_model_ptau)
 ```
 
 ```{r}
@@ -1567,8 +1518,6 @@ joint_model_nfl <- jm(
   n_iter = 11000L,
   n_burnin = 1000L
   )
-
-summary(joint_model_nfl)
 ```
 
 ```{r}
@@ -1586,11 +1535,6 @@ dev.off()
 ### Traceplots
 
 ```{r}
-#traceplot(joint_model_ptau)
-#traceplot(joint_model_nfl)
-```
-
-```{r}
 # For p-tau181
 # traceplot(joint_model_ptau, parm = "betas")
 # traceplot(joint_model_ptau, parm = "alphas")
@@ -1602,27 +1546,6 @@ dev.off()
 # traceplot(joint_model_nfl, parm = "betas")
 # traceplot(joint_model_nfl, parm = "alphas")
 # traceplot(joint_model_nfl, parm = "sigmas")
-```
-
-### Density plots
-
-```{r}
-#densplot(joint_model_ptau)
-#densplot(joint_model_nfl)
-```
-
-```{r}
-# For p-tau181
-# densplot(joint_model_ptau, parm = "betas")
-# densplot(joint_model_ptau, parm = "alphas")
-# densplot(joint_model_ptau, parm = "sigmas")
-```
-
-```{r}
-# For NfL
-# densplot(joint_model_nfl, parm = "betas")
-# densplot(joint_model_nfl, parm = "alphas")
-# densplot(joint_model_nfl, parm = "sigmas")
 ```
 
 # Multivariate joint model
@@ -1656,31 +1579,18 @@ multi_joint_model <- jm(surv_model_final, mixed ,
                          n_burnin = 2000L
                          )
  
-summary(multi_joint_model)
 ```
 
 ```{r}
 # Checking convergence 
-# ggtraceplot(multi_joint_model, "alphas")
+ggtraceplot(multi_joint_model, "alphas")
 ```
 
 ```{r}
 # Saving the convergence plot
-# png("figures/convergence_plot_multi.png", width = 400, height = 300)
-# ggtraceplot(multi_joint_model, "alphas")
-# dev.off()
-```
-
-```{r}
-multi_convergence_plots <- ggtraceplot(multi_joint_model, "alphas")
-
-png("figures/convergence_plot1_multi.png", width = 400, height = 300)
-print(multi_convergence_plots[[1]])
-dev.off()
-
-png("figures/convergence_plot2_multi.png", width = 400, height = 300)
-print(multi_convergence_plots[[2]])
-dev.off()
+png("figures/convergence_plot_multi.png", width = 400, height = 300)
+ ggtraceplot(multi_joint_model, "alphas")
+ dev.off()
 ```
 
 ### Joint model comparison table
@@ -1748,7 +1658,8 @@ table_jm
 
 ```{r}
 # Saving the joint model comparison table
-saveRDS(table_jm, "tables/table_jm.rds")
+saveRDS(table_jm, "tables/table_jm1.rds")
+#saveRDS(table_jm, "tables/table_jm2.rds")
 ```
 
 ## Rhat value comparison table
@@ -3325,10 +3236,6 @@ saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
 
 # Comparing models using time-dependent AUC
-
-*For the Cox PH models = using timeROC, from the package timeROC*
-
-*For the joint models = using tvAUC, from the package JMbayes2*
 
 ## Defining evaluation time points for time-dependent AUC comparison
 
