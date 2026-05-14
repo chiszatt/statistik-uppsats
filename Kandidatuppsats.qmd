@@ -115,7 +115,7 @@ The joint modelling framework extends the Cox PH model by linking a longitudinal
 
 The simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research.
 
-Various models have utilised longitudinal p-tau181 and NfL values with the aim of modeling AD progression, however, the question arises as to which of these modeling approaches has greatest predictive performance. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD research, specifically focusing on plasma biomarkers such as NfL and p-tau. Moreover, previous findings suggest that the observed associations with disease progression may vary between these biomarkers depending on how the longitudinal information is modeled.
+Various models have utilised longitudinal p-tau181 and NfL values with the aim of modeling AD progression, however, the question arises as to which of these modeling approaches has greatest predictive performance. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD research, specifically focusing on plasma biomarkers such as NfL and p-tau. Across these different modelling approaches, it is also of interest to examine whether NfL, p-tau181 or a combination of the biomarkers gives the best predictive perfomance.
 
 Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to AD explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, pp. 591-592).
 
@@ -127,14 +127,8 @@ The choice of inclusion strategy also has important implications for statistical
 
 This study investigates the prediction of progression to AD-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarkers, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
 
-1.  Which of the considered modelling approaches provides the best prediction of progression to AD-related dementia using longitudinal blood biomarker data?
-2.  How do these associations differ between p-tau181 and NfL?
-3.  How does the precision of estimated longitudinal trajectories and their associations with time to AD-related dementia vary with the number of repeated measurements per individual?
-
-**Alternativ:**
-
 1.  Which modelling approach (Cox proportional hazards model with baseline biomarker values, joint models with longitudinal biomarker data, or latent class joint models) provides the best prediction of progression to Alzheimer’s disease-related dementia?
-2.  Which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to Alzheimer’s disease-related dementia?
+2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to Alzheimer’s disease-related dementia?
 3.  How does the precision of estimated longitudinal trajectories and their associations with time to AD-related dementia vary with the number of repeated measurements per individual?
 
 # Methodology
@@ -505,6 +499,16 @@ Finally, a correlation matrix was computed for the numerical variables in the in
 It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34, indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
 
 # Results
+
+## Model fit overview
+
+## Model comparison
+
+## 
+
+## Biomarker comparison
+
+## Precision analysis
 
 ## Cox PH Models
 
