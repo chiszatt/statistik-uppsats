@@ -320,9 +320,7 @@ $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 {
 \sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
 
-Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination.
-
-**Class sizes are also important, as classes that are made up of less than** $5\%$ **of the total sample population may not be clinically meaningful (REF).**
+Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
 **Entropy**
 
@@ -442,56 +440,6 @@ Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a
 
 Among the participants with at least three biomarker measurements, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 109 of these participants carried no APOE-$ε4$ alleles, 772 carried one allele, and 53 carried two alleles.
 
-# Data Pre-processing and Descriptive Analysis
-
-*ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
-
-## Distributions, Transformation and Baseline Definition
-
-**Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. This means that diagnoses were available several years prior to the first biomarker measurements. Baseline was therefore defined as the first biomarker examination date, ensuring alignment of follow-up time with biomarker onset and comparable longitudinal trajectories across participants. Baseline age ranged from 55 to 94 years, with a median age of 74 years.**
-
-**Among the 704 participants with at least one biomarker measurement, diagnostic visits per individual ranged from 1 to 20, with a median of 7. In total, there were 3198 cognitively normal (CN), 3621 mild cognitive impairment (MCI), and 505 dementia diagnoses, of which 2206 CN, 2780 MCI, and 491 dementia diagnoses occurred after baseline. Restricting to participants with at least three biomarker measurements, the corresponding numbers were 2469 CN, 3163 MCI, and 463 dementia diagnoses, with 1723 CN, 2489 MCI, and 459 dementia diagnoses post-baseline. Diagnostic visits per individual ranged from 3 to 20, with a median of 8.**
-
-The number of biomarker measurements per participant ranged from one to five. Specifically, 66 participants had one measurement, 164 had two measurements, 223 had three measurements, 303 had four measurements, and 178 had five measurements.
-
-**Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. These descriptive statistics indicate pronounced right-skewness for both biomarkers, motivating the use of transformation to better satisfy the assumption of normality. A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement.**
-
-**Moreover, when examining observations with large Pearson residuals, specifically those exceeding three standard deviations from the mean, clear individual-level patterns were observed. For example, p-tau181 for one individual increased from 124 to 238 over time, and another individual showed consistently high values, ranging from 110 to 139. Similar patterns were observed for values of NfL. Accordingly, and given that the values fall within plausible biological ranges, these observations were not treated as outliers but were retained in the analysis.**
-
-**Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix X. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix X demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.**
-
-**Additionally, among the participants with at least three biomarker measurements, 315 were female and 389 were male. Regarding genotype status, 83 participants carried no APOE-**$ε4$ **alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 438 were female and 496 were male. Furthermore, 109 of these participants carried no APOE-**$ε4$ **alleles, 772 carried one allele, and 53 carried two alleles.**
-
-These distributions support the use of the variables in the subsequent statistical models.
-
-## Processing of Examination Date
-
-**Regarding biomarker measurements, 52 participants had two measurements recorded on the same examination date, leading to minor discrepancies depending on whether the first, last, or mean value was used. To ensure consistency, the mean value was selected as the primary approach. Sensitivity analyses showed no substantial differences in model precision.**
-
-**Furthermore, discrepancies were observed between p-tau181 and NfL examination dates within the same visit. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a common examination date was constructed using the midpoint between the two biomarker dates.**
-
-**Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.**
-
-Subsequently, sensitivity analyses were performed using alternative definitions of baseline, defined as either the earliest biomarker examination date or the first diagnostic examination date. No meaningful differences in model precision were observed, indicating robustness to the choice of time origin: **did we do this yet?**
-
-## Division Into In-Sample And Out-of-Sample Datasets
-
-**Additionally, the analyzed data were split so that the in-sample data set comprised three quarters of the total data and the out-of-sample comprised one quarter.**
-
-**When restricting the analysis to participants with at least one biomarker measurement, the in-sample data set consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-of-sample included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.**
-
-**In comparison, when restricting the participants to those with three or more biomarker measurements, the sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored.**
-
-**Related to this, participants who experienced dementia right at baseline were excluded from the survival analyses, as they did not contribute valid follow-up time.**
-
-## Correlation Between Numerical Model Variables
-
-**ALSO: age at baseline not included in cox models, so we probably dont need to mention high correlation with NfL.**
-
-**Finally, a correlation matrix was computed for the numerical variables in the in-sample dataset to assess potential multicollinearity. The results are presented in Appendices X and X. The correlations were generally low to moderate, indicating no issues with multicollinearity and supporting their inclusion in the models.**
-
-**It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34, indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.**
-
 # Results
 
 ## Model fit overview
@@ -519,7 +467,7 @@ The evaluation of the association between biomarkers and progression to dementia
 
 The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (**appendix X**).
 
-Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, the LME models were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME model with log-transformed data. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
 Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
 
@@ -744,30 +692,6 @@ Sex also remained non-significant across all joint models, with no meaningful di
 Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding optimal models. For the univariate JLCMM with longitudinal p-tau181 measurements, although BIC was minimised and entropy was maximised for the three class model, one class comprised of only $2.28\%$ of the sample population (**appendix:** **table ??**). Additionally, the posterior classification table showed the model had poorer classification certainty (**appendix: table??**) compared with the two class model (**appendix: table??**). Comparing the two class model on the full data set and the two class model chosen in the main analysis, classification uncertainty decreased when including individuals with fewer than three longitudinal p-tau181 measurements (**table ?? vs appendix: table ??**). When modelling longitudinal NfL measurements with this data set, the BIC was minimised for the two class model and despite the three class model having the highest entropy, class2 contained only $1.14\%$ of the sample population (**appendix: table ??**). Again, compared with the two class model estimated on the data set including only those with more than 3 longitudinal NfL measurements, classification certainty decreased (**table ?? vs. appendix: table ??**).
 
 Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements (**appendix table?? & table??**). For NfL, the three class model did not converge, therefore these results are not presented.
-
-# ...
-
-# JLCMM PLOTS: necessary or not?
-
-::: {layout-ncol="2"}
-![**Figure 4: class-specific survival curves for the two class JLCMM for longitudinal p-tau181 measurements**](figures/class-specific-survival-jlcmm-ptau.png)
-
-![**Figure 5: class-specific p-tau181 trajectories for the two-class JLCMM**](figures/longitudinal-jlcmm-ptau.png)
-:::
-
-**Figure ??** shows the class-specific survival curves. The probability of remaining dementia-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
-
-**JLCMM of longitudinal NfL measurements and time-to-dementia data**
-
-::: {layout-ncol="2"}
-![**Figure 6: class-specific survival curves for the two class JLCMM for longitudinal NfL measurements**](figures/class-specific-survival-jlcmm-nfl.png)
-
-![**Figure 7: class-specific NfL trajectories for the two class JLCMM**](figures/longitudinal-jlcmm-nfl.png)
-:::
-
-**Figure ??** shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in **figure ??**, suggesting both models have discerned latent classes with similar time-to-diagnosis processes.
-
-# ...
 
 # Discussion
 
@@ -1031,75 +955,4 @@ TABLE IS SAVED WRONG -\> IS THE THREE CLASS MODEL
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for p-tau181 and NfL"
 kable_standard(readRDS("tables/pprob_m1_ptau_nfl_full.rds"))
-```
-
-## Precision Analysis: Interval Censored Events
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "P-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
-kable_standard(readRDS("tables/table_ph_final_midpoint.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers"
-kable_standard(readRDS("tables/table_cox_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Concordance indices for all fitted Cox PH models with baseline biomarker values"
-kable_standard(readRDS("tables/c_index_table_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
-kable_standard(readRDS("tables/rhat_survival_table_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
-kable_standard(readRDS("tables/rhat_longitudinal_table_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-kable_standard(readRDS("tables/table_jm_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
-kable_standard(readRDS("tables/summary_jlcmm_ptau_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal p-tau181 measurements"
-kable_standard(readRDS("tables/pprob_m1_ptau_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal p-tau181 measurements"
-kable_standard(readRDS("tables/pprob_m2_ptau_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
-kable_standard(readRDS("tables/summary_jlcmm_nfl_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
-kable_standard(readRDS("tables/pprob_m1_nfl_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 and NfL measurements"
-kable_standard(readRDS("tables/summary_jlcmm_ptau_nfl_midpoint.rds"))
-```
-
-```{r}
-#| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal p-tau181 and NfL measurements"
-kable_standard(readRDS("tables/pprob_m1_ptau_nfl_midpoint.rds"))
 ```
