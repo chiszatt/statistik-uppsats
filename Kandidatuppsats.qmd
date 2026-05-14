@@ -639,9 +639,7 @@ An initial comparison of model performance by assessment of the concordance indi
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
 
-Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, the results remained robust, with inclusion of participants with fewer repeated observations increasing statistical power but not changing the direction or interpretation of the estimated effects for the main biological predictors.
-
-More precisely, age at baseline continued to violate the proportional hazards assumption and was therefore excluded from the final models, after which all models satisfied the assumption. Table 4 further demonstrates that hazard ratios, confidence intervals, and patterns of statistical significance remained broadly consistent across models, supporting unchanged conclusions.
+Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, the results remained robust, with inclusion of participants with fewer repeated observations increasing statistical power but not changing the direction or interpretation of the estimated effects for the main biological predictors. More precisely, Table X further demonstrates that hazard ratios, confidence intervals, and patterns of statistical significance remained broadly consistent across models, supporting unchanged conclusions.
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least one biomarker meausurement"
@@ -954,7 +952,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ![](figures/convergence_plot_multi.png)
 
-<!-- ![](figures/convergence_plot_multi_ptau181.png){width="400"} -->
+![](figures/convergence_plot_multi_ptau181.png){width="400"}
 
 ### Appendix X: Time-depending AUC curves for the NfL models
 
@@ -974,11 +972,19 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ### Appendix X: Time-depending AUC curves for the joint models
 
+![](figures/q2_auc_jm.png){width="400"}
+
 ### Appendix X: Time-depending AUC curves for the latent class joint models
+
+![](figures/q2_auc_lcjm.png){width="400"}
 
 ### Appendix X: Time-depending Brier score curves for the joint models
 
+![](figures/q2_brier_jm.png){width="400"}
+
 ### Appendix X: Time-depending AUC curves for the latent class joint models
+
+![](figures/q2_brier_lcjm.png){width="400"}
 
 ## Sensitivity Analysis: 1+ Biomarker Measurements
 
