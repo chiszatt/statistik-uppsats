@@ -590,6 +590,7 @@ Figure:
 
 ![](figures/q1_brier_ptau.png){width="400"}
 
+
 As for the time-depending AUC results, the time-depending Brier score results are also observed in Table X containing the Brier score values for each modelling approach and at each follow-up time point.
 
 ```{r, echo=FALSE}
@@ -903,11 +904,11 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ## Appendix X: correlation plot over the numerical variables used in the Cox PH models
 
-<!-- ![](figures/corrplot_cox.png) -->
+![](figures/corrplot_cox.png)
 
 ## Appendix X: correlation plot over the numerical variables used in the LME models
 
-<!-- ![](figures/corrplot_lme.png) -->
+![](figures/corrplot_lme.png)
 
 ## Appendix X
 
@@ -954,7 +955,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ![](figures/convergence_plot_multi.png)
 
-<!-- ![](figures/convergence_plot_multi_ptau181.png){width="400"} -->
+![](figures/convergence_plot_multi_ptau181.png){width="400"}
 
 ### Appendix X: Time-depending AUC curves for the NfL models
 
