@@ -523,7 +523,7 @@ The evaluation of the association between biomarkers and progression to dementia
 
 The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (**appendix X**).
 
-Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, the LME models were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
 Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
 
@@ -561,11 +561,9 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 ## Model comparison
 
-In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from 2 to 6 years of follow-up.
+In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from 2 to 6 years of follow-up. To start with, Figure X provides an initial overview of the time-dependent AUC of the different models across the follow-up period, with the biomarker being fixed as p-tau181.
 
-Figure X provides an initial overview of the time-dependent AUC of the different models across the follow-up period, with the biomarker being fixed as p-tau181.
-
-**Figure X: time-depending AUC curves for different modelling approaches (p-tau181)**
+**Figure X: time-depending AUC curves for different modelling approaches (p-tau181 models)**
 
 ![](figures/q1_auc_ptau.png){width="400"}
 
@@ -582,13 +580,13 @@ These results are also indicated by Table X, containing the AUC values for each 
 kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
-For instance, by showing that the JM among the multivariate models has an AUC value of 0.967 at the 2-year follow-up and still high discrimination at 6 years (AUC = 0.846), Table x confirms that it provides the best overall predictive performance among these models.
+For instance, by showing that the JM among the multivariate models has an AUC value of 0.967 at the two-year follow-up and an AUC value of 0.846 at the six-year follow-up, Table x confirms that it provides the best overall predictive performance among these models.
 
-By evaluating the predictive performance through time-depending Brier score instead, the patterns remain the same, but with lower values indicating better predictive accuracy.
+By evaluating the predictive performance through time-depending Brier score instead, the patterns remain the same, but with lower values indicating better predictive accuracy, as shown by Figure X ; it presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker being fixed as p-tau181.
 
-Figure:
+**Figure X: time-depending Brier score curves for different modelling approaches (p-tau181 models)**
 
-![](figures/q1_brier_ptau.png){width="400"}
+![](figures/q1_auc_ptau.png){width="400"}
 
 As for the time-depending AUC results, the time-depending Brier score results are also observed in Table X containing the Brier score values for each modelling approach and at each follow-up time point.
 
@@ -601,17 +599,33 @@ For instance,
 
 ## Biomarker comparison
 
-The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers.
+The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure X provides an initial overview of the time-dependent AUC of the models with different biomarker specifications across the follow-up period, with the model being fixed as Cox PH.
 
-Within the Cox proportional hazards models, the combined biomarker approach generally yields the highest discrimination compared to single biomarker models. At earlier time points, Cox models based on NfL tend to perform slightly better than p-tau181, but both single-marker models are consistently outperformed by the combined model (Cox both), which maintains the highest AUC across most follow-up times. Both single-biomarker models show a gradual decline in performance over time, with relatively similar trajectories.
+**Figure X: time-depending AUC curves for different biomarker specifications (Cox PH models)**
 
 ![](figures/q2_auc_cox.png){width="400"}
 
+Within the Cox PH models, the combined biomarker approach generally yields the highest discrimination compared to single biomarker models. At earlier time points, Cox models based on NfL tend to perform slightly better than p-tau181, but both single-marker models are consistently outperformed by the combined model (Cox both), which maintains the highest AUC across most follow-up times. Both single-biomarker models show a gradual decline in performance over time, with relatively similar trajectories.
+
 Within the joint modelling framework, the same overall pattern is observed; as shown by Appendix, the combined biomarker joint model (JM both) clearly provides the strongest predictive performance across all time points, with particularly high AUC values at early follow-up. NfL-based joint models outperform p-tau181-based models when considered separately, especially at early time points, but both are inferior to the combined model. Although all JM-based approaches show some decline over time, they maintain strong predictive accuracy throughout follow-up.
 
-Within the latent class joint models, the same pattern can also be observed, as shown in Appendix X...
+Within the latent class joint models, the same pattern can also be observed, as shown in Appendix X.
 
-As when comparing the different modelling approaches, these results are also indicated by Table X, containing the time-dependent AUC values for each biomarker specification and at each follow-up time point.
+As when comparing the different modelling approaches, these results are also indicated by Table X, containing the time-dependent AUC values for each biomarker specification and at each follow-up time point. For example, at the two-year follow-up within the joint modelling framework, the combined model achieved an AUC value of 0.967, compared to an AUC value of 0.953 for JM NfL and 0.902 for JM p-tau181, confirming that the combined joint model provides the highest predictive performance at this time point.
+
+Additionally, the time-dependent Brier score curves showed similar results across the different biomarker specifications within the Cox PH models.
+
+**Figure X: time-depending Brier score curves for different biomarker specifications (Cox PH models)**
+
+![](figures/q2_brier_cox.png)
+
+Within the Cox PH models, the combined biomarker approach consistently achieves the lowest Brier scores across most time points, indicating improved calibration and reduced prediction error compared to single-biomarker models. NfL-based Cox models generally perform slightly better than p-tau181 at earlier time points, but the differences between single biomarkers remain modest. Both single-biomarker models show increasing Brier scores over time, reflecting a gradual decline in predictive accuracy, while the combined model maintains a consistently lower error across follow-up.
+
+Similarly, Appendix X shows that, within the joint modelling framework, the combined JM approach again performs best, showing the lowest prediction error across all time points. When considered separately, NfL-based joint models tend to achieve slightly lower Brier scores than p-tau181-based models at earlier time points, while both remain clearly outperformed by the combined biomarker model. Although prediction error increases over time for all JM-based approaches, they maintain relatively strong calibration throughout the follow-up period.
+
+Within the latent class joint models, ....
+
+Table X containing the time-dependent Brier score values for each biomarker specification and at each follow-up time point confirms these results. For instance, within the Cox PH models at the two-year follow-up, the combined biomarker approach has a Brier score of 0.0520, while Cox p-tau181 has a value of 0.0542 and Cox NfL has a value of 0.0535, confirming that the combined model yields the lowest prediction error at this time point.
 
 ## Precision Analysis
 
@@ -658,7 +672,7 @@ When defining the event time as the midpoint between the diagnosis exams when a 
 
 ### Joint Models
 
-Subsequently, the hazard ratios from the joint models were estimated and are presented in Table 5, along with 95% confidence intervals and p-values.
+Since the joint models converged correctly, the hazard ratios from the joint models were Subsequently estimated and are presented in Table 5, along with 95% confidence intervals and p-values.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
@@ -948,7 +962,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ![](figures/convergence_plot_nfl.png)
 
-## Appendix X: trace plot of the $α$-parameter for the multivariate joint model
+## Appendix X: trace plots of the $α$-parameters for the multivariate joint model
 
 ![](figures/convergence_plot_multi.png)
 
