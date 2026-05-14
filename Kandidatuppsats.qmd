@@ -404,7 +404,7 @@ where $\tilde n(t)$ is the sum of the IPC weight (Prince et al., p. 6). The Brie
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1, ADNIGO and ADNI2 protocols. The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database (ADNI, n.d.-b). In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were present in the data set (ADNI, 2026).
 
-The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who do not meet these criteria are excluded. This resulted in a sample size of 1191 individuals with at least one biomarker measurement. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 704.
+The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. The exclusion criteria was any individual with a baseline dementia diagnosis. This resulted in a sample size of 934 individuals with at least one biomarker measurement. This reduced to 704 when restricting the sample to participants with three or more biomarker measurements.
 
 All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
 
@@ -412,19 +412,25 @@ All missing values were removed prior to the analysis to ensure a complete-case 
 
 ### Diagnosis status
 
-The variable of primary interest is an ordinal categorical variable representing three diagnostic states: cognitively normal (CN), mild cognitive impairment (MCI) and dementia. Each participant has multiple examination dates, meaning diagnostic status may change over time. Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The variable was retrieved from the DXSUM data set in ADNIMERGE2.
+The variable of primary interest represents three diagnostic states - cognitively normal (CN), mild cognitive impairment (MCI) and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
-### P-tau181
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-P-tau181 is a continuous variable representing one of the two plasma biomarkers used to potentially improve prediction of progression to dementia. The variable was retrieved from the UGOPTAU181 dataset in ADNIMERGE2, which has been processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the dataset documentation.
+When restricting the participants to those with three or more biomarker measurements, the sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. In comparison, extending the sample population to those with at least one biomarker measurement, the in-sample data set consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-of-sample data set included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
 
-### NfL
+### P-tau181 and NfL
 
-NfL is a continuous variable representing the second plasma biomarker included in the analyses, with potential to improve prediction of progression to dementia, as it may, as previously mentioned, serve as a prognostic marker of cognitive decline. It was retrieved from the BLENNOWPLASMANFLLONG dataset in ADNIMERGE2, and the data were processed by the Blennow Lab (ADNI, n.d.-b). As for p-tau181, the unit of measurement is not specified in the dataset documentation.
+P-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the data set documentation. NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
+
+Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (**appendix X & appendix X**). A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement. Values larger than three standard deviations were analysed and it was determined that they should be retained in the analysis. It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (**appendix X**), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
+
+Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. Diagnoses were therefore available several years prior to the first biomarker measurements. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
+
+52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. **Sensitivity analyses showed no substantial differences in model precision: did we do this yet?.** Furthermore, discrepancies were observed between p-tau181 and NfL examination dates with the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a common examination date was constructed using the midpoint between the two biomarker dates.
 
 ### Age
 
-Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age (Alzheimer’s Society, n.d.). The variable was retrieved from the PTDEMOG dataset and was initially recorded as year of birth for each participant (ADNI, n.d.-b). It is then transformed into age at visit and age at baseline, which are more suitable for the analyses.
+Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age (Alzheimer’s Society, n.d.). The variable was retrieved from the PTDEMOG data set and was initially recorded as year of birth for each participant (ADNI, n.d.-b) which was transformed into age at baseline. Baseline age ranged from 55 to 94 years, with a median age of 74 years.
 
 ### Gender
 
@@ -432,9 +438,9 @@ Another covariate included when predicting progression to dementia is participan
 
 ### APOE4-status
 
-Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b).
+Finally, apolipoprotein-$\epsilon 4$ (APOE-$\epsilon 4$) status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
 
-Initially coded numerically based on the number of $\epsilon 4$ alleles (ADNI, n.d.-b), the variable is recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
+Among the participants with at least three biomarker measurements, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 109 of these participants carried no APOE-$ε4$ alleles, 772 carried one allele, and 53 carried two alleles.
 
 # Data Pre-processing and Descriptive Analysis
 
@@ -442,45 +448,49 @@ Initially coded numerically based on the number of $\epsilon 4$ alleles (ADNI, n
 
 ## Distributions, Transformation and Baseline Definition
 
-Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. This means that diagnoses were available several years prior to the first biomarker measurements. Baseline was therefore defined as the first biomarker examination date, ensuring alignment of follow-up time with biomarker onset and comparable longitudinal trajectories across participants. Baseline age ranged from 55 to 94 years, with a median age of 74 years.
+**Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. This means that diagnoses were available several years prior to the first biomarker measurements. Baseline was therefore defined as the first biomarker examination date, ensuring alignment of follow-up time with biomarker onset and comparable longitudinal trajectories across participants. Baseline age ranged from 55 to 94 years, with a median age of 74 years.**
 
-Among the 704 participants with at least one biomarker measurement, diagnostic visits per individual ranged from 1 to 20, with a median of 7. In total, there were 3198 cognitively normal (CN), 3621 mild cognitive impairment (MCI), and 505 dementia diagnoses, of which 2206 CN, 2780 MCI, and 491 dementia diagnoses occurred after baseline. Restricting to participants with at least three biomarker measurements, the corresponding numbers were 2469 CN, 3163 MCI, and 463 dementia diagnoses, with 1723 CN, 2489 MCI, and 459 dementia diagnoses post-baseline. Diagnostic visits per individual ranged from 3 to 20, with a median of 8.
+**Among the 704 participants with at least one biomarker measurement, diagnostic visits per individual ranged from 1 to 20, with a median of 7. In total, there were 3198 cognitively normal (CN), 3621 mild cognitive impairment (MCI), and 505 dementia diagnoses, of which 2206 CN, 2780 MCI, and 491 dementia diagnoses occurred after baseline. Restricting to participants with at least three biomarker measurements, the corresponding numbers were 2469 CN, 3163 MCI, and 463 dementia diagnoses, with 1723 CN, 2489 MCI, and 459 dementia diagnoses post-baseline. Diagnostic visits per individual ranged from 3 to 20, with a median of 8.**
 
 The number of biomarker measurements per participant ranged from one to five. Specifically, 66 participants had one measurement, 164 had two measurements, 223 had three measurements, 303 had four measurements, and 178 had five measurements.
 
-Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. These descriptive statistics indicate pronounced right-skewness for both biomarkers, motivating the use of transformation to better satisfy the assumption of normality. A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement.
+**Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. These descriptive statistics indicate pronounced right-skewness for both biomarkers, motivating the use of transformation to better satisfy the assumption of normality. A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement.**
 
-Moreover, when examining observations with large Pearson residuals, specifically those exceeding three standard deviations from the mean, clear individual-level patterns were observed. For example, p-tau181 for one individual increased from 124 to 238 over time, and another individual showed consistently high values, ranging from 110 to 139. Similar patterns were observed for values of NfL. Accordingly, and given that the values fall within plausible biological ranges, these observations were not treated as outliers but were retained in the analysis.
+**Moreover, when examining observations with large Pearson residuals, specifically those exceeding three standard deviations from the mean, clear individual-level patterns were observed. For example, p-tau181 for one individual increased from 124 to 238 over time, and another individual showed consistently high values, ranging from 110 to 139. Similar patterns were observed for values of NfL. Accordingly, and given that the values fall within plausible biological ranges, these observations were not treated as outliers but were retained in the analysis.**
 
-Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix X. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix X demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.
+**Following log-transformation, p-tau181 exhibited a distribution that more closely approximated normality, as shown in Appendix X. The values became more concentrated around the central region, although a slight residual left-skewness remained. However, this deviation was not considered substantial. Similarly, Appendix X demonstrates that the log-transformation of NfL resulted in an even closer approximation to a normal distribution.**
 
-Additionally, among the participants with at least three biomarker measurements, 315 were female and 389 were male. Regarding genotype status, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 438 were female and 496 were male. Furthermore, 109 of these participants carried no APOE-$ε4$ alleles, 772 carried one allele, and 53 carried two alleles.
+**Additionally, among the participants with at least three biomarker measurements, 315 were female and 389 were male. Regarding genotype status, 83 participants carried no APOE-**$ε4$ **alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 438 were female and 496 were male. Furthermore, 109 of these participants carried no APOE-**$ε4$ **alleles, 772 carried one allele, and 53 carried two alleles.**
 
 These distributions support the use of the variables in the subsequent statistical models.
 
 ## Processing of Examination Date
 
-Regarding biomarker measurements, 52 participants had two measurements recorded on the same examination date, leading to minor discrepancies depending on whether the first, last, or mean value was used. To ensure consistency, the mean value was selected as the primary approach. Sensitivity analyses showed no substantial differences in model precision.
+**Regarding biomarker measurements, 52 participants had two measurements recorded on the same examination date, leading to minor discrepancies depending on whether the first, last, or mean value was used. To ensure consistency, the mean value was selected as the primary approach. Sensitivity analyses showed no substantial differences in model precision.**
 
-Furthermore, discrepancies were observed between p-tau181 and NfL examination dates within the same visit. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a common examination date was constructed using the midpoint between the two biomarker dates. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
+**Furthermore, discrepancies were observed between p-tau181 and NfL examination dates within the same visit. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a common examination date was constructed using the midpoint between the two biomarker dates.**
 
-Subsequently, sensitivity analyses were performed using alternative definitions of baseline, defined as either the earliest biomarker examination date or the first diagnostic examination date. No meaningful differences in model precision were observed, indicating robustness to the choice of time origin.
+**Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.**
+
+Subsequently, sensitivity analyses were performed using alternative definitions of baseline, defined as either the earliest biomarker examination date or the first diagnostic examination date. No meaningful differences in model precision were observed, indicating robustness to the choice of time origin: **did we do this yet?**
 
 ## Division Into In-Sample And Out-of-Sample Datasets
 
-Additionally, the analyzed data were split so that the in-dataset comprised three quarters of the total data and the out-dataset comprised one quarter.
+**Additionally, the analyzed data were split so that the in-sample data set comprised three quarters of the total data and the out-of-sample comprised one quarter.**
 
-When restricting the analysis to participants with at least one biomarker measurement, the in-dataset consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-dataset included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
+**When restricting the analysis to participants with at least one biomarker measurement, the in-sample data set consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-of-sample included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.**
 
-In comparison, when restricting the participants to those with three or more biomarker measurements, the sample size of the in-dataset was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-dataset, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored.
+**In comparison, when restricting the participants to those with three or more biomarker measurements, the sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored.**
 
-Related to this, participants who experienced dementia right at baseline were excluded from the survival analyses, as they did not contribute valid follow-up time.
+**Related to this, participants who experienced dementia right at baseline were excluded from the survival analyses, as they did not contribute valid follow-up time.**
 
 ## Correlation Between Numerical Model Variables
 
-Finally, a correlation matrix was computed for the numerical variables in the in-sample dataset to assess potential multicollinearity. The results are presented in Appendices X and X. The correlations were generally low to moderate, indicating no issues with multicollinearity and supporting their inclusion in the models.
+**ALSO: age at baseline not included in cox models, so we probably dont need to mention high correlation with NfL.**
 
-It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34, indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
+**Finally, a correlation matrix was computed for the numerical variables in the in-sample dataset to assess potential multicollinearity. The results are presented in Appendices X and X. The correlations were generally low to moderate, indicating no issues with multicollinearity and supporting their inclusion in the models.**
+
+**It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34, indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.**
 
 # Results
 
