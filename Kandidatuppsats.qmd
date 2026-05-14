@@ -137,7 +137,7 @@ First, Cox PH models will be used to assess associations between baseline biomar
 
 All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ status. In the joint models, these covariates will be included in both submodels to account for potential confounding when estimating the association between biomarker trajectories and disease progression. ***That being said, since the longitudinal submodels will already include a time variable, namely years since baseline, age at visit will not be included in the LME analyses; its inclusion would be redundant given that it is determined by baseline age and follow-up time.*** The significance level will be set at 0.05 for all analyses.
 
-The predictive performance of these modelling frameworks will be compared by time-dependent AUC and Brier scores, ***as well as the estimated associations of p-tau181 and NfL with disease progression***. For prognostic models predicting progression from MCI to AD-dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data is used for model development whilst out-of-sample data is reserved for model evaluation.
+The predictive performance of these modelling frameworks will be compared by time-dependent AUC and Brier scores, ***as well as the estimated associations of p-tau181 and NfL with disease progression***. For prognostic models predicting progression from MCI to AD-dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data is used for model development with three quarters of the sample population, whilst out-of-sample data was reserved for model evaluation with the remaining quarter.
 
 In addition, a precision analysis will be conducted to assess whether the inclusion of individuals with space longitudinal data effects the results of the analysis. Estimates of model parameters, their precision and model stability (???) will be compared for models estimated with a cohort including at least one biomarker measurement and models with a restricted cohort including individuals with at least three measurements.
 
@@ -402,9 +402,11 @@ where $\tilde n(t)$ is the sum of the IPC weight (Prince et al., p. 6). The Brie
 
 # Data
 
-The data used in this analysis comes from the ADNI cohort under the ADNI1, ADNIGO and ADNI2 protocols. Measurements of the concentration of p-tau181 and NfL in blood plasma of $n = xxx$ individuals were analysed. In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were present in the data set (ADNI, 2026).
+The data used in this analysis comes from the ADNI cohort under the ADNI1, ADNIGO and ADNI2 protocols. The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database (ADNI, n.d.-b). In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were present in the data set (ADNI, 2026).
 
-The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database (ADNI, n.d.-b). The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who do not meet these criteria are excluded.
+The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. Participants who do not meet these criteria are excluded. This resulted in a sample size of 1191 individuals with at least one biomarker measurement. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 704.
+
+All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
 
 ## Variables
 
@@ -437,14 +439,6 @@ Initially coded numerically based on the number of $\epsilon 4$ alleles (ADNI, n
 # Data Pre-processing and Descriptive Analysis
 
 *ADNI documentation: <https://adni.loni.usc.edu/quick-start-guide-asset/anatomy2.html>*
-
-## Missing Values
-
-All missing values were removed prior to the analysis to ensure a complete-case dataset and avoid bias introduced by incomplete observations.
-
-## Number of Participants
-
-The inclusion criteria resulted in a sample size of 1191 individuals with at least one biomarker measurement. Additionally, when restricting the sample to participants with three or more biomarker measurements, the sample size was reduced to 704.
 
 ## Distributions, Transformation and Baseline Definition
 
