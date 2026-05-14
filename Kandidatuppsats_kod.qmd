@@ -89,12 +89,12 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -106,14 +106,6 @@ apoe = APOERES
 - *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
 
 2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
-
-```{r}
-# Checking which ADNI protocols the data are from
-# 
-table(nfl_data$ORIGPROT)
-table(ptau_data$ORIGPROT)
-table(diagnosis_data$ORIGPROT)
-```
 
 ```{r}
 # checking whether there are any observations that should be removed as per the ADNI leadership guidelines about observations with PTID in the format "381_S_10###"
@@ -140,7 +132,7 @@ apoe <- apoe %>%
 
 # We select the required diagnosis variables
 diagnosis_data <- diagnosis_data %>%
-  dplyr::select(ORIGPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+  dplyr::select(RID, VISCODE2, EXAMDATE, DIAGNOSIS)
 
 # We add _dx on the diagnosis variables 
 diagnosis_data <- diagnosis_data %>%
@@ -301,19 +293,6 @@ diagnosis_data_clean <- diagnosis_data %>%
 ```{r}
 # We merge NFL, ptau and diagnosis data for survival data, only by RID 
 surv_data <- long_data %>% left_join(diagnosis_data_clean, by = c("RID"))
-```
-
-```{r}
-# Checking how many dementia diagnoses are probably due to AD
-dx <- ADNIMERGE2::DXSUM
-dx <- dx %>% dplyr::select(RID, DXAPP)
-dx <- dx %>% merge(surv_data, by = "RID")
-table(dx %>% dplyr::select(RID, DXAPP) %>% distinct() %>% dplyr::select(DXAPP))
-```
-
-```{r}
-# Checking with ADNI protocol the diagnosis data is from, ADNI 3 + uses dementia diagnosis an all-cause dementia diagnosis
-table(surv_data$ORIGPROT_dx)
 ```
 
 ## Checking missing values
@@ -4028,7 +4007,7 @@ ggplot(data.frame(
 dev.off()
 ```
 
-### Time-dependent Brier score
+### Time-dependent Brier score 
 
 ```{r}
 # Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent Brier score)

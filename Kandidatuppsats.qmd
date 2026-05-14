@@ -115,7 +115,7 @@ The joint modelling framework extends the Cox PH model by linking a longitudinal
 
 The simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research.
 
-Various models have utilised longitudinal p-tau181 and NfL values with the aim of modeling AD progression, however, the question arises as to which of these modeling approaches has greatest predictive performance. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD research, specifically focusing on plasma biomarkers such as NfL and p-tau. Across these different modelling approaches, it is also of interest to examine whether NfL, p-tau181 or a combination of the biomarkers gives the best predictive perfomance.
+Various models have utilised longitudinal p-tau181 and NfL values with the aim of modeling AD progression, however, the question arises as to which of these modeling approaches has greatest predictive performance. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD research, specifically focusing on plasma biomarkers such as NfL and p-tau. Furthermore, across these modelling approaches, it is also of interest to determine whether NfL, p-tau181, or a combination of the two provides the best predictive performance.
 
 A common issue in modeling longitudinal biomarker data is whether to include or exclude individuals with sparce data in the analysis (Rizopoulos, pp. 27-28). The previously illustrated studies included all participants regardless of the number of measurements per individual, however this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to AD included only those with at least three complete longitudinal cognitive assessments (Guo et al., 2026, p. ? ). Other studies have restricted the inclusion criteria further to those with at least ***ten longitudinal biomarker measurements in order to ensure the approximation did not lead to non-ignorable biases (Wang et al., 2024, pp. 591-592)***. Participants with cross-sectional data cannot provide information about within-subject change over time, however they still contribute useful information about between-subject variability (Fitzmaurice, Laird & Ware, 2011, chapter 8, pp. 214-215). Complete data analyses risk loss in precision dependent on the pattern and distribution of missing data across subjects and time as well as the missing data mechanism. The main concern of missing data is the potential for introducing bias, resulting in misleading inferences. Consequently, the mechanism underlying missing data is a critical consideration in longitudinal analyses, as it determines whether exclusion of incomplete cases may distort results (Fitzmaurice, Laird & Ware, chapter 17, p. 491). The handling of individuals with sparce data reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice.
 
@@ -133,11 +133,11 @@ This study investigates the prediction of progression to AD-dementia using longi
 
 To address the research questions, a series of statistical models will be implemented. In all models, time to progression to AD-dementia, defined by the first recorded diagnosis of dementia, is the survival outcome. Given the relatively recent focus on blood-based biomarkers in AD research, their inclusion was considered timely and relevant. Blood-based p-tau181 and NfL were selected due to their established relevance for predicting dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. In addition, they reflect two distinct pathological processes, making them suitable for comparative analyses of disease progression.
 
-First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, univariate joint models will be applied to link each biomarker’s longitudinal trajectory to the survival outcome. Third, multivariate joint models will jointly model both biomarker trajectories to capture their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal patterns and associated progression risks. Both univariate and multivariate latent class models will be evaluated.
+First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, joint models will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate joint models will be fitted for each biomarker separately. Thereafter, multivariate joint models including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. As with the joint modelling approach, both univariate and multivariate latent class models will be evaluated.
 
 All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ status. In the joint models, these covariates will be included in both submodels to account for potential confounding when estimating the association between biomarker trajectories and disease progression. ***That being said, since the longitudinal submodels will already include a time variable, namely years since baseline, age at visit will not be included in the LME analyses; its inclusion would be redundant given that it is determined by baseline age and follow-up time.*** The significance level will be set at 0.05 for all analyses.
 
-The predictive performance of these modelling frameworks will be compared by time-dependent AUC and Brier scores, ***as well as the estimated associations of p-tau181 and NfL with disease progression***. For prognostic models predicting progression from MCI to AD-dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data is used for model development whilst out-of-sample data is reserved for model evaluation.
+The predictive performance of these models will be compared by time-dependent AUC and Brier scores, ***as well as the estimated associations of p-tau181 and NfL with disease progression***. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD-dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data is used for model development whilst out-of-sample data is reserved for model evaluation.
 
 In addition, a precision analysis will be conducted to assess whether the inclusion of individuals with space longitudinal data effects the results of the analysis. Estimates of model parameters, their precision and model stability (???) will be compared for models estimated with a cohort including at least one biomarker measurement and models with a restricted cohort including individuals with at least three measurements.
 
@@ -494,7 +494,7 @@ It is also worth noting that the correlation between log-transformed p-tau181 an
 
 ## Model fit overview
 
-## Model comparison
+### Test of Proportional Hazards Assumption
 
 ## 
 
@@ -519,7 +519,69 @@ kable_standard(readRDS("tables/table_ph_final.rds"))
 
 After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
 
-As the proportional hazards assumption was met in the refitted models, the results can be interpreted in terms of hazard ratios, which are, together with 95% confidence intervals and p-values, presented in Table 2 for the Cox PH models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline.
+### Residual diagnostics
+
+The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL. As for the Cox models, these models were first estimated in participants with at least three biomarker measurements.
+
+The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (**appendix X**).
+
+Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
+
+Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
+
+### Convergence
+
+To ensure proper model convergence of the joint models, trace plots of the $α$-parameter were examined for each model, starting with those for the joint model of p-tau181, presented in Figure 1.
+
+**Figure 1: trace plot of the** $α$**-parameter for the joint model of p-tau181 estimated on participants with at least three biomarker meausurements.**
+
+The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
+
+A similar pattern was observed for the joint model of NfL, as shown in Appendix X. The chains likewise fluctuated around a stable mean value with good mixing, indicating convergence of the $α$-parameter comparable to the joint model of p-tau181.
+
+Finally, the multivariate joint model also exhibited a similar overall behaviour, as shown in Appendix X. Compared to the single-biomarker models, however, the trace plot for the multivariate joint model shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameter. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
+
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 3.
+
+```{r, echo=FALSE}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
+kable_standard(readRDS("tables/rhat_survival_table.rds"))
+```
+
+The $\widehat{R}$ values for the survival outcomes are all very close to 1, ranging from 1.000 to 1.007 across all joint models. This indicates good convergence of the MCMC chains for the survival components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
+
+While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each joint model are shown in Table 4.
+
+```{r, echo=FALSE}
+#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
+kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
+```
+
+In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all joint models, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. However, a higher value is observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.089. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
+
+## Model comparison
+
+## 
+
+![](figures/q1_auc_ptau.png){width="400"}
+
+![](figures/q1_auc_nfl.png){width="400"}
+
+![](figures/q1_auc_multi.png){width="400"}
+
+![](figures/q1_brier_ptau.png){width="400"}
+
+![](figures/q1_brier_nfl.png){width="400"}
+
+![](figures/q1_brier_multi.png){width="400"}
+
+## Biomarker comparison
+
+## Precision Analysis
+
+### Cox PH Models
+
+As the proportional hazards assumption was met in the refitted Cox PH models, the results can be interpreted in terms of hazard ratios, which are, together with 95% confidence intervals and p-values, presented in Table 2 for the Cox PH models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, more specifically those estimated on participants with at least three biomarker measurements.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least three biomarker meausurements"
@@ -560,45 +622,7 @@ In contrast, sex showed no association with progression in any of the models, wi
 
 When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of the proportional hazard test gave the same conclusions (**appendix: table??**) as well as mostly very similar hazard ratios for the cox PH and joint models (**appendix: table?? & table??**). However, the effect of the log-transformed p-tau181 and NfL measurements were somewhat reduced in the univariate joint models when the midpoint was used as the event time (**table?? vs.** **appendix: table??**). $\widehat R$ values for both the survival submodel and the longitudinal submodel were similar to the models estimated with the original exam date as the event time (**tables ?? & ?? vs. appendix tables ?? & ??**)
 
-## Joint Models
-
-The evaluation of the association between biomarkers and progression to AD-dementia, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL. As for the Cox models, these models were first estimated in participants with at least three biomarker measurements.
-
-The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (**appendix X**).
-
-Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised linear mixed effects models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the log-transformed model. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
-
-Thus, joint models including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the simple joint models, and 20,000 iterations with 2,000 burn-in iterations for the multivariate joint model.
-
-To ensure proper model convergence, trace plots of the $α$-parameter were examined for each joint model, starting with those for the joint model of p-tau181, presented in Figure 1.
-
-**Figure 1: trace plot of the** $α$**-parameter for the joint model of p-tau181 estimated on participants with at least three biomarker meausurements.**
-
-![](figures/convergence_plot_ptau.png){width="400"}
-
-The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
-
-A similar pattern was observed for the joint model of NfL, as shown in Appendix X. The chains likewise fluctuated around a stable mean value with good mixing, indicating convergence of the $α$-parameter comparable to the joint model of p-tau181.
-
-Finally, the multivariate joint model also exhibited a similar overall behaviour, as shown in Appendix X. Compared to the single-biomarker models, however, the trace plot for the multivariate joint model shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameter. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
-
-Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 3.
-
-```{r, echo=FALSE}
-#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
-kable_standard(readRDS("tables/rhat_survival_table.rds"))
-```
-
-The $\widehat{R}$ values for the survival outcomes are all very close to 1, ranging from 1.000 to 1.007 across all joint models. This indicates good convergence of the MCMC chains for the survival components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
-
-While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each joint model are shown in Table 4.
-
-```{r, echo=FALSE}
-#| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
-kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
-```
-
-In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all joint models, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. However, a higher value is observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.089. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
+### Joint Models
 
 Subsequently, the hazard ratios from the joint models were estimated and are presented in Table 5, along with 95% confidence intervals and p-values.
 
@@ -953,6 +977,30 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ![](figures/convergence_plot_multi.png)
 
 <!-- ![](figures/convergence_plot_multi_ptau181.png){width="400"} -->
+
+### Appendix X: Time-depending AUC curves for the NfL models
+
+![](figures/q1_auc_nfl.png){width="400"}
+
+### Appendix X: Time-depending AUC curves for the multivariate models
+
+![](figures/q1_auc_multi.png){width="400"}
+
+### Appendix X: Time-depending Brier score curves for the NfL models
+
+![](figures/q1_brier_nfl.png){width="400"}
+
+### Appendix X: Time-depending Brier score curves for the multivariate models
+
+![](figures/q1_brier_multi.png){width="400"}
+
+### Appendix X: Time-depending AUC curves for the joint models
+
+### Appendix X: Time-depending AUC curves for the latent class joint models
+
+### Appendix X: Time-depending Brier score curves for the joint models
+
+### Appendix X: Time-depending AUC curves for the latent class joint models
 
 ## Sensitivity Analysis: 1+ Biomarker Measurements
 
