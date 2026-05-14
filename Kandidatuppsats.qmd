@@ -743,30 +743,6 @@ Estimating the JLCMMs with the extended cohort of individuals with at least one 
 
 Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements (**appendix table?? & table??**). For NfL, the three class model did not converge, therefore these results are not presented.
 
-# ...
-
-# JLCMM PLOTS: necessary or not?
-
-::: {layout-ncol="2"}
-![**Figure 4: class-specific survival curves for the two class JLCMM for longitudinal p-tau181 measurements**](figures/class-specific-survival-jlcmm-ptau.png)
-
-![**Figure 5: class-specific p-tau181 trajectories for the two-class JLCMM**](figures/longitudinal-jlcmm-ptau.png)
-:::
-
-**Figure ??** shows the class-specific survival curves. The probability of remaining dementia-free reduces sharply for $class2$ up until about 5 years, where the curve starts to level out. For individuals in $class1$, the probability of dementia diagnosis remains close to 0 for about 10 years, where the probability of diagnosis increases slowly at first and then, from about 15 years, increases sharply.
-
-**JLCMM of longitudinal NfL measurements and time-to-dementia data**
-
-::: {layout-ncol="2"}
-![**Figure 6: class-specific survival curves for the two class JLCMM for longitudinal NfL measurements**](figures/class-specific-survival-jlcmm-nfl.png)
-
-![**Figure 7: class-specific NfL trajectories for the two class JLCMM**](figures/longitudinal-jlcmm-nfl.png)
-:::
-
-**Figure ??** shows the class-specific survival given from the two class JLCMM with longitudinal NfL measurements. The plot shows similar survival curves to those in **figure ??**, suggesting both models have discerned latent classes with similar time-to-diagnosis processes.
-
-# ...
-
 # Discussion
 
 ## Main Findings/Summary
