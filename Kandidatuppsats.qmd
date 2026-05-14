@@ -590,7 +590,6 @@ Figure:
 
 ![](figures/q1_brier_ptau.png){width="400"}
 
-
 As for the time-depending AUC results, the time-depending Brier score results are also observed in Table X containing the Brier score values for each modelling approach and at each follow-up time point.
 
 ```{r, echo=FALSE}
