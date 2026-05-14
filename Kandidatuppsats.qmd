@@ -117,15 +117,13 @@ The simultaneous modelling of multivariate longitudinal biomarkers and clinical 
 
 Various models have utilised longitudinal p-tau181 and NfL values with the aim of modeling AD progression, however, the question arises as to which of these modeling approaches has greatest predictive performance. Few studies have systematically compared the previously mentioned modeling approaches within a unified framework in AD research, specifically focusing on plasma biomarkers such as NfL and p-tau. Furthermore, across these modelling approaches, it is also of interest to determine whether NfL, p-tau181, or a combination of the two provides the best predictive performance.
 
-Additionally, an important consideration is whether to include all participants with repeated biomarker measurements. Although the two previously mentioned studies included all participants regardless of the number of measurements per individual, this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to AD explicitly states: "Participants were included if they had a baseline diagnosis of MCI and at least three follow-up visits with complete longitudinal cognitive assessments" (Guo et al., 2026, p. ? ). Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9). Another study, focusing on cardiovascular events, restricted their joint model analysis to the cohort of 3784 patients who had at least 10 measurements of the selected biomarker (Wang et al., 2024, pp. 591-592).
+A common issue in modeling longitudinal biomarker data is whether to include or exclude individuals with sparce data in the analysis (Rizopoulos, pp. 27-28). The previously illustrated studies included all participants regardless of the number of measurements per individual, however this is not always the case. For example, a study examining different cognitive biomarkers to predict progression to AD included only those with at least three complete longitudinal cognitive assessments (Guo et al., 2026, p. ? ). Other studies have restricted the inclusion criteria further to those with at least ***ten longitudinal biomarker measurements in order to ensure the approximation did not lead to non-ignorable biases (Wang et al., 2024, pp. 591-592)***. Participants with cross-sectional data cannot provide information about within-subject change over time, however they still contribute useful information about between-subject variability (Fitzmaurice, Laird & Ware, 2011, chapter 8, pp. 214-215). Complete data analyses risk loss in precision dependent on the pattern and distribution of missing data across subjects and time as well as the missing data mechanism. The main concern of missing data is the potential for introducing bias, resulting in misleading inferences. Consequently, the mechanism underlying missing data is a critical consideration in longitudinal analyses, as it determines whether exclusion of incomplete cases may distort results (Fitzmaurice, Laird & Ware, chapter 17, p. 491). The handling of individuals with sparce data reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice.
 
-In other words, some studies include all available participants, while others impose minimum requirements on the number of repeated measurements, thereby excluding individuals with only a single observation. This variation in inclusion criteria reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice. For example, in the previously mentioned study, such restrictions were applied to ensure that the approximation method did not lead to “non-ignorable biases” (Wang et al., p. 591). On one hand, participants with only a single observation do not provide information about change over time within individuals. On the other hand, their observations at a single time point still contribute useful information to the analysis by informing estimates of variability and between-subject effects (Fitzmaurice, Laird & Ware, 2011, chapter 8, pp. 214-215).
-
-The choice of inclusion strategy also has important implications for statistical efficiency and validity. Analyses restricted to individuals with complete data are generally less efficient than methods that use all available information, resulting in a loss of precision. This loss depends on the pattern and distribution of missing data across subjects and time points, as well as the extent to which missingness is related to observed outcomes. Importantly, missing data may under certain circumstances also introduce bias, potentially leading to misleading inferences about changes in the mean response. Consequently, the mechanism underlying missing data is a critical consideration in longitudinal analyses, as it determines whether exclusion of incomplete cases may distort results (Fitzmaurice, Laird & Ware, chapter 17, p. 491).
+***Similarly, in a study on type 1 diabetes and primary biliary cirrhosis (PBC), the joint model analysis was restricted to participants with recorded height and weight and at least three biomarker measurements (Xu, 2021, p. 9).***
 
 ## Research Aims
 
-This study investigates the prediction of progression to AD-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarker specifications, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
+This study investigates the prediction of progression to AD-dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarkers, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
 
 1.  Which modelling approach (Cox proportional hazards model with baseline biomarker values, joint models with longitudinal biomarker data, or latent class joint models) provides the best prediction of progression to Alzheimer’s disease-related dementia?
 2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to Alzheimer’s disease-related dementia?
@@ -141,7 +139,7 @@ All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ s
 
 Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. To ensure an unbiased assessment of model performance and generalisability, the data will be split into in-sample and out-of-sample sets, where the in-sample data are used for model development and the out-of-sample data are reserved for evaluation.
 
-Model performance will be assessed using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression.
+Model performance will be assessed using time-dependent AUC and Brier score for dynamic prediction. For prognostic models predicting progression from MCI to AD-dementia, a 2–4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2–6 years will be used to capture short- to mid-term progression.
 
 In addition, a precision analysis will be conducted to assess how the number of repeated measurements per individual influences the estimation of longitudinal trajectories and their associations with the survival outcome. This will be evaluated by comparing results between individuals with at least one repeated biomarker measurement and those with at least three repeated measurements, and by assessing differences in model stability and parameter precision.
 
@@ -275,7 +273,7 @@ As the number of iterations L increases and the between-chain variation B decrea
 
 While standard joint models assume a homogeneous population, AD is highly heterogeneous, with patients exhibiting different patterns of cognitive decline and biomarker evolution. JLCMMs address this by assuming that the population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks.
 
-This model links a longitudinal biomarker process and a survival process whilst assuming that the population, N, is heterogenous and made up of G homogenous and unobserved latent classes (Kyheng, Babykina & Duhamel, 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122). The multivariate JLCMM extends the joint latent class modeling framework by allowing multiple longitudinal biomarkers to be modeled simultaneously within each latent class, while linking their joint evolution to a class-specific risk. In this analysis, the univariate JLCMM will be fit on the longitudinal p-tau181 and NfL measurements separately, and then by compared to the multivariate model for both biomarkers, in order to assess which method more accurately models the class-specific hazard of progression to dementia due to AD, and whether, in fact, any latent classes can be distinguished at all.
+This model links a longitudinal biomarker process and a survival process whilst assuming that the population, N, is heterogenous and made up of G homogenous and unobserved latent classes (Kyheng, Babykina & Duhamel, 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122). The multivariate JLCMM extends the joint latent class modeling framework by allowing multiple longitudinal biomarkers to be modeled simultaneously within each latent class, while linking their joint evolution to a class-specific risk. In this analysis, the univariate JLCMM will be fit on the longitudinal p-tau181 and NfL measurements separately, and then by compared to the multivariate model for both biomarkers, in order to assess which method more accurately models the class-specific hazard of progression to AD-dementia, and whether, in fact, any latent classes can be distinguished at all.
 
 ### Class Submodel
 
@@ -519,7 +517,7 @@ kable_standard(readRDS("tables/table_ph_final.rds"))
 
 After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
 
-### Residual diagnostics 
+### Residual diagnostics
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was fitted separately for p-tau181 and NfL. As for the Cox models, these models were first estimated in participants with at least three biomarker measurements.
 
@@ -577,7 +575,7 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 ## Biomarker comparison
 
-## Precision Analysis 
+## Precision Analysis
 
 ### Cox PH Models
 
@@ -978,29 +976,29 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 <!-- ![](figures/convergence_plot_multi_ptau181.png){width="400"} -->
 
-### Appendix X: Time-depending AUC curves for the NfL models 
+### Appendix X: Time-depending AUC curves for the NfL models
 
 ![](figures/q1_auc_nfl.png){width="400"}
 
-### Appendix X: Time-depending AUC curves for the multivariate models 
+### Appendix X: Time-depending AUC curves for the multivariate models
 
 ![](figures/q1_auc_multi.png){width="400"}
 
-### Appendix X: Time-depending Brier score curves for the NfL models 
+### Appendix X: Time-depending Brier score curves for the NfL models
 
 ![](figures/q1_brier_nfl.png){width="400"}
 
-### Appendix X: Time-depending Brier score curves for the multivariate models 
+### Appendix X: Time-depending Brier score curves for the multivariate models
 
 ![](figures/q1_brier_multi.png){width="400"}
 
-### Appendix X: Time-depending AUC curves for the joint models 
+### Appendix X: Time-depending AUC curves for the joint models
 
-### Appendix X: Time-depending AUC curves for the latent class joint models 
+### Appendix X: Time-depending AUC curves for the latent class joint models
 
-### Appendix X: Time-depending Brier score curves for the joint models 
+### Appendix X: Time-depending Brier score curves for the joint models
 
-### Appendix X: Time-depending AUC curves for the latent class joint models 
+### Appendix X: Time-depending AUC curves for the latent class joint models
 
 ## Sensitivity Analysis: 1+ Biomarker Measurements
 
