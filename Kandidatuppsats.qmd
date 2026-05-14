@@ -705,11 +705,20 @@ Defining the event time as the midpoint between diagnoses exams was also tested 
 
 This analysis compared the predictive performance of different modeling frameworks when time-to-dementia for individuals in the ADNI cohort was the outcome of interest. Cox PH models were estimated with baseline p-tau181 and NfL values as well as a model with both baseline biomarker values. These models were expanded by incorporating longitudinal biomarker measurements into the Cox PH model via the joint modeling framework as well as allowing for class-specific modeling via the JLCMM framework.
 
-The predictive performance of these models was assessed by comaparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Modest differences were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself.
+The predictive performance of these models was assessed by comaparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Modest differences in AUC were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself.
 
-The multivariate joint model performed best at the 2 year time point, showing more accurate early predictions than the other models. The differences were mostly modest, with the smallest difference being 0.01 when compared to the joint model with longitudinal NfL alone. The largest difference was 0.156 when compared to the Cox PH with baseline p-tau181 values, suggesting clearly superior early predictions from the multivariate joint model. This is clinically meaningful, as early identification of those at risk of AD-dementia could be beneficial in clinical trial enrolement.
+The multivariate joint model performed best at the 2 year time point, showing better early discrimination than the other models. The differences were mostly modest, with the smallest difference being 0.01 when compared to the joint model with longitudinal NfL alone. The largest difference was 0.156 when compared to the Cox PH with baseline p-tau181 values, suggesting clearly superior early predictions from the multivariate joint model. This is clinically meaningful, as early identification of those at risk of AD-dementia could be beneficial in clinical trial enrolement. At the 6 year mark, the differences in AUC between models were reduced. The multivariate joint model again presented the highest AUC, suggesting that despite the expected reduction in predictive performance over time, multivariate joint modeling of plasma p-tau181 and NfL may be justified even when long-term discrimination between cases and non-cases are of importance.
 
-At the 6 year mark, the differences in performance were reduced, however the multivariate joint model again presented the highest AUC, suggesting that despite the expected reduction in predictive performance over time, multivariate joint modeling of plasma p-tau181 and NfL may be justified even when long-term predictions are of importance.
+```{r}
+# computing the null model benchmark for brier scores
+# 27.84% event rate in out-of-sample data set
+null <- 0.2784 * (1 - 0.2784)
+JLCMM_ipa <- 1 - (0.024 / 0.20)
+cox_ipa <- 1 - (0.057 / 0.20)
+JM_ipa <- 1 - (0.054 / 0.20)
+```
+
+When comparing Brier scores, the short-term predictive performance of the JLCMMs were superior when compared against the other models. The JLCMMs explained around 88% more of the variance than the null model which assigns all individuals the average event probability of 0.28. This was around 72% for all the Cox PH models and 73 % for the joint models. This suggests the JLCMM predicts individual survival probabilities closer to the true event probabilities.
 
 The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models.
 
