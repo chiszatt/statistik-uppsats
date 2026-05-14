@@ -699,6 +699,10 @@ Defining the event time as the midpoint between diagnoses exams was also tested 
 
 # Discussion
 
+## Main Findings
+
+*Summarise and interpret the results. What did we find?*
+
 This analysis compared the predictive performance of different modeling frameworks when time-to-dementia for individuals in the ADNI cohort was the outcome of interest. Cox PH models were estimated with baseline p-tau181 and NfL values as well as a model with both baseline biomarker values. These models were expanded by incorporating longitudinal biomarker measurements into the Cox PH model via the joint modeling framework as well as allowing for class-specific modeling via the JLCMM framework.
 
 The predictive performance of these models was assessed by comaparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Modest differences were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself.
@@ -710,16 +714,6 @@ At the 6 year mark, the differences in performance were reduced, however the mul
 The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models.
 
 Finally, the effect of the inclusion of individuals with sparse biomarker data was assessed by a precision analysis where the results of models estimated on individuals with at least three measurements were compared with those fit on a cohort of inidivudals with at least one measurement.
-
-## Main Findings/Summary
-
-*Summarise the results.*
-
-## Conclusions
-
-*Interpret the results. What did we find?*
-
-## Discussion - Relating to the research question(s)/previous literature
 
 *How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?*
 
