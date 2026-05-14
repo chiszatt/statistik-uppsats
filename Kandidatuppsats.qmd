@@ -604,11 +604,11 @@ In order to compare the different modelling approaches, predictive performance w
 
 ![](figures/q1_auc_ptau.png){width="400"}
 
-Among the models including p-tau181, the joint model (JM) provides the highest discrimination at early time points, outperforming both the Cox model and the latent class joint model (LCJM). However, the LCJM shows more stable performance over time, with relatively smaller declines in AUC at later time points compared to JM, while Cox models consistently yield the lowest predictive performance.
+Among the models including p-tau181, the time-dependent AUC values remain above 0.75 across all three modelling approaches throughout the follow-up period, indicating stable and relatively strong predictive performance overall. At earlier time points, the joint model (JM) provides the highest discrimination. However, the differences between the models decrease over time, and at the six-year follow-up, the latent class joint model (LCJM) slightly outperforms the other approaches. The Cox PH model consistently yields the lowest predictive performance across follow-up.
 
-Among the models including NfL, the same overall pattern is observed; as shown in Appendix X, the JM achieves the strongest early predictive performance. The LCJM performs slightly lower at baseline but demonstrates strong and relatively stable performance over time, maintaining competitive AUC values at later follow-up points. Cox models remain consistently inferior across all time horizons.
+Among the different models including NfL, the same overall pattern is observed. As shown in Appendix X, all models including NfL maintain AUC values above 0.75 throughout the follow-up period, indicating consistently strong predictive performance. At earlier follow-up times, the joint model (JM) yields the highest AUC values. However, its performance gradually declines at later follow-up times, becoming more similar to the other models. Additionally, the latent class joint model (LCJM) achieves the highest AUC value at the six-year follow-up.
 
-When considering the combined biomarker strategy, the JM with both NfL and p-tau181 provides the best overall predictive performance in the entire analysis, as shown in Appendix X.
+Appendix X, presenting the models including both biomarkers simultaneously, also demonstrates higher AUC values for the joint model at earlier follow-up time points. However, its AUC values gradually decline over time, yielding values more similar to those of the Cox PH model at later follow-up times.
 
 These results are also indicated by Table X, containing the AUC values for each modelling approach and at each follow-up time point.
 
@@ -617,13 +617,15 @@ These results are also indicated by Table X, containing the AUC values for each 
 kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
-For instance, by showing that the JM among the multivariate models has an AUC value of 0.967 at the two-year follow-up and an AUC value of 0.846 at the six-year follow-up, Table x confirms that it provides the best overall predictive performance among these models.
+For instance, by showing that the JM among the models including p-tau181 has an AUC value of 0.902 at the two-year follow-up, while the corresponding Cox PH model has an AUC value of 0.823 and the corresponding latent class joint model has an AUC value of 0.862, Table X confirms the results previously observed in the figure presenting the time-dependent AUC curves for these models. The differences between the models then decrease over time; at the four-year follow-up, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the LCJM.
 
-By evaluating the predictive performance through time-depending Brier score instead, the patterns remain the same, but with lower values indicating better predictive accuracy, as shown by Figure X ; it presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker being fixed as p-tau181.
+By evaluating predictive performance using time-dependent Brier scores instead, the same overall patterns are observed, with lower values indicating better predictive accuracy. Figure X presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 **Figure X: time-depending Brier score curves for different modelling approaches (p-tau181 models)**
 
-![](figures/q1_auc_ptau.png){width="400"}
+![](figures/q1_brier_ptau.png){width="400"}
+
+According to the figure, the JLCM yields the lowest AUC values across the follow-up period. In comparison, at the earlier follow-up points, the two other models yield very similar AUC values. At the later
 
 As for the time-depending AUC results, the time-depending Brier score results are also observed in Table X containing the Brier score values for each modelling approach and at each follow-up time point.
 
