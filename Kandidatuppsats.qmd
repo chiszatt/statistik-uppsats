@@ -109,15 +109,11 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-*Assessing the current landscape in terms of the scientific literature. What is known? What has been done Where are there gaps??? (This leads on to the next section, why are we doing this research, how do we hope to answer some remaining question in the AD research, orient this towards the statistical analysis/approaches!)*
-
 Recent research has applied a range of prognostic models to estimate disease progression and related adverse outcomes in AD using biomarker data. One study from 2020 used $log_{10}$ transformed baseline plasma p-tau181 values in a Cox proportional hazards (Cox PH) model and found it to be a strong predictor of conversion across groups, with hazard ratios ranging from approximately 2.5 to 3.8 depending on cognitive status (Janelidze et al., 2020, 388). Adjusting for age, sex and education, baseline plasma p-tau181 levels were strongly associated with increased risk of progression to Alzheimer’s dementia, with hazard ratios around 3-4 per standard deviation increase. A Cox PH model was estimated with additional $log_{10}$ transformed biomarker levels, including plasma NfL. The effect of p-tau181 remained significant, with only a small reduction in effect size, whereas NfL showed no meaningful contribution to risk prediction with hazard ratios close to 1 (Janelidze et al., pp. 385, 388).
 
 The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the conversion risk to AD (Yuan et al., 2024, p. 1). Higher longitudinal p-tau181 levels were found to be associated with a significantly increased risk of progression, with the joint model estimating a hazard ratio of approximately 5.83 for p-tau181 and 4.18 for NfL (Yuan et al., p. 1). Combining p-tau181 and NfL measuremetns in a multivariate joint model lead to improved performance (Yuan et al., pp. 1, 3). Several studies have examined the association between plasma p-tau181 and NfL levels and baseline measures such as cognition score or CSF biomarker levels using longitudinal models (Mattsson et al., 2019; Chen et al., 2021).
 
 The simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research.
-
-***Since there is evidence to support AD as a heterogeneous disease with differing disease trajectories (SOURCE), a JLCMM could be employed to assess whether individuals can be categorised into meaningful classes based on NfL and p-tau181 trajectories alongside survival data.***
 
 ***Is this relevent to us?:***
 
@@ -133,9 +129,9 @@ The choice of inclusion strategy also has important implications for statistical
 
 ## Research Aims
 
-This study investigates the prediction of progression to Alzheimer’s disease (AD)-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarkers, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
+This study investigates the prediction of progression to AD-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, different biomarkers, and the impact of the number of repeated measurements per individual. More specifically, the research questions are:
 
-1.  Which of the considered modelling approaches provides the best prediction of progression to Alzheimer’s disease (AD)-related dementia using longitudinal blood biomarker data?
+1.  Which of the considered modelling approaches provides the best prediction of progression to AD-related dementia using longitudinal blood biomarker data?
 2.  How do these associations differ between p-tau181 and NfL?
 3.  How does the precision of estimated longitudinal trajectories and their associations with time to AD-related dementia vary with the number of repeated measurements per individual?
 
