@@ -607,7 +607,7 @@ However, when observing the plots of the time-dependent Brier score curves for m
 
 **Figure X: time-depending Brier score curves for different biomarker specifications (Cox PH models)**
 
-![](figures/q2_brier_cox.png)
+![](figures/q2_brier_cox.png){width="400"}
 
 Within the Cox PH models, the models including p-tau181, NfL, or both biomarkers simultaneously all yield similar time-dependent Brier score values across the follow-up period. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed within the joint models, as shown in Appendix X, as well as within the latent class joint models, as shown in Appendix X.
 
