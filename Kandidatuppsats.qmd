@@ -444,7 +444,7 @@ Among the participants with at least three biomarker measurements, 83 participan
 
 ## Model fit overview
 
-### Test of Proportional Hazards Assumption
+### Test of Proportional Hazards Assumption and Concordance 
 
 To evaluate the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, Cox PH models were first fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Additional covariates were gender, age at baseline and APOE genotype. Initially fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
@@ -460,6 +460,13 @@ kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
 After excluding age at baseline, the GLOBAL test yielded p-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
+
+Furthermore, an initial comparison of model performance by assessment of the concordance indices for all cox models was performed. The results presented in Table 3 show that the concordance index evaluates all three models similarly.
+
+```{r, echo=FALSE}
+#| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values estimated on participants with at least three biomarker meausurements"
+kable_standard(readRDS("tables/c_index_table.rds"))
+```
 
 ### Residual diagnostics
 
@@ -633,13 +640,6 @@ Both baseline p-tau181 and baseline NfL were significantly associated with an in
 
 In the Cox PH model including both biomarkers simultaneously, the results were similar, with both p-tau181 and NfL remaining significantly associated with progression. The effect estimates were however slightly attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 1.81 and NfL showing a hazard ratio of 1.98. This indicates that both biomarkers retained independent prognostic value. The confidence intervals for both variables were somewhat wider than in the univariable models, reflecting increased uncertainty in the joint model due to shared variance between the biomarkers.
 
-An initial comparison of model performance by assessment of the concordance indices for all cox models was performed. The results presented in Table 3 show that the concordance index evaluates all three models similarly.
-
-```{r}
-#| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values estimated on participants with at least three biomarker meausurements"
-kable_standard(readRDS("tables/c_index_table.rds"))
-```
-
 Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, the results remained robust, with inclusion of participants with fewer repeated observations increasing statistical power but not changing the direction or interpretation of the estimated effects for the main biological predictors. More precisely, Table X further demonstrates that hazard ratios, confidence intervals, and patterns of statistical significance remained broadly consistent across models, supporting unchanged conclusions.
 
 ```{r}
@@ -701,9 +701,9 @@ Defining the event time as the midpoint between diagnoses exams was also tested 
 
 This analysis compared the predictive performance of different modeling frameworks when time-to-dementia for individuals in the ADNI cohort was the outcome of interest. Cox PH models were estimated with baseline p-tau181 and NfL values as well as a model with both baseline biomarker values. These models were expanded by incorporating longitudinal biomarker measurements into the Cox PH model via the joint modeling framework as well as allowing for class-specific modeling via the JLCMM framework.
 
-The predictive performance of these models was assessed by comaparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Modest differences in AUC were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself.
+The predictive performance of these models was assessed by comparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Modest differences in AUC were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself.
 
-The multivariate joint model performed best at the 2 year time point, showing better early discrimination than the other models. The differences were mostly modest, with the smallest difference being 0.01 when compared to the joint model with longitudinal NfL alone. The largest difference was 0.156 when compared to the Cox PH with baseline p-tau181 values, suggesting clearly superior early predictions from the multivariate joint model. This is clinically meaningful, as early identification of those at risk of AD-dementia could be beneficial in clinical trial enrolement. At the 6 year mark, the differences in AUC between models were reduced. The multivariate joint model again presented the highest AUC, suggesting that despite the expected reduction in predictive performance over time, multivariate joint modeling of plasma p-tau181 and NfL may be justified even when long-term discrimination between cases and non-cases are of importance.
+The multivariate joint model performed best at the 2 year time point, showing better early discrimination than the other models. The differences were mostly modest, with the smallest difference being 0.01 when compared to the joint model with longitudinal NfL alone. The largest difference was 0.156 when compared to the Cox PH with baseline p-tau181 values, suggesting clearly superior early predictions from the multivariate joint model. This is clinically meaningful, as early identification of those at risk of AD-dementia could be beneficial in clinical trial enrolement. At the 6 year mark, the differences in AUC between models were reduced. The multivariate joint model again presented the highest AUC, suggesting that despite the expected reduction in predictive performance over time, multivariate joint modeling of plasma p-tau181 and NfL may be justified even when long-term discrimination between cases and non-cases are of importance.**\*\*\* kanske dela upp detta bättre utifrån frågeställningarna? - samma för styckena nedan**
 
 ```{r}
 # computing the null model benchmark for brier scores
@@ -714,11 +714,13 @@ cox_ipa <- 1 - (0.057 / 0.20)
 JM_ipa <- 1 - (0.054 / 0.20)
 ```
 
-When comparing Brier scores, the short-term predictive performance of the JLCMMs were superior when compared against the other models. The JLCMMs explained around 88% more of the variance than the null model which assigns all individuals the average event probability of 0.28. This was around 72% for all the Cox PH models and 73 % for the joint models. This suggests the JLCMM predicts individual survival probabilities closer to the true event probabilities.
+**When comparing Brier scores, the short-term predictive performance of the JLCMMs were superior when compared against the other models. The JLCMMs explained around 88% more of the variance than the null model which assigns all individuals the average event probability of 0.28. This was around 72% for all the Cox PH models and 73 % for the joint models. This suggests the JLCMM predicts individual survival probabilities closer to the true event probabilities.**
 
-The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models.
+**The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models.**
 
-Finally, the effect of the inclusion of individuals with sparse biomarker data was assessed by a precision analysis where the results of models estimated on individuals with at least three measurements were compared with those fit on a cohort of inidivudals with at least one measurement.
+Although the superiority of joint models was primarily observed at earlier follow-up time points, the findings of this study are consistent with those of Goksuluk et al. (2025), who reported improved predictive performance of joint modelling approaches compared to Cox PH models using, among other specifications, baseline biomarker values. The authors further reported that models including multiple biomarkers simultaneously performed slightly better than models including a single biomarker, which is also supported by the findings of the present study.
+
+Finally, the effect of the inclusion of individuals with sparse biomarker data was assessed by a precision analysis where the results of models estimated on individuals with at least three measurements were compared with those fit on a cohort of individuals with at least one measurement. The differences in hazard ratios, confidence intervals, and p-values were marginal, which suggests that the main results are robust and not driven by individuals with sparse biomarker data. Missing data is important in studies of dementia progression since individuals with fewer biomarker measurements may have faster disease progression or poorer health, which could introduce bias. However, the results of the precision analysis suggest that this was not a major issue in this study.
 
 *How do our results help to answer the research question? Anything unexpected/not in accordance with previous studies?*
 
@@ -730,9 +732,7 @@ Kanske problem vi stötte på?
 
 Since the exact dates of Alzheimer’s disease onset are not available in the dataset and only diagnostic status at each visit is recorded, the event times for progression to dementia were consequently approximated based on observed follow-up visits. In other words, participants were treated as right-censored at the time of their last known assessment, rather than as interval-censored. However, it is highly likely that disease progression occurred between visits rather than exactly at the recorded observation times, which introduces a potential bias in the estimated event times.
 
-Despite this, interval-censoring was not implemented given the level of this thesis and its time constraints. Properly accounting for interval-censored event times would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable.
-
-As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval-censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
+Despite this, interval-censoring was not implemented given the level of this thesis and its time constraints. Properly accounting for interval-censored event times would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval-censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
 
 Furthermore, as plasma biomarker research is still emerging and longitudinal data with many repeated measurements per individual remain limited, explaining why the individuals in this study had at most five biomarker measurements, future studies should aim to replicate and extend this analysis once larger cohorts with more frequent longitudinal sampling become available. This would improve the precision of both trajectory estimation and the assessment of associations between biomarker dynamics and disease progression.
 
