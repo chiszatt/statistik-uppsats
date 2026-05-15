@@ -414,7 +414,7 @@ When restricting the participants to those with three or more biomarker measurem
 
 P-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b). However, the unit of measurement is not specified in the data set documentation. NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
 
-Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (**appendix X & appendix X**). A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement. Values larger than three standard deviations were analysed and it was determined that they should be retained in the analysis. It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (**appendix X**), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
+Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (appendix 8.1.1 & 8.1.2). A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement. Values larger than three standard deviations were analysed and it was determined that they should be retained in the analysis. It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate joint modelling framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
 
 Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. Diagnoses were therefore available several years prior to the first biomarker measurements. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
 
@@ -466,7 +466,7 @@ kable_standard(readRDS("tables/c_index_table.rds"))
 
 The evaluation of the association between biomarkers and progression to dementia due to AD, while adjusting for relevant covariates, was further extended by fitting joint models that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was estimated separately for p-tau181 and NfL. As for the Cox models, these models were first estimated in participants with at least three biomarker measurements.
 
-The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (**appendix X**).
+The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (appendix 8.2; table 12).
 
 Plotting the residuals against the fitted values for the LME model of p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix X. The slight deviations in the tails of the Q-Q plot, shown in Appendix X, were also not considered to be of concern. A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values in Appendix X showed even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181. The Q-Q plot for NfL in Appendix X showed similar results to those observed for p-tau181. Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME model with log-transformed data. Consequently, these were considered to provide an adequate fit to the data, suggesting that they are suitable for use within the joint modeling framework.
 
@@ -508,16 +508,16 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 The number of latent classes in the JLCMM were determined via analysis of the BIC, entropy and assessment of the posterior classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard model was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum.
 
-First, the log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (**table ?**). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
+First, the log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
 ```{r}
-#| tbl-cap: "Table 6: log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
+#| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
 Posterior classifications show the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
-For the two class model (**table ??**), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (**table ??**) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
+For the two class model (table 6), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (table 7) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
 
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal p-tau181 measurements"
@@ -531,14 +531,14 @@ kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 
 Additionally, the score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modeling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in appendix X. Therefore, the two class model was chosen for this analysis.
 
-Analysis of the log-likelihood, BIC and entropy provided in **table??** for candidate models using longitudinal NfL data suggests that even in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, and only increased very slightly between the two class and the three class model. BIC was minimised and entropy was maxmised for the two class model.
+Analysis of the log-likelihood, BIC and entropy provided in table 8 for candidate models using longitudinal NfL data suggests that even in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, and only increased very slightly between the two class and the three class model. BIC was minimised and entropy was maxmised for the two class model.
 
 ```{r}
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (**table ??**). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, a two class model was again chosen.
+Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (table 9). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, a two class model was again chosen.
 
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
@@ -559,7 +559,7 @@ Among the models including NfL, a similar overall pattern is observed. As shown 
 
 Appendix X, presenting the models including both biomarkers simultaneously, also demonstrates higher AUC values for the joint model at earlier follow-up time points. These values gradually decline over time, yielding values more similar to those of the Cox PH model at later follow-up times.
 
-These results are also indicated by Table X, containing the AUC values for each modelling approach and at each follow-up time point.
+These results are also indicated by table 10, containing the AUC values for each modelling approach and at each follow-up time point.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent AUC by model and follow-up time point"
@@ -578,9 +578,7 @@ Among the models including p-tau181, the time-dependent Brier score values remai
 
 A similar overall pattern is also observed among the models including NfL: as, shown in Appendix X, the latent class joint model yields lower Brier score values compared with the other two models at earlier follow-up points. Then, at later follow-up times, these values become smaller, resulting in the differences becoming smaller between the models, with values being low, stable and around the same range as for models including p-tau181.
 
-The same can be said for the time-depending Brier score values among the models including both biomarkers simultaneously. Appendix X demonstrates that the Cox PH model and the joint model yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at early follow-up to 0.14 at later follow-up.
-
-As for the time-depending AUC results, the time-depending Brier score results are also confirmed by Table X containing the Brier score values for each modelling approach and at each follow-up time point.
+The same can be said for the time-depending Brier score values among the models including both biomarkers simultaneously. Appendix X demonstrates that the Cox PH model and the joint model yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at early follow-up to 0.14 at later follow-up. Table 11 presents the Brier score values for each modelling approach and at each follow-up time point.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent Brier score by model and follow-up time point"
@@ -649,13 +647,13 @@ When both biomarkers were included simultaneously, the same pattern remained, wi
 
 In contrast, sex showed no association with progression in any of the models, with p-values above 0.05.
 
-When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of the proportional hazard test gave the same conclusions (**appendix: table??**) as well as mostly very similar hazard ratios for the cox PH and joint models (**appendix: table?? & table??**). However, the effect of the log-transformed p-tau181 and NfL measurements were somewhat reduced in the univariate joint models when the midpoint was used as the event time (**table?? vs.** **appendix: table??**). $\widehat R$ values for both the survival submodel and the longitudinal submodel were similar to the models estimated with the original exam date as the event time (**tables ?? & ?? vs. appendix tables ?? & ??**)
+When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of the proportional hazard test gave the same conclusions as well as mostly very similar hazard ratios for the cox PH and joint models. However, the effect of the log-transformed p-tau181 and NfL measurements were somewhat reduced in the univariate joint models when the midpoint was used as the event time. $\widehat R$ values for both the survival submodel and the longitudinal submodel were similar to the models estimated with the original exam date as the event time. All results from the sensitivity analysis are available upon request.
 
 ### Joint Models
 
 Since the joint models converged correctly, the hazard ratios from the joint models were Subsequently estimated and are presented in Table 5, along with 95% confidence intervals and p-values.
 
-```{r, echo=FALSE}
+```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
 # kable_standard(readRDS("tables/table_jm1.rds"))
 ```
@@ -683,9 +681,9 @@ Sex also remained non-significant across all joint models, with no meaningful di
 
 ### Joint Latent Class Mixed Models
 
-Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding optimal models. For the univariate JLCMM with longitudinal p-tau181 measurements, although BIC was minimised and entropy was maximised for the three class model, one class comprised of only $2.28\%$ of the sample population (**appendix:** **table ??**). Additionally, the posterior classification table showed the model had poorer classification certainty (**appendix: table??**) compared with the two class model (**appendix: table??**). Comparing the two class model on the full data set and the two class model chosen in the main analysis, classification uncertainty decreased when including individuals with fewer than three longitudinal p-tau181 measurements (**table ?? vs appendix: table ??**). When modelling longitudinal NfL measurements with this data set, the BIC was minimised for the two class model and despite the three class model having the highest entropy, class2 contained only $1.14\%$ of the sample population (**appendix: table ??**). Again, compared with the two class model estimated on the data set including only those with more than 3 longitudinal NfL measurements, classification certainty decreased (**table ?? vs. appendix: table ??**).
+Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding optimal models. For the univariate JLCMM with longitudinal p-tau181 measurements, although BIC was minimised and entropy was maximised for the three class model, one class comprised of only $2.28\%$ of the sample population (appendix 8.7; table 17). Additionally, the posterior classification table showed the model had poorer classification certainty (appendix 8.7; table 18) compared with the two class model (appendix 8.7; table 19). Comparing the two class model on the full data set and the two class model chosen in the main analysis, classification uncertainty decreased when including individuals with fewer than three longitudinal p-tau181 measurements (table 6 vs. appendix 8.7; table 18). When modelling longitudinal NfL measurements with this data set, the BIC was minimised for the two class model and despite the three class model having the highest entropy, class2 contained only $1.14\%$ of the sample population (appendix 8.7; table 20). Again, compared with the two class model estimated on the data set including only those with more than 3 longitudinal NfL measurements, classification certainty decreased (table 9 vs. appendix 8.7; table 21).
 
-Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements (**appendix table?? & table??**). For NfL, the three class model did not converge, therefore these results are not presented.
+Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements. For NfL, the three class model did not converge, therefore these results are not presented. Again, these results are available upon request.
 
 # Discussion
 
@@ -712,9 +710,9 @@ Finally, the effect of the inclusion of individuals with sparse biomarker data w
 
 ## Suggestions for Further Research
 
-Diagnostic exam dates were used as a proxy for AD onset in this analysis. Considering the exact time of disease onset is rarely known, individuals are considered interval censored. This has the potential to introduce bias in the estimated event times, as the time-to-diagnosis is overestimated.
+Diagnostic exam dates were used as a proxy for AD onset in this analysis. Considering the exact time of disease onset is rarely known, individuals are considered interval censored. This has the potential to introduce bias in the estimated event times, as the time-to-diagnosis is overestimated. Despite this, interval censoring was not adequately accounted for given the level of this thesis and its time constraints. This would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
 
-Despite this, interval censoring was not adequately accounted for given the level of this thesis and its time constraints. This would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
+Additionally, this analysis did not compare a multivariate JLCMM modeling both p-tau181 and NfL measurements, due to time constraints. Currently, the $lcmm$ package does not offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. Therefore, further research could work to assess the benefit in class-specific modeling of these biomarkers simultaneously.
 
 Furthermore, as plasma biomarker research is still emerging, rich longitudinal data sets for these biomarkers remain limited. For example, individuals in the data used for this analysis had at most five biomarker measurements. Future studies should therefore aim to replicate and extend this analysis once larger cohorts with either more frequent longitudinal sampling become available. This would improve the precision of both trajectory estimation and the assessment of associations between biomarker dynamics and disease progression.
 
@@ -828,23 +826,23 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ## Test Results
 
-### Results of LRT: LME Random Effects
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Results of the likelihood ratio tests to determine the random effects structure for LME models"
 kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```
 
-### Results of Proportional Hazard Test
-
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "P-values for the proportional hazards assumption tests for all covariates in the Cox PH models"
 kable_standard(readRDS("tables/table_ph.rds"))
 ```
 
-### Results of LRT: Gender in Cox PH Models
-
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without gender as a covariate"
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
