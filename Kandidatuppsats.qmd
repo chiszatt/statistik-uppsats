@@ -608,7 +608,7 @@ Additionally, the time-dependent Brier score curves showed similar results acros
 
 **Figure X: time-depending Brier score curves for different biomarker specifications (Cox PH models)**
 
-![](figures/q2_brier_cox.png)
+<!-- ![](figures/q2_brier_cox.png) -->
 
 Within the Cox PH models, the combined biomarker approach consistently achieves the lowest Brier scores across most time points, indicating improved calibration and reduced prediction error compared to single-biomarker models. NfL-based Cox models generally perform slightly better than p-tau181 at earlier time points, but the differences between single biomarkers remain modest. Both single-biomarker models show increasing Brier scores over time, reflecting a gradual decline in predictive accuracy, while the combined model maintains a consistently lower error across follow-up.
 
@@ -720,7 +720,7 @@ JM_ipa <- 1 - (0.054 / 0.20)
 
 When comparing Brier scores, the short-term predictive performance of the JLCMMs were superior when compared against the other models. The JLCMMs explained around 88% more of the variance than the null model which assigns all individuals the average event probability of 0.28. This was around 72% for all the Cox PH models and 73 % for the joint models. This suggests the JLCMM predicts individual survival probabilities closer to the true event probabilities.
 
-The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models.
+The predictive performance of plasma p-tau181 and NfL were compared in both univariate and multivariate models by again comparing AUC and Brier scores. For p-tau181, AUC was lower than for NfL across all models at the 2 year mark. Differences were modest for the Cox PH models, whilst clearer distinctions were found for the joint models and JLCMMs, suggesting predictive value is gained mostly from NfL trajectories rather than single-point measurements. Over time, differences between the predictive performance of the biomarkers reduced, however NfL performed better across most time points. Comparison of Brier scores gave similar results between biomarkers.
 
 Finally, the effect of the inclusion of individuals with sparse biomarker data was assessed by a precision analysis where the results of models estimated on individuals with at least three measurements were compared with those fit on a cohort of inidivudals with at least one measurement.
 
