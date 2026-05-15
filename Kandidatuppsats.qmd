@@ -895,39 +895,39 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 
 ## AUC and Brier Curves: Model Comparison
 
-<!-- ### Time-dependent AUC curves for the NfL models -->
+### Time-dependent AUC curves for the NfL models
 
-<!-- ![](figures/q1_auc_nfl.png){width="400"} -->
+![](figures/q1_auc_nfl.png){width="400"}
 
-<!-- ### Time-dependent AUC curves for the multivariate models -->
+### Time-dependent AUC curves for the multivariate models
 
-<!-- ![](figures/q1_auc_multi.png){width="400"} -->
+![](figures/q1_auc_multi.png){width="400"}
 
-<!-- ### Time-dependent Brier score curves for the NfL models -->
+### Time-dependent Brier score curves for the NfL models
 
-<!-- ![](figures/q1_brier_nfl.png){width="400"} -->
+![](figures/q1_brier_nfl.png){width="400"}
 
-<!-- ### Time-dependent Brier score curves for the multivariate models -->
+### Time-dependent Brier score curves for the multivariate models
 
-<!-- ![](figures/q1_brier_multi.png){width="400"} -->
+![](figures/q1_brier_multi.png){width="400"}
 
-<!-- ## AUC and Brier Curves: Biomarker Comparison -->
+## AUC and Brier Curves: Biomarker Comparison
 
-<!-- ### Time-dependent AUC curves for the joint models -->
+### Time-dependent AUC curves for the joint models
 
-<!-- ![](figures/q2_auc_jm.png){width="400"} -->
+![](figures/q2_auc_jm.png){width="400"}
 
-<!-- ### Time-dependent AUC curves for the latent class joint models -->
+### Time-dependent AUC curves for the latent class joint models
 
-<!-- ![](figures/q2_auc_lcjm.png){width="400"} -->
+![](figures/q2_auc_lcjm.png){width="400"}
 
-<!-- ### Time-dependent Brier score curves for the joint models -->
+### Time-dependent Brier score curves for the joint models
 
-<!-- ![](figures/q2_brier_jm.png){width="400"} -->
+![](figures/q2_brier_jm.png){width="400"}
 
-<!-- ### Appendix X: Time-dependent AUC curves for the latent class joint models -->
+### Appendix X: Time-dependent AUC curves for the latent class joint models
 
-<!-- ![](figures/q2_brier_lcjm.png){width="400"} -->
+![](figures/q2_brier_lcjm.png){width="400"}
 
 ## Precision Analysis: 1+ Biomarker Measurements
 
