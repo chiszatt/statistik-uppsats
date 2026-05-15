@@ -141,9 +141,7 @@ Subsequently, the different modelling approaches will be compared based on their
 
 In addition, a precision analysis will be conducted to assess whether the inclusion of individuals with space longitudinal data effects the results of the analysis. Estimates of model parameters, their precision and model stability (???) will be compared for models estimated with a cohort including at least one biomarker measurement and models with a restricted cohort including individuals with at least three measurements.
 
-**Additional modelling approaches could have been considered given the aims of the study, however due to the limited time and scope of this thesis, a smaller set of models was selected to allow for a more detailed and meaningful comparison.** The chosen models were based on their methodological relevance and their ability to capture different aspects of the data, providing an overview of different approaches for modelling longitudinal biomarker data and survival outcomes.
-
-The modelling approaches will be applied to data from the ADNI dataset, in accordance with its data use and access policies (ADNI, n.d.-b).
+The chosen modelling approaches were based on their methodological relevance and their ability to capture different aspects of the data, providing an overview of different approaches for modelling longitudinal biomarker data and survival outcomes. They will all be applied to data from the ADNI dataset, in accordance with its data use and access policies (ADNI, n.d.-b).
 
 # Statistical Theory
 
