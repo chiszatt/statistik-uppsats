@@ -607,7 +607,7 @@ However, when observing the plots of the time-dependent Brier score curves for m
 
 **Figure X: time-depending Brier score curves for different biomarker specifications (Cox PH models)**
 
-<!-- ![](figures/q2_brier_cox.png) -->
+![](figures/q2_brier_cox.png)
 
 Within the Cox PH models, the models including p-tau181, NfL, or both biomarkers simultaneously all yield similar time-dependent Brier score values across the follow-up period. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed within the joint models, as shown in Appendix X, as well as within the latent class joint models, as shown in Appendix X.
 
@@ -621,7 +621,7 @@ As the proportional hazards assumption was met in the refitted Cox PH models, th
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least three biomarker meausurements"
-# kable_standard(readRDS("tables/table_cox1.rds"))
+ kable_standard(readRDS("tables/table_cox1.rds"))
 ```
 
 Table 2 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (**Appendix X**) these variables were included due to clinical relevance.
@@ -636,7 +636,7 @@ Furthermore, when comparing individuals with three or more measurements of p-tau
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least one biomarker meausurement"
-# kable_standard(readRDS("tables/table_cox2.rds"))
+ kable_standard(readRDS("tables/table_cox2.rds"))
 ```
 
 Across both model specifications, APOE-$ε4$ remained the strongest and most stable genetic predictor of progression. Hazard ratios were very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals were of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.
@@ -655,7 +655,7 @@ Since the joint models converged correctly, the hazard ratios from the joint mod
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm1.rds"))
+ kable_standard(readRDS("tables/table_jm1.rds"))
 ```
 
 Table 5 presents the hazard ratios estimated from the joint models. Similar to the Cox PH models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a clear and consistent association with progression risk, with higher hazards observed as the number of $ε4$ alleles increased. Individuals carrying one $ε4$ allele had an approximately twofold increased hazard across models, while individuals carrying two $ε4$ alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -668,7 +668,7 @@ To assess the robustness of these findings, the same models were subsequently re
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm2.rds"))
+kable_standard(readRDS("tables/table_jm2.rds"))
 ```
 
 In the joint models, APOE-$ε4$ remained a strong and stable predictor of progression. Hazard ratios were slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remained well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
