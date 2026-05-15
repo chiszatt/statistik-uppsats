@@ -655,7 +655,7 @@ Since the joint models converged correctly, the hazard ratios from the joint mod
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm1.rds"))
+kable_standard(readRDS("tables/table_jm1.rds"))
 ```
 
 Table 5 presents the hazard ratios estimated from the joint models. Similar to the Cox PH models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a clear and consistent association with progression risk, with higher hazards observed as the number of $ε4$ alleles increased. Individuals carrying one $ε4$ allele had an approximately twofold increased hazard across models, while individuals carrying two $ε4$ alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -668,7 +668,7 @@ To assess the robustness of these findings, the same models were subsequently re
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm2.rds"))
+kable_standard(readRDS("tables/table_jm2.rds"))
 ```
 
 In the joint models, APOE-$ε4$ remained a strong and stable predictor of progression. Hazard ratios were slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remained well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
@@ -955,6 +955,13 @@ kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
+kable_standard(readRDS("tables/jlcmm_m1_ptau_full"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL"
 kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 ```
@@ -963,5 +970,12 @@ kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL"
-kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
+kable_standard(readRDS("tables/jlcmm_m1_nfl_full"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
+kable_standard(readRDS("tables/jlcmm_m1_ptau_full"))
 ```
