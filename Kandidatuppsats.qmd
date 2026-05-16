@@ -59,7 +59,8 @@ format:
     colorlinks: false
     number-sections: true
     fig-pos: "H"
-    tbl-pos: "H"     
+    tbl-pos: "H"
+    number-figures: true
 editor: visual
 ---
 
@@ -478,7 +479,7 @@ To ensure proper model convergence of the JMs, trace plots of the $α$-parameter
 
 **Figure 1: trace plot of the** $α$**-parameter for the joint model of p-tau181 estimated on participants with at least three biomarker meausurements.**
 
-![](figures/convergence_plot_ptau.png){width="400"}
+![Traceplot of log-transformed p-tau181](figures/convergence_plot_ptau.png){#fig-converg-ptau  }
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
@@ -551,7 +552,7 @@ In order to compare the different modelling approaches, predictive performance w
 
 **Figure 1: time-depending AUC curves for different modelling approaches (p-tau181 models)**
 
-![](figures/q1_auc_ptau.png){width="400"}
+![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau  }
 
 Among the models incorporating p-tau181, the time-dependent AUC curves remain consistently high, with AUC values exceeding 0.75 throughout follow-up, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher at earlier time points, especially for the JM. However, the differences between the models decrease over time, resulting in increasingly similar curves. The Cox PH model consistently yields the lowest AUC values.
 
@@ -572,7 +573,7 @@ When evaluating predictive performance using time-dependent Brier scores instead
 
 **Figure 2: time-depending Brier score curves for different modelling approaches (p-tau181 models)**
 
-![](figures/q1_brier_ptau.png){width="400"}
+![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau width="400"}
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences then become smaller at later follow-up times, where the curves get increasingly closer.
 
@@ -595,7 +596,7 @@ The predictive performance of the models was also examined in order to compare t
 
 **Figure 3: time-depending AUC curves for different biomarker specifications (Cox PH)**
 
-![](figures/q2_auc_cox.png){width="400"}
+![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox width="400"}
 
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period, with the exception of the three-year follow-up point, where the time-dependent AUC curve for the model incorporating p-tau181 is slightly higher. However, both single-marker models are consistently outperformed by the combined model, whose curve is consistently above the two other curves.
 
@@ -609,7 +610,7 @@ However, when observing the time-dependent Brier score curves, such as Figure 4 
 
 **Figure 4: time-depending Brier score curves for different biomarker specifications (Cox PH)**
 
-![](figures/q2_brier_cox.png){width="400"}
+![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox width="400"}
 
 Among the Cox PH models, those incorporating p-tau181, NfL, or both biomarkers simultaneously all yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed among the JMs (Appendix 8.7.3), as well as among the JLCMMs (Appendix 8.7.4).
 
@@ -638,7 +639,7 @@ Furthermore, when comparing individuals with three or more measurements of p-tau
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least one biomarker meausurement"
- kable_standard(readRDS("tables/table_cox2.rds"))
+ # kable_standard(readRDS("tables/table_cox2.rds"))
 ```
 
 Across both model specifications, APOE-$ε4$ remained the strongest and most stable genetic predictor of progression. Hazard ratios were very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals were of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.
@@ -657,7 +658,7 @@ Since the fitted JM converged correctly, the hazard ratios from the models were 
 
 ```{r}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-kable_standard(readRDS("tables/table_jm1.rds"))
+# kable_standard(readRDS("tables/table_jm1.rds"))
 ```
 
 Similar to the Cox PH models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all p-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a clear and consistent association with progression risk, with higher hazards observed as the number of $ε4$ alleles increased. Individuals carrying one $ε4$ allele had an approximately twofold increased hazard across models, while individuals carrying two $ε4$ alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
@@ -670,7 +671,7 @@ To assess the robustness of these findings, the same models were subsequently re
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-kable_standard(readRDS("tables/table_jm2.rds"))
+# kable_standard(readRDS("tables/table_jm2.rds"))
 ```
 
 In the JM, APOE-$ε4$ remained a strong and stable predictor of progression. Hazard ratios were slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remained well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
@@ -806,21 +807,21 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 ## Descriptive Statistics
 
-### Distribution of p-tau181 after log-transformation
+::: {#fig-hist-ptau-nfl layout-ncol="2"}
+![Log-transformed NfL distribution](figures/hist_log_p_tau.png){#fig-hist-ptau}
 
-![](figures/hist_log_p_tau.png){width="400"}
+![Log-transformed NfL distribution](figures/hist_log_nfl.png){#fig-hist-nfl}
 
-### Distribution of NfL after log-transformation
+Distributions of log transformed biomarkers
+:::
 
-![](figures/hist_log_nfl.png){width="400"}
+::: {#fig-corr layout-ncol="2"}
+![Variables in the Cox PH models](figures/corrplot_cox.png){#fig-corr-cox}
 
-### Correlation plot over the numerical variables used in the Cox PH models
+![Varibles in the LME models](figures/corrplot_lme.png){#fig-corr-lme}
 
-![](figures/corrplot_cox.png)
-
-### Correlation plot over the numerical variables used in the LME models
-
-![](figures/corrplot_lme.png)
+Correlation plots of numerical variables
+:::
 
 ## Test Results
 
@@ -847,33 +848,34 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ## Residual Diagnositics
 
-### Fitted values versus residuals from the LME model for p-tau181
+::: {#fig-corr layout-ncol="2"}
+![Residuals vs fitted values](figures/residuals_vs_fitted_ptau.png){#fig-resid-ptau}
 
-![](figures/residuals_vs_fitted_ptau.png){width="400"}
+![Q-Q plot](figures/qq_ptau.png){#fig-qq-ptau}
 
-### Q-Q plot of the LME model for p-tau181
+LME model with longitudinal p-tau181 measurements
+:::
 
-![](figures/qq_ptau.png){width="400"}
+::: {#fig-corr layout-ncol="2"}
+![Residuals vs fitted values](figures/residuals_vs_fitted_nfl.png){#fig-resid-nfl}
 
-### Fitted values versus residuals from the LME model for NfL
+![Q-Q plot](figures/qq_nfl.png){#fig-qq-nfl}
 
-![](figures/residuals_vs_fitted_nfl.png){width="400"}
+LME model with longitudinal NfL measurements
+:::
 
-### Q-Q plot of the LME model for NfL
-
-![](figures/qq_nfl.png){width="400"}
 
 ## Convergence
 
-### Trace plot of the $α$-parameter for the joint model of NfL
+::: {#fig-corr layout-ncol="3"}
+![JM, NfL](figures/convergence_plot_nfl.png){#fig-alpha-nfl-jm}
 
-![](figures/convergence_plot_nfl.png)
+![Multivariate JM, NfL](figures/convergence_plot_multi.png){#fig-alpha-nfl-multi}
 
-### Trace plots of the $α$-parameters for the multivariate joint model
+![Multivariate JM, p-tau181](figures/convergence_plot_multi_ptau181.png){#fig-alpha-ptau-multi}
 
-![](figures/convergence_plot_multi.png)
-
-![](figures/convergence_plot_multi_ptau181.png){width="400"}
+Trace plots of $α$-parameter convergence
+:::
 
 ## Model Results
 
@@ -893,39 +895,39 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 
 ## AUC and Brier Curves: Model Comparison
 
-### Time-dependent AUC curves for the NfL models
+::: {#fig-corr layout-ncol="2"}
+![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
 
-![](figures/q1_auc_nfl.png){width="400"}
+![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
 
-### Time-dependent AUC curves for the multivariate models
+Time-dependent AUC curves
+:::
 
-![](figures/q1_auc_multi.png){width="400"}
+::: {#fig-corr layout-ncol="2"}
+![Models using NfL](figures/q1_brier_nfl.png){#fig-brier-nfl}
 
-### Time-dependent Brier score curves for the NfL models
+![Models using p-tau181 & NfL](figures/q1_brier_multi.png){#fig-brier-multi}
 
-![](figures/q1_brier_nfl.png){width="400"}
-
-### Time-dependent Brier score curves for the multivariate models
-
-![](figures/q1_brier_multi.png){width="400"}
+Time-dependent Brier score curves
+:::
 
 ## AUC and Brier Curves: Biomarker Comparison
 
-### Time-dependent AUC curves for all JM
+::: {#fig-corr layout-ncol="2"}
+![JM](figures/q2_auc_jm.png){#fig-auc-jm}
 
-![](figures/q2_auc_jm.png){width="400"}
+![JLCMM](figures/q2_auc_lcjm.png){#fig-auc-jlcmm}
 
-### Time-dependent AUC curves for all JLCMM
+Time-dependent AUC curves
+:::
 
-![](figures/q2_auc_lcjm.png){width="400"}
+::: {#fig-corr layout-ncol="2"}
+![JM](figures/q2_brier_jm.png){#fig-brier-jm }
 
-### Time-dependent Brier score curves for all JM
+![JLCMM](figures/q2_brier_lcjm.png){#fig-brier-jlcmm}
 
-![](figures/q2_brier_jm.png){width="400"}
-
-### Time-dependent Brier score curves for all JLCMM
-
-![](figures/q2_brier_lcjm.png){width="400"}
+Time-dependent Brier score curves
+:::
 
 ## Precision Analysis: 1+ Biomarker Measurements
 
@@ -954,7 +956,7 @@ kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
-kable_standard(readRDS("tables/jlcmm_m1_ptau_full"))
+# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
 
 ```{r}
@@ -968,12 +970,12 @@ kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL"
-kable_standard(readRDS("tables/jlcmm_m1_nfl_full"))
+kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
-kable_standard(readRDS("tables/jlcmm_m1_ptau_full"))
+#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for NfL"
+# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
