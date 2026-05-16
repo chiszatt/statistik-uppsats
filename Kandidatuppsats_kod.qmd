@@ -1700,9 +1700,9 @@ multi_surv <- extract_rhat_surv(multi_joint_model)
 
 # Combining with model labels to form a table
 rhat_survival_table <- bind_rows(
-  ptau_surv %>% mutate(Model = "PTau"),
+  ptau_surv %>% mutate(Model = "p-tau181"),
   nfl_surv %>% mutate(Model = "NfL"),
-  multi_surv %>% mutate(Model = "Multi")
+  multi_surv %>% mutate(Model = "Multivariate")
 ) %>%
   pivot_wider(
     names_from = Model,
@@ -1739,9 +1739,9 @@ multi_long <- extract_rhat_long(multi_joint_model)
 
 # Combining with model labels to form a table
 rhat_longitudinal_table <- bind_rows(
-  ptau_long %>% mutate(Model = "Long_PTau"),
-  nfl_long %>% mutate(Model = "Long_NfL"),
-  multi_long %>% mutate(Model = "Long_Multi")
+  ptau_long %>% mutate(Model = "p-tau181"),
+  nfl_long %>% mutate(Model = "NfL"),
+  multi_long %>% mutate(Model = "Multivariate")
 ) %>%
   pivot_wider(
     names_from = Model,
@@ -3305,6 +3305,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
+    title = "Time-depending AUC curves (p-tau181)",
     x = "Time", 
     y = "AUC",
     color = "Model",
@@ -3473,6 +3474,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
+    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC",
     color = "Biomarker",
@@ -3928,6 +3930,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
+    title = "Time-dependent Brier score curves (p-tau181)",
     x = "Time", 
     y = "Brier score",
     color = "Model",
@@ -4096,6 +4099,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
+    title = "Time-dependent Brier score curves (Cox PH)",
     x = "Time", 
     y = "Brier score",
     color = "Biomarker",
