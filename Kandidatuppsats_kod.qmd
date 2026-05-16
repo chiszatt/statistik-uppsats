@@ -3264,13 +3264,13 @@ ggplot(data.frame(
   JM = auc_ptau_jm,
   JLCMM = auc_jlcmm_m1_ptau$AUC
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3286,20 +3286,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q1_auc_ptau.png", width = 400, height = 300)
+png("figures/q1_auc_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = auc_ptau_bl,
   JM = auc_ptau_jm,
   JLCMM = auc_jlcmm_m1_ptau$AUC
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3323,13 +3324,13 @@ ggplot(data.frame(
   JM = auc_nfl_jm,
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3345,20 +3346,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q1_auc_nfl.png", width = 400, height = 300)
+png("figures/q1_auc_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = auc_nfl_bl,
   JM = auc_nfl_jm,
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3380,10 +3382,10 @@ ggplot(data.frame(
   Cox = auc_both_bl,
   JM = auc_multi_jm
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
@@ -3399,16 +3401,17 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot
-png("figures/q1_auc_multi.png", width = 400, height = 300)
+png("figures/q1_auc_multi.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = auc_both_bl,
   JM = auc_multi_jm
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
@@ -3433,13 +3436,13 @@ ggplot(data.frame(
   pTau = auc_ptau_bl,
   Multi = auc_both_bl
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -3455,20 +3458,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot
-png("figures/q2_auc_cox.png", width = 400, height = 300)
+png("figures/q2_auc_cox.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = auc_nfl_bl,
   pTau = auc_ptau_bl,
   Multi = auc_both_bl
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -3492,13 +3496,13 @@ ggplot(data.frame(
   pTau = auc_ptau_jm,
   Multi = auc_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -3514,20 +3518,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot
-png("figures/q2_auc_jm.png", width = 400, height = 300)
+png("figures/q2_auc_jm.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = auc_nfl_jm,
   pTau = auc_ptau_jm,
   Multi = auc_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -3549,10 +3554,10 @@ ggplot(data.frame(
   NfL = auc_jlcmm_m1_nfl$AUC,
   pTau = auc_jlcmm_m1_ptau$AUC
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
@@ -3568,16 +3573,17 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot
-png("figures/q2_auc_lcjm.png", width = 400, height = 300)
+png("figures/q2_auc_lcjm.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = auc_jlcmm_m1_nfl$AUC,
   pTau = auc_jlcmm_m1_ptau$AUC
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
@@ -3889,13 +3895,13 @@ ggplot(data.frame(
   JM = brier_ptau_jm,
   JLCMM = brier_jlcmm_m1_ptau$Brier
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3911,20 +3917,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q1_brier_ptau.png", width = 400, height = 300)
+png("figures/q1_brier_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox p-tau`,
   JM = brier_ptau_jm,
   JLCMM = brier_jlcmm_m1_ptau$Brier
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3948,13 +3955,13 @@ ggplot(data.frame(
   JM = brier_nfl_jm,
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -3970,20 +3977,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q1_brier_nfl.png", width = 400, height = 300)
+png("figures/q1_brier_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox NfL`,
   JM = brier_nfl_jm,
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
-  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
   geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
@@ -4005,10 +4013,10 @@ ggplot(data.frame(
   Cox = cox_brier$`Cox both`,
   JM = brier_multi_jm
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
@@ -4024,16 +4032,17 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q1_brier_multi.png", width = 400, height = 300)
+png("figures/q1_brier_multi.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox both`,
   JM = brier_multi_jm
 )) +
-  geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
   geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
-  geom_line(aes(Time, JM, color = "JM")) +
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
   geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
@@ -4058,13 +4067,13 @@ ggplot(data.frame(
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -4080,20 +4089,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q2_brier_cox.png", width = 400, height = 300)
+png("figures/q2_brier_cox.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = cox_brier$`Cox NfL`,
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -4117,13 +4127,13 @@ ggplot(data.frame(
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -4139,20 +4149,21 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q2_brier_jm.png", width = 400, height = 300)
+png("figures/q2_brier_jm.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = brier_nfl_jm,
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
   geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
@@ -4174,10 +4185,10 @@ ggplot(data.frame(
   NfL = brier_jlcmm_m1_nfl$Brier,
   pTau = brier_jlcmm_m1_ptau$Brier
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
@@ -4193,16 +4204,17 @@ ggplot(data.frame(
 
 ```{r}
 # Saving the plot 
-png("figures/q2_brier_lcjm.png", width = 400, height = 300)
+png("figures/q2_brier_lcjm.png",
+    width = 6, height = 4, units = "in", res = 300)
 ggplot(data.frame(
   Time = times,
   NfL = brier_jlcmm_m1_nfl$Brier,
   pTau = brier_jlcmm_m1_ptau$Brier
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
   geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
-  geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_line(aes(Time, pTau, color = "P-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
