@@ -3388,7 +3388,7 @@ dev.off()
 ```
 
 ```{r}
-# Q1: Multivariate - comparing models (time-dependent AUC)
+# Q1: Both biomarkers - comparing models (time-dependent AUC)
 ggplot(data.frame(
   Time = times,
   Cox = auc_both_bl,
@@ -3454,10 +3454,10 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
   
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
@@ -3484,10 +3484,10 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
   
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (Cox PH)",
@@ -4018,7 +4018,7 @@ dev.off()
 ```
 
 ```{r}
-# Q1: Multivariate - comparing models (time-dependent Brier score)
+# Q1: Both biomarkers - comparing models (time-dependent Brier score)
 ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox both`,
@@ -4084,10 +4084,10 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
   
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
@@ -4114,10 +4114,10 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
   geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
   
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
   
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
