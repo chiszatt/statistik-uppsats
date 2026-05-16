@@ -136,7 +136,7 @@ First, Cox PH models will be used to assess associations between baseline biomar
 
 All models will additionally be adjusted for baseline age, sex, and apolipoprotein-$\epsilon 4$ (APOE-$ε4$) status. In the JMs, these covariates will be included in both submodels to account for potential confounding when estimating the association between biomarker trajectories and disease progression. The significance level will be set at 0.05 for all analyses.
 
-Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from mild cognitive impairment (MCI) to AD-dementia, a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter.
+Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD-dementia, a 2-4 year follow-up is most commonly used (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter.
 
 In addition, a precision analysis will be conducted to assess whether the inclusion of individuals with space longitudinal data effects the results of the analysis. Estimates of model parameters, their precision and model stability will be compared for models estimated with a cohort including at least one biomarker measurement and models with a restricted cohort including individuals with at least three measurements.
 
@@ -194,13 +194,13 @@ Longitudinal data consists of repeated measurements from the same individuals, w
 
 Following the notation of Rizopoulos (2012, p. 54), the biomarker process for p-tau181 and NfL can be considered such that:
 
-$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2) $$
+$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
 
-$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2) $$
+$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
 
 where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the non-independence of the repeated measurements. Combining the true biomarker trajectory function with the error term gives:
 
-$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2) $$
+$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
 
 ### Survival Submodel
 
@@ -220,9 +220,9 @@ The primary estimation approach that has been proposed for joint models is (semi
 
 A Bayesian alternative treats parameters as random variables and combines prior distributions with observed data to obtain posterior distributions, in contrast to the frequentist view where parameters are fixed but unknown (Carlin & Louis, 2008). This approach can simplify inference in complex models, and with weakly informative priors, it often yields results similar to maximum likelihood estimation (Brown & Ibrahim., 2003, p. 222).
 
-Using the R package $JMbayes$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
+Using the R package $JMbayes2$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
 
-In $JMbayes$, weakly informative ones are used, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
+In $JMbayes2$, weakly informative ones are used, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
 ### The Gelman-Rubin Statistic
 
@@ -337,7 +337,7 @@ The chosen classes should be clinically meaningful.
 
 ## Evaluation of Predictive Performance
 
-Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). The time-dependent Area Under the Curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
+Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent Area Under the Curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
 
 ### Time-dependent AUC
 
@@ -383,7 +383,7 @@ where $G_i(t)$ is the censoring survival function, which quantifies the probabil
 
 $$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
 
-where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 1704), becomes then the IPCW-adjusted Brier score:
+where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704), becomes then the IPCW-adjusted Brier score:
 
 $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
@@ -552,8 +552,6 @@ In order to compare the different modelling approaches, predictive performance w
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
-**Figure 2: time-depending AUC curves for different modelling approaches (p-tau181 models)**
-
 Among the models incorporating p-tau181, the time-dependent AUC curves remain consistently high, with AUC values exceeding 0.75 throughout follow-up, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher at earlier time points, especially for the JM. However, the differences between the models decrease over time, resulting in increasingly similar curves. The Cox PH model consistently yields the lowest AUC values.
 
 Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6.1, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 throughout follow-up. At earlier follow-up times, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models.
@@ -572,8 +570,6 @@ For instance, by showing that the JM among the p-tau181-based models has an AUC 
 When evaluating predictive performance using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau width="400"}
-
-**Figure 3: time-depending Brier score curves for different modelling approaches (p-tau181 models)**
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences then become smaller at later follow-up times, where the curves get increasingly closer.
 
@@ -596,8 +592,6 @@ The predictive performance of the models was also examined in order to compare t
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox width="400"}
 
-**Figure 4: time-depending AUC curves for different biomarker specifications (Cox PH)**
-
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period, with the exception of the three-year follow-up point, where the time-dependent AUC curve for the model incorporating p-tau181 is slightly higher. However, both single-marker models are consistently outperformed by the combined model, whose curve is consistently above the two other curves.
 
 Within the JM framework, a similar overall pattern is observed. More specifically, Appendix 8.7.1 demonstrates that the combined biomarker joint model provides the strongest predictive performance across all time points, with consistently higher AUC values than models including the biomarkers separately. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
@@ -609,8 +603,6 @@ As when comparing the different modelling approaches, these results are also ind
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox width="400"}
-
-**Figure 5: time-depending Brier score curves for different biomarker specifications (Cox PH)**
 
 Among the Cox PH models, those incorporating p-tau181, NfL, or both biomarkers simultaneously all yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed among the JMs (Appendix 8.7.3), as well as among the JLCMMs (Appendix 8.7.4).
 
@@ -769,7 +761,7 @@ Moore, D. F. (2016). Regression Analysis Using the Proportional Hazards Model. 
 
 Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
-P
+Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, *20*(1), e0318349. https://doi.org/10.1371/journal.pone.0318349
 
 Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
 
@@ -850,7 +842,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ## Residual Diagnositics
 
-::: {layout-ncol="2"}
+::: {#fig-lme-ptau layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_ptau.png){#fig-resid-ptau}
 
 ![Q-Q plot](figures/qq_ptau.png){#fig-qq-ptau}
@@ -858,7 +850,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 LME model with longitudinal p-tau181 measurements
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-lme-nfl layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_nfl.png){#fig-resid-nfl}
 
 ![Q-Q plot](figures/qq_nfl.png){#fig-qq-nfl}
@@ -868,7 +860,7 @@ LME model with longitudinal NfL measurements
 
 ## Convergence
 
-::: {layout-ncol="3"}
+::: {#fig-alpha layout-ncol="3"}
 ![JM, NfL](figures/convergence_plot_nfl.png){#fig-alpha-nfl-jm}
 
 ![Multivariate JM, NfL](figures/convergence_plot_multi.png){#fig-alpha-nfl-multi}
@@ -896,7 +888,7 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 
 ## AUC and Brier Curves: Model Comparison
 
-::: {layout-ncol="2"}
+::: {#fig-auc-model layout-ncol="2"}
 ![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
 
 ![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
@@ -904,7 +896,7 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 Time-dependent AUC curves
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-brier-model layout-ncol="2"}
 ![Models using NfL](figures/q1_brier_nfl.png){#fig-brier-nfl}
 
 ![Models using p-tau181 & NfL](figures/q1_brier_multi.png){#fig-brier-multi}
@@ -914,7 +906,7 @@ Time-dependent Brier score curves
 
 ## AUC and Brier Curves: Biomarker Comparison
 
-::: {layout-ncol="2"}
+::: {#fig-auc-bm layout-ncol="2"}
 ![JM](figures/q2_auc_jm.png){#fig-auc-jm}
 
 ![JLCMM](figures/q2_auc_lcjm.png){#fig-auc-jlcmm}
@@ -922,7 +914,7 @@ Time-dependent Brier score curves
 Time-dependent AUC curves
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-brier-bm layout-ncol="2"}
 ![JM](figures/q2_brier_jm.png){#fig-brier-jm}
 
 ![JLCMM](figures/q2_brier_lcjm.png){#fig-brier-jlcmm}
