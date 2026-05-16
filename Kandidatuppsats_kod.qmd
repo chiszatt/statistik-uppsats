@@ -501,27 +501,11 @@ baseline <- long_data %>%
 ```
 
 ```{r}
-# merging the survival data with demographics, apoe and the baseline biomarker values
-# Demographics
-surv_data <- merge(
-  surv_data,
-  demographics_small,
-  by = "RID"
-)
-
-# Apoe
-surv_data <- merge(
-  surv_data,
-  apoe %>% dplyr::select(RID, APOE4_status, genotype),
-  by = "RID"
-)
-
-# Baseline biomarker values
-surv_data <- merge(
-  surv_data,
-  baseline,
-  by = "RID"
-)
+# merging the survival data with demographics and the baseline biomarker values
+surv_data <- surv_data %>%
+  merge(demographics_small, by = "RID") %>% 
+  merge(apoe %>% dplyr::select(RID, APOE4_status, genotype), by = "RID") %>%
+  merge(baseline, by = "RID")
 ```
 
 ## Summaries and distributions of the model variables
