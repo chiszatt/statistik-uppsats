@@ -337,7 +337,7 @@ The chosen classes should be clinically meaningful.
 
 ## Evaluation of Predictive Performance
 
-Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent area under the receiver operating characteristic (ROC) curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
+Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent Area Under the Curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
 
 ### Time-dependent AUC
 
@@ -383,7 +383,7 @@ where $G_i(t)$ is the censoring survival function, which quantifies the probabil
 
 $$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
 
-where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 1704), becomes then the IPCW-adjusted Brier score:
+where $\widehat S_i(t)$ is the predicted probability of an event for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704), becomes then the IPCW-adjusted Brier score:
 
 $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
@@ -850,7 +850,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 
 ## Residual Diagnositics
 
-::: {layout-ncol="2"}
+::: {#fig-lme-ptau layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_ptau.png){#fig-resid-ptau}
 
 ![Q-Q plot](figures/qq_ptau.png){#fig-qq-ptau}
@@ -858,7 +858,7 @@ kable_standard(readRDS("tables/surv_lrt_table.rds"))
 LME model with longitudinal p-tau181 measurements
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-lme-nfl layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_nfl.png){#fig-resid-nfl}
 
 ![Q-Q plot](figures/qq_nfl.png){#fig-qq-nfl}
@@ -868,7 +868,7 @@ LME model with longitudinal NfL measurements
 
 ## Convergence
 
-::: {layout-ncol="3"}
+::: {#fig-alpha layout-ncol="3"}
 ![JM, NfL](figures/convergence_plot_nfl.png){#fig-alpha-nfl-jm}
 
 ![Multivariate JM, NfL](figures/convergence_plot_multi.png){#fig-alpha-nfl-multi}
@@ -896,7 +896,7 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 
 ## AUC and Brier Curves: Model Comparison
 
-::: {layout-ncol="2"}
+::: {#fig-auc-model layout-ncol="2"}
 ![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
 
 ![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
@@ -904,7 +904,7 @@ kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 Time-dependent AUC curves
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-brier-model layout-ncol="2"}
 ![Models using NfL](figures/q1_brier_nfl.png){#fig-brier-nfl}
 
 ![Models using p-tau181 & NfL](figures/q1_brier_multi.png){#fig-brier-multi}
@@ -914,7 +914,7 @@ Time-dependent Brier score curves
 
 ## AUC and Brier Curves: Biomarker Comparison
 
-::: {layout-ncol="2"}
+::: {#fig-auc-bm layout-ncol="2"}
 ![JM](figures/q2_auc_jm.png){#fig-auc-jm}
 
 ![JLCMM](figures/q2_auc_lcjm.png){#fig-auc-jlcmm}
@@ -922,7 +922,7 @@ Time-dependent Brier score curves
 Time-dependent AUC curves
 :::
 
-::: {layout-ncol="2"}
+::: {#fig-brier-bm layout-ncol="2"}
 ![JM](figures/q2_brier_jm.png){#fig-brier-jm}
 
 ![JLCMM](figures/q2_brier_lcjm.png){#fig-brier-jlcmm}
