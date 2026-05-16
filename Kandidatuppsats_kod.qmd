@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -393,22 +393,22 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-# long_data <- long_data %>% filter(RID %in% keep)
-# surv_data <- surv_data %>% filter(RID %in% keep)
-# # We check number of individuals with at least 3 measurements
-# length(keep)
+ keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+ long_data <- long_data %>% filter(RID %in% keep)
+ surv_data <- surv_data %>% filter(RID %in% keep)
+ # We check number of individuals with at least 3 measurements
+ length(keep)
 ```
 
 ## Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-length(keep)
+#length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -1617,8 +1617,7 @@ png("figures/convergence_plot_multi.png", width = 400, height = 300)
 
 ```{r}
 # Building joint model comparison table
-Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)),
-where Mean is the posterior mean of the log-hazard ratio
+# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
 extract_model_jm <- function(model) {
 
   s <- summary(model)$Survival
@@ -1679,7 +1678,7 @@ table_jm
 ```{r}
 # Saving the joint model comparison table
 saveRDS(table_jm, "tables/table_jm1.rds")
-saveRDS(table_jm, "tables/table_jm2.rds")
+#saveRDS(table_jm, "tables/table_jm2.rds")
 ```
 
 ## Rhat value comparison table
@@ -3269,8 +3268,13 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (p-tau181)",
@@ -3290,8 +3294,13 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Figure 1: Time-depending AUC curves (p-tau181)",
@@ -3311,8 +3320,13 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (NfL)",
@@ -3332,8 +3346,13 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (NfL)",
@@ -3352,7 +3371,10 @@ ggplot(data.frame(
   JM = auc_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (multivariate)",
@@ -3371,7 +3393,10 @@ ggplot(data.frame(
   JM = auc_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (multivariate)",
@@ -3393,8 +3418,13 @@ ggplot(data.frame(
   Multi = auc_both_bl
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (Cox PH)",
@@ -3414,8 +3444,13 @@ ggplot(data.frame(
   Multi = auc_both_bl
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Figure 3: Time-depending AUC curves (Cox PH)",
@@ -3435,8 +3470,13 @@ ggplot(data.frame(
   Multi = auc_multi_jm
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (JM)",
@@ -3456,8 +3496,13 @@ ggplot(data.frame(
   Multi = auc_multi_jm
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_line(aes(Time, Multi, color = "Multivariable")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
+  geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (JM)",
@@ -3476,7 +3521,10 @@ ggplot(data.frame(
   pTau = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (JLCMM)",
@@ -3495,7 +3543,10 @@ ggplot(data.frame(
   pTau = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-depending AUC curves (JLCMM)",
@@ -3804,6 +3855,7 @@ plot_data_Brier <- data.frame(
 ```
 
 ### Time-dependent Brier score
+
 ### For comparing modelling approaches
 
 ```{r}
@@ -3815,8 +3867,13 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (p-tau181)",
@@ -3836,8 +3893,13 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Figure 2: Time-dependent Brier score curves (p-tau181)",
@@ -3857,8 +3919,13 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (NfL)",
@@ -3878,8 +3945,13 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (NfL)",
@@ -3898,7 +3970,10 @@ ggplot(data.frame(
   JM = brier_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (multivariate)",
@@ -3917,7 +3992,10 @@ ggplot(data.frame(
   JM = brier_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
+  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  
   geom_line(aes(Time, JM, color = "JM")) +
+  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (multivariate)",
@@ -3938,9 +4016,14 @@ ggplot(data.frame(
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (Cox PH)",
@@ -3959,9 +4042,14 @@ ggplot(data.frame(
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Figure 4: Time-dependent Brier score curves (Cox PH)",
@@ -3980,9 +4068,14 @@ ggplot(data.frame(
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (JM)",
@@ -4001,9 +4094,14 @@ ggplot(data.frame(
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-  geom_line(aes(Time, NfL, color = "NfL")) +
+   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  
   geom_line(aes(Time, Multi, color = "Multivariate")) +
+  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (JM)",
@@ -4022,7 +4120,10 @@ ggplot(data.frame(
   pTau = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (JLCMM)",
@@ -4041,7 +4142,10 @@ ggplot(data.frame(
   pTau = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  
   geom_line(aes(Time, pTau, color = "P-tau181")) +
+  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
   ylim(0,1) +
   labs(
     title = "Time-dependent Brier score curves (JLCMM)",
