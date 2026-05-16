@@ -552,8 +552,6 @@ In order to compare the different modelling approaches, predictive performance w
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
-**Figure 2: time-depending AUC curves for different modelling approaches (p-tau181 models)**
-
 Among the models incorporating p-tau181, the time-dependent AUC curves remain consistently high, with AUC values exceeding 0.75 throughout follow-up, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher at earlier time points, especially for the JM. However, the differences between the models decrease over time, resulting in increasingly similar curves. The Cox PH model consistently yields the lowest AUC values.
 
 Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6.1, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 throughout follow-up. At earlier follow-up times, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models.
@@ -572,8 +570,6 @@ For instance, by showing that the JM among the p-tau181-based models has an AUC 
 When evaluating predictive performance using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau width="400"}
-
-**Figure 3: time-depending Brier score curves for different modelling approaches (p-tau181 models)**
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences then become smaller at later follow-up times, where the curves get increasingly closer.
 
@@ -596,8 +592,6 @@ The predictive performance of the models was also examined in order to compare t
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox width="400"}
 
-**Figure 4: time-depending AUC curves for different biomarker specifications (Cox PH)**
-
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period, with the exception of the three-year follow-up point, where the time-dependent AUC curve for the model incorporating p-tau181 is slightly higher. However, both single-marker models are consistently outperformed by the combined model, whose curve is consistently above the two other curves.
 
 Within the JM framework, a similar overall pattern is observed. More specifically, Appendix 8.7.1 demonstrates that the combined biomarker joint model provides the strongest predictive performance across all time points, with consistently higher AUC values than models including the biomarkers separately. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
@@ -609,8 +603,6 @@ As when comparing the different modelling approaches, these results are also ind
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox width="400"}
-
-**Figure 5: time-depending Brier score curves for different biomarker specifications (Cox PH)**
 
 Among the Cox PH models, those incorporating p-tau181, NfL, or both biomarkers simultaneously all yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed among the JMs (Appendix 8.7.3), as well as among the JLCMMs (Appendix 8.7.4).
 
@@ -769,7 +761,7 @@ Moore, D. F. (2016). Regression Analysis Using the Proportional Hazards Model. 
 
 Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
-P
+Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, *20*(1), e0318349. https://doi.org/10.1371/journal.pone.0318349
 
 Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
 
