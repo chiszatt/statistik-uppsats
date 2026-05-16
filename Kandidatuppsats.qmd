@@ -164,7 +164,7 @@ which is the proportional hazards assumption (Moore, p. 55). Further, covariate 
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline p-tau181 and NfL values.
+where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL.
 
 ### Model Assumptions
 
@@ -220,15 +220,15 @@ The primary estimation approach that has been proposed for joint models is (semi
 
 A Bayesian alternative treats parameters as random variables and combines prior distributions with observed data to obtain posterior distributions, in contrast to the frequentist view where parameters are fixed but unknown (Carlin & Louis, 2008). This approach can simplify inference in complex models, and with weakly informative priors, it often yields results similar to maximum likelihood estimation (Brown & Ibrahim., 2003, p. 222).
 
-Using the R package $JMbayes$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, it converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
+Using the R package $JMbayes$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
 
 In $JMbayes$, weakly informative ones are used, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
 ### The Gelman-Rubin Statistic
 
-Convergence within the framework of Bayesian joint modeling can be evaluated by running multiple chains from different starting values (Peng, 2022). All chains are expected to eventually reach the stationary distribution and become indistinguishable. Convergence can be assessed by comparing variation between chains to variation within chains, with small between-chain variation indicating that the chains are similar (Peng).
+Within Bayesian joint modeling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman–Rubin statistic ($R$) (Peng, 2022).
 
-The Gelman-Rubin statistic $R$ formalizes this idea (Peng). Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
+Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
 Then calculate the chain mean for each chain,
 
@@ -254,7 +254,7 @@ Subsequently, the Gelman-Rubin statistic is:
 
 $$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
 
-As the number of iterations $L$ increases and the between-chain variation $B$ decreases, $R$ approaches 1. Thus, chains are typically run until $R$ is near this number. Being a unit-free ratio, $R$ provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng).
+As the number of iterations $L$ increases and the between-chain variation $B$ decreases, $R$ approaches 1. Thus, chains are typically run until $R$ is near this number. Being a unit-free ratio, $R$ provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
 ## Joint Latent Class Mixed Model
 
@@ -306,7 +306,7 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimization of the Bayesian Information Criterion (BIC) (**Schwarz, 1978**), which is the preferred criterion for mixture models (Proust-Lima et al., p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., p. 7):
+One aspect of determining the optimal number of classes is minimization of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., p. 7):
 
 $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 = \frac{
@@ -475,7 +475,7 @@ Thus, JMs including longitudinal measurements of p-tau181, NfL, or both biomarke
 
 ### Convergence
 
-To ensure proper model convergence of the JMs, trace plots of the $α$-parameter were examined for each model, starting with those for the JM of p-tau181, presented in Figure 1.
+To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in Figure 1.
 
 ![Traceplot of log-transformed p-tau181](figures/convergence_plot_ptau.png){#fig-converg-ptau}
 
@@ -483,9 +483,9 @@ To ensure proper model convergence of the JMs, trace plots of the $α$-parameter
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
-A similar pattern was observed for the JM including NfL, as shown in Appendix 8.4.1. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameter comparable to the JM including p-tau181.
+A similar pattern was observed for the JM including NfL, as shown in Appendix 8.4.1. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
 
-Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4.2). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameter. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
+Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4.2). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
 Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 3.
 
@@ -875,7 +875,7 @@ LME model with longitudinal NfL measurements
 
 ![Multivariate JM, p-tau181](figures/convergence_plot_multi_ptau181.png){#fig-alpha-ptau-multi}
 
-Trace plots of $α$-parameter convergence
+Trace plots of the $α$-parameters (convergence)
 :::
 
 ## Model Results
