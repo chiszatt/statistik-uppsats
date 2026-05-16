@@ -3654,7 +3654,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves (p-tau181)",
+    title = "Figure 1: Time-depending AUC curves (p-tau181)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3778,7 +3778,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves (Cox PH)",
+    title = "Figure 3: Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -4199,7 +4199,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves (p-tau181)",
+    title = "Figure 2: Time-dependent Brier score curves (p-tau181)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4323,7 +4323,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves (Cox PH)",
+    title = "Figure 4: Time-dependent Brier score curves (Cox PH)",
     x = "Time", 
     y = "Brier score"
   ) +
