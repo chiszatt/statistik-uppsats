@@ -3157,16 +3157,16 @@ auc_jlcmm_m1_ptau <- jlcmm_timeAUC(jlcmm_m1_ptau, newdata,
                                    "RID", "time_years", "time_to_event", "event",
                                    1, times)
 
-# Computing AUC for 3 class joint latent class mixed model for ptau
-auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, newdata,
-                                   "RID", "time_years", "time_to_event", "event",
-                                   1, times)
-
-# ON IN-SAMPLE DATA
-# Computing AUC for 2 class multivariate joint latent class mixed model for ptau & NfL
-auc_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data,
-                                   "RID", "time_years", "time_to_event", "event",
-                                   1, times)
+# # Computing AUC for 3 class joint latent class mixed model for ptau
+# auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, newdata,
+#                                    "RID", "time_years", "time_to_event", "event",
+#                                    1, times)
+# 
+# # ON IN-SAMPLE DATA
+# # Computing AUC for 2 class multivariate joint latent class mixed model for ptau & NfL
+# auc_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data,
+#                                    "RID", "time_years", "time_to_event", "event",
+#                                    1, times)
 ```
 
 ## Table of the results
@@ -3248,7 +3248,7 @@ plot_data <- data.frame(
     auc_ptau_jm,
     auc_nfl_jm,
     auc_multi_jm,
-    auc_jlcmm_m2_ptau$AUC,
+    auc_jlcmm_m1_ptau$AUC,
     auc_jlcmm_m1_nfl$AUC
   )
 ) 
@@ -3262,20 +3262,24 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_ptau_bl,
   JM = auc_ptau_jm,
-  JLCMM = auc_jlcmm_m2_ptau$AUC
+  JLCMM = auc_jlcmm_m1_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 ```
@@ -3287,20 +3291,24 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_ptau_bl,
   JM = auc_ptau_jm,
-  JLCMM = auc_jlcmm_m2_ptau$AUC
+  JLCMM = auc_jlcmm_m1_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 dev.off()
@@ -3315,17 +3323,21 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 ```
@@ -3340,17 +3352,21 @@ ggplot(data.frame(
   JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 dev.off()
@@ -3364,14 +3380,18 @@ ggplot(data.frame(
   JM = auc_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 ```
@@ -3385,14 +3405,18 @@ ggplot(data.frame(
   JM = auc_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
     ) +
   theme_minimal()
 dev.off()
@@ -3409,17 +3433,21 @@ ggplot(data.frame(
   Multi = auc_both_bl
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 ```
@@ -3434,17 +3462,21 @@ ggplot(data.frame(
   Multi = auc_both_bl
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 dev.off()
@@ -3459,17 +3491,21 @@ ggplot(data.frame(
   Multi = auc_multi_jm
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 ```
@@ -3484,17 +3520,21 @@ ggplot(data.frame(
   Multi = auc_multi_jm
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 dev.off()
@@ -3505,17 +3545,21 @@ dev.off()
 ggplot(data.frame(
   Time = times,
   NfL = auc_jlcmm_m1_nfl$AUC,
-  pTau = auc_jlcmm_m2_ptau$AUC
+  pTau = auc_jlcmm_m1_ptau$AUC
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 ```
@@ -3526,17 +3570,21 @@ png("figures/q2_auc_lcjm.png", width = 400, height = 300)
 ggplot(data.frame(
   Time = times,
   NfL = auc_jlcmm_m1_nfl$AUC,
-  pTau = auc_jlcmm_m2_ptau$AUC
+  pTau = auc_jlcmm_m1_ptau$AUC
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "AUC"
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
     ) +
   theme_minimal()
 dev.off()
@@ -3840,17 +3888,21 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 ```
@@ -3865,17 +3917,21 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 dev.off()
@@ -3890,17 +3946,21 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 ```
@@ -3915,17 +3975,21 @@ ggplot(data.frame(
   JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
   
   geom_line(aes(Time, JLCMM, color = "JLCMM")) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM"), size = 1.5) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 dev.off()
@@ -3939,14 +4003,18 @@ ggplot(data.frame(
   JM = brier_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 ```
@@ -3960,14 +4028,18 @@ ggplot(data.frame(
   JM = brier_multi_jm
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
-  geom_point(aes(Time, Cox, color = "Cox PH"), size = 1.5) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
   
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_point(aes(Time, JM, color = "JM"), size = 1.5) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Model",
+    shape = "Model"
   ) +
   theme_minimal()
 dev.off()
@@ -3983,18 +4055,22 @@ ggplot(data.frame(
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 ```
@@ -4008,18 +4084,22 @@ ggplot(data.frame(
   pTau = cox_brier$`Cox p-tau`,
   Multi = cox_brier$`Cox both`
 )) +
-   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 dev.off()
@@ -4033,18 +4113,22 @@ ggplot(data.frame(
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 ```
@@ -4058,18 +4142,22 @@ ggplot(data.frame(
   pTau = brier_ptau_jm,
   Multi = brier_multi_jm
 )) +
-   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_line(aes(Time, NfL, color = "NfL")) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
   
   geom_line(aes(Time, Multi, color = "Multivariate")) +
-  geom_point(aes(Time, Multi, color = "Multivariate"), size = 1.5) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 dev.off()
@@ -4083,14 +4171,18 @@ ggplot(data.frame(
   pTau = brier_jlcmm_m1_ptau$Brier
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 ```
@@ -4101,17 +4193,21 @@ png("figures/q2_brier_lcjm.png", width = 400, height = 300)
 ggplot(data.frame(
   Time = times,
   NfL = brier_jlcmm_m1_nfl$Brier,
-  pTau = brier_jlcmm_m2_ptau$Brier
+  pTau = brier_jlcmm_m1_ptau$Brier
 )) +
   geom_line(aes(Time, NfL, color = "NfL")) +
-  geom_point(aes(Time, NfL, color = "NfL"), size = 1.5) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
   
   geom_line(aes(Time, pTau, color = "P-tau181")) +
-  geom_point(aes(Time, pTau, color = "P-tau181"), size = 1.5) +
+  geom_point(aes(Time, pTau, color = "P-tau181", shape = "P-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "P-tau181" = 16)) +
   ylim(0,1) +
   labs(
     x = "Time", 
-    y = "Brier score"
+    y = "Brier score",
+    color = "Biomarker",
+    shape = "Biomarker"
   ) +
   theme_minimal()
 dev.off()
