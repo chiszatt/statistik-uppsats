@@ -21,7 +21,7 @@ format:
         {\large \today\par}
         \vspace{3cm}
         
-        {\Huge Charlotte Emily Iszatt and Milou Rossi\par}
+        {\Huge Charlotte Emily Iszatt & Milou Rossi\par}
         
         \vfill
         
@@ -89,12 +89,12 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -305,10 +305,10 @@ surv_data <- long_data %>% left_join(diagnosis_data_clean, by = c("RID"))
 
 ```{r}
 # Checking how many dementia diagnoses are probably due to AD
-dx <- ADNIMERGE2::DXSUM
-dx <- dx %>% dplyr::select(RID, DXAPP)
-dx <- dx %>% merge(surv_data, by = "RID")
-table(dx %>% dplyr::select(RID, DXAPP) %>% distinct() %>% dplyr::select(DXAPP))
+#dx <- ADNIMERGE2::DXSUM
+#dx <- dx %>% dplyr::select(RID, DXAPP)
+#dx <- dx %>% merge(surv_data, by = "RID")
+#table(dx %>% dplyr::select(RID, DXAPP) %>% distinct() %>% dplyr::select(DXAPP))
 ```
 
 ```{r}
@@ -501,11 +501,27 @@ baseline <- long_data %>%
 ```
 
 ```{r}
-# merging the survival data with demographics and the baseline biomarker values
-surv_data <- surv_data %>%
-  merge(demographics_small, by = "RID") %>% 
-  merge(apoe %>% dplyr::select(RID, APOE4_status, genotype), by = "RID") %>%
-  merge(baseline, by = "RID")
+# merging the survival data with demographics, apoe and the baseline biomarker values
+# Demographics
+surv_data <- merge(
+  surv_data,
+  demographics_small,
+  by = "RID"
+)
+
+# Apoe
+surv_data <- merge(
+  surv_data,
+  apoe %>% dplyr::select(RID, APOE4_status, genotype),
+  by = "RID"
+)
+
+# Baseline biomarker values
+surv_data <- merge(
+  surv_data,
+  baseline,
+  by = "RID"
+)
 ```
 
 ## Summaries and distributions of the model variables
@@ -3260,7 +3276,7 @@ saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 # plot(mult_jlcmm_m2, outcome = 1, which = "fit")
 ```
 
-## Defining time points for evaluation of predictive performance 
+## Defining time points for evaluation of predictive performance
 
 ```{r}
 # We define evaluation time points for time-dependent AUC comparison
@@ -3602,7 +3618,7 @@ plot_data <- data.frame(
 ) 
 ```
 
-### For comparing modelling approaches 
+### For comparing modelling approaches
 
 ```{r}
 # Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent AUC)
@@ -3610,14 +3626,14 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_ptau_bl,
   JM = auc_ptau_jm,
-  LCJM = auc_jlcmm_m2_ptau$AUC
+  JLCMM = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Model comparison (p-tau181)",
+    title = "Time-depending AUC curves (p-tau181)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3631,14 +3647,14 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_ptau_bl,
   JM = auc_ptau_jm,
-  LCJM = auc_jlcmm_m2_ptau$AUC
+  JLCMM = auc_jlcmm_m2_ptau$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Figure 1: Time-depending AUC curves - Model comparison (p-tau181)",
+    title = "Time-depending AUC curves (p-tau181)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3652,14 +3668,14 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_nfl_bl,
   JM = auc_nfl_jm,
-  LCJM = auc_jlcmm_m1_nfl$AUC
+  JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Model comparison (NfL)",
+    title = "Time-depending AUC curves (NfL)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3673,14 +3689,14 @@ ggplot(data.frame(
   Time = times,
   Cox = auc_nfl_bl,
   JM = auc_nfl_jm,
-  LCJM = auc_jlcmm_m1_nfl$AUC
+  JLCMM = auc_jlcmm_m1_nfl$AUC
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Model comparison (NfL)",
+    title = "Time-depending AUC curves (NfL)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3699,7 +3715,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JM, color = "JM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Model comparison (multivariate)",
+    title = "Time-depending AUC curves (multivariate)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3718,7 +3734,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JM, color = "JM")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Model comparison (multivariate)",
+    title = "Time-depending AUC curves (multivariate)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3741,7 +3757,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Biomarker comparison (Cox PH)",
+    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3762,7 +3778,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Figure 3: Time-depending AUC curves - Biomarker comparison (Cox PH)",
+    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3783,7 +3799,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Biomarker comparison (JM)",
+    title = "Time-depending AUC curves (JM)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3804,7 +3820,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariable")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Biomarker comparison (JM)",
+    title = "Time-depending AUC curves (JM)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3823,7 +3839,7 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "P-tau181")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Biomarker comparison (LCJM)",
+    title = "Time-depending AUC curves (JLCMM)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -3842,7 +3858,7 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "P-tau181")) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves - Biomarker comparison (LCJM)",
+    title = "Time-depending AUC curves (JLCMM)",
     x = "Time", 
     y = "AUC"
     ) +
@@ -4147,7 +4163,7 @@ plot_data_Brier <- data.frame(
 )
 ```
 
-### For comparing modelling approaches 
+### For comparing modelling approaches
 
 ```{r}
 # Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent Brier score)
@@ -4155,14 +4171,14 @@ ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox p-tau`,
   JM = brier_ptau_jm,
-  LCJM = brier_jlcmm_m2_ptau$Brier
+  JLCMM = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Model comparison (p-tau181)",
+    title = "Time-dependent Brier score curves (p-tau181)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4176,14 +4192,14 @@ ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox p-tau`,
   JM = brier_ptau_jm,
-  LCJM = brier_jlcmm_m2_ptau$Brier
+  JLCMM = brier_jlcmm_m2_ptau$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Figure 2: Time-dependent Brier score curves - Model comparison (p-tau181)",
+    title = "Time-dependent Brier score curves (p-tau181)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4197,14 +4213,14 @@ ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox NfL`,
   JM = brier_nfl_jm,
-  LCJM = brier_jlcmm_m1_nfl$Brier
+  JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Model comparison (NfL)",
+    title = "Time-dependent Brier score curves (NfL)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4218,14 +4234,14 @@ ggplot(data.frame(
   Time = times,
   Cox = cox_brier$`Cox NfL`,
   JM = brier_nfl_jm,
-  LCJM = brier_jlcmm_m1_nfl$Brier
+  JLCMM = brier_jlcmm_m1_nfl$Brier
 )) +
   geom_line(aes(Time, Cox, color = "Cox PH")) +
   geom_line(aes(Time, JM, color = "JM")) +
-  geom_line(aes(Time, LCJM, color = "LCJM")) +
+  geom_line(aes(Time, JLCMM, color = "JLCMM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Model comparison (NfL)",
+    title = "Time-dependent Brier score curves (NfL)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4244,7 +4260,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JM, color = "JM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Model comparison (multivariate)",
+    title = "Time-dependent Brier score curves (multivariate)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4263,7 +4279,7 @@ ggplot(data.frame(
   geom_line(aes(Time, JM, color = "JM")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Model comparison (multivariate)",
+    title = "Time-dependent Brier score curves (multivariate)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4271,7 +4287,7 @@ ggplot(data.frame(
 dev.off()
 ```
 
-### For comparing biomarker specifications 
+### For comparing biomarker specifications
 
 ```{r}
 # Q2: Cox PH - comparing biomarkers (time-dependent Brier score)
@@ -4286,7 +4302,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Biomarker comparison (Cox PH)",
+    title = "Time-dependent Brier score curves (Cox PH)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4307,7 +4323,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Figure 4: Time-dependent Brier score curves - Biomarker comparison (Cox PH)",
+    title = "Time-dependent Brier score curves (Cox PH)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4328,7 +4344,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Biomarker comparison (JM)",
+    title = "Time-dependent Brier score curves (JM)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4349,7 +4365,7 @@ ggplot(data.frame(
   geom_line(aes(Time, Multi, color = "Multivariate")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Biomarker comparison (JM)",
+    title = "Time-dependent Brier score curves (JM)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4368,7 +4384,7 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "P-tau181")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Biomarker comparison (LCJM)",
+    title = "Time-dependent Brier score curves (JLCMM)",
     x = "Time", 
     y = "Brier score"
   ) +
@@ -4387,7 +4403,7 @@ ggplot(data.frame(
   geom_line(aes(Time, pTau, color = "P-tau181")) +
   ylim(0,1) +
   labs(
-    title = "Time-dependent Brier score curves - Biomarker comparison (LCJM)",
+    title = "Time-dependent Brier score curves (JLCMM)",
     x = "Time", 
     y = "Brier score"
   ) +
