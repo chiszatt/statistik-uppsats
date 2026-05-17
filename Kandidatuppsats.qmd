@@ -162,7 +162,7 @@ where the corresponding hazard function is given as the probability that the eve
 
 $$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$
 
-and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11 - 14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
+and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11-14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
 
 $$S(t) = [S_0(t)]^{\psi}$$
 
@@ -210,9 +210,9 @@ $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\eps
 
 $$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
 
-where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the non-independence of the repeated measurements. Combining the true biomarker trajectory function with the error term gives:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the dependence between repeated measurements. Combining the true biomarker trajectory function with the error term gives:
 
-$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
+$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
 
 ### Survival Submodel
 
@@ -224,7 +224,7 @@ where $M_i$ represents the true unobserved biomarker profile up to time $t$.
 
 ### Model Assumptions
 
-A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other. (**REF**)
+A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other. (Rizopolos, 2012, pp. 62-63)
 
 ### Estimation: Frequentist vs Bayesian Approach
 
