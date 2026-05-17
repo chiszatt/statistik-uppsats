@@ -146,13 +146,23 @@ The modelling approaches were chosen based on their methodological relevance and
 
 ## Survival Analysis
 
-All of the modeling approaches considered in this study are grounded in the survival analysis framework, where the primary aim is to analyze the time until a prespecified event of interest occurs. Here, time refers to the duration from baseline, defined as the beginning of follow-up, until the occurrence of the event, and the event denotes a specified outcome of interest (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis, and ptau-181 and NfL levels as well as diagnosis status are available at baseline.
+All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis. Diagnosis status, ptau-181 and NfL levels are all available at baseline.
 
-Additionally, individuals with AD-dementia are either considered as right-censored, meaning that they do not reach the event during the follow-up period, or as interval-censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). Due to the diagnoses being made yearly, meaning that the exact date of transition to dementia can only be approximated, participants in this study are considered as right-censored.
+Additionally, individuals with AD-dementia are either considered as right censored, meaning that they do not reach the event during the follow-up period, or as interval censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). Due to diagnoses exams being made either every half year or yearly, depending on the individuals cognition status and what stage of their protocol they are in, the exact date of transition to dementia can only be approximated. Therefore, participants in this study are considered as interval censored.
 
 ## Cox Proportional Hazards Model
 
-To quantify the association between biomarkers and disease progression, relative hazards models are commonly used. These models compare the hazard of progression between individuals with different covariate profiles, and assume that their hazard rates are proportional. The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
+To quantify the association between biomarkers and disease progression, relative hazards models are commonly used. These models compare the hazard of progression between individuals with different covariate profiles, and assume that their hazards are proportional.
+
+Given that $T$ denotes either the time-to-event or the censuring time, the survival function models the probability of an individual remaining event-free up until time $t$, such that:
+
+$$S(t) = Pr(T > t)$$
+
+where the corresponding hazard function is given as the probability that the event occurs in the vicinity of time $t$ divided by the probability of being event-free at time $t$:
+
+$$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$
+
+and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11 - 14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
 
 $$S(t) = [S_0(t)]^{\psi}$$
 
@@ -172,15 +182,15 @@ A key assumption of the Cox PH model is the assumed proportionality between haza
 
 ### Concordance Index
 
-The concordance index ($C$ index) is an evaluation measure for the performance of survival models. All pairs of individuals are selected, and the $C$ index evaluates the proportion of pairs who are concordant, where the individual with a higher cumulative incidence, calculated as $1 - S(t)$, has the shorter time-to-event (Park et al., 2021, p. 1701). It will be considered as an initial evaluation metric for the different Cox PH models estimated in this study.
+The concordance index ($C$ index) is an evaluation measure for the predictive performance of survival models. All pairs of individuals in the sample population are selected, and the $C$ index evaluates the proportion of pairs who are concordant. Pairs are said to be concordant if the individual with a higher cumulative risk, given by $F(t)$, has the shorter time-to-event (Park et al., 2021, p. 1701). The $C$ index will be considered as an initial evaluation metric for the different Cox PH models estimated in this study.
 
 ## Joint Modelling of Longitudinal and Survival Data
 
 In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the value of the biomarker level at time $t$. In AD research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and the relationship between their trajectories and disease progression analysed.
 
-The longitudinal process - modeled by a linear mixed-effects model - and the survival process - modeled by a proportional hazards model - are linked by a specified association structure. This structure can link the survival process to the current value of the biomarker estimate only, or include the current rate of change of the biomarker trajectory. For instance, if both the current value and current rate of change are specified in the proportional hazards model, this becomes:
+The longitudinal process - modeled by a linear mixed-effects model - and the survival process - modeled by a proportional hazards model - are linked by a specified association structure. This structure can link the survival process to the current value of the biomarker estimate only, or include the current rate of change of the biomarker trajectory. For longitudinal data where measurements are repeated over the span of months, the current rate of change is better described as the difference between biomarker measurements. For instance, if both the current value and current rate of change are specified in the proportional hazards model, this becomes:
 
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = \frac{d}{dt} m_i(t)$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = m_i(t) - m_i(t-1)$$
 
 where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and the current rate of change, $m_i'(t)$, respectively to the hazard function. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 

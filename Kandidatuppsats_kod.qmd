@@ -1452,12 +1452,12 @@ get_value <- function(df, var, col) {
 table_cox <- data.frame(
   Variable = all_vars_cox,
 
-  "PTau HR (CI)" = format_hr_ci(
+  "p-tau181 HR (CI)" = format_hr_ci(
     get_value(ptau_cox, all_vars_cox, "HR"),
     get_value(ptau_cox, all_vars_cox, "CI_low"),
     get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  "PTau P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
+  "p-tau181 P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
   "NfL HR (CI)" = format_hr_ci(
     get_value(nfl_cox, all_vars_cox, "HR"),
