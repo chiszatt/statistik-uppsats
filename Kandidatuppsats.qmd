@@ -619,75 +619,13 @@ All three Cox PH models yield low and similar time-dependent Brier scores across
 
 Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.149 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
-## Precision Analysis
+## Sensitivity Analyses
 
-### Cox PH Models
+When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of
 
-As the proportional hazards assumption was met in the refitted Cox PH models, the results can be interpreted in terms of hazard ratios, which are, together with 95% confidence intervals and $p$-values, presented in Table 12 for the Cox PH models including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, more specifically those estimated on participants with at least three biomarker measurements.
+All results from the sensitivity analysis are available upon request.
 
-```{r, echo=FALSE}
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least three biomarker meausurements"
- kable_standard(readRDS("tables/table_cox1.rds"))
-```
-
-Table 12 indicates that sex was not significantly associated with progression to dementia due to AD in any of the models, with all $p$-values exceeding 0.05. Despite non-significant coefficients for sex and non-significant likelihood ratio tests (Appendix 8.2; Table 18) these variables were included due to clinical relevance.
-
-In contrast, APOE-$ε4$ status showed a strong and consistent association with progression risk, with increasing risk observed according to the number of $ε4$ alleles carried. Individuals carrying one $ε4$ allele had approximately a twofold increased hazard across models, whereas individuals carrying two $ε4$ alleles showed a substantially higher risk, corresponding to an approximately three- to fourfold increased hazard. These associations were highly statistically significant across all models. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals with two $ε4$ alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
-
-Both baseline p-tau181 and baseline NfL were significantly associated with an increased risk of progression in separate models, with $p$-values below 0.001. However, NfL showed a slightly stronger association with progression risk than p-tau181 (HR = 2.39 vs. HR = 2.04), indicating a modestly higher effect estimate for NfL. At the same time, the confidence interval for NfL was somewhat wider, suggesting slightly greater uncertainty in its effect estimate compared with p-tau181.
-
-In the Cox PH model including both biomarkers simultaneously, the results were similar, with both p-tau181 and NfL remaining significantly associated with progression. The effect estimates were however slightly attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 1.81 and NfL showing a hazard ratio of 1.98. This indicates that both biomarkers retained independent prognostic value. The confidence intervals for both variables were somewhat wider than in the univariable models, reflecting increased uncertainty in the joint model due to shared variance between the biomarkers.
-
-Furthermore, when comparing individuals with three or more measurements of p-tau181 and NfL to those with at least one measurement, the results remained robust, with inclusion of participants with fewer repeated observations increasing statistical power but not changing the direction or interpretation of the estimated effects for the main biological predictors. More precisely, Table 13 further demonstrates that hazard ratios, confidence intervals, and patterns of statistical significance remained broadly consistent across models, supporting unchanged conclusions.
-
-```{r}
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the Cox PH models including baseline biomarkers estimated on participants with at least one biomarker meausurement"
- # kable_standard(readRDS("tables/table_cox2.rds"))
-```
-
-Across both model specifications, APOE-$ε4$ remained the strongest and most stable genetic predictor of progression. Hazard ratios were very similar, with a slight increase in the larger cohort, from about 2.0 to 2.2 for one allele and from about 3.6 to just above 4.0 for two alleles. The confidence intervals were of similar width across both analyses, suggesting stable uncertainty in the estimates and consistent precision.
-
-For the biomarkers, both ptau and NfL were consistently associated with progression, but NfL showed stronger effects and slightly lower uncertainty than ptau across both cohorts. For example, in single-biomarker models, NfL showed higher hazard ratios than ptau and generally slightly narrower confidence intervals, indicating more precise estimation of its association.
-
-When both biomarkers were included simultaneously, the same pattern remained, with NfL consistently showing higher hazard ratios than ptau in both model specifications. Effect sizes were slightly lower compared to single-biomarker models, and confidence intervals were somewhat wider, consistent with shared variance between biomarkers, but the relative ranking between ptau and NfL was unchanged.
-
-In contrast, sex showed no association with progression in any of the models, with $p$-values above 0.05.
-
-When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of the proportional hazard test gave the same conclusions as well as mostly very similar hazard ratios for the Cox PH models and JMs. However, the effect of the log-transformed p-tau181 and NfL measurements were somewhat reduced in the univariate JMs when the midpoint was used as the event time. $\widehat R$ values for both the survival submodel and the longitudinal submodel were similar to the models estimated with the original exam date as the event time. All results from the sensitivity analysis are available upon request.
-
-### Joint Models
-
-Since the fitted JM converged correctly, the hazard ratios from the models were estimated and are presented in Table 14, along with 95% confidence intervals and $p$-values.
-
-```{r}
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm1.rds"))
-```
-
-Similar to the Cox PH models, sex was not significantly associated with progression to dementia due to AD in any of the models, with all $p$-values exceeding 0.05. In contrast, APOE-$ε4$ status showed a clear and consistent association with progression risk, with higher hazards observed as the number of $ε4$ alleles increased. Individuals carrying one $ε4$ allele had an approximately twofold increased hazard across models, while individuals carrying two $ε4$ alleles showed a substantially greater risk, corresponding to an approximately three- to fivefold increased hazard. These associations were statistically significant throughout the analyses. The confidence intervals for individuals with one $ε4$ allele were relatively narrow, indicating stable estimates, while the wider intervals among individuals carrying two alleles suggest greater uncertainty, likely reflecting the smaller number of participants in this subgroup.
-
-Both longitudinal p-tau181 and longitudinal NfL were significantly associated with an increased risk of progression in the separate joint models, with $p$-values below 0.001. As in the Cox PH models, NfL showed a slightly stronger association with progression risk than p-tau181, with hazard ratios of 3.45 and 3.33, respectively. The confidence intervals for both biomarkers were relatively narrow, suggesting reasonably precise and stable effect estimates.
-
-In the multivariate joint model including both biomarkers simultaneously, both p-tau181 and NfL remained significantly associated with progression. However, the estimated effects were attenuated compared with the separate models, with p-tau181 showing a hazard ratio of 2.30 and NfL showing a hazard ratio of 2.36. This attenuation suggests that the biomarkers capture partly overlapping information related to disease progression, while still retaining independent prognostic value. The confidence intervals for both biomarkers were also somewhat wider in the multivariate model, reflecting increased uncertainty due to the correlation between the longitudinal biomarker processes.
-
-To assess the robustness of these findings, the same models were subsequently re-estimated in the full cohort including participants with at least one biomarker measurement. Overall, the results remained highly consistent with those obtained in the primary analysis. Residual patterns and Q–Q plots remained broadly unchanged, and model convergence was stable across specifications. As shown in Table 15, hazard ratios, confidence intervals, and patterns of statistical significance were also largely consistent with the main results.
-
-```{r, echo=FALSE}
-#| tbl-cap: "Hazard ratios with 95% confidence intervals and p-values from the joint models"
-# kable_standard(readRDS("tables/table_jm2.rds"))
-```
-
-In the JM, APOE-$ε4$ remained a strong and stable predictor of progression. Hazard ratios were slightly higher in the model including all individuals, increasing from about 1.9 to 2.2 for one allele and from about 3.2 to 3.5 for two alleles, with a further increase to around 4.3 for two alleles in the full model. Confidence intervals remained well separated from one and show substantial overlap between model specifications, supporting the robustness of the genetic association within a joint modeling framework.
-
-For the longitudinal biomarkers, a clearer separation between ptau and NfL was observed. In both model settings, NfL consistently showed a stronger association with progression than ptau. In the first joint model, ptau had a hazard ratio around 3.3, while NfL was around 3.5, and in the more inclusive model these increase to approximately 4.5 for ptau and 5.5 for NfL. NfL also tended to show slightly narrower confidence intervals than ptau, indicating lower uncertainty in its estimated association.
-
-When both biomarkers were included simultaneously, the same pattern remained, with NfL consistently showing higher hazard ratios than ptau in both joint model specifications. Effect sizes were slightly lower compared to models with single biomarkers, and confidence intervals were correspondingly wider, consistent with shared variance between biomarkers.
-
-Sex also remained non-significant across all joint models, with no meaningful differences between model specifications.
-
-### Joint Latent Class Mixed Models
-
-Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding optimal models. For the univariate JLCMM with longitudinal p-tau181 measurements, although BIC was minimised and entropy was maximised for the three class model, one class comprised of only $2.28\%$ of the sample population (Appendix 8.7; Table 17). Additionally, the posterior classification table showed the model had poorer classification certainty (Appendix 8.7; Table 18) compared with the two class model (Appendix 8.7; Table 19). Comparing the two class model on the full data set and the two class model chosen in the main analysis, classification uncertainty decreased when including individuals with fewer than three longitudinal p-tau181 measurements (Table 6 vs. Appendix 8.7; Table 18). When modelling longitudinal NfL measurements with this data set, the BIC was minimised for the two class model and despite the three class model having the highest entropy, class2 contained only $1.14\%$ of the sample population (Appendix 8.7; Table 20). Again, compared with the two class model estimated on the data set including only those with more than 3 longitudinal NfL measurements, classification certainty decreased (Table 9 vs. Appendix 8.7; Table 21).
+Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding
 
 Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements. For NfL, the three class model did not converge, therefore these results are not presented. Again, these results are available upon request.
 
