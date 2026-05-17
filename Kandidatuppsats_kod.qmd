@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -599,28 +599,6 @@ hist(long_data$log_PLASMA_NFL, main="log_PLASMA_NFL")
 ```
 
 ```{r}
-# Creating a folder to save plots
-dir.create("figures", showWarnings = FALSE)
-
-#  Saving log transformed ptau histogram
-png("figures/hist_log_p_tau.png",
-    width = 6, height = 4, units = "in", res = 300)
-hist(long_data$log_PLASMAPTAU181,
-     xlab = "Log-transformed p-tau181")
-dev.off()
-```
-
-```{r}
-#  Saving log transformed NfL histogram
-png("figures/hist_log_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-hist(long_data$log_PLASMA_NFL,
-     xlab = "Log-transformed NfL" 
-     )
-dev.off()
-```
-
-```{r}
 # Transforming the baseline values in the survival data
 surv_data$baseline_value_ptau <- log(surv_data$baseline_value_ptau)
 surv_data$baseline_value_nfl <- log(surv_data$baseline_value_nfl)
@@ -713,27 +691,6 @@ corrplot(lme_cor,
          addCoef.col = "black",
          tl.col = "black",
          tl.srt = 45)
-```
-
-```{r}
-# Saving the correlation plots 
-png("figures/corrplot_cox.png", width = 6, height = 4, units = "in", res = 300)
-corrplot(cox_cor,
-         method = "color",
-         type = "upper",
-         addCoef.col = "black",
-         tl.col = "black",
-         tl.srt = 45)
-dev.off()
-
-png("figures/corrplot_lme.png", width = 6, height = 4, units = "in", res = 300)
-corrplot(lme_cor,
-         method = "color",
-         type = "upper",
-         addCoef.col = "black",
-         tl.col = "black",
-         tl.srt = 45)
-dev.off()
 ```
 
 # Longitudinal models
@@ -1039,19 +996,13 @@ anova(m1, m2, type = "LRT")
 ```
 
 ```{r}
-# Saving a table of results from the likelihood ratio tests between models with only a ranodom intercept and those with random intercept and slope
+# Table of results from the likelihood ratio tests between models with only a ranodom intercept and those with random intercept and slope
 long_re_lrt_table <- data.frame(
   "Model" = c("ptau-181", "NfL"),
   "Test statistic" = c(1.488, 10.506),
   "P-value" = c(0.475, 0.005),
   check.names = FALSE
   )
-
-# Creating a directory to save tables into
-dir.create("tables", showWarnings = FALSE)
-
-# Saving the table 
-saveRDS(long_re_lrt_table, "tables/long_re_lrt_table.rds")
 ```
 
 ```{r}
@@ -1079,18 +1030,6 @@ abline(h = 0, col = "red", lty = 2)
 ```
 
 ```{r}
-# Saving the plot of residuals vs fitted for ptau
-png("figures/residuals_vs_fitted_ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(fitted_vals_ptau, res_ptau,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted for p-tau181")
-abline(h = 0, col = "red", lty = 2)
-dev.off()
-```
-
-```{r}
 # residuals of the NfL LME model
 res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
@@ -1103,18 +1042,6 @@ plot(fitted_vals_nfl, res_nfl,
      ylab = "Residuals",
      main = "Residuals vs Fitted for NFL")
 abline(h = 0, col = "red", lty = 2)
-```
-
-```{r}
-# Saving the residuals vs fitted plot for nfl
-png("figures/residuals_vs_fitted_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(fitted_vals_nfl, res_nfl,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs Fitted for NfL")
-abline(h = 0, col = "red", lty = 2)
-dev.off()
 ```
 
 #### Shapiro-Wilk test
@@ -1139,21 +1066,6 @@ qqline(res_ptau, col = "red")
 # For NFL 
 qqnorm(res_nfl, main = "QQ plot: NfL residuals")
 qqline(res_nfl, col = "red")
-```
-
-```{r}
-#  Saving the QQ-plots
-png("figures/qq_ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
-qqline(res_ptau, col = "red")
-dev.off()
-
-png("figures/qq_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-qqnorm(res_nfl, main = "QQ plot: NfL residuals")
-qqline(res_nfl, col = "red")
-dev.off()
 ```
 
 # Survival models
@@ -1267,11 +1179,6 @@ table_ph <- ph_all %>%
 table_ph
 ```
 
-```{r}
-# Saving table with PHT results
-saveRDS(table_ph, "tables/table_ph.rds")
-```
-
 #### Removing age-at-baseline due to evidence of non-proportional hazards
 
 ```{r}
@@ -1328,11 +1235,6 @@ table_ph_final <- ph_all_final %>%
 table_ph_final
 ```
 
-```{r}
-# Saving the final PH table
-saveRDS(table_ph_final, "tables/table_ph_final.rds")
-```
-
 ### Removing PTGENDER to run likelihood-ratio tests
 
 ```{r}
@@ -1387,15 +1289,13 @@ anova_both
 ```
 
 ```{r}
-# Saving a table of results from the likelihood ratio tests for cox models with and without PTGENDER
+# Table of results from the likelihood ratio tests for cox models with and without PTGENDER
 surv_lrt_table <- data.frame(
   "Model" = c("ptau-181 baseline", "NfL baseline", "ptau-181 and NfL baseline"),
   "Test statistic" = c(chi_ptau, chi_nfl, chi_both),
   "P-value" = c(0.98, 0.95, 0.73),
   check.names = FALSE
   )
-
-saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
 ```
 
 ### Cox model comparison table
@@ -1481,22 +1381,14 @@ table_cox <- data.frame(
 table_cox
 ```
 
-```{r}
-# Savig the cox models comparison table
-saveRDS(table_cox, "tables/table_cox1.rds")
-#saveRDS(table_cox, "tables/table_cox2.rds")
-```
-
 ### Concordance Index Table
 
 ```{r}
-# Saving the c-index table
+# C-index table
 c_index_table <- data.frame(
   "Model" = c("Cox ptau-181", "Cox NfL", "Cox ptau-181 & NfL"),
   "C-Index" = c(0.679, 0.673, 0.681),
   check.names = FALSE)
-  
-saveRDS(c_index_table, "tables/c_index_table.rds")
 ```
 
 # Two separate joint models
@@ -1520,14 +1412,6 @@ joint_model_ptau <- jm(
 ggtraceplot(joint_model_ptau, "alphas")
 ```
 
-```{r}
-# Saving the convergence plot
-png("figures/convergence_plot_ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggtraceplot(joint_model_ptau, "alphas")
-dev.off()
-```
-
 ## Fitted joint model for NfL
 
 ```{r}
@@ -1545,30 +1429,6 @@ joint_model_nfl <- jm(
 ```{r}
 # Checking convergence 
 ggtraceplot(joint_model_nfl, "alphas")
-```
-
-```{r}
-# Saving the convergence plot
-png("figures/convergence_plot_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggtraceplot(joint_model_nfl, "alphas")
-dev.off()
-```
-
-### Traceplots
-
-```{r}
-# For p-tau181
-# traceplot(joint_model_ptau, parm = "betas")
-# traceplot(joint_model_ptau, parm = "alphas")
-# traceplot(joint_model_ptau, parm = "sigmas")
-```
-
-```{r}
-# For NfL
-# traceplot(joint_model_nfl, parm = "betas")
-# traceplot(joint_model_nfl, parm = "alphas")
-# traceplot(joint_model_nfl, parm = "sigmas")
 ```
 
 # Multivariate joint model
@@ -1607,16 +1467,6 @@ multi_joint_model <- jm(surv_model_final, mixed ,
 ```{r}
 # Checking convergence 
 ggtraceplot(multi_joint_model, "alphas")
-```
-
-```{r}
-# Saving the convergence plot
-png("figures/convergence_plot_multi.png",
-    width = 6, height = 4, units = "in", res = 300)
- ggtraceplot(multi_joint_model, "alphas")
- dev.off()
- 
- # Note: Since the function does not allow direct extraction of both plots, one is saved here, # while the other was captured via screenshot and added manually.
 ```
 
 ### Joint model comparison table
@@ -1681,12 +1531,6 @@ table_jm <- data.frame(
 table_jm
 ```
 
-```{r}
-# Saving the joint model comparison table
-saveRDS(table_jm, "tables/table_jm1.rds")
-#saveRDS(table_jm, "tables/table_jm2.rds")
-```
-
 ## Rhat value comparison table
 
 ```{r}
@@ -1724,11 +1568,6 @@ rhat_survival_table
 ```
 
 ```{r}
-# Saving the rhat table
-saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
-```
-
-```{r}
 # Extracting Rhat for longitudinal outcome
 extract_rhat_long <- function(model) {
 
@@ -1760,11 +1599,6 @@ rhat_longitudinal_table <- bind_rows(
 
 # Showing table
 rhat_longitudinal_table
-```
-
-```{r}
-# Saving the rhat table
-saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
 ```
 
 # Latent Class Mixed Models
@@ -2089,12 +1923,6 @@ get_pprob_table <- function(model) {
 ```
 
 ```{r}
-# Saving the posterior probability table for the 2 class jlcmm for nfl
-pprob_m1_nfl <- get_pprob_table(jlcmm_m1_nfl)
-saveRDS(pprob_m1_nfl, "tables/pprob_m1_nfl.rds")
-```
-
-```{r}
 # defining a function to extract the model parameters
 get_jlcmm_params <- function(model) {
   
@@ -2133,12 +1961,6 @@ get_jlcmm_params <- function(model) {
   
   return(out)
 }
-```
-
-```{r}
-# Saving the model estimates in a table
-jlcmm_m1_nfl_output <- get_jlcmm_params(jlcmm_m1_nfl)
-saveRDS(jlcmm_m1_nfl_output, "tables/jlcmm_m1_nfl_output.rds")
 ```
 
 ## M2 (3 latent classes)
@@ -2261,11 +2083,6 @@ summary_jlcmm_nfl <- data.frame(
 ```
 
 ```{r}
-# Saving comparison table of fit statistics
-saveRDS(summary_jlcmm_nfl, "tables/summary_jlcmm_nfl.rds")
-```
-
-```{r}
 summary(jlcmm_m1_nfl)
 ```
 
@@ -2327,30 +2144,12 @@ class_preds %>%
 plot(jlcmm_m1_nfl, which = "survival")
 ```
 
-```{r}
-png("figures/class-specific-survival-jlcmm-nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_nfl, which = "survival",
-     main = "",
-     xlab = "Time (years)", ylab = "Survival Probability")
-dev.off()
-```
-
 ### Longitudinal trajectory by class
 
 ```{r}
 # longitudinal trajectory by class
 plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
      ylim = c(2.5,4.2))
-```
-
-```{r}
-png("figures/longitudinal-jlcmm-nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
-     main = "",
-     xlab = "Time (years)", ylab = "NfL")
-dev.off()
 ```
 
 # JLCMM: PTAU
@@ -2480,15 +2279,13 @@ postprob(jlcmm_m1_ptau)
 ```
 
 ```{r}
-# Saving the posterior probability table for the 2 class jlcmm for ptau
-pprob_m1_ptau <- get_pprob_table(jlcmm_m1_ptau)
-saveRDS(pprob_m1_ptau, "tables/pprob_m1_ptau.rds")
+# Posterior probability table for the 2 class jlcmm for ptau
+get_pprob_table(jlcmm_m1_ptau)
 ```
 
 ```{r}
-# Saving the model estimates in a table
-jlcmm_m1_ptau_output <- get_jlcmm_params(jlcmm_m1_ptau)
-saveRDS(jlcmm_m1_ptau_output, "tables/jlcmm_m1_ptau_output.rds")
+# The model estimates in a table
+get_jlcmm_params(jlcmm_m1_ptau)
 ```
 
 ## M2 (3 latent classes)
@@ -2549,9 +2346,8 @@ postprob(jlcmm_m2_ptau)
 ```
 
 ```{r}
-# Saving the posterior probability table for the 3 class jlcmm for ptau
-pprob_m2_ptau <- get_pprob_table(jlcmm_m2_ptau)
-saveRDS(pprob_m2_ptau, "tables/pprob_m2_ptau.rds")
+# Posterior probability table for the 3 class jlcmm for ptau
+get_pprob_table(jlcmm_m2_ptau)
 ```
 
 ```{r}
@@ -2659,10 +2455,6 @@ summary_jlcmm_ptau <- data.frame(
 )
 ```
 
-```{r}
-saveRDS(summary_jlcmm_ptau, "tables/summary_jlcmm_ptau.rds")
-```
-
 ## Class Descriptions
 
 ```{r}
@@ -2696,29 +2488,11 @@ class_preds %>%
 plot(jlcmm_m2_ptau, which = "survival")
 ```
 
-```{r}
-png("figures/class-specific-survival-jlcmm-ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_nfl, which = "survival",
-     main = "",
-     xlab = "Time (years)", ylab = "Survival Probability")
-dev.off()
-```
-
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
 plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
-```
-
-```{r}
-png("figures/longitudinal-jlcmm-ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit",
-     main = "",
-     xlab = "Time (years)", ylab = "ptau-181")
-dev.off()
 ```
 
 # MJLCMM: NFL & PTAU
@@ -2822,9 +2596,8 @@ postprob(mult_jlcmm_m1)
 ```
 
 ```{r}
-# Saving the posterior probability table for the 2 class jlcmm for ptau and NfL
-pprob_m1_ptau_nfl <- get_pprob_table(mult_jlcmm_m1)
-saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
+# Posterior probability table for the 2 class jlcmm for ptau and NfL
+get_pprob_table(mult_jlcmm_m1)
 ```
 
 ```{r}
@@ -2897,10 +2670,6 @@ summary_jlcmm_ptau_nfl <- data.frame(
   props,
   check.names = FALSE
 )
-```
-
-```{r}
-saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
 
 ### Survival curves by class
@@ -3182,434 +2951,6 @@ auc_jlcmm_m1_ptau <- jlcmm_timeAUC(jlcmm_m1_ptau, newdata,
 #                                    1, times)
 ```
 
-## Table of the results
-
-```{r}
-# Time-dependent AUC for Cox and joint models summarized in a table
-results_table_AUC <- data.frame(
-  Model = c("Cox ptau-181", "Cox NfL", "Cox both",
-            "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
-  
-  AUC_2y = c(auc_ptau_bl[1],
-             auc_nfl_bl[1],
-             auc_both_bl[1],
-             auc_ptau_jm[1],
-             auc_nfl_jm[1],
-             auc_multi_jm[1],
-             auc_jlcmm_m1_ptau[1,3],
-             auc_jlcmm_m1_nfl[1,3]),
-  
-  AUC_3y = c(auc_ptau_bl[2],
-             auc_nfl_bl[2],
-             auc_both_bl[2],
-             auc_ptau_jm[2],
-             auc_nfl_jm[2],
-             auc_multi_jm[2],
-             auc_jlcmm_m1_ptau[2,3],
-             auc_jlcmm_m1_nfl[2,3]),
-  
-  AUC_4y = c(auc_ptau_bl[3],
-             auc_nfl_bl[3],
-             auc_both_bl[3],
-             auc_ptau_jm[3],
-             auc_nfl_jm[3],
-             auc_multi_jm[3],
-             auc_jlcmm_m1_ptau[3,3],
-             auc_jlcmm_m1_nfl[3,3]),
-  
-  AUC_5y = c(auc_ptau_bl[4],
-             auc_nfl_bl[4],
-             auc_both_bl[4],
-             auc_ptau_jm[4],
-             auc_nfl_jm[4],
-             auc_multi_jm[4],
-             auc_jlcmm_m1_ptau[4,3],
-             auc_jlcmm_m1_nfl[4,3]),
-  
-  AUC_6y = c(auc_ptau_bl[5],
-             auc_nfl_bl[5],
-             auc_both_bl[5],
-             auc_ptau_jm[5],
-             auc_nfl_jm[5],
-             auc_multi_jm[5],
-             auc_jlcmm_m1_ptau[5,3],
-             auc_jlcmm_m1_nfl[5,3])
-)
-
-results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
-results_table_AUC
-```
-
-```{r}
-# Saving the AUC results table
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
-```
-
-## Plot of the results
-
-```{r}
-# We reshape all AUC results into long format for plotting
-plot_data <- data.frame(
-  Time = rep(times, 8),
-  Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
-                "JM ptau-181", "JM NfL", "JM multi", "JLCM ptau-181", "JLCM NfL"),
-              each = length(times)),
-  AUC = c(
-    auc_ptau_bl,
-    auc_nfl_bl,
-    auc_both_bl,
-    auc_ptau_jm,
-    auc_nfl_jm,
-    auc_multi_jm,
-    auc_jlcmm_m1_ptau$AUC,
-    auc_jlcmm_m1_nfl$AUC
-  )
-) 
-```
-
-### For comparing modelling approaches
-
-```{r}
-# Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_ptau_bl,
-  JM = auc_ptau_jm,
-  JLCMM = auc_jlcmm_m1_ptau$AUC
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot 
-png("figures/q1_auc_ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_ptau_bl,
-  JM = auc_ptau_jm,
-  JLCMM = auc_jlcmm_m1_ptau$AUC
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
-```{r}
-# Q1: NfL - comparing models (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_nfl_bl,
-  JM = auc_nfl_jm,
-  JLCMM = auc_jlcmm_m1_nfl$AUC
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot 
-png("figures/q1_auc_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_nfl_bl,
-  JM = auc_nfl_jm,
-  JLCMM = auc_jlcmm_m1_nfl$AUC
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
-  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
-```{r}
-# Q1: Both biomarkers - comparing models (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_both_bl,
-  JM = auc_multi_jm
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot
-png("figures/q1_auc_multi.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  Cox = auc_both_bl,
-  JM = auc_multi_jm
-)) +
-  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
-  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
-  
-  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
-  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
-  
-  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Model",
-    shape = "Model"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
-### For comparing biomarker specifications
-
-```{r}
-# Q2: Cox PH - comparing biomarkers (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_nfl_bl,
-  pTau = auc_ptau_bl,
-  Multi = auc_both_bl
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot
-png("figures/q2_auc_cox.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_nfl_bl,
-  pTau = auc_ptau_bl,
-  Multi = auc_both_bl
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
-  ylim(0,1) +
-  labs(
-    title = "Time-depending AUC curves (Cox PH)",
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
-```{r}
-# Q2: JM - comparing biomarkers (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_nfl_jm,
-  pTau = auc_ptau_jm,
-  Multi = auc_multi_jm
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot
-png("figures/q2_auc_jm.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_nfl_jm,
-  pTau = auc_ptau_jm,
-  Multi = auc_multi_jm
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
-  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
-```{r}
-# Q2: LCJM - comparing biomarkers (time-dependent AUC)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_jlcmm_m1_nfl$AUC,
-  pTau = auc_jlcmm_m1_ptau$AUC
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-```
-
-```{r}
-# Saving the plot
-png("figures/q2_auc_lcjm.png",
-    width = 6, height = 4, units = "in", res = 300)
-ggplot(data.frame(
-  Time = times,
-  NfL = auc_jlcmm_m1_nfl$AUC,
-  pTau = auc_jlcmm_m1_ptau$AUC
-)) +
-  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
-  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
-  
-  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
-  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
-  
-  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
-  ylim(0,1) +
-  labs(
-    x = "Time", 
-    y = "AUC",
-    color = "Biomarker",
-    shape = "Biomarker"
-    ) +
-  theme_minimal()
-dev.off()
-```
-
 # Time-depending Brier score
 
 ## Time-dependent Brier score for fitted Cox PH models
@@ -3804,7 +3145,67 @@ brier_mult_jlcmm_m1 <- brier_jlcmm(
 )
 ```
 
-## Table of the results
+# Tables of the predictive performance results
+
+## Time-depending AUC 
+
+```{r}
+# Time-dependent AUC for Cox and joint models summarized in a table
+results_table_AUC <- data.frame(
+  Model = c("Cox ptau-181", "Cox NfL", "Cox both",
+            "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
+  
+  AUC_2y = c(auc_ptau_bl[1],
+             auc_nfl_bl[1],
+             auc_both_bl[1],
+             auc_ptau_jm[1],
+             auc_nfl_jm[1],
+             auc_multi_jm[1],
+             auc_jlcmm_m1_ptau[1,3],
+             auc_jlcmm_m1_nfl[1,3]),
+  
+  AUC_3y = c(auc_ptau_bl[2],
+             auc_nfl_bl[2],
+             auc_both_bl[2],
+             auc_ptau_jm[2],
+             auc_nfl_jm[2],
+             auc_multi_jm[2],
+             auc_jlcmm_m1_ptau[2,3],
+             auc_jlcmm_m1_nfl[2,3]),
+  
+  AUC_4y = c(auc_ptau_bl[3],
+             auc_nfl_bl[3],
+             auc_both_bl[3],
+             auc_ptau_jm[3],
+             auc_nfl_jm[3],
+             auc_multi_jm[3],
+             auc_jlcmm_m1_ptau[3,3],
+             auc_jlcmm_m1_nfl[3,3]),
+  
+  AUC_5y = c(auc_ptau_bl[4],
+             auc_nfl_bl[4],
+             auc_both_bl[4],
+             auc_ptau_jm[4],
+             auc_nfl_jm[4],
+             auc_multi_jm[4],
+             auc_jlcmm_m1_ptau[4,3],
+             auc_jlcmm_m1_nfl[4,3]),
+  
+  AUC_6y = c(auc_ptau_bl[5],
+             auc_nfl_bl[5],
+             auc_both_bl[5],
+             auc_ptau_jm[5],
+             auc_nfl_jm[5],
+             auc_multi_jm[5],
+             auc_jlcmm_m1_ptau[5,3],
+             auc_jlcmm_m1_nfl[5,3])
+)
+
+results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
+results_table_AUC
+```
+
+## Time-depending Brier score 
 
 ```{r}
 # Time-dependent Brier score for Cox and joint models summarized in a table
@@ -3863,16 +3264,82 @@ results_table_Brier[, -1] <- round(results_table_Brier[, -1], 3)
 results_table_Brier
 ```
 
+## Saving the tables 
+
+### Original tables 
+
 ```{r}
+# Creating a directory to save tables into
+dir.create("tables", showWarnings = FALSE)
+
+# Saving the AUC results table
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+
 # Saving the table of the Brier score results
 saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
-## Plot of the results
+### Sensitivity analysis tables
+
+#### Baseline is the first biomarker examdate 
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")B
+```
+
+#### Baseline is the first diagnosis examdate 
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+```
+
+#### The duplicate biomarker measurements are replaced by the first measurement
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+```
+
+### The duplicate biomarker measurements are replaced by the last measurement
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+```
+
+### Including participants with at least one biomarker measurement 
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+```
+
+# Plots of the predictive performance results
+
+```{r}
+# We reshape all AUC results into long format for plotting
+plot_data <- data.frame(
+  Time = rep(times, 8),
+  Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
+                "JM ptau-181", "JM NfL", "JM multi", "JLCM ptau-181", "JLCM NfL"),
+              each = length(times)),
+  AUC = c(
+    auc_ptau_bl,
+    auc_nfl_bl,
+    auc_both_bl,
+    auc_ptau_jm,
+    auc_nfl_jm,
+    auc_multi_jm,
+    auc_jlcmm_m1_ptau$AUC,
+    auc_jlcmm_m1_nfl$AUC
+  )
+) 
+```
 
 ```{r}
 # We reshape all Brier score results into long format for plotting
-# We reshape all Brier results into long format for plotting
 plot_data_Brier <- data.frame(
   Time = rep(times, 8),
   Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
@@ -3895,9 +3362,183 @@ plot_data_Brier <- data.frame(
 )
 ```
 
-### Time-dependent Brier score
+## For comparing modelling approaches
 
-### For comparing modelling approaches
+### Time-dependent AUC
+
+```{r}
+# Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_ptau_bl,
+  JM = auc_ptau_jm,
+  JLCMM = auc_jlcmm_m1_ptau$AUC
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Creating a folder to save plots
+dir.create("figures", showWarnings = FALSE)
+
+# Saving the plot 
+png("figures/q1_auc_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_ptau_bl,
+  JM = auc_ptau_jm,
+  JLCMM = auc_jlcmm_m1_ptau$AUC
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+```{r}
+# Q1: NfL - comparing models (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_nfl_bl,
+  JM = auc_nfl_jm,
+  JLCMM = auc_jlcmm_m1_nfl$AUC
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Saving the plot 
+png("figures/q1_auc_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_nfl_bl,
+  JM = auc_nfl_jm,
+  JLCMM = auc_jlcmm_m1_nfl$AUC
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  geom_line(aes(Time, JLCMM, color = "JLCMM"), linewidth = 0.3) +
+  geom_point(aes(Time, JLCMM, color = "JLCMM", shape = "JLCMM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+```{r}
+# Q1: Both biomarkers - comparing models (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_both_bl,
+  JM = auc_multi_jm
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Saving the plot
+png("figures/q1_auc_multi.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  Cox = auc_both_bl,
+  JM = auc_multi_jm
+)) +
+  geom_line(aes(Time, Cox, color = "Cox PH"), linewidth = 0.3) +
+  geom_point(aes(Time, Cox, color = "Cox PH", shape = "Cox PH"), size = 1.5) +
+  
+  geom_line(aes(Time, JM, color = "JM"), linewidth = 0.3) +
+  geom_point(aes(Time, JM, color = "JM", shape = "JM"), size = 1.5) +
+  
+  scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Model",
+    shape = "Model"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+### Time-dependent Brier score
 
 ```{r}
 # Q1: Biomarker fixed (p-tau181) - comparing models (time-dependent Brier score)
@@ -4068,7 +3709,181 @@ ggplot(data.frame(
 dev.off()
 ```
 
-### For comparing biomarker specifications
+## For comparing biomarker specifications
+
+### Time-dependent AUC
+
+```{r}
+# Q2: Cox PH - comparing biomarkers (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_nfl_bl,
+  pTau = auc_ptau_bl,
+  Multi = auc_both_bl
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Saving the plot
+png("figures/q2_auc_cox.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_nfl_bl,
+  pTau = auc_ptau_bl,
+  Multi = auc_both_bl
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  geom_line(aes(Time, Multi, color = "Multivariable"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariable", shape = "Multivariable"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
+  ylim(0,1) +
+  labs(
+    title = "Time-depending AUC curves (Cox PH)",
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+```{r}
+# Q2: JM - comparing biomarkers (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_nfl_jm,
+  pTau = auc_ptau_jm,
+  Multi = auc_multi_jm
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Saving the plot
+png("figures/q2_auc_jm.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_nfl_jm,
+  pTau = auc_ptau_jm,
+  Multi = auc_multi_jm
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  geom_line(aes(Time, Multi, color = "Multivariate"), linewidth = 0.3) +
+  geom_point(aes(Time, Multi, color = "Multivariate", shape = "Multivariate"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+```{r}
+# Q2: LCJM - comparing biomarkers (time-dependent AUC)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_jlcmm_m1_nfl$AUC,
+  pTau = auc_jlcmm_m1_ptau$AUC
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+```
+
+```{r}
+# Saving the plot
+png("figures/q2_auc_lcjm.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggplot(data.frame(
+  Time = times,
+  NfL = auc_jlcmm_m1_nfl$AUC,
+  pTau = auc_jlcmm_m1_ptau$AUC
+)) +
+  geom_line(aes(Time, NfL, color = "NfL"), linewidth = 0.3) +
+  geom_point(aes(Time, NfL, color = "NfL", shape = "NfL"), size = 1.5) +
+  
+  geom_line(aes(Time, pTau, color = "p-tau181"), linewidth = 0.3) +
+  geom_point(aes(Time, pTau, color = "p-tau181", shape = "p-tau181"), size = 1.5) +
+  
+  scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
+  ylim(0,1) +
+  labs(
+    x = "Time", 
+    y = "AUC",
+    color = "Biomarker",
+    shape = "Biomarker"
+    ) +
+  theme_minimal()
+dev.off()
+```
+
+### Time-dependent Brier score
 
 ```{r}
 # Q2: Cox PH - comparing biomarkers (time-dependent Brier score)
@@ -4237,4 +4052,247 @@ ggplot(data.frame(
   ) +
   theme_minimal()
 dev.off()
+```
+
+# Saving other relevant tables and figures
+
+```{r}
+#  Saving log transformed ptau histogram
+png("figures/hist_log_p_tau.png",
+    width = 6, height = 4, units = "in", res = 300)
+hist(long_data$log_PLASMAPTAU181,
+     xlab = "Log-transformed p-tau181")
+dev.off()
+```
+
+```{r}
+#  Saving log transformed NfL histogram
+png("figures/hist_log_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+hist(long_data$log_PLASMA_NFL,
+     xlab = "Log-transformed NfL" 
+     )
+dev.off()
+```
+
+```{r}
+# Saving the correlation plots 
+png("figures/corrplot_cox.png", width = 6, height = 4, units = "in", res = 300)
+corrplot(cox_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+dev.off()
+
+png("figures/corrplot_lme.png", width = 6, height = 4, units = "in", res = 300)
+corrplot(lme_cor,
+         method = "color",
+         type = "upper",
+         addCoef.col = "black",
+         tl.col = "black",
+         tl.srt = 45)
+dev.off()
+```
+
+```{r}
+# Saving the table of results from the likelihood ratio tests between models with only a ranodom intercept and those with random intercept and slope
+saveRDS(long_re_lrt_table, "tables/long_re_lrt_table.rds")
+```
+
+```{r}
+# Saving the plot of residuals vs fitted for ptau
+png("figures/residuals_vs_fitted_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(fitted_vals_ptau, res_ptau,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for p-tau181")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
+```
+
+```{r}
+# Saving the residuals vs fitted plot for nfl
+png("figures/residuals_vs_fitted_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(fitted_vals_nfl, res_nfl,
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted for NfL")
+abline(h = 0, col = "red", lty = 2)
+dev.off()
+```
+
+```{r}
+#  Saving the QQ-plots
+png("figures/qq_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+qqnorm(res_ptau, main = "QQ plot: p-tau181 residuals")
+qqline(res_ptau, col = "red")
+dev.off()
+
+png("figures/qq_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+qqnorm(res_nfl, main = "QQ plot: NfL residuals")
+qqline(res_nfl, col = "red")
+dev.off()
+```
+
+```{r}
+# Saving table with PHT results
+saveRDS(table_ph, "tables/table_ph.rds")
+```
+
+```{r}
+# Saving the final PH table
+saveRDS(table_ph_final, "tables/table_ph_final.rds")
+```
+
+```{r}
+# Saving a table of results from the likelihood ratio tests for cox models with and without PTGENDER
+saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
+```
+
+```{r}
+# Savig the cox models comparison table
+saveRDS(table_cox, "tables/table_cox1.rds")
+```
+
+```{r}
+# Saving the C-index table
+saveRDS(c_index_table, "tables/c_index_table.rds")
+```
+
+```{r}
+# Saving the convergence plot for the p-tau181 joint model
+png("figures/convergence_plot_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggtraceplot(joint_model_ptau, "alphas")
+dev.off()
+```
+
+```{r}
+# Saving the convergence plot for the NfL joint model
+png("figures/convergence_plot_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+ggtraceplot(joint_model_nfl, "alphas")
+dev.off()
+```
+
+```{r}
+# Saving the convergence plot for the multivariate joint model
+png("figures/convergence_plot_multi.png",
+    width = 6, height = 4, units = "in", res = 300)
+ ggtraceplot(multi_joint_model, "alphas")
+ dev.off()
+ 
+ # Note: Since the function does not allow direct extraction of both plots, one is saved here, # while the other was captured via screenshot and added manually.
+```
+
+```{r}
+# Saving the joint model comparison table
+saveRDS(table_jm, "tables/table_jm1.rds")
+```
+
+```{r}
+# Saving the rhat table (survival outcome)
+saveRDS(rhat_survival_table, "tables/rhat_survival_table.rds")
+```
+
+```{r}
+# Saving the rhat table (longitudinal outcome)
+saveRDS(rhat_longitudinal_table, "tables/rhat_longitudinal_table.rds")
+```
+
+```{r}
+# Saving the posterior probability table for the 2 class jlcmm for nfl
+pprob_m1_nfl <- get_pprob_table(jlcmm_m1_nfl)
+saveRDS(pprob_m1_nfl, "tables/pprob_m1_nfl.rds")
+```
+
+```{r}
+# Saving the model estimates in a table
+jlcmm_m1_nfl_output <- get_jlcmm_params(jlcmm_m1_nfl)
+saveRDS(jlcmm_m1_nfl_output, "tables/jlcmm_m1_nfl_output.rds")
+```
+
+```{r}
+# Saving comparison table of fit statistics (NfL) 
+saveRDS(summary_jlcmm_nfl, "tables/summary_jlcmm_nfl.rds")
+```
+
+```{r}
+# Survival curves by class (NfL) 
+png("figures/class-specific-survival-jlcmm-nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(jlcmm_m1_nfl, which = "survival",
+     main = "",
+     xlab = "Time (years)", ylab = "Survival Probability")
+dev.off()
+```
+
+```{r}
+# Longitudinal trajectory by class (NfL) 
+png("figures/longitudinal-jlcmm-nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
+     main = "",
+     xlab = "Time (years)", ylab = "NfL")
+dev.off()
+```
+
+```{r}
+# Saving the posterior probability table for the 2 class jlcmm for p-tau181
+pprob_m1_ptau <- get_pprob_table(jlcmm_m1_ptau)
+saveRDS(pprob_m1_ptau, "tables/pprob_m1_ptau.rds")
+```
+
+```{r}
+# Saving the model estimates in a table (p-tau181)
+jlcmm_m1_ptau_output <- get_jlcmm_params(jlcmm_m1_ptau)
+saveRDS(jlcmm_m1_ptau_output, "tables/jlcmm_m1_ptau_output.rds")
+```
+
+```{r}
+# Saving the posterior probability table for the 3 class jlcmm for p-tau181
+pprob_m2_ptau <- get_pprob_table(jlcmm_m2_ptau)
+saveRDS(pprob_m2_ptau, "tables/pprob_m2_ptau.rds")
+```
+
+```{r}
+# Comparing M0, M1, M2 (p-tau181)
+saveRDS(summary_jlcmm_ptau, "tables/summary_jlcmm_ptau.rds")
+```
+
+```{r}
+# Survival curves by class (p-tau181)
+png("figures/class-specific-survival-jlcmm-ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(jlcmm_m1_nfl, which = "survival",
+     main = "",
+     xlab = "Time (years)", ylab = "Survival Probability")
+dev.off()
+```
+
+```{r}
+# Longitudinal trajectories by class (p-tau181)
+png("figures/longitudinal-jlcmm-ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit",
+     main = "",
+     xlab = "Time (years)", ylab = "ptau-181")
+dev.off()
+```
+
+```{r}
+# Saving the posterior probability table for the 2 class jlcmm for ptau and NfL
+pprob_m1_ptau_nfl <- get_pprob_table(mult_jlcmm_m1)
+saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
+```
+
+```{r}
+# Comparing M0, M1, M2 (NfL and p-tau181)
+saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
