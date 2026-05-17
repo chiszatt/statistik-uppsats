@@ -3284,29 +3284,29 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 #### Baseline is the first biomarker examdate 
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")B
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")B
 ```
 
 #### Baseline is the first diagnosis examdate 
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_dx_bl.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_dx_bl.rds")
 ```
 
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
 ```
 
 ### The duplicate biomarker measurements are replaced by the last measurement
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_last_duplicate.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
 ```
 
 ### Including participants with at least one biomarker measurement 
