@@ -3147,7 +3147,7 @@ brier_mult_jlcmm_m1 <- brier_jlcmm(
 
 # Tables of the predictive performance results
 
-## Time-depending AUC 
+## Time-depending AUC
 
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized in a table
@@ -3205,7 +3205,7 @@ results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
 results_table_AUC
 ```
 
-## Time-depending Brier score 
+## Time-depending Brier score
 
 ```{r}
 # Time-dependent Brier score for Cox and joint models summarized in a table
@@ -3264,9 +3264,9 @@ results_table_Brier[, -1] <- round(results_table_Brier[, -1], 3)
 results_table_Brier
 ```
 
-## Saving the tables 
+## Saving the tables
 
-### Original tables 
+### Original tables
 
 ```{r}
 # Creating a directory to save tables into
@@ -3281,21 +3281,21 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 
 ### Sensitivity analysis tables
 
-#### Modelling without covariates? 
+#### Modelling without covariates?
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_no covariates.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_no_covariates.rds")
 ```
 
-#### Baseline is the first biomarker examdate 
+#### Baseline is the first biomarker examdate
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
 ```
 
-#### Baseline is the first diagnosis examdate 
+#### Baseline is the first diagnosis examdate
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_first_dx_bl.rds")
@@ -3316,7 +3316,7 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
 ```
 
-#### Including participants with at least one biomarker measurement 
+#### Including participants with at least one biomarker measurement
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
@@ -3770,7 +3770,6 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC",
     color = "Biomarker",

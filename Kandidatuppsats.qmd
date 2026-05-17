@@ -519,9 +519,9 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 ### BIC, Entropy, Posterior Classification, Score Test
 
-Finally, JLCMMs were estimated The number of latent classes in the models were determined via analysis of the BIC, entropy and assessment of the posterior classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum.
+Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding a global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
 
-First, the log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
+The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
 ```{r}
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
@@ -542,16 +542,16 @@ kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
-Additionally, the score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modeling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in Table 16 (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
+The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modeling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in Table 16 (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
 
-Analysis of the log-likelihood, BIC and entropy provided in Table 8 for candidate models using longitudinal NfL data suggests that even in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, and only increased very slightly between the two class and the three class model. BIC was minimised and entropy was maxmised for the two class model.
+The log-likelihood, BIC and entropy provided in Table 8 for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
 
 ```{r}
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (Table 9). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). Therefore, a two class model was again chosen.
+Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (Table 9). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
 
 ```{r}
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
@@ -560,11 +560,11 @@ kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 
 ## Model comparison
 
-In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from 2 to 6 years of follow-up. To start with, Figure 2 provides an initial overview of the time-dependent AUC of the different models across the follow-up period, with the biomarker being fixed as p-tau181.
+In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from 2 to 6 years of follow-up and a landmark time of 1 year. Figure 2 provides an initial overview of the time-dependent AUC of the different models across the follow-up period, with the biomarker being fixed as p-tau181.
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
-Among the models incorporating p-tau181, the time-dependent AUC curves remain consistently high, with AUC values exceeding 0.75 throughout follow-up, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher at earlier time points, especially for the JM. However, the differences between the models decrease over time, resulting in increasingly similar curves. The Cox PH model consistently yields the lowest AUC values.
+Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 throughout follow-up, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher at earlier time points, especially for the JM. However, differences between the models decrease over time, resulting in increasingly similar curves. The Cox PH model consistently yields the lowest AUC values.
 
 Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 throughout follow-up. At earlier follow-up times, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models.
 
@@ -581,13 +581,13 @@ For instance, by showing that the JM among the p-tau181-based models has an AUC 
 
 When evaluating predictive performance using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
-![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau width="400"}
+![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences then become smaller at later follow-up times, where the curves get increasingly closer.
 
 This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The JLCMM yields lower Brier score values compared with the other two models at earlier follow-up points. Over longer prediction hoizons, the differences between models reduces, with values being low, stable and around the same range as for models including p-tau181.
 
-The same can be said for the time-depending Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the Cox PH model and the JM yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at early follow-up to 0.14 at later follow-up.
+The same can be said for the time-dependent Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the Cox PH model and the JM yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at early follow-up to 0.14 at later follow-up.
 
 Table 11 presents the Brier score values for each modelling approach and at each follow-up time point.
 
@@ -602,7 +602,7 @@ At the two-year follow-up, the JLCMM including NfL achieves the lowest Brier sco
 
 The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 provides an initial overview of the time-dependent AUC of the models with different biomarker specifications across the follow-up period, with the model being fixed as Cox PH.
 
-![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox width="400"}
+![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox}
 
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period, with the exception of the three-year follow-up point, where the time-dependent AUC curve for the model incorporating p-tau181 is slightly higher. However, both single-marker models are consistently outperformed by the combined model, whose curve is consistently above the two other curves.
 
@@ -614,7 +614,7 @@ The time-dependent AUC values for each biomarker specification at each horizon a
 
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
-![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox width="400"}
+![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
 Among the Cox PH models, those incorporating p-tau181, NfL, or both biomarkers simultaneously all yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
 
