@@ -452,47 +452,47 @@ Among the participants with at least three biomarker measurements, 83 participan
 
 ## Model fit overview
 
+The initial analysis was run on the restricted cohort of individuals with three or more longitudinal p-tau181 and NfL measurements. A subsequent sensitivity analysis was run on the extended cohort including all individuals with at least one p-tau181 and NfL measurement in order to verify whether the results are stable when including individuals with sparse longitudinal data.
+
 ### Test of Proportional Hazards Assumption and Concordance
 
-First, Cox PH models were fitted including either baseline p-tau181, baseline NfL, or both biomarkers measured at baseline, restricted to participants with three or more biomarker measurements. Additional covariates were gender, age at baseline and APOE genotype. Initially fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
+First, Cox PH models including baseline values of p-tau181, NfL, or both were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
-Prior to interpreting the predictive performance and the estimated hazard ratios of the models, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. As the subsequent JMs also require a standard Cox PH model, this assumption was additionally evaluated for this model. The resulting $p$-values are presented in Table 14 (Appendix 8.2).
+Prior to interpreting the predictive performance and the estimated hazard ratios of the models, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 14 (Appendix 8.2).
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
-Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models therefore yielded the $p$-values presented in Table 1.
+Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in Table 1.
 
 ```{r, echo=FALSE}
-#| tbl-cap: "p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models estimated on participants with at least three biomarker meausurements"
+#| tbl-cap: "p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
 kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
-After excluding age at baseline, the GLOBAL test yielded $p$-values above the 5% significance level and therefore no longer indicates any violation of the proportional hazards assumption. The other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
+After excluding age at baseline, the GLOBAL test yielded $p$-values above the 5% significance level, no longer indicating any violation of the proportional hazards assumption. All other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
 
-Furthermore, an initial comparison of model performance by assessment of the concordance indices for all cox models was performed. The results presented in Table 2 show that the concordance index evaluates all three models similarly.
+Furthermore, an initial comparison of model performance by assessment of the concordance indices for all cox models was performed. The results presented in Table 2 show that the concordance index evaluates all three models similarly, with results indicating adequate discrimination.
 
 ```{r, echo=FALSE}
-#| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values estimated on participants with at least three biomarker meausurements"
+#| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values"
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
 
 ### Residual diagnostics
 
-The fitted Cox PH models were followed by fitted JMs that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data. For the longitudinal component, an LME model was estimated separately for p-tau181 and NfL. As for the Cox models, these models were first estimated in participants with at least three biomarker measurements.
+Next, JMs that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data were estimated. For the longitudinal component, an LME model was estimated separately for p-tau181 and NfL.
 
-The choice of random effects structure was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; Table 13).
+Plotting the residuals against the fitted values for the LME model with p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 8.3; Figure 8a. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (Appendix 8.3; Figure 8b). A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values demonstrated even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (Appendix 8.3; Figure 9a). The Q-Q plot for NfL showed similar results to those observed for p-tau181 (Appendix 8.3; Figure 9b). Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME models with log-transformed biomarker measurements. Consequently, they were considered to provide an adequate fit to the data and as suitable for use within the joint modeling framework.
 
-Plotting the residuals against the fitted values for the LME model with p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 8.3; Figure 8a. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (Appendix 8.3; Figure 8b). A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values demonstrated even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (Appendix 8.3; Figure 9a). The Q-Q plot for NfL showed similar results to those observed for p-tau181 (Appendix 8.3; Figure 9b). Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME models with log-transformed data. Consequently, they were considered to provide an adequate fit to the data and as suitable for use within the joint modeling framework.
+The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; Table 13).
 
-Thus, JMs including longitudinal measurements of p-tau181, NfL, or both biomarkers were fitted. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM.
+Thus, JMs including longitudinal measurements of p-tau181, NfL, or both were fit. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM.
 
 ### Convergence
 
 To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in Figure 1.
 
 ![Traceplot of log-transformed p-tau181](figures/convergence_plot_ptau.png){#fig-converg-ptau}
-
-**Figure 1: trace plot of the** $α$**-parameters for the joint model of p-tau181 estimated on participants with at least three biomarker meausurements.**
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
@@ -569,26 +569,24 @@ Among these models, the time-dependent AUC curves remain consistently high, with
 
 Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 throughout follow-up. At earlier follow-up times, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models.
 
-Appendix 8.6; Figure 11b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for the JM at earlier follow-up time points. These values gradually decline over time, yielding values more similar to those of the Cox PH model at later follow-up times.
-
-These results are also indicated by Table 10, containing the AUC values for each modelling approach and at each follow-up time point.
+Appendix 8.6; Figure 11b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for the JM at earlier follow-up time points. These values gradually decline over time, yielding values more similar to those of the Cox PH model at later follow-up times. These results are also indicated by Table 10 which contains the AUC values for each modelling approach and at each horizon.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent AUC by model and follow-up time point"
 kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
-For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.902 at the two-year follow-up, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table X confirms the results previously observed in the figure. The differences between the models then decrease over time; at the four-year follow-up, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
+For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.902 at the two-year follow-up, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; at the four-year follow-up, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
 When evaluating predictive performance using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
 
-Among the models incorporating p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences then become smaller at later follow-up times, where the curves get increasingly closer.
+Among the models involving p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 at early follow-up to 0.16 at later follow-up, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. At earlier follow-up points, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences between models decrease at later follow-up times, as the curves get increasingly closer.
 
-This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The JLCMM yields lower Brier score values compared with the other two models at earlier follow-up points. Over longer prediction hoizons, the differences between models reduces, with values being low, stable and around the same range as for models including p-tau181.
+This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The JLCMM yields lower Brier score values compared with the other two models at earlier follow-up points. Over longer prediction horizons, the differences between models reduces, with values being low, stable and around the same range as for models including p-tau181.
 
-The same can be said for the time-dependent Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the Cox PH model and the JM yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at early follow-up to 0.14 at later follow-up.
+The same can be said for the time-dependent Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the Cox PH model and the JM yield similar, stable AUC values across the follow-up period, ranging from approximately 0.05 at for earlier predictions to 0.14 at later horizons.
 
 Table 11 presents the Brier score values for each modelling approach and at each follow-up time point.
 
@@ -601,25 +599,25 @@ At the two-year follow-up, the JLCMM including NfL achieves the lowest Brier sco
 
 ## Biomarker comparison
 
-The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 provides an initial overview of the time-dependent AUC of the models with different biomarker specifications across the follow-up period, with the model being fixed as Cox PH.
+The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 illustrates how the time-dependent AUC of the models changes with biomarker specification across the follow-up period, with the model being fixed as Cox PH.
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox}
 
-Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period, with the exception of the three-year follow-up point, where the time-dependent AUC curve for the model incorporating p-tau181 is slightly higher. However, both single-marker models are consistently outperformed by the combined model, whose curve is consistently above the two other curves.
+Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across the follow-up period with the exception of the three-year follow-up point. However, both single-marker models are consistently outperformed by the combined model.
 
-Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 13a demonstrates that the combined biomarker JM provides the strongest predictive performance across all time points, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
+Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 13a demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
 
-Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except at the three-year follow-up time point, where this model shows a slightly higher value (Appendix 8.7; Figure 13b).
+Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except at the three-year follow-up time point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; Figure 13b).
 
-The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, at the two-year follow-up within the JM framework, the multivariate model achieved an AUC value of 0.967, compared to 0.953 for the NfL model and 0.902 for the p-tau181 model. This indicates that the multivarite model provides the highest predictive performance at this time point.
+The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, at the two-year follow-up within the JM framework, the multivariate model achieved an AUC value of 0.967, compared to 0.953 for the NfL model and 0.902 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
 
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
-Among the Cox PH models, those incorporating p-tau181, NfL, or both biomarkers simultaneously all yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. It is not until the six-year follow-up that a small difference can be observed, although this difference remains minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
+All three Cox PH models yield low and similar time-dependent Brier scores across the follow-up period, as reflected by the closely aligned curves. Small differences can be observed for the predictions at year six, although they remain minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
 
-Table 11, containing the time-dependent Brier score values for each biomarker specification and at each follow-up time point, also confirms this pattern. For instance, within the Cox PH models at the two-year follow-up, all three models yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. At the six-year follow-up, the difference becomes slightly more pronounced: the model incorporating both biomarkers yields a value of 0.149, while the models incorporating p-tau181 and NfL yield values of 0.158 and 0.159, respectively.
+Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.149 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
 ## Precision Analysis
 
