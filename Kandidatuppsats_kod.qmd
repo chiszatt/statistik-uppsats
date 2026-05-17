@@ -230,23 +230,23 @@ nfl_data <- nfl_data %>%
 ### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
 
 ```{r}
-ptau_data <- ptau_data %>%
-  group_by(RID, EXAMDATE) %>%
-  arrange(RID, EXAMDATE) %>%
-  mutate(
-    PLASMAPTAU181 = first_ptau
-    ) %>%
-  ungroup() %>%
-  distinct()
+#ptau_data <- ptau_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMAPTAU181 = first_ptau
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
 
-nfl_data <- nfl_data %>%
-  group_by(RID, EXAMDATE) %>%
-  arrange(RID, EXAMDATE) %>%
-  mutate(
-    PLASMA_NFL = first_nfl
-    ) %>%
-  ungroup() %>%
-  distinct()
+#nfl_data <- nfl_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMA_NFL = first_nfl
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
 ```
 
 ### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
@@ -3337,10 +3337,10 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 
 # Saving the table of the Brier score results
-saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
