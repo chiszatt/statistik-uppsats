@@ -167,29 +167,27 @@ nfl_data[nfl_data$RID == 1097, "VISCODE2"] <-  c("m48", "m60_1", "m60_2")
 # Replacing visits with double measurements with visits with mean-value of the measurements as well as saving both measurements for future sensitivity analysis
 # Naming the mean as the original variable to do analysis first with this method and then sensitivity analysis with the first and last measurements
 
-# Adding columns for each ptau measurement and their mean and then collapsing down to unique RID and EXAMDATE
+# Adding columns for first, last and averaged ptau measurement
 ptau_data <- ptau_data %>%
   group_by(RID, EXAMDATE) %>%
   arrange(RID, EXAMDATE) %>%
   mutate(
     first_ptau = first(PLASMAPTAU181),
-    last_ptau = last(PLASMAPTAU181),
-    PLASMAPTAU181 = mean(PLASMAPTAU181),
-    ) %>%
-  ungroup() %>%
-  distinct()
+    last_ptau  = last(PLASMAPTAU181),
+    mean_ptau = mean(PLASMAPTAU181)
+  ) %>%
+  ungroup()
 
-# Adding columns for each nfl measurement and their mean and then collapsing down to unique RID and EXAMDATE
+# Adding columns for first, last and averaged nfl measurement
 nfl_data <- nfl_data %>%
   group_by(RID, EXAMDATE) %>%
   arrange(RID, EXAMDATE) %>%
   mutate(
     first_nfl = first(PLASMA_NFL),
-    last_nfl = last(PLASMA_NFL),
-    PLASMA_NFL = mean(PLASMA_NFL)
-    ) %>%
-  ungroup() %>%
-  distinct()
+    last_nfl  = last(PLASMA_NFL),
+    mean_nfl = mean(PLASMA_NFL)
+  ) %>%
+  ungroup()
 ```
 
 ```{r}
@@ -197,14 +195,80 @@ nfl_data <- nfl_data %>%
 # for ptau
 head(ptau_data %>%
        filter(PLASMAPTAU181 != first_ptau) %>%
-       dplyr::select(PLASMAPTAU181, first_ptau, last_ptau)
+       dplyr::select(mean_ptau, first_ptau, last_ptau)
      )
 
 # for nfl
 head(nfl_data %>%
        filter(PLASMA_NFL != first_nfl) %>%
-       dplyr::select(PLASMA_NFL, first_nfl, last_nfl)
+       dplyr::select(mean_nfl, first_nfl, last_nfl)
      )
+```
+
+### Replacing visits with double measurements with visits with mean-value of the measurements
+
+```{r}
+#Defining plasma ptau as the mean and collapsing to unique RID and EXAMDATE
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  mutate(
+    PLASMAPTAU181 = mean_ptau
+  ) %>%
+  ungroup() %>%
+  distinct()
+
+# Defining plasma nfl as the mean and collapsing to unique RID and EXAMDATE
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  mutate(
+    PLASMA_NFL = mean_nfl
+  ) %>%
+  ungroup() %>%
+  distinct()
+```
+
+### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
+
+```{r}
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    PLASMAPTAU181 = first_ptau
+    ) %>%
+  ungroup() %>%
+  distinct()
+
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    PLASMA_NFL = first_nfl
+    ) %>%
+  ungroup() %>%
+  distinct()
+```
+
+### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
+
+```{r}
+#ptau_data <- ptau_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMAPTAU181 = last_ptau,
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
+
+#nfl_data <- nfl_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#   PLASMA_NFL = last_nfl
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
 ```
 
 ## Merging NfL and ptau-181 data for the longitudinal data set
@@ -1352,12 +1416,12 @@ get_value <- function(df, var, col) {
 table_cox <- data.frame(
   Variable = all_vars_cox,
 
-  "p-tau181 HR (CI)" = format_hr_ci(
+  "PTau HR (CI)" = format_hr_ci(
     get_value(ptau_cox, all_vars_cox, "HR"),
     get_value(ptau_cox, all_vars_cox, "CI_low"),
     get_value(ptau_cox, all_vars_cox, "CI_high")
   ),
-  "p-tau181 P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
+  "PTau P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
 
   "NfL HR (CI)" = format_hr_ci(
     get_value(nfl_cox, all_vars_cox, "HR"),
@@ -3281,11 +3345,11 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 
 ### Sensitivity analysis tables
 
-#### Modelling without covariates?
+#### Cox PH models without gender
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_no covariates.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_no_covariates.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_wo_gender.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_wo_gender.rds")
 ```
 
 #### Baseline is the first biomarker examdate
@@ -3770,6 +3834,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
+    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC",
     color = "Biomarker",
