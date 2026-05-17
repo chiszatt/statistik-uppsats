@@ -3281,11 +3281,18 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 
 ### Sensitivity analysis tables
 
+#### Modelling without covariates? 
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_no covariates.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_no_covariates.rds")
+```
+
 #### Baseline is the first biomarker examdate 
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")B
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
 ```
 
 #### Baseline is the first diagnosis examdate 
@@ -3302,14 +3309,14 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
 ```
 
-### The duplicate biomarker measurements are replaced by the last measurement
+#### The duplicate biomarker measurements are replaced by the last measurement
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_last_duplicate.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
 ```
 
-### Including participants with at least one biomarker measurement 
+#### Including participants with at least one biomarker measurement 
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
