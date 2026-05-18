@@ -623,19 +623,17 @@ All three Cox PH models yield low and similar time-dependent Brier scores across
 
 Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.149 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
-## Sensitivity Analyses
+## Sensitivity (or precision?) Analyses
 
-To assure the robustness of these results, sensitivity analyses were also assessed. For instance,
+To assure the robustness of these results, **sensitivity(?)** analyses were run.
 
-When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of
+In response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements.
 
-All results from the sensitivity analysis are available upon request.
+For the Cox PH models, the assumption of proportional hazards was also fulfilled for this cohort. The time-dependent AUC and Brier scores were in concordance with those from predictions made with the cohort restricted to those with 3 or more biomarker measurements.
 
-Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions.
+To address the interval censored nature of the data, event times were also defined as the midpoint between the diagnosis exams when a positive dementia diagnosis was given.
 
-Defining the event time as the midpoint between diagnoses exams was also tested.
-
-Again, these results are available upon request.
+The results from all **sensitivity(?)** analyses are available upon request.
 
 # Discussion
 
@@ -880,6 +878,7 @@ Time-dependent AUC curves
 Time-dependent Brier score curves
 :::
 
+<<<<<<< HEAD
 ## Sensitivity analysis: 1+ Biomarker Measurements
 
 ```{r}
@@ -931,20 +930,22 @@ Time-dependent Brier score curves
 # kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
 
+=======
+>>>>>>> 6e39935b47c9b67a66db17e28638e7ac9e1f2c65
 ## Results of sensitivity analyses
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
- kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
+ # kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
- kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
+ # kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
 
 ```{r}
@@ -958,5 +959,7 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+
+# kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+
 ```
