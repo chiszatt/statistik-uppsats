@@ -53,7 +53,7 @@ include-before-body:
     \begin{titlepage}
     \raggedleft
 
-    {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
+    {\normalsize Independent Thesis Study of 15 credits in Statistics III, Spring 2026\par}
     {\normalsize Supervisor: Hans Nyqvist\par}
 
     \vspace{2cm}
@@ -946,15 +946,43 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when participants are only set as event when they have a second dementia diagnosis within six months afterwards"
+kable_standard(readRDS("tables/results_table_AUC_strict_event.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier score when participants are only set as event when they have a second dementia diagnosis within six months afterwards"
+kable_standard(readRDS("tables/results_table_Brier_strict_event.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
- # kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
- # kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
 
 ```{r}
@@ -968,7 +996,19 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+```
 
-# kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when setting participants to those with at least one biomarker measurement "
+kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+```
 
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when setting participants to those with at least one biomarker measurement"
+kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
