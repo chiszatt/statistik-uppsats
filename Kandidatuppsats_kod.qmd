@@ -97,16 +97,6 @@ apoe <- APOERES
 #apoe = APOERES
 ```
 
-- *There are 52 individuals with two measurements recorded on the same exam date.*
-
-- *How should we deal with these? Average the measurements? Remove the observations?*
-
-1.  *Describe the measurements, their differences and averages*
-
-- *Some of the values are quite different, what do we assume by averaging them? Do we introduce bias but just just removing them?*
-
-2.  *Show how different these values are from the nfl and ptau averages (report SD differences in log transformations)*
-
 ```{r}
 # Checking which ADNI protocols the data are from
 table(nfl_data$ORIGPROT)
