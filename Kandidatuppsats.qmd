@@ -7,13 +7,15 @@ format:
         \raggedleft
         \vspace*{0.5cm}
         
-        {\Huge\bfseries Kandidatuppsats\par}
+        {\Huge\bfseries Bachelor thesis\par}
         \vspace{0.5cm}
         
-        {\Large Statistiska Institutionen\par}
+        {\Large Department of Statistics\par}
         \vspace{3cm}
         
-        {\Huge\bfseries Nr 2026:x\par}
+        \includegraphics[width=4cm]{images/su_logo.png}  %
+        
+        {\Huge\bfseries No 2026:x\par}
         \vspace{0.5cm}
         
         {\LARGE \bfseries Title in English\par}
@@ -39,8 +41,8 @@ format:
         \begin{titlepage}
         \raggedleft
         
-        {\normalsize Självständigt arbete 15 högskolepoäng inom Statistik III, VT2026\par}
-        {\normalsize Handledare: Hans Nyqvist\par}
+        {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
+        {\normalsize Supervisor: Hans Nyqvist\par}
         \vspace{2cm}
         
         \raggedright
@@ -110,9 +112,9 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of statistical models to predict progression to dementia using biomarker data and evaluate their predictive accuracy. For instance, a 2021 study used a Cox proportional hazards (Cox PH) model with baseline p-tau181, alongside demographic and genetic covariates such as age, sex, and apolipoprotein E ε4 (APOE-ε4) status. The study included a total of 767 participants from the ADNI database, including cognitively unimpaired individuals, individuals with mild cognitive impairment (MCI), and individuals with dementia. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
+Recent research has applied a range of statistical models to predict progression to dementia using biomarker data and evaluate their predictive accuracy. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
 
-Similarly, a large population-based study of 2148 dementia-free older adults from Sweden applied a single multivariable Cox proportional hazards model including p-tau181, p-tau217, neurofilament light (NfL), and GFAP as simultaneous baseline predictors, to examine their predictive value for progression to all-cause and Alzheimer’s disease dementia. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 74.3%, 77.0%, and 81.3% for AD-dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD-dementia (Grande et al., 2025, pp. 2027-2031).
+Similarly, a large population-based study of 2148 older adults from Sweden applied a single multivariable Cox proportional hazards model including p-tau181, p-tau217, neurofilament light (NfL), and GFAP as simultaneous baseline predictors, to examine their predictive value for progression to all-cause and Alzheimer’s disease dementia. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 74.3%, 77.0%, and 81.3% for AD-dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD-dementia (Grande et al., 2025, pp. 2027-2031).
 
 The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the progression risk to AD (Yuan et al., 2024, p. 1). By evaluating AUC and Brier score at different time points and time spans, the researchers found that p‐tau181 and NfL exhibited comparable performance in terms of discriminative capability and predictive accuracy for both 2‐year and 5‐year prediction spans. In addition, it was concluded that combining the biomarker measurements in a multivariate joint model lead to improved performance (Yuan et al., 2024, p. 4).
 
@@ -143,7 +145,7 @@ The modelling approaches were chosen based on their methodological relevance and
 
 ## Survival Analysis
 
-All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis. Diagnosis status, ptau-181 and NfL levels are all available at baseline.
+All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis, consistent with previous dementia survival studies (Park et al., 2019, p. 4). Diagnosis status, ptau-181 and NfL levels are all available at baseline.
 
 Additionally, individuals with AD-dementia are either considered as right censored, meaning that they do not reach the event during the follow-up period, or as interval censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). Due to diagnoses exams being made either every half year or yearly, depending on the individuals cognition status and what stage of their protocol they are in, the exact date of transition to dementia can only be approximated. Therefore, participants in this study are considered as interval censored.
 
@@ -703,6 +705,8 @@ Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019
 
 Moore, D. F. (2016). Regression Analysis Using the Proportional Hazards Model. *Use R!*, 55-72. https://doi.org/10.1007/978-3-319-31245-3_5
 
+Park, K. M., Sung, J. M., Kim, W. J., An, S. K., Namkoong, K., Lee, E., & Chang, H. J. (2019). Population-based dementia prediction model using Korean public health examination data: A cohort study. *PloS one*, 14(2), e0211957. <https://doi.org/10.1371/journal.pone.0211957>
+
 Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. https://doi.org/10.1371/journal.pone.0318349
@@ -890,12 +894,14 @@ Time-dependent Brier score curves
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-# kable_standard(readRDS("tables/tables/results_table_AUC_last_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+
 # kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+
 ```

@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -211,7 +211,7 @@ head(nfl_data %>%
 ptau_data <- ptau_data %>%
   group_by(RID, EXAMDATE) %>%
   mutate(
-    PLASMAPTAU181 = mean_ptau
+    PLASMAPTAU181 = mean(PLASMAPTAU181)
   ) %>%
   ungroup() %>%
   distinct()
@@ -220,7 +220,7 @@ ptau_data <- ptau_data %>%
 nfl_data <- nfl_data %>%
   group_by(RID, EXAMDATE) %>%
   mutate(
-    PLASMA_NFL = mean_nfl
+    PLASMA_NFL = mean(PLASMA_NFL)
   ) %>%
   ungroup() %>%
   distinct()
@@ -701,12 +701,7 @@ table(surv_data_out$event)
 49/176
 ```
 
-## Checking correlation between the biomarkers as well as the numerical variables going to be used in the models
-
-```{r}
-# Correlation between the biomarkers 
-cor(long_data_in$PLASMAPTAU181, long_data_in$PLASMA_NFL, use = "complete.obs")
-```
+## Checking correlation between the log-transformed biomarkers as well as the numerical variables going to be used in the models
 
 ```{r}
 # Saving the numerical variables used in the Cox PH models
@@ -3048,7 +3043,7 @@ brier_jlcmm_m1_ptau <- brier_jlcmm(
 # Time-dependent AUC for Cox and joint models summarized in a table
 results_table_AUC <- data.frame(
   Model = c("Cox ptau-181", "Cox NfL", "Cox both",
-            "JM ptau-181", "JM NfL", "JM both", "JLCM ptau-181", "JLCM NfL"),
+            "JM ptau-181", "JM NfL", "JM both", "JLCMM ptau-181", "JLCMM NfL"),
   
   AUC_2y = c(auc_ptau_bl[1],
              auc_nfl_bl[1],
@@ -3168,10 +3163,10 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-#saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 
 # Saving the table of the Brier score results
-#saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
@@ -3225,7 +3220,7 @@ dir.create("tables", showWarnings = FALSE)
 plot_data <- data.frame(
   Time = rep(times, 8),
   Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
-                "JM ptau-181", "JM NfL", "JM multi", "JLCM ptau-181", "JLCM NfL"),
+                "JM ptau-181", "JM NfL", "JM multi", "JLCMM ptau-181", "JLCMM NfL"),
               each = length(times)),
   AUC = c(
     auc_ptau_bl,
