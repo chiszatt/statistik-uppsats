@@ -7,13 +7,13 @@ format:
         \raggedleft
         \vspace*{0.5cm}
         
-        {\Huge\bfseries Kandidatuppsats\par}
+        {\Huge\bfseries Bachelor thesis\par}
         \vspace{0.5cm}
         
-        {\Large Statistiska Institutionen\par}
+        {\Large Department of Statistics\par}
         \vspace{3cm}
         
-        {\Huge\bfseries Nr 2026:x\par}
+        {\Huge\bfseries No 2026:x\par}
         \vspace{0.5cm}
         
         {\LARGE \bfseries Title in English\par}
@@ -39,8 +39,8 @@ format:
         \begin{titlepage}
         \raggedleft
         
-        {\normalsize Självständigt arbete 15 högskolepoäng inom Statistik III, VT2026\par}
-        {\normalsize Handledare: Hans Nyqvist\par}
+        {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
+        {\normalsize Supervisor: Hans Nyqvist\par}
         \vspace{2cm}
         
         \raggedright
@@ -705,6 +705,8 @@ Mattsson, N., Cullen, N. C., Andreasson, U., Zetterberg, H., & Blennow, K. (2019
 
 Moore, D. F. (2016). Regression Analysis Using the Proportional Hazards Model. *Use R!*, 55-72. https://doi.org/10.1007/978-3-319-31245-3_5
 
+Park, K. M., Sung, J. M., Kim, W. J., An, S. K., Namkoong, K., Lee, E., & Chang, H. J. (2019). Population-based dementia prediction model using Korean public health examination data: A cohort study. *PloS one*, 14(2), e0211957. <https://doi.org/10.1371/journal.pone.0211957>
+
 Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. https://doi.org/10.1371/journal.pone.0318349
@@ -872,7 +874,7 @@ Time-dependent AUC curves
 Time-dependent Brier score curves
 :::
 
-## Precision Analysis: 1+ Biomarker Measurements
+## Sensitivity analysis: 1+ Biomarker Measurements
 
 ```{r}
 #| pos: "H"
