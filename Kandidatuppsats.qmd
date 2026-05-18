@@ -619,21 +619,23 @@ Table 11, containing the time-dependent Brier score values for each biomarker sp
 
 ## Sensitivity Analyses
 
-To assure the robustness of these results, sensitivity analyses were also assessed,
+To assure the robustness of these results, sensitivity analyses were also assessed. For instance,
 
 When defining the event time as the midpoint between the diagnosis exams when a positive dementia diagnosis was given, the results of
 
 All results from the sensitivity analysis are available upon request.
 
-Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions regarding
+Estimating the JLCMMs with the extended cohort of individuals with at least one biomarker measurement resulted in similar conclusions.
 
-Defining the event time as the midpoint between diagnoses exams was also tested for JLCMM. These results also gave support to the two class univariate models for p-tau181 and NfL measurements. For NfL, the three class model did not converge, therefore these results are not presented. Again, these results are available upon request.
+Defining the event time as the midpoint between diagnoses exams was also tested.
+
+Again, these results are available upon request.
 
 # Discussion
 
 ## Main Findings and Conclusions
 
-This study compared the predictive performance of different modeling frameworks for time-to-AD-dementia in individuals from the ADNI cohort, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was used in Cox PH models estimated with either p-tau181, NfL or both jointly. The second level incorporated longitudinal biomarker information by extending these Cox PH models within a joint modeling framework, accounting for repeated measurements over time. The most complex level combined longitudinal biomarker trajectories with latent class structure using the JLCMM framework to capture heterogeneity in disease progression by modeling class-specific trajectories and survival processes.
+This study compared the predictive performance of different modeling frameworks for time-to-AD-dementia in individuals from the ADNI cohort, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was used in Cox PH models estimated with either p-tau181, NfL or both jointly. The second level incorporated longitudinal biomarker information by extending these Cox PH models within a joint modeling framework, accounting for repeated measurements over time. The most complex level combined longitudinal biomarker trajectories with latent class structure using the JLCMM framework to capture heterogeneity in disease progression by modeling class-specific trajectories and survival processes. More precisely, two class models were fitted for p-tau181 and NfL measurements.
 
 The predictive performance of these models was assessed by comparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Both evaluations demonstrated that all three model approaches showed relatively good predictive performance, with AUC-values above 0.75 and Brier scores below approximately 0.15 across all horizons.
 
@@ -954,14 +956,14 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/tables/results_table_AUC_first_duplicate.rds"))
+ kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/tables/results_table_Brier_first_duplicate.rds"))
+ kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
 
 ```{r}
@@ -975,5 +977,5 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-# kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
 ```
