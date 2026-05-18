@@ -110,21 +110,15 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of prognostic models to estimate disease progression and related adverse outcomes in AD using biomarker data. One study from 2020 used $log_{10}$ transformed baseline plasma p-tau181 values in a Cox proportional hazards (Cox PH) model and found it to be a strong predictor of conversion across groups, with hazard ratios ranging from approximately 2.5 to 3.8 depending on cognitive status (Janelidze et al., 2020, 388). Adjusting for age, sex and education, baseline plasma p-tau181 levels were strongly associated with increased risk of progression to Alzheimer’s dementia. A Cox PH model was estimated with additional $log_{10}$ transformed biomarker levels, including plasma NfL. The effect of p-tau181 remained significant, whereas NfL showed no meaningful contribution to risk prediction (Janelidze et al., 2020, pp. 385, 388).
+Recent research has applied a range of statistical models to predict progression to dementia using biomarker data. For instance, a 2021 study used a Cox proportional hazards (Cox PH) model with baseline p-tau181, alongside covariates such as age and sex. The study included a total of 767 participants from the ADNI database, comprising cognitively unimpaired individuals, individuals with mild cognitive impairment (MCI), and individuals with dementia. Predictive performance was evaluated using Receiver Operating Characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, p. X). 
 
-**Förslag på att ta upp denna istället för den ovan eftersom denna tar upp om predictive performance mer (vanlig AUC):**
+Similarly, a large population-based study of 2148 dementia-free older adults applied a single multivariable Cox proportional hazards model including p-tau181, p-tau217, neurofilament light (NfL), and GFAP as simultaneous baseline predictors, to examine their predictive value for progression to all-cause and Alzheimer’s disease dementia. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 74.3%, 77.0%, and 81.3% for AD-dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD-dementia (Grande et al., 2025, p. ?).
 
-- <https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2021.695696/full>
-
-**Även förslag på att ta upp denna eftersom den tar med p-tau181 och Nfl i samma Cox PH modell:**
-
-- <https://www.nature.com/articles/s41591-025-03605-x>
-
-The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the conversion risk to AD (Yuan et al., 2024, p. 1). By evaluating AUC and Brier score at different time points and time spans, the researchers found that p‐tau181 and NfL exhibited comparable performance in terms of discriminative capability and predictive accuracy for both 2‐year and 5‐year prediction spans. In addition, it was discovered that combining the biomarker measurements in a multivariate joint model lead to improved performance (Yuan et al., 2024, p. 4).
+The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the progression risk to AD (Yuan et al., 2024, p. 1). By evaluating AUC and Brier score at different time points and time spans, the researchers found that p‐tau181 and NfL exhibited comparable performance in terms of discriminative capability and predictive accuracy for both 2‐year and 5‐year prediction spans. In addition, it was concluded that combining the biomarker measurements in a multivariate joint model lead to improved performance (Yuan et al., 2024, p. 4).
 
 The simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE genotype, sex, race, education and neuropathological burden (Scollard et al., 2026, p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research.
 
-Various models have utilised longitudinal p-tau181 and NfL values to model AD progression; however, it remains unclear which approach yields the highest predictive performance. A 2025 study comparing statistical approaches for mortality risk prediction in peritoneal dialysis patients evaluated the predicive performance of Cox proportional hazards models with baseline, time-averaged, and time-dependent biomarker values, as well as joint models (Goksuluk et al., 2025, pp. 1, 4-5). Overall, joint models demonstrated superior performance, with multivariate joint models performing slightly better than separate joint models for each biomarker (Goksuluk et al, 2025, p. 8). In AD research, however, few studies have systematically compared these modelling strategies within a unified framework, particularly for plasma biomarkers such as p-tau181 and NfL. Given these findings, an additional question is whether models based on p-tau181, NfL, or their combination provide the best prediction of progression to AD dementia.
+While the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and data conditions, few studies have systematically compared them within a unified framework, particularly for plasma biomarkers such as p-tau181 and NfL. However, such comparisons have been conducted in other domains. For example, a 2025 study compared statistical approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox proportional hazards models using baseline, time-averaged, and time-dependent biomarker values, as well as joint models (Goksuluk et al., 2025, pp. 1, 4-5). Overall, joint models demonstrated superior predictive performance, with multivariate joint models performing slightly better than separate joint models fitted for each biomarker (Goksuluk et al., 2025, p. 8). Given these findings, an additional question is whether models based on p-tau181, NfL, or their combination provide the best prediction of progression to AD dementia.
 
 ## Research Aims
 
@@ -643,7 +637,7 @@ This study compared the predictive performance of different modeling frameworks 
 
 The predictive performance of these models was assessed by comparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Both evaluations demonstrated that all three model approaches showed relatively good predictive performance, with AUC-values above 0.75 and low Brier score-values (below approximately 0.15) across the follow-up period.
 
-### **Förslag på tolkning av AUC/Brier score results utifrån frågeställningarna** 
+### **Förslag på tolkning av AUC/Brier score results utifrån frågeställningarna**
 
 At the same time, the time-dependent AUC showed that the predictive performance differed across the three levels of information considered. Overall, incorporating longitudinal biomarker trajectories improved discriminatory ability compared to relying on a single measurement such as baseline. This improvement was consistent across biomarkers (p-tau181, NfL, and their combination) and was most pronounced at early follow-up times, where joint models achieved the highest AUC values relative to Cox-based approaches. These findings are consistent with those of Goksuluk et al. (2025, p. 14), who reported improved predictive performance of joint modelling approaches compared to Cox PH models using, among other specifications, baseline biomarker values.
 
@@ -710,15 +704,15 @@ Fitzmaurice, G. M., Laird, N. M., & Ware, J. H. (2011). *Applied longitudinal an
 
 Goksuluk, M. B., Goksuluk, D., & Sipahioglu, M. H. (2025). Assessing biomarker trajectories for mortality risk in peritoneal dialysis: A focus on multivariate joint modeling. *PloS one*, 20(7), e0320385. <https://doi.org/10.1371/journal.pone.0320385> 
 
+Grande, G., Valletta, M., Rizzuto, D., et al. (2025). Blood-based biomarkers of Alzheimer’s disease and incident dementia in the community. *Nature Medicine*, 31(1), 2027-2035. <https://doi.org/10.1038/s41591-025-03605-x>
+
 Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z., Zhang, Z., Meng, W., & Wang, S. (2026). Sensitivity comparison of longitudinal cognitive function indicators of Alzheimer’s disease after mild cognitive impairment: a prospective cohort study. *Sci Rep*, 16(1), 14503. <https://doi.org/10.1038/s41598-026-44192-2>
 
 Hamra, G., MacLehose, R., & Richardson, D. (2013). Markov chain Monte Carlo: an introduction for epidemiologists. *International journal of epidemiology*, 42(2), 627-634. <https://doi.org/10.1093/ije/dyt043>
 
 Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, *20*(8). https://doi.org/10.1002/alz.13859
 
-Jacqmin-Gadda, H., Proust-Lima, C., Taylor, J. M. G., & Commenges, D. (2010). Score Test for Conditional Independence Between Longitudinal Outcome and Time to Event Given the Classes in the Joint Latent Class Model. *Biometrics*, *66*(1), 11–19. http://www.jstor.org/stable/40663147
-
-Janelidze, S., Mattsson, N., Palmqvist, S., Smith, R., Beach, T. G., Serrano, G. E., Chai, X., Proctor, N. K., Eichenlaub, U., Zetterberg, H., Blennow, K., Reiman, E. M., Stomrud, E., Dage, J. L., & Hansson, O. (2020). Plasma P-tau181 in Alzheimer's disease: relationship to other biomarkers, differential diagnosis, neuropathology and longitudinal progression to Alzheimer's dementia. *Nature medicine*, 26(3), 379-386. <https://doi.org/10.1038/s41591-020-0755-1>
+Jacqmin-Gadda, H., Proust-Lima, C., Taylor, J. M. G., & Commenges, D. (2010). Score Test for Conditional Independence Between Longitudinal Outcome and Time to Event Given the Classes in the Joint Latent Class Model. *Biometrics*, *66*(1), 11-19. http://www.jstor.org/stable/40663147
 
 Kamarudin, A. N., Cox, T., & Kolamunnage-Dona, R. (2017). Time-dependent ROC curve analysis in medical research: Current methods and applications. *BMC Medical Research Methodology*, 17(1), 53. <https://doi.org/10.1186/s12874-017-0332-6>
 
@@ -951,6 +945,27 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Brier scores for XXX"
-# kable_standard(readRDS("tables/tables/results_table_Brier_last.rds"))
+#| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
+# kable_standard(readRDS("tables/tables/results_table_AUC_first_duplicate.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
+# kable_standard(readRDS("tables/tables/results_table_Brier_first_duplicate.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+# kable_standard(readRDS("tables/tables/results_table_AUC_last_duplicate.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+# kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
 ```
