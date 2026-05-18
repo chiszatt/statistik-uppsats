@@ -3834,7 +3834,6 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    title = "Time-depending AUC curves (Cox PH)",
     x = "Time", 
     y = "AUC",
     color = "Biomarker",

@@ -953,5 +953,8 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ## Results of sensitivity analyses
 
 ```{r}
-kable_standard(readRDS("tables/tables/results_table_Brier_last.rds.rds"))
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Brier scores for XXX"
+# kable_standard(readRDS("tables/tables/results_table_Brier_last.rds"))
 ```
