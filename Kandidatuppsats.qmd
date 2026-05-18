@@ -458,11 +458,11 @@ Among the participants with at least three biomarker measurements, 83 participan
 
 # Results
 
-## Model fit overview
+## Model Fit Overview
 
 The initial analysis was run on the restricted cohort of individuals with three or more longitudinal p-tau181 and NfL measurements. A subsequent sensitivity analysis was run on the extended cohort including all individuals with at least one p-tau181 and NfL measurement in order to verify whether the results are stable when including individuals with sparse longitudinal data.
 
-### Test of Proportional Hazards Assumption and Concordance
+### Cox PH Models
 
 First, Cox PH models including baseline values of p-tau181, NfL, or both were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
@@ -486,7 +486,7 @@ Furthermore, an initial comparison of model performance by assessment of the con
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
 
-### Residual diagnostics
+### Joint Models
 
 Next, JMs that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data were estimated. For the longitudinal component, an LME model was estimated separately for p-tau181 and NfL.
 
@@ -494,11 +494,7 @@ Plotting the residuals against the fitted values for the LME model with p-tau181
 
 The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; Table 13).
 
-Thus, JMs including longitudinal measurements of p-tau181, NfL, or both were fit. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM.
-
-### Convergence
-
-To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in Figure 1.
+Thus, JMs with a random intercept and slope were estimated for longitudinal measurements of p-tau181, NfL, or both simultaneously. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM. To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in Figure 1.
 
 ![Traceplot of log-transformed p-tau181](figures/convergence_plot_ptau.png){#fig-converg-ptau}
 
@@ -526,7 +522,7 @@ kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 
 In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all JMs, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. A slightly higher value can be observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.09. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
 
-### BIC, Entropy, Posterior Classification, Score Test
+### Joint Latent Class Mixed Models
 
 Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
 
@@ -567,7 +563,7 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-## Model comparison
+## Model Comparison
 
 In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
@@ -605,7 +601,7 @@ kable_standard(readRDS("tables/results_table_Brier.rds"))
 
 For predictions at two years, the JLCMM including NfL achieves the lowest Brier score, with a value of 0.024, compared with 0.053 for the JM including NfL and 0.054 for the Cox PH model including NfL. A similar pattern is observed for predictions using the p-tau181-based models at the same time point, where the JLCMM also yields the lowest Brier score, with a value of 0.024, compared with 0.055 for the JM and 0.054 for the Cox PH model.
 
-## Biomarker comparison
+## Biomarker Comparison
 
 The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 illustrates how the time-dependent AUC of the models changes with biomarker specification across prediction horizons, with the model being fixed as Cox PH.
 
