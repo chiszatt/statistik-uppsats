@@ -226,7 +226,7 @@ nfl_data <- nfl_data %>%
   distinct()
 ```
 
-### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
+#### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
 
 ```{r}
 #ptau_data <- ptau_data %>%
@@ -248,7 +248,7 @@ nfl_data <- nfl_data %>%
 #  distinct()
 ```
 
-### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
+#### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
 
 ```{r}
 #ptau_data <- ptau_data %>%
@@ -329,14 +329,21 @@ long_data <- long_data %>%
   ungroup()
 ```
 
-### Baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
+#### Sensitivity analysis: baseline date is the earliest of EXAMDATE_nfl and EXAMDATE_ptau
 
 ```{r}
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
-# long_data <- long_data %>%
-#   group_by(RID) %>%
-#   mutate(baseline_date = min(EXAMDATE_ptau, EXAMDATE_nfl)) %>%
-#   ungroup()
+#long_data <- long_data %>%
+#  group_by(RID) %>%
+#  mutate(
+#    # first biomarker exam across NFL and pTau 
+#    EXAMDATE = pmin(EXAMDATE_nfl, EXAMDATE_ptau, na.rm = TRUE),
+#
+#    EXAMDATE_baseline = min(EXAMDATE, na.rm = TRUE),
+#
+#    time_years = as.numeric(EXAMDATE - EXAMDATE_baseline) / 365.25
+#  ) %>%
+#  ungroup()
 ```
 
 ## Removing early diagnosis observations
@@ -450,15 +457,15 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
  length(keep)
 ```
 
-## Sensitivity analysis: Selecting participants with at least 1 measurement
+### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-length(keep)
+#length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -469,47 +476,98 @@ length(keep)
 surv_data <- surv_data %>%
   group_by(RID) %>%
   summarise(
-#     carrying these forward to check events and event times are coded correctly
+    #carrying these forward to check events and event times are coded correctly
     baseline_dx = unique(baseline_dx),
     last_dx = unique(last_dx),
     
 #     baseline EXAMDATE defined as midpoint between ptau and nfl exam dates if different
     EXAMDATE_baseline = min(EXAMDATE_baseline),
     
-#     age at baseline visit
+     #age at baseline visit
     age_at_baseline = age_at_visit[
-      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
-      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+    EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
+    EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
       ][1],
 
-#      last dx/nfl/ptau exam
-      last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+    #last dx/nfl/ptau exam
+    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
 
-#     1 = dementia, 0 = otherwise
+     #1 = dementia, 0 = otherwise
       event = as.integer(any(DIAGNOSIS_dx == "Dementia")),
 
-#     0 if dementia dx at baseline, otherwise time to dementia dx or date of censuring
+     #0 if dementia dx at baseline, otherwise time to dementia dx or date of censuring
       time_to_event = case_when(
         event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
         event == 1 & unique(baseline_dx) != "Dementia" ~
-          as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - EXAMDATE_baseline)/365,
+        as.numeric(min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"]) - EXAMDATE_baseline)/365,
         TRUE ~
           as.numeric(last_followup - EXAMDATE_baseline)/365),
 
-#     Sensitivity: event time = midpoint between last clean exam and dementia dx exam
+    #Sensitivity: event time = midpoint between last clean exam and dementia dx exam
     time_to_event_midpoint = case_when(
       event == 1 & unique(baseline_dx) == "Dementia" ~ 0,
       event == 1 & unique(baseline_dx) != "Dementia" ~ {
-        dx_date <- min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
-        prev_date <- max(EXAMDATE_dx[DIAGNOSIS_dx != "Dementia" & 
+      dx_date <- min(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
+      prev_date <- max(EXAMDATE_dx[DIAGNOSIS_dx != "Dementia" & 
                                      EXAMDATE_dx < dx_date], 
                          na.rm = TRUE)
-        as.numeric((prev_date + (dx_date - prev_date) / 2) - EXAMDATE_baseline) / 365
+      as.numeric((prev_date + (dx_date - prev_date) / 2) - EXAMDATE_baseline) / 365
       },
       TRUE ~
         as.numeric(last_followup - EXAMDATE_baseline) / 365
     )
 )
+```
+
+#### Sensitivity analysis: event = first dementia diagnosis ONLY if the person got a second dementia diagnosis within the following six months
+
+```{r}
+#surv_data <- surv_data %>%
+#  group_by(RID) %>%
+#  summarise(
+#    
+#    baseline_dx = unique(baseline_dx),
+#    last_dx = unique(last_dx),
+#    
+#    EXAMDATE_baseline = min(EXAMDATE_baseline),
+#    
+#    age_at_baseline = age_at_visit[
+#      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
+#      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
+#    ][1],
+#    
+#    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
+#    
+#    # Event definition
+#    # event = 1 if the person has PERSISTENT dementia, meaning at least 2 dementia diagnoses AND at least one pair of diagnoses separated by ≥ 6 months
+#    event = {
+#      d <- sort(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
+#      
+#      as.integer(
+#        length(d) >= 2 &&
+#        any(diff(d) >= 6 * 30.44)
+#      )
+#    },
+#    
+#    # Time-to-event definition
+#    # time_to_event = time from baseline to first "confirmed stable dementia" signal, defined as the first dementia diagnosis that is part of a pair with ≥ 6 months separation
+#    time_to_event = {
+#      d <- sort(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
+#      
+#      idx <- which(diff(d) >= 6 * 30.44)[1]
+#      
+#      if (length(d) < 2 || is.na(idx)) {
+#        
+#        # no persistent dementia -> censored
+#        as.numeric(last_followup - EXAMDATE_baseline) / 365
+#        
+#      } else {
+#        
+#        # first dementia diagnosis in first qualifying pair
+#        as.numeric(d[idx] - EXAMDATE_baseline) / 365
+#      }
+#    }
+#  )
 ```
 
 ```{r}
@@ -3163,19 +3221,19 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 
 # Saving the table of the Brier score results
-saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
 
-#### Cox PH models without gender
+#### Only people who got a second dementia diagnosis within the following six months are set to event 
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_wo_gender.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_wo_gender.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_strict_event.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_strict_event.rds")
 ```
 
 #### Baseline is the first biomarker examdate
@@ -3183,13 +3241,6 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
 #saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
-```
-
-#### Baseline is the first diagnosis examdate
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_dx_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_dx_bl.rds")
 ```
 
 #### The duplicate biomarker measurements are replaced by the first measurement
@@ -3209,8 +3260,8 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 #### Including participants with at least one biomarker measurement
 
 ```{r}
-# saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-# saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
 ```
 
 # Plots of the predictive performance results
