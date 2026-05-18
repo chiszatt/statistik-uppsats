@@ -1,72 +1,84 @@
 ---
-format:
-  pdf:
-    include-before-body:
-      text: |
-        \begin{titlepage}
-        
-        \noindent
-        \includegraphics[width=4cm]{su_logo.png}
-        \vspace{0.5cm}
-        
-        
-        \raggedleft
-        \vspace*{0.5cm}
-        
-        {\Huge\bfseries Bachelor thesis\par}
-        \vspace{0.5cm}
-        
-        {\Large Department of Statistics\par}
-        \vspace{3cm}
-        
-        {\Huge\bfseries No 2026:x\par}
-        \vspace{0.5cm}
-        
-        {\LARGE \bfseries Title in English\par}
+format: pdf
 
-        {\large Title in Swedish\par}
-        \vspace{0.5cm}
-        
-        {\large \today\par}
-        \vspace{3cm}
-        
-        {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
-        \vspace{0.1cm}
-        
-        {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
-        \vspace{0.5cm}
-        
-        {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
+include-before-body:
+  text: |
 
-        \vfill
-        
-        \end{titlepage}
-        
-        \begin{titlepage}
-        \raggedleft
-        
-        {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
-        {\normalsize Supervisor: Hans Nyqvist\par}
-        \vspace{2cm}
-        
-        \raggedright
-        {\huge\bfseries Abstract\par}
-        \vspace{1cm}
-        
-        {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
-        \vspace{3cm}
-        {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
-        
-        
-        \vfill
-        
-        \end{titlepage}
-    toc: false
-    colorlinks: false
-    number-sections: true
-    fig-pos: "H"
-    tbl-pos: "H"
-    number-figures: true
+    \begin{titlepage}
+
+    % HEADER
+    \noindent
+    \begin{minipage}[t]{0.25\textwidth}
+    \includegraphics[width=4.5cm]{su_logo.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.7\textwidth}
+    \raggedleft
+    \vspace*{-1.8cm}
+
+    {\Huge\bfseries Bachelor thesis\par}
+    \vspace{0.3cm}
+    {\LARGE Department of Statistics\par}
+
+    \end{minipage}
+
+    \vspace{2cm}
+
+    \raggedleft
+
+    {\Huge\bfseries No 2026:x\par}
+    \vspace{0.5cm}
+
+    {\LARGE \bfseries Title in English\par}
+    {\large Title in Swedish\par}
+
+    \vspace{0.5cm}
+    {\large \today\par}
+
+    \vspace{3cm}
+
+    {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
+
+    \vspace{0.1cm}
+
+    {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
+
+    \vspace{0.5cm}
+
+    {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+
+    \vfill
+    \end{titlepage}
+
+    \begin{titlepage}
+    \raggedleft
+
+    {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
+    {\normalsize Supervisor: Hans Nyqvist\par}
+
+    \vspace{2cm}
+
+    \raggedright
+
+    {\huge\bfseries Abstract\par}
+
+    \vspace{1cm}
+
+    {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
+
+    \vspace{3cm}
+
+    {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+
+    \vfill
+    \end{titlepage}
+
+toc: false
+colorlinks: false
+number-sections: true
+fig-pos: "H"
+tbl-pos: "H"
+number-figures: true
 editor: visual
 ---
 
