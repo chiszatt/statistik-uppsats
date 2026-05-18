@@ -2753,12 +2753,6 @@ predict_mjlcmm <- function(model, data, ID, landmark, times) {
 
 #### Function for extracting time-dependent AUC
 
-1.  Confidence intervals
-
-2.  Overall model discrimination
-
-3.  Class specific discrimination
-
 ```{r}
 # Defining a function to compute time dependent AUC for joint latent class models
 jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var,
@@ -3032,18 +3026,18 @@ brier_jlcmm_m1_ptau <- brier_jlcmm(
   landmark = 1
 )
 
-# ON IN-SAMPLE DATA 
-# Computing Brier scores for 2 class multivariate jlcmm for ptau & NfL
-brier_mult_jlcmm_m1 <- brier_jlcmm(
-  model = mult_jlcmm_m1,
-  data = jlcmm_data,
-  ID = "RID",
-  time_var = "time_years",
-  surv_time_var = "time_to_event",
-  event_var = "event",
-  times = times,
-  landmark = 1
-)
+# # ON IN-SAMPLE DATA 
+# # Computing Brier scores for 2 class multivariate jlcmm for ptau & NfL
+# brier_mult_jlcmm_m1 <- brier_jlcmm(
+#   model = mult_jlcmm_m1,
+#   data = jlcmm_data,
+#   ID = "RID",
+#   time_var = "time_years",
+#   surv_time_var = "time_to_event",
+#   event_var = "event",
+#   times = times,
+#   landmark = 1
+# )
 ```
 
 # Tables of the predictive performance results
@@ -3220,8 +3214,8 @@ dir.create("tables", showWarnings = FALSE)
 #### Including participants with at least one biomarker measurement
 
 ```{r}
-saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+# saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
 ```
 
 # Plots of the predictive performance results
