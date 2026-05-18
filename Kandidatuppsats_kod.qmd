@@ -109,7 +109,6 @@ apoe <- APOERES
 
 ```{r}
 # Checking which ADNI protocols the data are from
-# 
 table(nfl_data$ORIGPROT)
 table(ptau_data$ORIGPROT)
 table(diagnosis_data$ORIGPROT)
@@ -367,19 +366,6 @@ diagnosis_data_clean <- diagnosis_data %>%
 surv_data <- long_data %>% left_join(diagnosis_data_clean, by = c("RID"))
 ```
 
-```{r}
-# Checking how many dementia diagnoses are probably due to AD
-#dx <- ADNIMERGE2::DXSUM
-#dx <- dx %>% dplyr::select(RID, DXAPP)
-#dx <- dx %>% merge(surv_data, by = "RID")
-#table(dx %>% dplyr::select(RID, DXAPP) %>% distinct() %>% dplyr::select(DXAPP))
-```
-
-```{r}
-# Checking with ADNI protocol the diagnosis data is from, ADNI 3 + uses dementia diagnosis an all-cause dementia diagnosis
-table(surv_data$ORIGPROT_dx)
-```
-
 ## Checking missing values
 
 ```{r}
@@ -468,11 +454,11 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-#length(keep)
+length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -487,7 +473,7 @@ surv_data <- surv_data %>%
     baseline_dx = unique(baseline_dx),
     last_dx = unique(last_dx),
     
-#     baseline EXAMDATE defined as the earlier biomarker EXAMDATE (nfl or ptau)
+#     baseline EXAMDATE defined as midpoint between ptau and nfl exam dates if different
     EXAMDATE_baseline = min(EXAMDATE_baseline),
     
 #     age at baseline visit
@@ -756,18 +742,6 @@ corrplot(lme_cor,
 
 ## Comparing link functions for longitudinal models
 
-Suggested models:
-
-- Gamma: raw data could be modelled well with the gamma distribution since takes no negative values, variance increases with mean, and there is a right-skew to the raw distributions
-
-- Linear mixed effects model with log-transformed data: approximately normal, yet still some skew
-
-- Linear mixed effects model with cube root transformed data: again, approximately normal, still a bit of skew (why such a low AIC? seems wrong?)
-
-- GLMM with log-normal distribution
-
-- GLMM with Student-t distribution: longer tails
-
 ### PTAU
 
 ```{r}
@@ -903,20 +877,6 @@ shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
 shapiro.test(lognormal_residuals_nfl$fittedResiduals)
 #shapiro.test(student_residuals_nfl$fittedResiduals)
 ```
-
-#### AIC and log-likelihood
-
-```{r}
-# Comparing NfL-models with AIC and log likelihood
-AIC(fit_lme_log_nfl, fit_lme_cubed_nfl, fit_gamma_nfl, fit_lognormal_nfl)
-logLik(fit_lme_log_nfl)
-logLik(fit_lme_cubed_nfl)
-logLik(fit_gamma_nfl)
-logLik(fit_lognormal_nfl)
-#logLik(fit_student_nfl)
-```
-
-Osäker dock om man kan jämföra log-version och cube-version av lme med de andra modellerna (som använder råa versionen) eftersom de då är på olika skalor! Tror det är bäst att kolla på residualerna och QQ-plotsen
 
 # Fitted LME models
 
@@ -1663,129 +1623,6 @@ rhat_longitudinal_table
 # Latent Class Mixed Models
 
 Choice of p-value <https://pmc.ncbi.nlm.nih.gov/articles/PMC5059270/>
-
-# LCMM: NFL
-
-## M0 (1 latent class)
-
-```{r}
-# Fitting a one class latent class mixed model with a random intercept
-hlme_m0_1 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ 1,
-  subject = "RID",
-  data = long_data_in
-)
-```
-
-```{r}
-summary(hlme_m0_1)
-```
-
-```{r}
-# Fitting a one class latent class mixed model with a random intercept and slope
-hlme_m0_2 <- hlme(
-  fixed = log_PLASMA_NFL ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  data = long_data_in
-)
-```
-
-```{r}
-summary(hlme_m0_2)
-```
-
-### Determining the random effects
-
-```{r}
-# Comparing BIC and log-likelihood for the two one class models with different random effects structures
-summarytable(hlme_m0_1, hlme_m0_2)
-```
-
-```{r}
-# log likelihood for the full model
-l = hlme_m0_2$loglik
-
-# log likelihood for the reduced model
-l_0 = hlme_m0_1$loglik
-
-# computing the LR test statistic
-LR = - 2 * (l_0 - l)
-
-# computing the p-value given the null hypothesis is true (the reduced model is the true model)
-pchisq(LR, 2, lower.tail = FALSE)
-LR
-```
-
-## M1 (2 latent classes)
-
-```{r}
-# Fitting a two class latent class mixed model
-hlme_m1 <- hlme(
-    fixed = log_PLASMA_NFL ~ time_years,
-    mixture = ~ 1,
-    random = ~ 1,
-    subject = "RID",
-    classmb = ~ 1,
-    ng = 2,
-    data = long_data_in,
-    B = random(hlme_m0_1)
-  )
-
-summary(hlme_m1)
-```
-
-### Posterior probabilities
-
-```{r}
-postprob(hlme_m1)
-```
-
-## Comparing M0, M1
-
-```{r}
-summarytable(hlme_m0_2, hlme_m1,
-             which = c("G", "loglik", "BIC", "entropy"))
-```
-
-## Visualisation
-
-### Distribution of posterior probabilities (class 1)
-
-```{r}
-# saving the posterior probabilities into a data frame
-pp <- hlme_m1$pprob
-```
-
-```{r}
-# plotting posterior probabilities for class 1
-ggplot(pp, aes(x = prob1)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 1") +
-  theme_classic()
-```
-
-### Distribution of posterior probabilities (class 2)
-
-```{r}
-# plotting posterior probabilities for class 2
-ggplot(pp, aes(x = prob2)) + 
-  geom_histogram(bins = 30, colour = "white", fill = "cornflowerblue") +
-  labs(title = "Posterior Probabilities for Class 1") +
-  theme_classic()
-```
-
-### Class certainty scatterplot
-
-```{r}
-# scatterplot of class certainty
-ggplot(pp, aes(prob1, prob2)) +
-  geom_point(alpha = .8) +
-  geom_abline(slope = -1, intercept = 1, linetype = "dashed") +
-  labs(x = "P(Class 1)", y = "P(Class 2)") +
-  theme_classic()
-```
 
 # JLCMM: NFL
 
@@ -2911,12 +2748,6 @@ predict_mjlcmm <- function(model, data, ID, landmark, times) {
 
 #### Function for extracting time-dependent AUC
 
-1.  Confidence intervals
-
-2.  Overall model discrimination
-
-3.  Class specific discrimination
-
 ```{r}
 # Defining a function to compute time dependent AUC for joint latent class models
 jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var,
@@ -3190,18 +3021,18 @@ brier_jlcmm_m1_ptau <- brier_jlcmm(
   landmark = 1
 )
 
-# ON IN-SAMPLE DATA 
-# Computing Brier scores for 2 class multivariate jlcmm for ptau & NfL
-brier_mult_jlcmm_m1 <- brier_jlcmm(
-  model = mult_jlcmm_m1,
-  data = jlcmm_data,
-  ID = "RID",
-  time_var = "time_years",
-  surv_time_var = "time_to_event",
-  event_var = "event",
-  times = times,
-  landmark = 1
-)
+# # ON IN-SAMPLE DATA 
+# # Computing Brier scores for 2 class multivariate jlcmm for ptau & NfL
+# brier_mult_jlcmm_m1 <- brier_jlcmm(
+#   model = mult_jlcmm_m1,
+#   data = jlcmm_data,
+#   ID = "RID",
+#   time_var = "time_years",
+#   surv_time_var = "time_to_event",
+#   event_var = "event",
+#   times = times,
+#   landmark = 1
+# )
 ```
 
 # Tables of the predictive performance results
@@ -3378,8 +3209,8 @@ saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 #### Including participants with at least one biomarker measurement
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
+# saveRDS(results_table_AUC, "tables/results_table_AUC_full.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier_full.rds")
 ```
 
 # Plots of the predictive performance results
