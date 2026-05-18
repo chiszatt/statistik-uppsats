@@ -13,6 +13,8 @@ format:
         {\Large Department of Statistics\par}
         \vspace{3cm}
         
+        \includegraphics[width=4cm]{images/su_logo.png}  %
+        
         {\Huge\bfseries No 2026:x\par}
         \vspace{0.5cm}
         
@@ -922,7 +924,7 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for NfL"
-# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
+ kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
 
 ## Results of sensitivity analyses
@@ -945,12 +947,12 @@ kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-# kable_standard(readRDS("tables/tables/results_table_AUC_last_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
