@@ -878,7 +878,6 @@ Time-dependent AUC curves
 Time-dependent Brier score curves
 :::
 
-<<<<<<< HEAD
 ## Sensitivity analysis: 1+ Biomarker Measurements
 
 ```{r}
@@ -930,8 +929,6 @@ Time-dependent Brier score curves
 # kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
 
-=======
->>>>>>> 6e39935b47c9b67a66db17e28638e7ac9e1f2c65
 ## Results of sensitivity analyses
 
 ```{r}
