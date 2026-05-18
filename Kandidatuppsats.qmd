@@ -651,33 +651,6 @@ More precisely, the combined biomarker specification yielded higher time-depende
 
 Sensitivity analyses were made to ensure that these results were robust, more precisely by changing ....
 
-# **...**
-
-**Det som stod innan - har inte vävt ihop det ovan med detta**
-
-At the 6 year mark, the differences in AUC between models were reduced, in line with expectations.
-
-When comparing Brier scores, the short-term predictive performance of the JLCMMs were superior when compared against the other models.
-
-The JLCMMs explained around 88% more of the variance than a null model which assigns all individuals the average event probability of 0.28. On the other hand, Cox PH models and JMs explained 72% and 73% more variance respectively.
-
-```{r}
-# computing the null model benchmark for brier scores
-# 27.84% event rate in out-of-sample data set
-null <- 0.2784 * (1 - 0.2784)
-JLCMM_ipa <- 1 - (0.024 / 0.20)
-cox_ipa <- 1 - (0.057 / 0.20)
-JM_ipa <- 1 - (0.054 / 0.20)
-```
-
-However, modest differences in AUC were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself within this modeling framework. Clearer distinctions were found for the JMs and JLCMMs, suggesting predictive value is gained mostly from NfL trajectories rather than single-point measurements.
-
-The predictive performance of plasma p-tau181 and NfL were compared both individually and jointly by comparison of AUC and Brier scores. Across all modalities, the AUC for p-tau181 was lower than that for NfL at the 2 year mark. Modest differences in AUC were reported between the Cox PH models with single biomarker baseline values and the model using both p-tau181 and NfL at baseline, suggesting minimal increase in discriminative value over modeling either biomarker by itself within this modeling framework. However, clearer distinctions were found for the JMs and JLCMMs, suggesting predictive value is gained mostly from NfL trajectories rather than single-point measurements.
-
-Over time, differences between the predictive performance of the biomarkers reduced, however NfL performed better across most time points. The multivariate JM presented the highest AUC at the 6 year mark, suggesting that this modeling framework may be justified when long-term discrimination between cases and non-cases are of importance. Comparison of Brier scores gave similar results between biomarkers.
-
-# ...
-
 Diagnostic exam dates were used as a proxy for AD onset in this analysis. Considering the exact time of dementia onset is unknown, individuals are interval censored. This has the potential to introduce bias in the estimated event times, as the time-to-diagnosis is overestimated. Despite this, interval censoring was not adequately accounted for given the level of this thesis and its time constraints. This would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
 
 Additionally, this analysis did not compare a multivariate JLCMM modeling both p-tau181 and NfL measurements, due to time constraints. Currently, the $lcmm$ package does not offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. Therefore, further research could work to assess the benefit in class-specific modeling of these biomarkers simultaneously.
