@@ -143,7 +143,7 @@ The modelling approaches were chosen based on their methodological relevance and
 
 ## Survival Analysis
 
-All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis. Diagnosis status, ptau-181 and NfL levels are all available at baseline.
+All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis, consistent with previous dementia survival studies (Park et al., 2019, p. 4). Diagnosis status, ptau-181 and NfL levels are all available at baseline.
 
 Additionally, individuals with AD-dementia are either considered as right censored, meaning that they do not reach the event during the follow-up period, or as interval censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). Due to diagnoses exams being made either every half year or yearly, depending on the individuals cognition status and what stage of their protocol they are in, the exact date of transition to dementia can only be approximated. Therefore, participants in this study are considered as interval censored.
 
