@@ -4,6 +4,12 @@ format:
     include-before-body:
       text: |
         \begin{titlepage}
+        
+        \noindent
+        \includegraphics[width=4cm]{su_logo.png}
+        \vspace{0.5cm}
+        
+        
         \raggedleft
         \vspace*{0.5cm}
         
@@ -12,8 +18,6 @@ format:
         
         {\Large Department of Statistics\par}
         \vspace{3cm}
-        
-        \includegraphics[width=4cm]{images/su_logo.png}  %
         
         {\Huge\bfseries No 2026:x\par}
         \vspace{0.5cm}
@@ -882,21 +886,21 @@ Time-dependent Brier score curves
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for p-tau181"
-kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
+#kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
-kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
+#kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for p-tau181"
-kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
+#kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 ```
 
 ```{r}
@@ -910,21 +914,21 @@ kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL"
-kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
+#kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL"
-kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
+#kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for NfL"
- kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
+# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
 ```
 
 ## Results of sensitivity analyses
