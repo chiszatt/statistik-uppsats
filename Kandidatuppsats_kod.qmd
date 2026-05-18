@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 - *There are 52 individuals with two measurements recorded on the same exam date.*
@@ -464,7 +464,7 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
  length(keep)
 ```
 
-## Selecting participants with at least 1 measurement
+## Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
