@@ -876,6 +876,8 @@ Time-dependent Brier score curves
 
 ## Results of sensitivity analyses
 
+
+
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
