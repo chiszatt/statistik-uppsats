@@ -527,7 +527,7 @@ table((surv_data %>% filter(time_to_event > 0))$event)
 table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
-### Final diagnosis for the selected participants
+### Checking the final diagnosis for the selected participants
 
 ```{r}
 final_dx <- diagnosis_data_clean %>%
