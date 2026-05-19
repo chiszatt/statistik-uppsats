@@ -810,6 +810,14 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Appendix
 
+## Table of characteristics and measurement distributions for participants with at least one biomarker measurement 
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
+```
+
 ## Descriptive Statistics
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
