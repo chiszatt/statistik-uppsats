@@ -136,7 +136,7 @@ The joint modelling framework extends the Cox PH model by linking a longitudinal
 
 The simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE-$ε4$ status, sex, race, education and neuropathological burden (Scollard et al., 2026, p. 383). Despite these advances, such modeling approaches have rarely been applied to longitudinal plasma biomarkers in AD research.
 
-Additionally, while the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and data conditions, few studies have systematically compared them within a unified framework, particularly for plasma biomarkers such as p-tau181 and NfL. Such comparisons have been conducted in other domains. For instance, a 2025 study compared modelling approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox proportional hazards models using baseline, time-averaged, and time-dependent biomarker values, as well as joint models (Goksuluk et al., 2025, pp. 1, 4-5). Overall, joint models demonstrated superior predictive performance, with multivariate joint models performing slightly better than separate joint models fitted for each biomarker (Goksuluk et al., 2025, p. 8). Given these findings, an additional question is whether models based on p-tau181, NfL, or their combination provide the best prediction of progression to AD dementia.
+Additionally, while the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and data conditions, few studies have systematically compared them within a unified framework, particularly for plasma biomarkers such as p-tau181 and NfL. Such comparisons have been conducted in other domains. For instance, a 2025 study compared modelling approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox proportional hazards models using baseline, time-averaged, and time-dependent biomarker values, as well as JMs (Goksuluk et al., 2025, pp. 1, 4-5). Overall, JMs demonstrated superior predictive performance, with multivariate JMs performing slightly better than separate JMs fitted for each biomarker (Goksuluk et al., 2025, p. 8). Given these findings, an additional question is whether models based on p-tau181, NfL, or their combination provide the best prediction of progression to AD dementia.
 
 ## Research Aims
 
@@ -211,7 +211,7 @@ $$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \
 
 where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and its current rate of change, $m_i'(t)$, respectively to the hazard function. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 
-This univariate framework is applied to the longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. Multivariate joint models extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to AD or dementia. Therefore, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Ignoring their correlation may lead to biased estimation (Xu, 2021, p. 6)
+This univariate framework is applied to the longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. Multivariate JMs extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to AD or dementia. Therefore, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Ignoring their correlation may lead to biased estimation (Xu, 2021, p. 6)
 
 ### Linear Mixed-Effects Submodel
 
@@ -325,7 +325,17 @@ Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distribute
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular joint model (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of joint models which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using a **Marquardt algorithm**. In model estimation it should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
+The log-likelihood for the JLCMM is much more tractable than for the regular joint model (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of s which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
+
+The Marquardt algorithm used in estimating JLCMMs updates the vector of model parameters to be used for log-likelihood evaluation, $\theta_{G}$, such that for iteration $l + 1$:
+
+$$\theta_{G}^{\ (l + 1)} =
+\theta_{G}^{\ (l)} - \delta \left( \tilde{\mathbf{H}}^{\ (l)} \right)^{-1}
+\nabla (\ell(\theta_{G}^{\ (l)}))
+\quad \text{where} \quad
+\nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
+
+where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2017, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2017, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
 
 In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). Therefore, it is necessary to assess whether the hazard is best modeled by the Weibull or by a flexible baseline hazard model.
 
@@ -364,7 +374,7 @@ The chosen classes should be clinically meaningful.
 
 ## Evaluation of Predictive Performance
 
-Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent Area Under the Curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
+Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate predictive performance in JMs combining longitudinal and survival data. However, when the main focus is the survival outcome and how well a longitudinal biomarker predicts it, performance is typically assessed using two main approaches: calibration, which measures how closely predicted probabilities agree with observed outcomes, and discrimination, which evaluates how well the model distinguishes between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent Area Under the Curve (AUC) is an example of a discrimination measure, while the time-dependent Brier score is a calibration-oriented measure that also reflects overall prediction error over time.
 
 ### Time-dependent AUC
 
@@ -942,8 +952,6 @@ Time-dependent Brier score curves
 ```
 
 ## Results of sensitivity analyses
-
-
 
 ```{r}
 #| pos: "H"
