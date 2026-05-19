@@ -29,13 +29,13 @@ include-before-body:
     {\Huge\bfseries No 2026:x\par}
     \vspace{0.5cm}
 
-    {\LARGE \bfseries Title in English\par}
-    {\large Title in Swedish\par}
+    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Longitudinal Blood-Based Biomarkers\par}
+    {\large A comparison of Modelling Approaches and Biomarker Strategies\par}
 
     \vspace{0.5cm}
     {\large \today\par}
 
-    \vspace{3cm}
+    \vspace{2cm}
 
     {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
 
@@ -56,15 +56,19 @@ include-before-body:
     {\normalsize Independent Thesis Study of 15 credits in Statistics III, Spring 2026\par}
     {\normalsize Supervisor: Hans Nyqvist\par}
 
-    \vspace{2cm}
+    \vspace{1cm}
 
     \raggedright
 
     {\huge\bfseries Abstract\par}
 
-    \vspace{1cm}
+    \vspace{0.5cm}
 
-    {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
+    {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1–5 year horizons. The results demonstrate that predictive accuracy varies across modelling frameworks and follow-up time, with joint models improving discrimination relative to Cox models when longitudinal information is incorporated, particularly at earlier horizons, while JLCMMs provide comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yields the best predictive performance, whereas each biomarker alone shows similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
+    
+        \vspace{0.5cm}
+
+    {\normalsize Keywords: Alzheimer’s disease, dementia progression, blood-based biomarkers, p-tau181, neurofilament light chain, survival analysis\par}
 
     \vspace{3cm}
 
@@ -140,10 +144,10 @@ Additionally, while the predictive performance of most of these modelling approa
 
 ## Research Aims
 
-This study investigates the prediction of progression to AD-dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
+This study investigates the prediction of progression to Alzheimer’s disease-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
 
-1.  What provides the best prediction of progression to Alzheimer’s disease-related dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with latent class structure?
-2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to Alzheimer’s disease-related dementia?
+1.  What provides the best prediction of progression to AD-dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with latent class structure?
+2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to AD-dementia?
 
 # Methodology
 
