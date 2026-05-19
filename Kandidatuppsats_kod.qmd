@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 ```{r}
@@ -440,11 +440,11 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
- keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
- long_data <- long_data %>% filter(RID %in% keep)
- surv_data <- surv_data %>% filter(RID %in% keep)
- # We check number of individuals with at least 3 measurements
- length(keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
+# We check number of individuals with at least 3 measurements
+length(keep)
 ```
 
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
@@ -454,7 +454,7 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 #keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
 #long_data <- long_data %>% filter(RID %in% keep)
 #surv_data <- surv_data %>% filter(RID %in% keep)
-# # We check number of individuals with at least 1 measurement
+ # We check number of individuals with at least 1 measurement
 #length(keep)
 ```
 
@@ -3903,8 +3903,8 @@ dev.off()
 
 ```{r}
 # Saving the table showing cohort characteristics and measurement distributions
-saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
-#saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
+#saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
+saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
 ```
 
 ```{r}
