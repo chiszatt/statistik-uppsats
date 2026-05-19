@@ -2033,6 +2033,57 @@ summary(jlcmm_m1_nfl)
 ## Class Descriptions
 
 ```{r}
+# Saving which class each individual was predicted to be in
+class_preds <- jlcmm_m1_nfl$pprobY
+
+# Merging with model variables
+data_preds <- class_preds %>% merge(
+  jlcmm_data, by = "RID") %>% merge(
+    surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
+  )
+
+# Merging with baseline biomarker values
+data_preds <- data_preds %>% merge(
+  baseline, by = "RID"
+)
+
+# Summarising age and baseline nfl & ptau by class
+continuous_summary <- data_preds %>%
+  pivot_longer(
+    cols = c(age_at_baseline, baseline_value_nfl, baseline_value_ptau),
+    names_to = "variable",
+    values_to = "value"
+  ) %>%
+  group_by(variable, class) %>%
+  summarise(
+    stat = sprintf("%.1f (%.1f, %.1f)", median(value, na.rm = TRUE),
+                   quantile(value, 0.25, na.rm = TRUE),
+                   quantile(value, 0.75, na.rm = TRUE)),
+    .groups = "drop"
+  )
+
+# Summarising APOE status and gender by class
+cat_summary <- data_preds %>%
+  pivot_longer(
+    cols = c(APOE4_status, PTGENDER),
+    names_to = "variable",
+    values_to = "value"
+  ) %>%
+  group_by(variable, class, value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(variable, class) %>%
+  mutate(pct = n / sum(n) * 100,
+         stat = sprintf("%d (%.1f%%)", n, pct),
+         variable = paste0(variable, ": ", value)) %>%
+  ungroup() %>%
+  dplyr::select(variable, class, stat)
+
+# Combining the summary statistics and pivot_wider makes each class a column
+class_summary_nfl <- bind_rows(continuous_summary, cat_summary) %>%
+  pivot_wider(names_from = class, values_from = stat)
+```
+
+```{r}
 # saving which class each individual was predicted to be in
 class_preds <- jlcmm_m1_nfl$pprobY
 
@@ -2048,7 +2099,7 @@ data_preds <- data_preds %>% merge(
 )
 
 # Creating a table to compare age, baseline nfl and ptau between classes
-class_table_nfl <- data_preds %>%
+continuous_nfl <- data_preds %>%
   pivot_longer(
     cols = c(age_at_baseline, baseline_value_nfl, baseline_value_ptau),
     names_to = "Variable",
@@ -2066,14 +2117,30 @@ class_table_nfl <- data_preds %>%
                       "Baseline p-tau181", "Baseline p-tau181"))
 
 names(class_table_nfl)[2] <- "Class"
+
+# Table to compare apoe status and gender
+categorical_nfl <- data_preds %>%
+  pivot_longer(
+    cols = c(APOE4_status, PTGENDER),
+    names_to = "Variable",
+    values_to = "value"
+  ) %>%
+  group_by(variable, class, value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(variable, class) %>%
+  mutate(pct = n / sum(n) * 100,
+         Percentage = sprintf("%d (%.1f%%)", n, pct),
+         Variable = paste0(variable, ": ", value)) %>%
+  ungroup() %>%
+  select(Variable, class, Percentage)
+
+# Combine and pivot wide so each class is a column
+bind_rows(continuous_nfl, categorical_nfl) %>%
+  pivot_wider(names_from = class, values_from = Percentage)
 ```
 
 ```{r}
-# checking the distribution of genotype by class
-table(data_preds$class, data_preds$APOE4_status)
-
-# checking the distribution of gender by class
-table(data_preds$class, data_preds$PTGENDER)
+saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
 ```
 
 ### Survival curves by class
@@ -2424,39 +2491,58 @@ summary_jlcmm_ptau <- data.frame(
 ## Class Descriptions
 
 ```{r}
-# saving which class each individual was predicted to be in
+# Saving which class each individual was predicted to be in
 class_preds <- jlcmm_m1_ptau$pprobY
 
-# merging with model variables
+# Merging with model variables
 data_preds <- class_preds %>% merge(
   jlcmm_data, by = "RID") %>% merge(
     surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
   )
 
-# merging with baseline biomarker values
+# Merging with baseline biomarker values
 data_preds <- data_preds %>% merge(
   baseline, by = "RID"
 )
 
-# Creating a table to compare age, baseline nfl and ptau between classes
-class_table_ptau <- data_preds %>%
+# Summarising age and baseline nfl & ptau by class
+continuous_summary <- data_preds %>%
   pivot_longer(
     cols = c(age_at_baseline, baseline_value_nfl, baseline_value_ptau),
-    names_to = "Variable",
-    values_to = "value") %>%
-  group_by(Variable, class) %>%
+    names_to = "variable",
+    values_to = "value"
+  ) %>%
+  group_by(variable, class) %>%
   summarise(
-    Mean = mean(value),
-    Median = median(value),
-    Q1 = quantile(value, 0.25),
-    Q3 = quantile(value, 0.75),
-    .groups = "drop") %>%
-  arrange(Variable, class) %>%
-  mutate(Variable = c("Age at baseline", "Age at baseline",
-                      "Baseline NfL", "Baseline NfL",
-                      "Baseline p-tau181", "Baseline p-tau181"))
+    stat = sprintf("%.1f (%.1f, %.1f)", median(value, na.rm = TRUE),
+                   quantile(value, 0.25, na.rm = TRUE),
+                   quantile(value, 0.75, na.rm = TRUE)),
+    .groups = "drop"
+  )
 
-names(class_table_nfl)[2] <- "Class"
+# Summarising APOE status and gender by class
+cat_summary <- data_preds %>%
+  pivot_longer(
+    cols = c(APOE4_status, PTGENDER),
+    names_to = "variable",
+    values_to = "value"
+  ) %>%
+  group_by(variable, class, value) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(variable, class) %>%
+  mutate(pct = n / sum(n) * 100,
+         stat = sprintf("%d (%.1f%%)", n, pct),
+         variable = paste0(variable, ": ", value)) %>%
+  ungroup() %>%
+  dplyr::select(variable, class, stat)
+
+# Combining the summary statistics and pivot_wider makes each class a column
+class_summary_ptau <- bind_rows(continuous_summary, cat_summary) %>%
+  pivot_wider(names_from = class, values_from = stat)
+```
+
+```{r}
+saveRDS(class_summary_ptau, "tables/class_summary_ptau.rds")
 ```
 
 ### Survival curves by class
