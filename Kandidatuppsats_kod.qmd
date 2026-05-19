@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 ```{r}
@@ -530,17 +530,21 @@ table((surv_data %>% filter(time_to_event == 0))$event)
 ### Checking the final diagnosis for the selected participants
 
 ```{r}
-final_dx <- diagnosis_data_clean %>%
-  arrange(RID, EXAMDATE_dx) %>%
-  group_by(RID) %>%
-  slice_tail(n = 1) %>%
-  ungroup() %>%
-  dplyr::select(RID, final_dx = DIAGNOSIS_dx)
+final_diagnosis <- surv_data %>%
+  left_join(
+    diagnosis_data_clean %>%
+      arrange(RID, EXAMDATE_dx) %>%
+      group_by(RID) %>%
+      slice_tail(n = 1) %>%
+      ungroup() %>%
+      transmute(
+        RID,
+        final_dx = DIAGNOSIS_dx
+      ),
+    by = "RID"
+  )
 
-surv_merged <- surv_data %>%
-  left_join(final_dx, by = "RID")
-
-table(surv_merged$final_dx, useNA = "ifany")
+table(final_diagnosis$final_dx, useNA = "ifany")
 ```
 
 ### Constructing baseline values of each biomarker, to include in the Cox PH models as covariates
