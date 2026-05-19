@@ -23,32 +23,27 @@ include-before-body:
 
     \end{minipage}
 
-    \vspace{2cm}
+    \vspace{3cm}
 
     \raggedleft
 
     {\Huge\bfseries No 2026:x\par}
     \vspace{0.5cm}
 
-    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Longitudinal Blood-Based Biomarkers\par}
-    {\large A comparison of Modelling Approaches and Biomarker Strategies\par}
-
+    {\LARGE \bfseries A Comparative Assessment of Modelling Approaches and Biomarker Strategies for Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers\par}
+    
     \vspace{0.5cm}
-    {\large \today\par}
+    
+    {\normalsize A Comparative Assessment of Modelling Approaches and Biomarker Strategies for Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers\par}
 
-    \vspace{2cm}
+    
+    \vfill
+
 
     {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
-
-    \vspace{0.1cm}
-
+  
     {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
 
-    \vspace{0.5cm}
-
-    {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
-
-    \vfill
     \end{titlepage}
 
     \begin{titlepage}
@@ -78,9 +73,15 @@ include-before-body:
     
     \vfill
     
+    \raggedleft
+
+    {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+    
+    \vfill
+    
     \raggedright
     
-    {\tiny Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+    {\normalsize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
     
     \end{titlepage}
 
@@ -139,7 +140,7 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of statistical models to predict progression to dementia using biomarker data and evaluate their predictive accuracy. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
+Recent research has applied a range of statistical models to predict progression to dementia using biomarker data in order to evaluate their predictive performance For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
 
 Similarly, a large population-based study of 2148 older adults from Sweden applied a single multivariable Cox proportional hazards model including p-tau181, p-tau217, neurofilament light (NfL), and GFAP as simultaneous baseline predictors, to examine their predictive value for progression to all-cause and Alzheimer’s disease dementia. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 74.3%, 77.0%, and 81.3% for AD-dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD-dementia (Grande et al., 2025, pp. 2027-2031).
 
