@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 ```{r}
@@ -632,8 +632,8 @@ cohort_summary_table <- tibble(
     "Diagnosis examination dates (range)",
     "All diagnoses distribution",
     "Post-baseline diagnoses distribution",
-    "p-tau181 visits per participant (median [range])",
-    "NfL visits per participant (median [range])",
+    "Participants by number of p-tau181 measurements",
+    "Participants by number of NfL measurements",
     "Diagnosis visits per participant (median [range])"
   ),
   Value = c(
