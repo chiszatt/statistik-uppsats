@@ -2824,13 +2824,13 @@ get_jm_brier <- function(model, times) {
     tmp <- tvBrier(
       model,
       newdata = newdata,
-      Tstart = 0,
+      Tstart = 1,
       Thoriz = t
     )
     
     return(tmp$Brier)
   })
-  
+
   return(as.numeric(briers))
 }
 ```
