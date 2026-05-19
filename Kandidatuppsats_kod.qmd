@@ -450,7 +450,7 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
-# We filter individuals with at least 1 measurement of ptau_data
+# # We filter individuals with at least 1 measurement of ptau_data
 # keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
 # long_data <- long_data %>% filter(RID %in% keep)
 # surv_data <- surv_data %>% filter(RID %in% keep)
@@ -2030,55 +2030,50 @@ summary_jlcmm_nfl <- data.frame(
 summary(jlcmm_m1_nfl)
 ```
 
-```{r}
-# params_all <- do.call(rbind, lapply(names(models), function(m)
-#   get_jlcmm_params(models[[nm]], model_name = m)
-# ))
-# 
-# params_all %>%
-#   dplyr::select(Model, parameter, estimate, lower, upper, P_value) %>%
-#   mutate(
-#     "95% CI" = paste0("(", Lower95, ", ", Upper95, ")"),
-#     "P-value" = case_when(
-#       P_value < 0.001 ~ "<0.001",
-#       TRUE ~ as.character(P_value)
-#     )
-#   ) %>%
-#   dplyr::select(Model, Parameter, Estimate, `95% CI`, `P-value`) %>%
-#   kable(
-#     booktabs = TRUE,
-#     caption = "Parameter estimates from joint latent class models",
-#     escape = FALSE
-#   ) %>%
-#   kable_styling(latex_options = c("hold_position", "scale_down")) %>%
-#   # Group rows by model
-#   pack_rows(index = table(params_all$Model))
-```
-
 ## Class Descriptions
 
 ```{r}
-# # saving which class each individual was predicted to be in
+# saving which class each individual was predicted to be in
 class_preds <- jlcmm_m1_nfl$pprobY
 
-# merging with genotype and demographic data
-class_preds <- class_preds %>%
-  merge((apoe %>% dplyr::select(RID, APOE4_status)), by = "RID") %>% 
-  merge((surv_data %>% dplyr::select(RID, event, age_at_baseline, PTGENDER)), by = "RID")
-
-# checking the distribution of genotype by class
-table(class_preds$class, class_preds$APOE4_status)
-# checking the distribution of gender by class
-table(class_preds$class, class_preds$PTGENDER)
-# checking the distribution of age by class
-class_preds %>%
-  group_by(class) %>%
-  summarise(
-    mean = mean(age_at_baseline, na.rm = TRUE),
-    median = median(age_at_baseline, na.rm = TRUE),
-    q1 = quantile(age_at_baseline, 0.25, na.rm = TRUE),
-    q3 = quantile(age_at_baseline, 0.75, na.rm = TRUE)
+# merging with model variables
+data_preds <- class_preds %>% merge(
+  jlcmm_data, by = "RID") %>% merge(
+    surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
   )
+
+# merging with baseline biomarker values
+data_preds <- data_preds %>% merge(
+  baseline, by = "RID"
+)
+
+# Creating a table to compare age, baseline nfl and ptau between classes
+class_table_nfl <- data_preds %>%
+  pivot_longer(
+    cols = c(age_at_baseline, baseline_value_nfl, baseline_value_ptau),
+    names_to = "Variable",
+    values_to = "value") %>%
+  group_by(Variable, class) %>%
+  summarise(
+    Mean = mean(value),
+    Median = median(value),
+    Q1 = quantile(value, 0.25),
+    Q3 = quantile(value, 0.75),
+    .groups = "drop") %>%
+  arrange(Variable, class) %>%
+  mutate(Variable = c("Age at baseline", "Age at baseline",
+                      "Baseline NfL", "Baseline NfL",
+                      "Baseline p-tau181", "Baseline p-tau181"))
+
+names(class_table_nfl)[2] <- "Class"
+```
+
+```{r}
+# checking the distribution of genotype by class
+table(data_preds$class, data_preds$APOE4_status)
+
+# checking the distribution of gender by class
+table(data_preds$class, data_preds$PTGENDER)
 ```
 
 ### Survival curves by class
@@ -2429,27 +2424,39 @@ summary_jlcmm_ptau <- data.frame(
 ## Class Descriptions
 
 ```{r}
-# # saving which class each individual was predicted to be in
+# saving which class each individual was predicted to be in
 class_preds <- jlcmm_m1_ptau$pprobY
 
-# merging with genotype and demographic data
-class_preds <- class_preds %>%
-  merge((apoe %>% dplyr::select(RID, APOE4_status)), by = "RID") %>% 
-  merge((surv_data %>% dplyr::select(RID, event, age_at_baseline, PTGENDER)), by = "RID")
-
-# checking the distribution of genotype by class
-table(class_preds$class, class_preds$APOE4_status)
-# checking the distribution of gender by class
-table(class_preds$class, class_preds$PTGENDER)
-# checking the distribution of age by class
-class_preds %>%
-  group_by(class) %>%
-  summarise(
-    mean = mean(age_at_baseline, na.rm = TRUE),
-    median = median(age_at_baseline, na.rm = TRUE),
-    q1 = quantile(age_at_baseline, 0.25, na.rm = TRUE),
-    q3 = quantile(age_at_baseline, 0.75, na.rm = TRUE)
+# merging with model variables
+data_preds <- class_preds %>% merge(
+  jlcmm_data, by = "RID") %>% merge(
+    surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
   )
+
+# merging with baseline biomarker values
+data_preds <- data_preds %>% merge(
+  baseline, by = "RID"
+)
+
+# Creating a table to compare age, baseline nfl and ptau between classes
+class_table_ptau <- data_preds %>%
+  pivot_longer(
+    cols = c(age_at_baseline, baseline_value_nfl, baseline_value_ptau),
+    names_to = "Variable",
+    values_to = "value") %>%
+  group_by(Variable, class) %>%
+  summarise(
+    Mean = mean(value),
+    Median = median(value),
+    Q1 = quantile(value, 0.25),
+    Q3 = quantile(value, 0.75),
+    .groups = "drop") %>%
+  arrange(Variable, class) %>%
+  mutate(Variable = c("Age at baseline", "Age at baseline",
+                      "Baseline NfL", "Baseline NfL",
+                      "Baseline p-tau181", "Baseline p-tau181"))
+
+names(class_table_nfl)[2] <- "Class"
 ```
 
 ### Survival curves by class
@@ -3065,15 +3072,14 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-#saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
-
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 # Saving the table of the Brier score results
-#saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
 
-#### Only people who got a second dementia diagnosis within the following six months are set to event 
+#### Only people who got a second dementia diagnosis within the following six months are set to event
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_strict_event.rds")
