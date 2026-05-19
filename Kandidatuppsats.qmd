@@ -1,6 +1,7 @@
 ---
 format: pdf
-
+header-includes:
+  - \usepackage{textgreek}
 include-before-body:
   text: |
 
@@ -45,7 +46,7 @@ include-before-body:
 
     \vspace{0.5cm}
 
-    {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+    {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
 
     \vfill
     \end{titlepage}
@@ -64,17 +65,23 @@ include-before-body:
 
     \vspace{0.5cm}
 
-    {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1–5 year horizons. The results demonstrate that predictive accuracy varies across modelling frameworks and follow-up time, with joint models improving discrimination relative to Cox models when longitudinal information is incorporated, particularly at earlier horizons, while JLCMMs provide comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yields the best predictive performance, whereas each biomarker alone shows similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
+    {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 protein (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards (Cox PH) models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1–5 year horizons. The results demonstrate that predictive accuracy varies across modelling frameworks and follow-up time, with JMs improving discrimination relative to Cox PH models when longitudinal information is incorporated, particularly at earlier horizons, while JLCMMs provide comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yield the best predictive performance, whereas modeling each biomarker seperately resulted in weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
     
         \vspace{0.5cm}
 
-    {\normalsize Keywords: Alzheimer’s disease, dementia progression, blood-based biomarkers, p-tau181, neurofilament light chain, survival analysis\par}
-
-    \vspace{3cm}
-
-    {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+    {\normalsize Keywords: Alzheimer’s disease, dementia progression, blood-based biomarkers, p-tau181, NfL, survival analysis\par}
 
     \vfill
+    \end{titlepage}
+    
+    \begin{titlepage}
+    
+    \vfill
+    
+    \raggedright
+    
+    {\tiny Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+    
     \end{titlepage}
 
 toc: false
@@ -102,8 +109,8 @@ knitr::opts_chunk$set(tab.pos = "H")
 
 ```{r}
 # set-up for tables
-kable_standard <- function(df, caption = NULL, ...) {
-  kable(df, booktabs = TRUE, caption = caption, ...) %>%
+kable_standard <- function(df, caption = NULL) {
+  kable(df, booktabs = TRUE, caption = caption) %>%
     kable_styling(
       latex_options = c("hold_position", "scale_down"),
       full_width = FALSE
@@ -374,7 +381,7 @@ where $G$ is the number of latent classes specified by the model and $\widehat\p
 
 **Validation**
 
-The chosen classes should be clinically meaningful.
+In addition to fulf chosen classes should be clinically meaningful.
 
 ## Evaluation of Predictive Performance
 
@@ -589,6 +596,18 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
+The distribution of age at baseline, gender, APOE-$\epsilon 4$ status
+
+```{r}
+#| tbl-cap: "Comparison between latent classes estimated from longitudinal p-tau181 measurements"
+kable_standard(readRDS("tables/class_summary_ptau.rds"))
+```
+
+```{r}
+#| tbl-cap: "Comparison between latent classes estimated from longitudinal NfL measurements"
+kable_standard(readRDS("tables/class_summary_nfl.rds"))
+```
+
 ## Model Comparison
 
 In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
@@ -643,7 +662,7 @@ The time-dependent AUC values for each biomarker specification at each horizon a
 
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
-![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
+<!-- ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox} -->
 
 All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. Small differences can be observed for predictions made at year six, although they remain minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
 
@@ -1029,4 +1048,18 @@ kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC scores when time-to-event is defined as the midpoint between diagnostic exams"
+kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when time-to-event is defined as the midpoint between diagnostic exams"
+kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
 ```
