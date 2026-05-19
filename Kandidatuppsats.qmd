@@ -464,9 +464,9 @@ The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was
 
 Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement. Values larger than three standard deviations were analysed and it was determined that they should be retained in the analysis. It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
 
-Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. Diagnoses were therefore available several years prior to the first biomarker measurements. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
+Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
 
-52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. **Sensitivity analyses showed no substantial differences in model precision: did we do this yet?.** Furthermore, discrepancies were observed between p-tau181 and NfL examination dates with the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a common examination date was constructed using the midpoint between the two biomarker dates.
+52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. **Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.** Furthermore, discrepancies were observed between p-tau181 and NfL examination dates with the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. **To address this, an additional sensitivity analysis consisted of constructing a common examination date using the midpoint between the two biomarker dates as an.**
 
 ### Age
 
@@ -593,7 +593,7 @@ In order to compare the different modelling approaches, predictive performance w
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
-Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall predictive performance. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
+Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong overall performance in predicting progression to AD-dementia. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
 Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows higher a slightly higher value for the JLCMM at for the latest prediction horizon.
 
@@ -606,11 +606,11 @@ kable_standard(readRDS("tables/results_table_AUC.rds"))
 
 For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.902 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
-When evaluating predictive performance using time-dependent Brier scores, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
+When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
 
-Among the models involving p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 for early predictions to 0.16 at later horizons, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall predictive performance. For earlier horizons, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences between models decrease for later predictions, as the curves get increasingly closer.
+Among the models involving p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 for early predictions to 0.16 at later horizons, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall performance in predicting progression to AD-dementia. For earlier horizons, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences between models decrease for later predictions, as the curves get increasingly closer.
 
 This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The JLCMM yields lower Brier score values compared with the other two models for early predictions. However, over longer prediction horizons the differences between models reduces, with values being low, stable and around the same range as for models including p-tau181.
 
@@ -627,7 +627,7 @@ For predictions at two years, the JLCMM including NfL achieves the lowest Brier 
 
 ## Biomarker Comparison
 
-The predictive performance of the models was also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 illustrates how the time-dependent AUC of the models changes with biomarker specification across prediction horizons, with the model being fixed as Cox PH.
+The models' performances in predicting progression to AD-dementia were also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 illustrates how the time-dependent AUC of the models changes with biomarker specification across prediction horizons, with the model being fixed as Cox PH.
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox}
 
@@ -647,21 +647,19 @@ All three Cox PH models yield low and similar time-dependent Brier scores across
 
 Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.149 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
-## Sensitivity (or precision?) Analyses
+## Sensitivity Analyses
 
-To assure the robustness of these results, **sensitivity(?)** analyses were run.
+To examine the robustness of these results, different sensitivity analyses were run.
 
-As previously mentioned, some participants had visits with duplicated biomarker measurements. In the main analyses, these duplicated measurements were handled by replacing them with their averaged value. In a sensitivity analysis, the duplicated measurements were instead replaced using the first recorded value. This resulted in only minimal changes in the time-dependent AUC and time-dependent Brier score estimates. For instance, the 2-year AUC for the JM model incorporating both biomarkers changed from 0.967 to 0.956, while the corresponding 6-year Brier score changed from 0.138 to 0.139. In other terms, the performance of the models remained essentially unchanged, indicating that the results were robust to the handling of duplicated measurements.
+As previously mentioned, some participants had visits with duplicated biomarker measurements. In the main analyses, these duplicated measurements were handled by replacing them with their averaged value. In sensitivity analyses, the duplicated measurements were instead replaced using the first recorded value or the last recorded value. They both resulted in only minimal changes in the time-dependent AUC and time-dependent Brier score estimates. For instance, in the first analysis, the 2-year AUC for the JM model incorporating both biomarkers changed from 0.967 to 0.956, while the corresponding 6-year Brier score changed from 0.138 to 0.139. In the second analysis, the change in the 6-year Brier score for this model was identical, while the difference in the 2-year AUC was even less. In other terms, the performance of the models remained essentially unchanged, indicating that the results were robust to the handling of duplicated measurements.
 
-...
+In order to handle the difference in examination dates between the biomarkers, the baseline was alternatively defined as the first examination date across biomarkers. As before, the JMs yielded higher values than the Cox PH models, but the difference in performance between the JMs and the JLCMMs became less pronounced. The models incorporating both biomarkers generally remained the better performative models.
 
-Finally, in response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the JM including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM using NfL decreased from 0.907 to 0.521. In contrast, the Cox PH models showed smaller reductions and remained comparatively stable across prediction horizons. The same results were seen in the time-depending Brier scores, which increased overall but where the increase was less pronounced for the Cox PH models.
+In response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models, as shown in Appendix. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the JM including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM using NfL decreased from 0.907 to 0.521. In contrast, the Cox PH models showed smaller reductions and remained comparatively stable across prediction horizons. The same results were similar in the time-depending Brier scores, which increased overall but where the increase was less pronounced for the Cox PH models.
 
-For the Cox PH models, the assumption of proportional hazards was also fulfilled for this cohort. The time-dependent AUC and Brier scores were in concordance with those from predictions made with the cohort restricted to those with 3 or more biomarker measurements.
+Additionally, among the JMs and JLCMMs, the models incorporating p-tau181 yielded higher AUC values than the models incorporating NfL when including the participants with sparse data. This made them more comparable in terms of performance to the models incorporating both biomarkers, which previously performed notably better than the single biomarker models. Among the Cox PH models, the difference in performance between the model incorporating p-tau181 and the model incorporating both biomarkers became mainly less pronounced.
 
-To address the interval censored nature of the data, event times were also defined as the midpoint between the diagnosis exams when a positive dementia diagnosis was given.
-
-The results from all **sensitivity(?)** analyses are available upon request.
+Finally, to address the interval censored nature of the data, event times were also defined as the midpoint between the diagnosis exams when a positive dementia diagnosis was given.
 
 # Discussion
 
@@ -977,14 +975,14 @@ kable_standard(readRDS("tables/results_table_Brier_strict_event.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```
 
 ```{r}
