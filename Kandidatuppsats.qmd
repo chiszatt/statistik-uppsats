@@ -29,11 +29,8 @@ include-before-body:
     {\Huge\bfseries No 2026:x\par}
     \vspace{0.5cm}
 
-    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Longitudinal Blood-Based Biomarkers\par}
-    {\large A comparison of Modelling Approaches and Biomarker Strategies\par}
-
-    \vspace{0.5cm}
-    {\large \today\par}
+    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia: a comparison of Modelling Approaches and Biomarker Strategies\par}
+    {\large Prediktion av progression till Alzheimers sjukdomsdemens: en jämförelse av modelleringsmetoder och biomarkörstrategier\par}
 
     \vspace{2cm}
 
@@ -64,13 +61,13 @@ include-before-body:
 
     \vspace{0.5cm}
 
-    {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1–5 year horizons. The results demonstrate that predictive accuracy varies across modelling frameworks and follow-up time, with joint models improving discrimination relative to Cox models when longitudinal information is incorporated, particularly at earlier horizons, while JLCMMs provide comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yields the best predictive performance, whereas each biomarker alone shows similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
+    {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1-5 year horizons. The results demonstrated that predictive accuracy varied across modelling frameworks and follow-up time, with joint models improving discrimination relative to Cox models, particularly at earlier horizons, while JLCMMs provided comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yielded the best predictive performance, while each biomarker alone showed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
     
         \vspace{0.5cm}
 
     {\normalsize Keywords: Alzheimer’s disease, dementia progression, blood-based biomarkers, p-tau181, neurofilament light chain, survival analysis\par}
 
-    \vspace{3cm}
+    \vspace{1 cm}
 
     {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
 
