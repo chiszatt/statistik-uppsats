@@ -659,7 +659,7 @@ In response to the debate over whether individuals with sparse data should be in
 
 Additionally, among the JMs and JLCMMs, the models incorporating p-tau181 yielded higher AUC values than the models incorporating NfL when including the participants with sparse data. This made them more comparable in terms of performance to the models incorporating both biomarkers, which previously performed notably better than the single biomarker models. Among the Cox PH models, the difference in performance between the model incorporating p-tau181 and the model incorporating both biomarkers became mainly less pronounced.
 
-Finally, to address the interval censored nature of the data, event times were also defined as the midpoint between the diagnosis exams when a positive dementia diagnosis was given.
+Finally, to address the interval censored nature of the data, event times were also defined as the midpoint between the diagnosis exams when a positive dementia diagnosis was given...
 
 # Discussion
 
