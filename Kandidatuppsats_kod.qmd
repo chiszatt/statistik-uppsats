@@ -89,12 +89,12 @@ apoe <- APOERES
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 ```{r}
@@ -451,11 +451,11 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
-# We check number of individuals with at least 1 measurement
-#length(keep)
+# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+# long_data <- long_data %>% filter(RID %in% keep)
+# surv_data <- surv_data %>% filter(RID %in% keep)
+# # We check number of individuals with at least 1 measurement
+# length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -2084,16 +2084,43 @@ class_preds %>%
 ### Survival curves by class
 
 ```{r}
-# survival curves by class
-plot(jlcmm_m1_nfl, which = "survival")
+plot(
+  jlcmm_m1_nfl,
+  which = "survival",
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  legend.loc = "topright",
+  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = "Class-specific survival functions"
+)
 ```
 
 ### Longitudinal trajectory by class
 
 ```{r}
-# longitudinal trajectory by class
-plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
-     ylim = c(2.5,4.2))
+# longitudinal trajectories by class
+plot(
+  jlcmm_m1_nfl,
+  which = "fit",
+  var.time = "time_years",
+  marg = TRUE,
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  pch = c(16, 17),
+  legend.loc = "topright",
+  cex = 0.6,
+  legend = c("Class 1", "Class 2"),
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Outcome",
+  ylim = c(3.4, 4.2)
+)
 ```
 
 # JLCMM: PTAU
@@ -2429,213 +2456,44 @@ class_preds %>%
 
 ```{r}
 # survival curves by class
-plot(jlcmm_m2_ptau, which = "survival")
+plot(
+  jlcmm_m1_ptau,
+  which = "survival",
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  legend.loc = "topright",
+  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = "Class-specific survival functions"
+)
 ```
 
 ### Longitudinal trajectories by class
 
 ```{r}
 # longitudnal trajectories by class
-plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit")
-```
-
-# MJLCMM: NFL & PTAU
-
-## M0 (1 latent class)
-
-```{r}
-# Modelling the longitudinal data only, these will be used as arguments in the joint models
-# Fitting a one class multivariate latent class mixed model with random intercept
-mlcmm_m0_1 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  subject = "RID",
-  data = jlcmm_data
+# longitudinal trajectories by class
+plot(
+  jlcmm_m1_ptau,
+  which = "fit",
+  var.time = "time_years",
+  marg = TRUE,
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  pch = c(16, 17),
+  legend.loc = "topright",
+  cex = 0.6,
+  legend = c("Class 1", "Class 2"),
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Outcome",
+  ylim = c(2.2, 3.4)
 )
-
-# Fitting a one class multivariate latent class model with random intercept and slope
-mlcmm_m0_2 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ time_years,
-  subject = "RID",
-  data = jlcmm_data
-)
-```
-
-```{r}
-# Modelling longitudinal and survival data
-# Fitting a one class multivariate joint latent class model with random intercept
-mult_jlcmm_m0_1 <- mpjlcmm(
-  longitudinal = list(mlcmm_m0_1),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 1,
-  data = jlcmm_data
-)
-```
-
-```{r}
-summary(mult_jlcmm_m0_1)
-```
-
-```{r}
-# Modelling longitudinal and survival data
-# Fitting a one class multivariate joint latent class model with random intercept and slope
-mult_jlcmm_m0_2 <- mpjlcmm(
-  longitudinal = list(mlcmm_m0_2),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 1,
-  data = jlcmm_data
-)
-```
-
-```{r}
-summary(mult_jlcmm_m0_2)
-```
-
-### Determining the random effects
-
-```{r}
-# Comparing BIC and log-likelihood for the two one class models with different random effects structures
-summarytable(mult_jlcmm_m0_1, mult_jlcmm_m0_2)
-```
-
-## M1 (2 latent classes)
-
-```{r}
-# Modelling longitudinal data, used as argument in the joint model
-# Fitting a multivariate latent class model with two latent classes
-mlcmm_m1 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 2,
-  data = jlcmm_data,
-  B = random(mlcmm_m0_1)
-)
-```
-
-```{r}
-# Modelling longitudinal and survival data
-# Fitting a multivariate joint latent class model with two latent classes
-mult_jlcmm_m1 <- mpjlcmm(
-  longitudinal = list(mlcmm_m1),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 2,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0_1)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m1)
-```
-
-```{r}
-postprob(mult_jlcmm_m1)
-```
-
-```{r}
-# Posterior probability table for the 2 class jlcmm for ptau and NfL
-get_pprob_table(mult_jlcmm_m1)
-```
-
-```{r}
-# # Saving the model estimates in a table
-# jlcmm_m1_ptau_nfl_output_midpoint <- get_jlcmm_params(mult_jlcmm_m1)
-# saveRDS(jlcmm_m1_ptau_nfl_output_midpoint, "tables/jlcmm_m1_ptau_nfl_output_midpoint.rds")
-```
-
-## M2 (3 latent classes)
-
-```{r}
-# Modelling longitudinal data, used as argument in the joint model
-# Fitting a three class multivariate latent class model
-mlcmm_m2 <- multlcmm(
-  fixed = log_PLASMA_NFL + log_PLASMAPTAU181 ~ time_years,
-  random = ~ 1,
-  mixture = ~ 1,
-  subject = "RID",
-  classmb = ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mlcmm_m0_1)
-)
-```
-
-```{r}
-# Modelling longitudinal and survival data
-# Fitting a three class multivariate joint latent class model
-mult_jlcmm_m2 <- mpjlcmm(
-  longitudinal = list(mlcmm_m2),
-  subject = "RID",
-  survival = Surv(time_to_event, event) ~ 1,
-  ng = 3,
-  data = jlcmm_data,
-  B = random(mult_jlcmm_m0_1)
-)
-```
-
-```{r}
-summary(mult_jlcmm_m2)
-```
-
-```{r}
-postprob(mult_jlcmm_m2)
-```
-
-## Comparing M0, M1, M2
-
-```{r}
-models <- list(mult_jlcmm_m0_1, mult_jlcmm_m1, mult_jlcmm_m2)
-
-# Find max number of classes across all models
-G_max <- max(sapply(models, function(m) m$ng))
-
-# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
-props <- do.call(rbind, lapply(models, function(m) {
-  p <- get_class_proportions(m)
-  padded <- c(p, rep(NA, G_max - length(p)))
-  return(padded)
-}))
-
-colnames(props) <- paste0("Class", 1:G_max, " (%)")
-
-summary_jlcmm_ptau_nfl <- data.frame(
-  "Candidate model" = paste0("Model", 1:length(models)),
-  "G" = sapply(models, function(m) m$ng),
-  "Log Likelihood" = sapply(models, function(m) m$loglik),
-  "BIC" = sapply(models, function(m) m$BIC),
-  "Entropy" = sapply(models, get_entropy),
-  props,
-  check.names = FALSE
-)
-```
-
-### Survival curves by class
-
-```{r}
-#plot(mult_jlcmm_m1, which = "survival")
-```
-
-```{r}
-# plot(mult_jlcmm_m1, var.time = "time_years", which = "fit")
-```
-
-### Survival curves by class
-
-```{r}
-# survival curves by class
-#plot(mult_jlcmm_m2, which = "survival")
-```
-
-```{r}
-# # longitudnal trajectories by class
-# plot(mult_jlcmm_m2, outcome = 1, which = "fit")
 ```
 
 ## Defining time points for evaluation of predictive performance
@@ -2877,11 +2735,7 @@ auc_jlcmm_m1_ptau <- jlcmm_timeAUC(jlcmm_m1_ptau, newdata,
                                    "RID", "time_years", "time_to_event", "event",
                                    1, times)
 
-# # Computing AUC for 3 class joint latent class mixed model for ptau
-# auc_jlcmm_m2_ptau <- jlcmm_timeAUC(jlcmm_m2_ptau, newdata,
-#                                    "RID", "time_years", "time_to_event", "event",
-#                                    1, times)
-# 
+
 # # ON IN-SAMPLE DATA
 # # Computing AUC for 2 class multivariate joint latent class mixed model for ptau & NfL
 # auc_mult_jlcmm_m1 <- jlcmm_timeAUC(mult_jlcmm_m1, jlcmm_data,
