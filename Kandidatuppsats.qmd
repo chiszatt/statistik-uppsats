@@ -478,9 +478,7 @@ Another covariate included when predicting progression to dementia is participan
 
 ### APOE4-status
 
-Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4).
-
-Among the participants with at least three biomarker measurements, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles. When looking at the participants with at least one biomarker measurement, 109 of these participants carried no APOE-$ε4$ alleles, 772 carried one allele, and 53 carried two alleles.
+Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the participants with at least three biomarker measurements, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles.
 
 # Results
 
@@ -657,7 +655,7 @@ As previously mentioned, some participants had visits with duplicated biomarker 
 
 ...
 
-Finally, in response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the joint model including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM model using NfL decreased from 0.907 to 0.521. In contrast, the Cox regression models showed smaller reductions and remained comparatively stable across prediction horizons. Brier scores also increased overall, indicating reduced predictive accuracy after inclusion of participants with sparse longitudinal data.
+Finally, in response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the JM including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM using NfL decreased from 0.907 to 0.521. In contrast, the Cox PH models showed smaller reductions and remained comparatively stable across prediction horizons. The same results were seen in the time-depending Brier scores, which increased overall but where the increase was less pronounced for the Cox PH models.
 
 For the Cox PH models, the assumption of proportional hazards was also fulfilled for this cohort. The time-dependent AUC and Brier scores were in concordance with those from predictions made with the cohort restricted to those with 3 or more biomarker measurements.
 
@@ -1029,4 +1027,18 @@ kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when setting time-to-event to midpoint"
+kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when setting time-to-event to midpoint"
+kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
 ```
