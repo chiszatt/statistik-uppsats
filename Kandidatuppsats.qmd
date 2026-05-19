@@ -1,68 +1,84 @@
 ---
-format:
-  pdf:
-    include-before-body:
-      text: |
-        \begin{titlepage}
-        \raggedleft
-        \vspace*{0.5cm}
-        
-        {\Huge\bfseries Bachelor thesis\par}
-        \vspace{0.5cm}
-        
-        {\Large Department of Statistics\par}
-        \vspace{3cm}
-        
-        \includegraphics[width=4cm]{images/su_logo.png}  %
-        
-        {\Huge\bfseries No 2026:x\par}
-        \vspace{0.5cm}
-        
-        {\LARGE \bfseries Title in English\par}
+format: pdf
 
-        {\large Title in Swedish\par}
-        \vspace{0.5cm}
-        
-        {\large \today\par}
-        \vspace{3cm}
-        
-        {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
-        \vspace{0.1cm}
-        
-        {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
-        \vspace{0.5cm}
-        
-        {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
+include-before-body:
+  text: |
 
-        \vfill
-        
-        \end{titlepage}
-        
-        \begin{titlepage}
-        \raggedleft
-        
-        {\normalsize Independent Thesis Study of 15 credits in Statistics III,, Spring 2026\par}
-        {\normalsize Supervisor: Hans Nyqvist\par}
-        \vspace{2cm}
-        
-        \raggedright
-        {\huge\bfseries Abstract\par}
-        \vspace{1cm}
-        
-        {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
-        \vspace{3cm}
-        {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
-        
-        
-        \vfill
-        
-        \end{titlepage}
-    toc: false
-    colorlinks: false
-    number-sections: true
-    fig-pos: "H"
-    tbl-pos: "H"
-    number-figures: true
+    \begin{titlepage}
+
+    % HEADER
+    \noindent
+    \begin{minipage}[t]{0.25\textwidth}
+    \includegraphics[width=4.5cm]{su_logo.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.7\textwidth}
+    \raggedleft
+    \vspace*{-1.8cm}
+
+    {\Huge\bfseries Bachelor thesis\par}
+    \vspace{0.3cm}
+    {\LARGE Department of Statistics\par}
+
+    \end{minipage}
+
+    \vspace{2cm}
+
+    \raggedleft
+
+    {\Huge\bfseries No 2026:x\par}
+    \vspace{0.5cm}
+
+    {\LARGE \bfseries Title in English\par}
+    {\large Title in Swedish\par}
+
+    \vspace{0.5cm}
+    {\large \today\par}
+
+    \vspace{3cm}
+
+    {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
+
+    \vspace{0.1cm}
+
+    {\footnotesize for the Alzheimer's Disease Neuroimaging Initiative*}
+
+    \vspace{0.5cm}
+
+    {\footnotesize *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+
+    \vfill
+    \end{titlepage}
+
+    \begin{titlepage}
+    \raggedleft
+
+    {\normalsize Independent Thesis Study of 15 credits in Statistics III, Spring 2026\par}
+    {\normalsize Supervisor: Hans Nyqvist\par}
+
+    \vspace{2cm}
+
+    \raggedright
+
+    {\huge\bfseries Abstract\par}
+
+    \vspace{1cm}
+
+    {\Large The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. The abstract text can go here. Keywords: XXX, XXX, XXX\par}
+
+    \vspace{3cm}
+
+    {\footnotesize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+
+    \vfill
+    \end{titlepage}
+
+toc: false
+colorlinks: false
+number-sections: true
+fig-pos: "H"
+tbl-pos: "H"
+number-figures: true
 editor: visual
 ---
 
@@ -131,7 +147,7 @@ This study investigates the prediction of progression to AD-dementia using longi
 
 # Methodology
 
-To address the research questions, a series of statistical models will be implemented. In all models, time to progression to AD-dementia, defined by the first recorded diagnosis of dementia, is the survival outcome. Given the relatively recent focus on blood-based biomarkers in AD research, their inclusion was considered timely and relevant. Blood-based p-tau181 and NfL were selected due to their established relevance for predicting dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. In addition, they reflect two distinct pathological processes, making them suitable for comparative analyses of disease progression.
+To address the research questions, a series of statistical models will be implemented. In all models, time to progression to AD-dementia, defined as the first recorded diagnosis of dementia after baseline time, serves as the survival outcome. Given the relatively recent focus on blood-based biomarkers in AD research, their inclusion was considered timely and relevant. Blood-based p-tau181 and NfL were selected due to their established relevance for predicting dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. In addition, they reflect two distinct pathological processes, making them suitable for comparative analyses of disease progression.
 
 First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. As with the JM approach, both univariate and multivariate models will be evaluated.
 
@@ -145,7 +161,7 @@ The modelling approaches were chosen based on their methodological relevance and
 
 ## Survival Analysis
 
-All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis, consistent with previous dementia survival studies (Park et al., 2019, p. 4). Diagnosis status, ptau-181 and NfL levels are all available at baseline.
+All of the modeling approaches considered in this study are grounded in the survival analysis framework. The primary aim is to predict the time until the occurrence of a pre-specified event of interest from some baseline time, usually the beginning of follow-up (Kleinbaum & Klein, 2012, p. 4). In this study, the event is defined as the first dementia diagnosis after baseline time, consistent with previous dementia survival studies (Park et al., 2019, p. 4). Diagnosis status, ptau-181 and NfL levels are all available at baseline.
 
 Additionally, individuals with AD-dementia are either considered as right censored, meaning that they do not reach the event during the follow-up period, or as interval censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). Due to diagnoses exams being made either every half year or yearly, depending on the individuals cognition status and what stage of their protocol they are in, the exact date of transition to dementia can only be approximated. Therefore, participants in this study are considered as interval censored.
 
@@ -874,6 +890,57 @@ Time-dependent AUC curves
 Time-dependent Brier score curves
 :::
 
+## Sensitivity analysis: 1+ Biomarker Measurements
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for p-tau181"
+#kable_standard(readRDS("tables/summary_jlcmm_ptau_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
+#kable_standard(readRDS("tables/pprob_m1_ptau_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Summary of posterior probabilities for the three class JLCMM with 1+ longitudinal measurements for p-tau181"
+#kable_standard(readRDS("tables/pprob_m2_ptau_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for p-tau181"
+# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Summary of fit statistics for JLCMM with 1+ longitudinal measurements for NfL"
+#kable_standard(readRDS("tables/summary_jlcmm_nfl_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Summary of posterior probabilities for the two class JLCMM with 1+ longitudinal measurements for NfL"
+#kable_standard(readRDS("tables/pprob_m1_nfl_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Model parameters for the two class JLCMM with 1+ longitudinal measurements for NfL"
+# kable_standard(readRDS("tables/jlcmm_m1_ptau_full.rds"))
+```
+
 ## Results of sensitivity analyses
 
 
@@ -881,15 +948,43 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when participants are only set as event when they have a second dementia diagnosis within six months afterwards"
+kable_standard(readRDS("tables/results_table_AUC_strict_event.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier score when participants are only set as event when they have a second dementia diagnosis within six months afterwards"
+kable_standard(readRDS("tables/results_table_Brier_strict_event.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
- # kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
- # kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
 
 ```{r}
@@ -903,7 +998,19 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+```
 
-# kable_standard(readRDS("tables/tables/results_table_Brier_last_duplicate.rds"))
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when setting participants to those with at least one biomarker measurement "
+kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+```
 
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when setting participants to those with at least one biomarker measurement"
+kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
