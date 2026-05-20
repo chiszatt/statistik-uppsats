@@ -439,22 +439,22 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
- keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
- long_data <- long_data %>% filter(RID %in% keep)
- surv_data <- surv_data %>% filter(RID %in% keep)
- # We check number of individuals with at least 3 measurements
- length(keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
+# We check number of individuals with at least 3 measurements
+length(keep)
 ```
 
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
 # # We filter individuals with at least 1 measurement of ptau_data
-# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-# long_data <- long_data %>% filter(RID %in% keep)
-# surv_data <- surv_data %>% filter(RID %in% keep)
-# # We check number of individuals with at least 1 measurement
-# length(keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
+ # We check number of individuals with at least 1 measurement
+#length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -508,57 +508,6 @@ surv_data <- surv_data %>%
 )
 ```
 
-#### Sensitivity analysis: event = first dementia diagnosis ONLY if the person got a second dementia diagnosis within the following six months
-
-```{r}
-# surv_data <- surv_data %>%
-#  group_by(RID) %>%
-#  summarise(
-# 
-#    baseline_dx = unique(baseline_dx),
-#    last_dx = unique(last_dx),
-# 
-#    EXAMDATE_baseline = min(EXAMDATE_baseline),
-# 
-#    age_at_baseline = age_at_visit[
-#      EXAMDATE_ptau == min(EXAMDATE_ptau[!is.na(PLASMAPTAU181)]) |
-#      EXAMDATE_nfl == min(EXAMDATE_nfl[!is.na(PLASMA_NFL)])
-#    ][1],
-# 
-#    last_followup = max(c(EXAMDATE_ptau, EXAMDATE_nfl, EXAMDATE_dx), na.rm = TRUE),
-# 
-#    # Event definition
-#    # event = 1 if the person has PERSISTENT dementia, meaning at least 2 dementia diagnoses AND at least one pair of diagnoses separated by ≥ 6 months
-#    event = {
-#      d <- sort(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
-# 
-#      as.integer(
-#        length(d) >= 2 &&
-#        any(diff(d) >= 6 * 30.44)
-#      )
-#    },
-# 
-#    # Time-to-event definition
-#    # time_to_event = time from baseline to first "confirmed stable dementia" signal, defined as the first dementia diagnosis that is part of a pair with ≥ 6 months separation
-#    time_to_event = {
-#      d <- sort(EXAMDATE_dx[DIAGNOSIS_dx == "Dementia"])
-# 
-#      idx <- which(diff(d) >= 6 * 30.44)[1]
-# 
-#      if (length(d) < 2 || is.na(idx)) {
-# 
-#        # no persistent dementia -> censored
-#        as.numeric(last_followup - EXAMDATE_baseline) / 365
-# 
-#      } else {
-# 
-#        # first dementia diagnosis in first qualifying pair
-#        as.numeric(d[idx] - EXAMDATE_baseline) / 365
-#      }
-#    }
-#  )
-```
-
 ```{r}
 # extracting number of events with time_to_event != 0
 table((surv_data %>% filter(time_to_event > 0))$event)
@@ -574,6 +523,26 @@ long_data <- long_data %>% filter(RID %in% unique(surv_data$RID))
 
 # extracting number of events with time_to_event != 0
 table((surv_data %>% filter(time_to_event > 0))$event)
+```
+
+### Checking the final diagnosis for the selected participants
+
+```{r}
+final_diagnosis <- surv_data %>%
+  left_join(
+    diagnosis_data_clean %>%
+      arrange(RID, EXAMDATE_dx) %>%
+      group_by(RID) %>%
+      slice_tail(n = 1) %>%
+      ungroup() %>%
+      transmute(
+        RID,
+        final_dx = DIAGNOSIS_dx
+      ),
+    by = "RID"
+  )
+
+table(final_diagnosis$final_dx, useNA = "ifany")
 ```
 
 ### Constructing baseline values of each biomarker, to include in the Cox PH models as covariates
@@ -599,16 +568,15 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-## Summaries and distributions of the model variables
+## Cohort characteristics and measurement distributions
 
 ```{r}
-# Distribution of diagnosis assessments
-dx_full_704 <- diagnosis_data %>%
+# Filtering diagnosis data to cohort
+dx_full_cohort <- diagnosis_data %>%
   filter(RID %in% surv_data$RID)
-table(dx_full_704$DIAGNOSIS_dx)
 
-# Distribution of post-baseline diagnosis assessments (aligned to biomarker baseline)
-dx_post <- dx_full_704 %>%
+# Post-baseline diagnoses aligned to biomarker baseline
+dx_post <- dx_full_cohort %>%
   left_join(
     long_data %>%
       dplyr::select(RID, EXAMDATE_baseline) %>%
@@ -616,10 +584,26 @@ dx_post <- dx_full_704 %>%
     by = "RID"
   ) %>%
   dplyr::filter(EXAMDATE_dx >= EXAMDATE_baseline)
+
 table(dx_post$DIAGNOSIS_dx)
 
-# Number of diagnosis assessments per participant
-dx_full_704 %>%
+# Diagnosis distributions
+dx_full_counts <- table(dx_full_cohort$DIAGNOSIS_dx)
+dx_post_counts <- table(dx_post$DIAGNOSIS_dx)
+
+# Biomarker measurement frequency per participant
+ptau_table <- long_data %>%
+  filter(!is.na(PLASMAPTAU181)) %>%
+  count(RID) %>%
+  count(n, name = "n_RID")
+
+nfl_table <- long_data %>%
+  filter(!is.na(PLASMA_NFL)) %>%
+  count(RID) %>%
+  count(n, name = "n_RID")
+
+# Diagnosis visits per participant (min/median/max)
+dx_visits <- dx_full_cohort %>%
   filter(!is.na(DIAGNOSIS_dx)) %>%
   count(RID) %>%
   summarise(
@@ -628,34 +612,62 @@ dx_full_704 %>%
     max = max(n)
   )
 
-# Summaries of p-tau181 and NfL 
-summary(long_data[, c("PLASMAPTAU181", "PLASMA_NFL")])
+# Examination date ranges
+ptau_range <- range(long_data$EXAMDATE_ptau, na.rm = TRUE)
+nfl_range  <- range(long_data$EXAMDATE_nfl, na.rm = TRUE)
+dx_range   <- range(dx_full_cohort$EXAMDATE_dx, na.rm = TRUE)
 
-# Examination date ranges for p-tau181, NfL and diagnosis
-range(long_data$EXAMDATE_ptau, na.rm = TRUE)
-range(long_data$EXAMDATE_nfl, na.rm = TRUE)
-range(dx_full_704$EXAMDATE_dx, na.rm = TRUE)
+# Cohort summary table
+cohort_summary_table <- tibble(
+  Category = c(
+    "Age at baseline, years (median [range])",
+    "Sex distribution",
+    "APOE ε4 genotype distribution",
+    "Plasma p-tau181 levels (median [range])",
+    "Plasma NfL levels (median [range])",
+    "p-tau181 examination dates (range)",
+    "NfL examination dates (range)",
+    "Diagnosis examination dates (range)",
+    "All diagnoses distribution",
+    "Post-baseline diagnoses distribution",
+    "Participants by number of p-tau181 measurements",
+    "Participants by number of NfL measurements",
+    "Diagnosis visits per participant (median [range])"
+  ),
+  Value = c(
+    paste0(median(surv_data$age_at_baseline, na.rm = TRUE),
+           " (", min(surv_data$age_at_baseline, na.rm = TRUE),
+           ", ", max(surv_data$age_at_baseline, na.rm = TRUE), ")"),
 
-# Number of biomarker measurements per participant (p-tau181)
-ptau_table <- long_data %>%
-  filter(!is.na(PLASMAPTAU181)) %>%
-  count(RID) %>%
-  count(n, name = "n_RID")
-ptau_table
+    paste(names(table(surv_data$PTGENDER)),
+          table(surv_data$PTGENDER), collapse = "; "),
 
-# Number of biomarker measurements per participant (NfL)
-nfl_table <- long_data %>%
-  filter(!is.na(PLASMA_NFL)) %>%
-  count(RID) %>%
-  count(n, name = "n_RID")
-nfl_table
+    paste(names(table(surv_data$genotype)),
+          table(surv_data$genotype), collapse = "; "),
 
-# Summary of age at baseline
-summary(surv_data$age_at_baseline)
+    paste0(median(long_data$PLASMAPTAU181, na.rm = TRUE),
+           " (", min(long_data$PLASMAPTAU181, na.rm = TRUE),
+           ", ", max(long_data$PLASMAPTAU181, na.rm = TRUE), ")"),
 
-# Distributions of gender and APOE4 status
-table(surv_data$PTGENDER)
-table(surv_data$genotype)
+    paste0(median(long_data$PLASMA_NFL, na.rm = TRUE),
+           " (", min(long_data$PLASMA_NFL, na.rm = TRUE),
+           ", ", max(long_data$PLASMA_NFL, na.rm = TRUE), ")"),
+
+    paste(ptau_range, collapse = " – "),
+    paste(nfl_range, collapse = " – "),
+    paste(dx_range, collapse = " – "),
+
+    paste(names(dx_full_counts), dx_full_counts, collapse = "; "),
+    paste(names(dx_post_counts), dx_post_counts, collapse = "; "),
+
+    paste(ptau_table$n_RID, collapse = ", "),
+    paste(nfl_table$n_RID, collapse = ", "),
+
+    paste0(dx_visits$min, " (", dx_visits$median, ", ", dx_visits$max, ")")
+  )
+)
+
+cohort_summary_table
 ```
 
 ## Checking outliers
@@ -3113,14 +3125,7 @@ dir.create("tables", showWarnings = FALSE)
 
 ### Sensitivity analysis tables
 
-#### Only people who got a second dementia diagnosis within the following six months are set to event
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_strict_event.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_strict_event.rds")
-```
-
-#### Baseline is the first biomarker examdate
+#### Baseline is the first examination date across biomarkers
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
@@ -3900,6 +3905,12 @@ dev.off()
 ```
 
 # Saving other relevant tables and figures
+
+```{r}
+# Saving the table showing cohort characteristics and measurement distributions
+#saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
+saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
+```
 
 ```{r}
 #  Saving log transformed ptau histogram
