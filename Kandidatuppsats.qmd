@@ -501,8 +501,6 @@ Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting pro
 
 ## Model Fit Overview
 
-The initial analysis was run on the restricted cohort of individuals with three or more longitudinal p-tau181 and NfL measurements. A subsequent sensitivity analysis was run on the extended cohort including all individuals with at least one p-tau181 and NfL measurement in order to verify whether the results are stable when including individuals with sparse longitudinal data.
-
 ### Cox PH Models
 
 First, Cox PH models including baseline values of p-tau181, NfL, or both were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-siginificant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
@@ -604,11 +602,11 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-\$\epsilon\$4 alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
+The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
 
 ## Model Comparison
 
-In order to compare the different modelling approaches, predictive performance was evaluated using time-dependent AUC at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
+In order to compare the predictive performance of the different modelling approaches, time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
@@ -629,11 +627,11 @@ When evaluating the models' predictive performances using time-dependent Brier s
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
 
-Among the models involving p-tau181, the time-dependent Brier score curves remain low, with values ranging from approximately 0.05 for early predictions to 0.16 at later horizons, regardless of modelling approach. This suggests that the models demonstrate stable and relatively strong overall performance in predicting progression to AD-dementia. For earlier horizons, however, the JLCMM yields lower Brier score values compared with the other two models, indicating better predictive performance. The differences between models decrease for later predictions, as the curves get increasingly closer.
+Among the models incorporating p-tau181, the time-dependent Brier score curves remain consistently low, across all modelling approaches, although they show a slight increase over time. This indicates generally stable and relatively strong predictive performance for progression to AD-dementia. However, the curve for the Cox PH model curve remain slightly higher than the curves representing the JM and the JLCMM models, meaning that it consistently yields higher Brier scores than the two other models. More precisely, the AUC for this model range from approximately 0.05 at early follow-up to 0.17 at late follow-up, while the corresponding AUC for the other models range from approximately 0.02 to 0.16. In other terms, two other curves remain closely aligned, although the curve for the JM is slightly lower, indicating a slightly better predictive performance.
 
-This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The JLCMM yields lower Brier score values compared with the other two models for early predictions. However, over longer prediction horizons the differences between models reduces, with values being low, stable and around the same range as for models including p-tau181.
+This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The curves remain consistently high, at around the same AUC range as the curves representing the models incorporating p-tau181. At the same time, the curve for the Cox PH model remain slightly higher than the curves representing the curves for the JM and the JLCMM, indicating a worse predictive performance.
 
-The same can be said for the time-dependent Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the Cox PH model and the JM yield similar, stable AUC values across all prediction horizons, ranging from approximately 0.05 at for earlier predictions to 0.14 at later horizons.
+The same can be said for the time-dependent Brier score values among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the JM and the JLCMM yield similar, stable AUC values across all prediction horizons, ranging from approximately 0.02 at earlier predictions to 0.16 at later horizons.
 
 Table 11 presents the Brier score values for each modelling approach and at each horizon.
 
@@ -642,7 +640,7 @@ Table 11 presents the Brier score values for each modelling approach and at each
 kable_standard(readRDS("tables/results_table_Brier.rds"))
 ```
 
-For predictions at two years, the JLCMM including NfL achieves the lowest Brier score, with a value of 0.024, compared with 0.053 for the JM including NfL and 0.054 for the Cox PH model including NfL. A similar pattern is observed for predictions using the p-tau181-based models at the same time point, where the JLCMM also yields the lowest Brier score, with a value of 0.024, compared with 0.055 for the JM and 0.054 for the Cox PH model.
+For predictions at two years, the Cox PH incorporating p-tau181 achieves an AUC value of 0.054, which is notably higher than the corresponding AUC values for the JM and JLCMM incorportating p-tau181, which yield AUC values of 0.018 and 0.024, respectively. This indicates that the Cox PH model perform the worst, with the JLCMM coming in second and the JM performing the best. The same results are observed among the models incorporating NfL, as well as among those incorporating both biomarkers.
 
 ## Biomarker Comparison
 
@@ -660,7 +658,7 @@ The time-dependent AUC values for each biomarker specification at each horizon a
 
 However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
 
-<!-- ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox} -->
+![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
 All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. Small differences can be observed for predictions made at year six, although they remain minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
 
