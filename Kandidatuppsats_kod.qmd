@@ -2097,20 +2097,24 @@ saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
 ### Survival curves by class
 
 ```{r}
+# Saving the plot 
+png("figures/class_specific_nfl.png",
+    width = 6, height = 4, units = "in", res = 300)
 plot(
   jlcmm_m1_nfl,
   which = "survival",
   col = c("cornflowerblue", "firebrick"),
   lty = c(1, 2, 3),
   lwd = 2,
-  legend.loc = "topright",
+  legend.loc = "bottomleft",
   legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
   cex = 0.6,
   bty = "l",
   xlab = "Time (years)",
   ylab = "Event-free probability",
-  main = "Class-specific survival functions"
+  main = ""
 )
+dev.off()
 ```
 
 ### Longitudinal trajectory by class
@@ -2508,21 +2512,24 @@ saveRDS(class_summary_ptau, "tables/class_summary_ptau.rds")
 ### Survival curves by class
 
 ```{r}
-# survival curves by class
+# Saving the plot 
+png("figures/class_specific_ptau.png",
+    width = 6, height = 4, units = "in", res = 300)
 plot(
   jlcmm_m1_ptau,
   which = "survival",
   col = c("cornflowerblue", "firebrick"),
   lty = c(1, 2, 3),
   lwd = 2,
-  legend.loc = "topright",
+  legend.loc = "bottomleft",
   legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
   cex = 0.6,
   bty = "l",
   xlab = "Time (years)",
   ylab = "Event-free probability",
-  main = "Class-specific survival functions"
+  main = ""
 )
+dev.off()
 ```
 
 ### Longitudinal trajectories by class

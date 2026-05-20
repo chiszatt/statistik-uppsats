@@ -604,17 +604,8 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-The distribution of age at baseline, gender, APOE-$\epsilon 4$ status
+The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon$4 alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
 
-```{r}
-#| tbl-cap: "Comparison between latent classes estimated from longitudinal p-tau181 measurements"
-kable_standard(readRDS("tables/class_summary_ptau.rds"))
-```
-
-```{r}
-#| tbl-cap: "Comparison between latent classes estimated from longitudinal NfL measurements"
-kable_standard(readRDS("tables/class_summary_nfl.rds"))
-```
 
 ## Model Comparison
 
@@ -810,7 +801,7 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Appendix
 
-## Table of characteristics and measurement distributions for participants with at least one biomarker measurement 
+## Table of characteristics and measurement distributions for participants with at least one biomarker measurement
 
 ```{r}
 #| pos: "H"
@@ -905,9 +896,28 @@ kable_standard(readRDS("tables/jlcmm_m1_ptau_output.rds"))
 kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 ```
 
+```{r}
+#| tbl-cap: "Comparison between latent classes estimated from longitudinal p-tau181 measurements"
+kable_standard(readRDS("tables/class_summary_ptau.rds"))
+```
+
+```{r}
+#| tbl-cap: "Comparison between latent classes estimated from longitudinal NfL measurements"
+kable_standard(readRDS("tables/class_summary_nfl.rds"))
+```
+
+
+::: {#fig-class-surv layout-ncol="2"}
+![Two class JLCMM (p-tau181)](figures/class_specific_ptau.png){#fig-class-surv-ptau}
+
+![Two class JLCMM (NfL)](figures/class_specific_nfl.png){#fig-class-surv-nfl}
+
+Class-specific survival curves estimated from the JLCMMs
+:::
+
 ## AUC and Brier Curves: Model Comparison
 
-::: {#fig-auc-model layout-ncol="2"}
+::: {layout-ncol="2"}
 ![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
 
 ![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
