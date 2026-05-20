@@ -948,20 +948,6 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
 #| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
@@ -985,6 +971,20 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 #| tbl-pos: "H"
 #| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```
 
 ```{r}
