@@ -17,14 +17,14 @@ include-before-body:
     \raggedleft
     \vspace*{-1.8cm}
     
-    \vspace*{-1cm}
-    {\Huge\bfseries Bachelor thesis\par}
+    \vspace*{-2cm}
+    {\Huge\bfseries Bachelor's Thesis\par}
     \vspace{0.3cm}
     {\LARGE Department of Statistics\par}
 
     \end{minipage}
 
-    \vspace{3cm}
+    \vspace{2cm}
 
     \raggedleft
 
@@ -53,7 +53,7 @@ include-before-body:
     {\normalsize Independent Thesis Study of 15 credits in Statistics III, Spring 2026\par}
     {\normalsize Supervisor: Hans Nyqvist\par}
 
-    \vspace{1cm}
+    \vspace{2cm}
 
     \raggedright
 
@@ -71,9 +71,7 @@ include-before-body:
     \vfill
     
     {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
-  
 
-    \vfill
     \end{titlepage}
     
     \begin{titlepage}
