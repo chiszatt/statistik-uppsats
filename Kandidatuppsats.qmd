@@ -656,13 +656,13 @@ Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the mod
 
 The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.967, compared to 0.953 for the NfL model and 0.902 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
 
-However, when observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, the difference in predictive performance between the models with different biomarker specifications becomes suddenly less evident.
+When observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, a similar pattern can be observed, although not as evident.
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
-All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. Small differences can be observed for predictions made at year six, although they remain minimal. A similar pattern is also observed among the JMs and JLCMMs (Appendix 8.7; Figure 14a-b).
+All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, meaning a slightly lower AUC value, which suggests that this model performs slightly better than the two models at this time-point. In a similar manner, the multivariate JM demonstrates lower AUC compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 14a). These two are consistently at a similar height, which can also be said for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 14b).
 
-Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.149 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
+Table 11, containing the time-dependent Brier score values for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.142 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
 ## Sensitivity Analyses
 
