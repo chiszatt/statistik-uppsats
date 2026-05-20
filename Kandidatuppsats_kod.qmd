@@ -70,31 +70,31 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```{r}
 # Loading data
 # Milou
-# NfL data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-# nfl_data <- BLENNOWPLASMANFLLONG
-# # P-tau181 data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-# ptau_data <- UGOTPTAU181
-# # Diagnosis data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
-# # Demographics data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
+#NfL data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
+# P-tau181 data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
+# Diagnosis data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+# Demographics data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
 # # Apoe data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe <- APOERES
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 ```{r}
@@ -323,10 +323,10 @@ long_data <- long_data %>%
 ```{r}
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
 #long_data <- long_data %>%
-#  group_by(RID) %>%
-#  mutate(
-#    # first biomarker exam across NFL and pTau 
-#    EXAMDATE = pmin(EXAMDATE_nfl, EXAMDATE_ptau, na.rm = TRUE),
+ # group_by(RID) %>%
+  #mutate(
+    # first biomarker exam across NFL and pTau 
+   # EXAMDATE = pmin(EXAMDATE_nfl, EXAMDATE_ptau, na.rm = TRUE),
 #
 #    EXAMDATE_baseline = min(EXAMDATE, na.rm = TRUE),
 #
@@ -449,11 +449,11 @@ length(keep)
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
-# # We filter individuals with at least 1 measurement of ptau_data
+# We filter individuals with at least 1 measurement of ptau_data
 #keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
 #long_data <- long_data %>% filter(RID %in% keep)
 #surv_data <- surv_data %>% filter(RID %in% keep)
- # We check number of individuals with at least 1 measurement
+# We check number of individuals with at least 1 measurement
 #length(keep)
 ```
 
@@ -568,7 +568,7 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-## Cohort characteristics and measurement distributions
+## Table showing cohort characteristics and measurement distributions
 
 ```{r}
 # Filtering diagnosis data to cohort
@@ -720,7 +720,7 @@ length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-## Splitting data into in-sample and out-sample
+## Splitting data into in-sample and out-sample 
 
 ```{r}
 # Total number of individuals
@@ -745,18 +745,38 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 ```
 
-```{r}
-# Checking the number of individuals and event distribution for the in-sample observations
-length(unique(surv_data_in$RID))
-table(surv_data_in$event)
-# Fraction of individuals who experience the event in in-sample
-128/528
+## Table showing number of participants, event distribution, and event rates in in-sample and out-of-sample data
 
-# Checking the number of individuals and event distribution for the out-sample observations
-length(unique(surv_data_out$RID))
-table(surv_data_out$event)
-# Fraction of individuals who experience the event in out-sample
-49/176
+```{r}
+event_table <- data.frame(
+  Dataset = c("In-sample", "Out-of-sample"),
+
+  # Number of unique participants in each dataset
+  Participants = c(
+    length(unique(surv_data_in$RID)),
+    length(unique(surv_data_out$RID))
+  ),
+
+  # Number of events (event == 1)
+  Events = c(
+    sum(surv_data_in$event == 1),
+    sum(surv_data_out$event == 1)
+  ),
+
+  # Number of censored observations (event == 0)
+  Censored = c(
+    sum(surv_data_in$event == 0),
+    sum(surv_data_out$event == 0)
+  ),
+
+  # Event rate = proportion of participants experiencing the event
+  Event_rate = c(
+    sum(surv_data_in$event == 1) / length(unique(surv_data_in$RID)),
+    sum(surv_data_out$event == 1) / length(unique(surv_data_out$RID))
+  )
+)
+
+event_table
 ```
 
 ## Checking correlation between the log-transformed biomarkers as well as the numerical variables going to be used in the models
@@ -3137,20 +3157,6 @@ dir.create("tables", showWarnings = FALSE)
 
 ### Sensitivity analysis tables
 
-#### Baseline is the first examination date across biomarkers
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
-```
-
-#### Baseline is the first biomarker examdate
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
-```
-
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
@@ -3163,6 +3169,13 @@ dir.create("tables", showWarnings = FALSE)
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_last_duplicate.rds")
 # saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
+```
+
+#### Baseline date is the first examination date across biomarkers
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
 ```
 
 #### Including participants with at least one biomarker measurement
@@ -3917,6 +3930,12 @@ dev.off()
 ```
 
 # Saving other relevant tables and figures
+
+```{r}
+# Saving the table showing number of participants, event distribution, and event rates in in-sample and out-of-sample data
+#saveRDS(event_table, "tables/event_table.rds")
+#saveRDS(event_table, "tables/event_table_full.rds")
+```
 
 ```{r}
 # Saving the table showing cohort characteristics and measurement distributions
