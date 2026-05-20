@@ -266,7 +266,7 @@ where $M_i$ represents the true unobserved biomarker profile up to time $t$.
 
 ### Model Assumptions
 
-A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other. (Rizopolos, 2012, pp. 62-63)
+A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
 
 ### Estimation: Frequentist vs Bayesian Approach
 
@@ -276,7 +276,7 @@ A Bayesian alternative treats parameters as random variables and combines prior 
 
 Using the R package $JMbayes2$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
 
-In $JMbayes2$, weakly informative ones are used, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
+The package uses weakly informative priors, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
 ### The Gelman-Rubin Statistic
 
@@ -399,9 +399,7 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 
 ### Time-dependent AUC
 
-Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1).
-
-In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
+Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
 
 When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
 
@@ -455,13 +453,11 @@ where $\tilde n(t)$ is the sum of all IPCW weights at time $t$ (Prince et al., 2
 
 The data used in this analysis comes from the ADNI cohort under the ADNI1, ADNIGO and ADNI2 protocols. The variables of interest were all retrieved from the ADNIMERGE2 package, found in the ADNI database (ADNI, n.d.-b). In accordance with the ADNI leadership guidelines, which state that there were serious data quality concerns for individuals with a PTID in the format "381_S_10###" , checks were run to assure that no observations with these PTIDs were present in the data set (ADNI, 2026).
 
-The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. The exclusion criteria was any individual with a baseline dementia diagnosis. This resulted in a sample size of 934 individuals with at least one biomarker measurement.
+The inclusion criteria for this study require participants to have recorded diagnostic visits and biomarker measurements of both p-tau181 and NfL. The exclusion criteria was any individual with a baseline dementia diagnosis.
 
-Moreoever, the inclusion criteria also concerns the number of biomarker meaurements per individual and is set to at least three measurements. However, sensitivity analyses will also be applied, where the analysis will only require individuals to have at least one biomarker. This is based on a common issue in modeling longitudinal biomarker data, which is whether to include or exclude individuals with sparse data in the analysis (Rizopoulos, 2012, pp. 27-28). While the previously illustrated studies included all participants regardless of the number of measurements per individual, a study examining different cognitive biomarkers to predict progression to AD included only those with at least three complete longitudinal cognitive assessments (Guo et al., 2026, p. 2). Other studies have restricted the inclusion criteria further to those with at least ten longitudinal biomarker measurements in order to ensure the approximation did not lead to non-ignorable biases (Wang et al., 2024, pp. 591-592).
+Moreover, the inclusion criteria also related to the number of biomarker measurements per individual and were set to at least three measurements. However, a common issue in modelling longitudinal biomarker data, namely whether to include or exclude individuals with sparse data in the analysis (Rizopoulos, 2012, pp. 27-28). While the previously described studies included all participants regardless of the number of measurements per individual, a study examining different cognitive biomarkers for predicting progression to AD included only those with at least three complete longitudinal cognitive assessments (Guo et al., 2026, p. 2). Other studies have restricted the inclusion criteria further to those with at least ten longitudinal biomarker measurements in order to ensure that the approximation did not lead to non-ignorable bias (Wang et al., 2024, pp. 591-592). Participants with cross-sectional data cannot provide information on within-subject change over time; however, they may still contribute useful information on between-subject variability (Fitzmaurice et al., 2011, pp. 214-215). Excluding individuals with sparse data may reduce precision and potentially introduce bias depending on the pattern and mechanism of missingness (Fitzmaurice et al., 2011, p. 491). Therefore, sensitivity analyses were conducted to assess the robustness of the results when including individuals with at least one biomarker measurement.
 
-**Participants with cross-sectional data cannot provide information about within-subject change over time, however they still contribute useful information about between-subject variability (Fitzmaurice et al., 2011, pp. 214-215). Complete data analyses risk loss in precision dependent on the pattern and distribution of missing data across subjects and time as well as the missing data mechanism. The main concern of missing data is the potential for introducing bias, resulting in misleading inferences. Consequently, the mechanism underlying missing data is a critical consideration in longitudinal analyses, as it determines whether exclusion of incomplete cases may distort results (Fitzmaurice et al., 2011, p. 491). The handling of individuals with sparse data reflects an ongoing methodological discussion regarding how longitudinal data should be handled in practice.**
-
-This reduced to 704 when restricting the sample to participants with three or more biomarker measurements.
+Application of these criteria yielded a sample of 704 participants with at least three biomarker measurements. Inclusion of participants with at least one biomarker measurement increased the sample size to 934.
 
 All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
 
@@ -473,17 +469,21 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-When restricting the participants to those with three or more biomarker measurements, the sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. In comparison, extending the sample population to those with at least one biomarker measurement, the in-sample data set consisted of 701 individuals, among whom 145 experienced the event of dementia, corresponding to 20.69%, while 556 individuals were censored. The out-of-sample data set included 233 individuals, among whom 53 experienced the event of dementia, corresponding to 22.75%, while 180 individuals were censored.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix X. The corresponding distributions and summary statistics for the variables of interest are also presented there and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
 The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
 
-Among participants with at least three biomarker measurements, p-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). A similar right-skewed distribution was observed when including all participants with at least one biomarker measurement. Values larger than three standard deviations were analysed and it was determined that they should be retained in the analysis. It is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
+P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
+
+Here, it is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
 
 Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
 
-52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. **Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.** Furthermore, discrepancies were observed between p-tau181 and NfL examination dates with the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. **To address this, an additional sensitivity analysis consisted of constructing a common examination date using the midpoint between the two biomarker dates as an.**
+52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.
+
+Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonized examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
 
 ### Age
 
@@ -495,7 +495,7 @@ Another covariate included when predicting progression to dementia is participan
 
 ### APOE4-status
 
-Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). Among the participants with at least three biomarker measurements, 83 participants carried no APOE-$ε4$ alleles, 578 carried one allele, and 43 carried two alleles.
+Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). 83 participants carried no APOE-$𝜀4$ alleles, 578 carried one allele, and 43 carried two alleles
 
 # Results
 
@@ -550,7 +550,7 @@ Additionally, convergence of the models was assessed by examining the $\widehat{
 kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
-The $\widehat{R}$ values for the survival outcomes remained very close to 1, ranging from 1.000 to 1.007 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
+The $\widehat{R}$ values for the survival outcomes remained very close to 1, ranging from 1.000 to 1.005 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
 
 While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in Table 4.
 
@@ -559,7 +559,7 @@ While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the c
 kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
-In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all JMs, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. A slightly higher value can be observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.09. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
+In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all JMs. When considered together with the trace plots and survival $\widehat{R}$ values, the results support adequate convergence of the models.
 
 ### Joint Latent Class Mixed Models
 
