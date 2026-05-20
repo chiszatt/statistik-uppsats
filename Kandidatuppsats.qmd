@@ -1,7 +1,10 @@
 ---
-format: pdf
-header-includes:
-  - \usepackage{textgreek}
+format:
+  pdf:
+    include-in-header:
+      text: |
+        \usepackage{ragged2e}
+        \justifying
 include-before-body:
   text: |
 
@@ -36,10 +39,8 @@ include-before-body:
     \vspace{0.5cm}
     
     {\normalsize Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers: A Comparative Assessment of Modelling Approaches and Biomarker Strategies\par}
-
     
     \vfill
-
 
     {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
   
@@ -47,7 +48,9 @@ include-before-body:
 
     \end{titlepage}
 
+
     \begin{titlepage}
+    
     \raggedleft
 
     {\normalsize Independent Thesis Study of 15 credits in Statistics III, Spring 2026\par}
@@ -60,17 +63,24 @@ include-before-body:
     {\huge\bfseries Abstract\par}
 
     \vspace{0.5cm}
-
+    
+    \begin{justify}
+    
     {\normalsize The aim of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards (Cox PH) models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and calibration across 1-5 year horizons. The results demonstrated that predictive accuracy varied across modelling frameworks and follow-up time, with joint models improving discrimination relative to Cox PH models, particularly at earlier horizons, while JLCMMs provided comparable or improved short-term calibration but no consistent overall superiority across time. Across all modelling approaches, combining p-tau181 and NfL consistently yielded the best predictive performance, while each biomarker alone showed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers..\par}
     
+    \end{justify}
+    
     \vspace{0.5cm}
-
+    
     {\normalsize Keywords: Alzheimer’s disease, dementia progression, blood-based biomarkers, p-tau181, neurofilament light chain, survival analysis\par}
     
-    \raggedleft
     \vfill
     
+    \begin{justify}
+    
     {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+    
+    \end{justify}
 
     \end{titlepage}
     
@@ -78,9 +88,11 @@ include-before-body:
     
     \vspace*{6cm}
     
-    \raggedright
+    \begin{justify}
     
     {\normalsize Data collection and sharing for the Alzheimer's Disease Neuroimaging Initiative (ADNI) is funded by the National Institute on Aging (National Institutes of Health Grant U19AG024904). The grantee organization is the Northern California Institute for Research and Education. In the past, ADNI has also received funding from the National Institute of Biomedical Imaging and Bioengineering, the Canadian Institutes of Health Research, and private sector contributions through the Foundation for the National Institutes of Health (FNIH) including generous contributions from the following: AbbVie, Alzheimer’s Association; Alzheimer’s Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.; Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.; Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F. Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio; GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \& Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.; NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical Company; and Transition Therapeutics.}
+    
+    \end{justify}
     
     \vfill
 
