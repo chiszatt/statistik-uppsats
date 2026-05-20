@@ -485,7 +485,7 @@ Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while di
 
 52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.
 
-Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonized examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline for the longitudinal time scale. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
+Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonized examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
 
 ### Age
 
