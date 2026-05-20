@@ -800,11 +800,12 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 
 # Appendix
 
-## Table of characteristics and measurement distributions for participants with at least one biomarker measurement
+## Cohort Summary
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Characteristics and measurement distributions for participants with at least one biomarker measurement"
 kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
 
@@ -949,7 +950,7 @@ Time-dependent AUC curves
 Time-dependent Brier score curves
 :::
 
-## Results of sensitivity analyses
+## Results of Sensitivity Analyses
 
 ```{r}
 #| pos: "H"
