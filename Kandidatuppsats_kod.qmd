@@ -71,20 +71,20 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 # Loading data
 # Milou
 # NfL data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
-# P-tau181 data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
-# Diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-# Demographics data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-# Apoe data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe <- APOERES
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+# # Diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# # Demographics data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+# # Apoe data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe <- APOERES
 ```
 
 ```{r}
@@ -3129,7 +3129,7 @@ results_table_Brier
 # Creating a directory to save tables into
 dir.create("tables", showWarnings = FALSE)
 
-# # Saving the AUC results table
+# # # Saving the AUC results table
 # saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 # # Saving the table of the Brier score results
 # saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
@@ -3185,8 +3185,8 @@ dir.create("tables", showWarnings = FALSE)
 # We reshape all AUC results into long format for plotting
 plot_data <- data.frame(
   Time = rep(times, 8),
-  Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
-                "JM ptau-181", "JM NfL", "JM multi", "JLCMM ptau-181", "JLCMM NfL"),
+  Model = rep(c("Cox p-tau181", "Cox NfL", "Cox both",
+                "JM p-tau181", "JM NfL", "JM multi", "JLCMM p-tau181", "JLCMM NfL"),
               each = length(times)),
   AUC = c(
     auc_ptau_bl,
@@ -3205,9 +3205,9 @@ plot_data <- data.frame(
 # We reshape all Brier score results into long format for plotting
 plot_data_Brier <- data.frame(
   Time = rep(times, 8),
-  Model = rep(c("Cox ptau-181", "Cox NfL", "Cox both",
-                "JM ptau-181", "JM NfL", "JM multi",
-                "JLCMM ptau-181", "JLCMM NfL"),
+  Model = rep(c("Cox p-tau181", "Cox NfL", "Cox both",
+                "JM p-tau181", "JM NfL", "JM multi",
+                "JLCMM p-tau181", "JLCMM NfL"),
               each = length(times)),
   
   Brier = c(
