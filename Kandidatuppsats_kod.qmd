@@ -2938,8 +2938,9 @@ brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, tim
                        1 / Ghat(sub$time),
                        0))
     
-#     Calculating the IPCW-adjusted Brier score
-    mean(w * (status_t - pred_t)^2, na.rm = TRUE)
+    #     Calculating the IPCW-adjusted Brier score
+    sum(w * (status_t - pred_t)^2, na.rm = TRUE) / sum(w, na.rm = TRUE)
+    
   }
   
 #   Calculating the Brier score for each horizon
@@ -3066,7 +3067,7 @@ results_table_Brier <- data.frame(
             "JM ptau-181", "JM NfL", "JM both",
             "JLCMM ptau-181", "JLCMM NfL"),
   
-  Brier_2y = c(cox_brier$`Cox p-tau`[1],
+  "Year 2" = c(cox_brier$`Cox p-tau`[1],
                cox_brier$`Cox NfL`[1],
                cox_brier$`Cox both`[1],
                brier_ptau_jm[1],
@@ -3075,7 +3076,7 @@ results_table_Brier <- data.frame(
                brier_jlcmm_m1_ptau$Brier[1],
                brier_jlcmm_m1_nfl$Brier[1]),
   
-  Brier_3y = c(cox_brier$`Cox p-tau`[2],
+  "Year 3" = c(cox_brier$`Cox p-tau`[2],
                cox_brier$`Cox NfL`[2],
                cox_brier$`Cox both`[2],
                brier_ptau_jm[2],
@@ -3084,7 +3085,7 @@ results_table_Brier <- data.frame(
                brier_jlcmm_m1_ptau$Brier[2],
                brier_jlcmm_m1_nfl$Brier[2]),
   
-  Brier_4y = c(cox_brier$`Cox p-tau`[3],
+  "Year 4" = c(cox_brier$`Cox p-tau`[3],
                cox_brier$`Cox NfL`[3],
                cox_brier$`Cox both`[3],
                brier_ptau_jm[3],
@@ -3093,7 +3094,7 @@ results_table_Brier <- data.frame(
                brier_jlcmm_m1_ptau$Brier[3],
                brier_jlcmm_m1_nfl$Brier[3]),
   
-  Brier_5y = c(cox_brier$`Cox p-tau`[4],
+  "Year 5" = c(cox_brier$`Cox p-tau`[4],
                cox_brier$`Cox NfL`[4],
                cox_brier$`Cox both`[4],
                brier_ptau_jm[4],
@@ -3102,14 +3103,16 @@ results_table_Brier <- data.frame(
                brier_jlcmm_m1_ptau$Brier[4],
                brier_jlcmm_m1_nfl$Brier[4]),
   
-  Brier_6y = c(cox_brier$`Cox p-tau`[5],
+  "Year 6" = c(cox_brier$`Cox p-tau`[5],
                cox_brier$`Cox NfL`[5],
                cox_brier$`Cox both`[5],
                brier_ptau_jm[5],
                brier_nfl_jm[5],
                brier_multi_jm[5],
                brier_jlcmm_m1_ptau$Brier[5],
-               brier_jlcmm_m1_nfl$Brier[5])
+               brier_jlcmm_m1_nfl$Brier[5]),
+  
+  check.names = FALSE
 )
 
 results_table_Brier[, -1] <- round(results_table_Brier[, -1], 3)
