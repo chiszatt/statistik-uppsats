@@ -3005,10 +3005,10 @@ brier_jlcmm_m1_ptau <- brier_jlcmm(
 ```{r}
 # Time-dependent AUC for Cox and joint models summarized in a table
 results_table_AUC <- data.frame(
-  Model = c("Cox ptau-181", "Cox NfL", "Cox both",
-            "JM ptau-181", "JM NfL", "JM both", "JLCMM ptau-181", "JLCMM NfL"),
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both",
+            "JM p-tau181", "JM NfL", "JM both", "JLCMM p-tau181", "JLCMM NfL"),
   
-  AUC_2y = c(auc_ptau_bl[1],
+  "Year 2" = c(auc_ptau_bl[1],
              auc_nfl_bl[1],
              auc_both_bl[1],
              auc_ptau_jm[1],
@@ -3017,7 +3017,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m1_ptau[1,3],
              auc_jlcmm_m1_nfl[1,3]),
   
-  AUC_3y = c(auc_ptau_bl[2],
+  "Year 3" = c(auc_ptau_bl[2],
              auc_nfl_bl[2],
              auc_both_bl[2],
              auc_ptau_jm[2],
@@ -3026,7 +3026,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m1_ptau[2,3],
              auc_jlcmm_m1_nfl[2,3]),
   
-  AUC_4y = c(auc_ptau_bl[3],
+  "Year 4" = c(auc_ptau_bl[3],
              auc_nfl_bl[3],
              auc_both_bl[3],
              auc_ptau_jm[3],
@@ -3035,7 +3035,7 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m1_ptau[3,3],
              auc_jlcmm_m1_nfl[3,3]),
   
-  AUC_5y = c(auc_ptau_bl[4],
+  "Year 5" = c(auc_ptau_bl[4],
              auc_nfl_bl[4],
              auc_both_bl[4],
              auc_ptau_jm[4],
@@ -3044,14 +3044,16 @@ results_table_AUC <- data.frame(
              auc_jlcmm_m1_ptau[4,3],
              auc_jlcmm_m1_nfl[4,3]),
   
-  AUC_6y = c(auc_ptau_bl[5],
+  "Year 6" = c(auc_ptau_bl[5],
              auc_nfl_bl[5],
              auc_both_bl[5],
              auc_ptau_jm[5],
              auc_nfl_jm[5],
              auc_multi_jm[5],
              auc_jlcmm_m1_ptau[5,3],
-             auc_jlcmm_m1_nfl[5,3])
+             auc_jlcmm_m1_nfl[5,3]),
+  
+  check.names = FALSE
 )
 
 results_table_AUC[, -1] <- round(results_table_AUC[, -1], 3)
@@ -3063,9 +3065,9 @@ results_table_AUC
 ```{r}
 # Time-dependent Brier score for Cox and joint models summarized in a table
 results_table_Brier <- data.frame(
-  Model = c("Cox ptau-181", "Cox NfL", "Cox both",
-            "JM ptau-181", "JM NfL", "JM both",
-            "JLCMM ptau-181", "JLCMM NfL"),
+  Model = c("Cox p-tau181", "Cox NfL", "Cox both",
+            "JM p-tau181", "JM NfL", "JM both",
+            "JLCMM p-tau181", "JLCMM NfL"),
   
   "Year 2" = c(cox_brier$`Cox p-tau`[1],
                cox_brier$`Cox NfL`[1],
