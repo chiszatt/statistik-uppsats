@@ -3137,20 +3137,6 @@ dir.create("tables", showWarnings = FALSE)
 
 ### Sensitivity analysis tables
 
-#### Baseline is the first examination date across biomarkers
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
-```
-
-#### Baseline is the first biomarker examdate
-
-```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
-```
-
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
@@ -3163,6 +3149,13 @@ dir.create("tables", showWarnings = FALSE)
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_last_duplicate.rds")
 # saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
+```
+
+#### Baseline date is the first examination date across biomarkers
+
+```{r}
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_biomarker_bl.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_biomarker_bl.rds")
 ```
 
 #### Including participants with at least one biomarker measurement
