@@ -437,7 +437,7 @@ $$\omega_i(t) =
 \frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$
 
-where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event for the $i^{th}$ individual, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). The commonly formulated Brier score:
+where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). The commonly formulated Brier score:
 
 $$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
 
@@ -445,7 +445,7 @@ where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ i
 
 $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
-\frac{\widehat S_i(t)^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
+\frac{\widehat (S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}
 \right)$$
 
@@ -672,7 +672,7 @@ To examine the robustness of the results, sensitivity analyses were performed us
 
 However, when the baseline was defined as the first biomarker specific examination date, more noticeable changes in predictive performance were observed. Time-dependent AUC values decreased across all models compared with the main analysis, with the largest reduction seen for the JM both model at two years, from 0.967 to 0.844, and similar reductions across follow up times. Subsequently, the the JLCMMs yielded higher AUC values than the JMs at the two-year follow-up, which wasn't the case in the main analysis. At the later follow-ups however, the differences still became smaller, with the Cox PH models still showing the lowest performance overall. Additionally, while the models incorporating borth biomarkers still performed the best, p-tau181 models performed slightly better than the NfL models in this analysis, in contrast to the similar performances between the biomarkers shown in the main analysis.
 
-In response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models, as shown in Appendix. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the JM including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM using NfL decreased from 0.907 to 0.521. In contrast, the Cox PH models showed smaller reductions and remained comparatively stable across prediction horizons. The same results were similar in the time-depending Brier scores, which increased overall but where the increase was less pronounced for the Cox PH models.
+In response to the debate over whether individuals with sparse data should be included when modeling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, this resulted in reduced predictive performance across all models, as shown in Appendix. The largest declines were observed for the models incorporating longitudinal values of the biomarkers: for example, the AUC of the JM including both biomarkers decreased from 0.967 to 0.648 at 2 years, while the JLCMM using NfL decreased from 0.907 to 0.521. In contrast, the Cox PH models showed smaller reductions and remained comparatively stable across prediction horizons. The same results were similar in the time-dependent Brier scores, which increased overall but where the increase was less pronounced for the Cox PH models.
 
 Additionally, among the JMs and JLCMMs, the models incorporating p-tau181 yielded higher AUC values than the models incorporating NfL when including the participants with sparse data. This made them more comparable in terms of performance to the models incorporating both biomarkers, which previously performed notably better than the single biomarker models. Among the Cox PH models, the difference in performance between the model incorporating p-tau181 and the model incorporating both biomarkers became mainly less pronounced.
 
@@ -954,69 +954,69 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending AUC when visits with duplicate measurements are replaced by visits with the first measurement"
+#| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
+#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending AUC when baseline date is defined as the first biomarker examination date"
+#| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when baseline date is defined as the first biomarker examination date"
+#| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending AUC when setting participants to those with at least one biomarker measurement "
+#| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
 kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when setting participants to those with at least one biomarker measurement"
+#| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending AUC when setting time-to-event to midpoint"
+#| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Time-depending Brier scores when setting time-to-event to midpoint"
+#| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
 ```
