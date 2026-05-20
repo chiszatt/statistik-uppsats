@@ -449,11 +449,11 @@ length(keep)
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
-# # We filter individuals with at least 1 measurement of ptau_data
+# We filter individuals with at least 1 measurement of ptau_data
 #keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
 #long_data <- long_data %>% filter(RID %in% keep)
 #surv_data <- surv_data %>% filter(RID %in% keep)
- # We check number of individuals with at least 1 measurement
+# We check number of individuals with at least 1 measurement
 #length(keep)
 ```
 
@@ -568,7 +568,7 @@ surv_data <- surv_data %>%
   merge(baseline, by = "RID")
 ```
 
-## Cohort characteristics and measurement distributions
+## Table showing cohort characteristics and measurement distributions
 
 ```{r}
 # Filtering diagnosis data to cohort
@@ -720,7 +720,7 @@ length(unique(long_data$RID)) # longitudinal data
 length(unique(surv_data$RID)) # survival data
 ```
 
-## Splitting data into in-sample and out-sample
+## Splitting data into in-sample and out-sample 
 
 ```{r}
 # Total number of individuals
@@ -744,6 +744,8 @@ surv_data_in <- surv_data %>% filter(!RID %in% RID_out_sample)
 # Survival data with out-sample individuals
 surv_data_out <- surv_data %>% filter(RID %in% RID_out_sample)
 ```
+
+## Table showing number of participants, event distribution, and event rates in in-sample and out-of-sample data
 
 ```{r}
 event_table <- data.frame(
@@ -3931,7 +3933,7 @@ dev.off()
 
 ```{r}
 # Saving the table showing number of participants, event distribution, and event rates in in-sample and out-of-sample data
-saveRDS(event_table, "tables/event_table.rds")
+#saveRDS(event_table, "tables/event_table.rds")
 #saveRDS(event_table, "tables/event_table_full.rds")
 ```
 
