@@ -266,7 +266,7 @@ where $M_i$ represents the true unobserved biomarker profile up to time $t$.
 
 ### Model Assumptions
 
-A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other. (Rizopolos, 2012, pp. 62-63)
+A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
 
 ### Estimation: Frequentist vs Bayesian Approach
 
@@ -276,7 +276,7 @@ A Bayesian alternative treats parameters as random variables and combines prior 
 
 Using the R package $JMbayes2$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
 
-In $JMbayes2$, weakly informative ones are used, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
+The package uses weakly informative priors, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
 ### The Gelman-Rubin Statistic
 
@@ -399,9 +399,7 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 
 ### Time-dependent AUC
 
-Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1).
-
-In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
+Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
 
 When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
 
@@ -459,9 +457,9 @@ The inclusion criteria for this study require participants to have recorded diag
 
 Moreover, the inclusion criteria also related to the number of biomarker measurements per individual and were set to at least three measurements. However, a common issue in modelling longitudinal biomarker data, namely whether to include or exclude individuals with sparse data in the analysis (Rizopoulos, 2012, pp. 27-28). While the previously described studies included all participants regardless of the number of measurements per individual, a study examining different cognitive biomarkers for predicting progression to AD included only those with at least three complete longitudinal cognitive assessments (Guo et al., 2026, p. 2). Other studies have restricted the inclusion criteria further to those with at least ten longitudinal biomarker measurements in order to ensure that the approximation did not lead to non-ignorable bias (Wang et al., 2024, pp. 591-592). Participants with cross-sectional data cannot provide information on within-subject change over time; however, they may still contribute useful information on between-subject variability (Fitzmaurice et al., 2011, pp. 214-215). Excluding individuals with sparse data may reduce precision and potentially introduce bias depending on the pattern and mechanism of missingness (Fitzmaurice et al., 2011, p. 491). Therefore, sensitivity analyses were conducted to assess the robustness of the results when including individuals with at least one biomarker measurement.
 
-Additionally, all missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
-
 Application of these criteria yielded a sample of 704 participants with at least three biomarker measurements. Inclusion of participants with at least one biomarker measurement increased the sample size to 934.
+
+All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
 
 ## Variables
 
@@ -552,7 +550,7 @@ Additionally, convergence of the models was assessed by examining the $\widehat{
 kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
-The $\widehat{R}$ values for the survival outcomes remained very close to 1, ranging from 1.000 to 1.007 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
+The $\widehat{R}$ values for the survival outcomes remained very close to 1, ranging from 1.000 to 1.005 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
 
 While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in Table 4.
 
@@ -561,7 +559,7 @@ While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the c
 kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
 
-In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all JMs, indicating good convergence for most parameters. The intercepts and covariate effects show values very close to 1, suggesting stable convergence. A slightly higher value can be observed for the time effect in the multivariate model, where $\widehat{R}$ reaches 1.09. This suggests somewhat slower convergence for this parameter in the multivariate model, likely reflecting the increased complexity of the longitudinal structure. Overall, when considered together with the trace plots and survival $\widehat{R}$ values, the results still support adequate convergence of the models.
+In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are generally close to 1 across all JMs. When considered together with the trace plots and survival $\widehat{R}$ values, the results support adequate convergence of the models.
 
 ### Joint Latent Class Mixed Models
 
