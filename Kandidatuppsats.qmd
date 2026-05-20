@@ -666,7 +666,13 @@ Table 11, containing the time-dependent Brier score values for each biomarker sp
 
 ## Sensitivity Analyses
 
-To examine the robustness of the results, sensitivity analyses were performed using the first or last recorded value instead of averaging duplicated biomarker measurements. This resulted in only minimal changes in the time dependent AUC and Brier score estimates. For example, for the JM model including both biomarkers, the AUC for predictions at year 2 changed from 0.967 in the main analysis to 0.956 when using the first value and to 0.965 when using the last value. The corresponding Brier score for predictions made 5 years from baseline changed from 0.115 in the main analysis to 0.114 and 0.113, respectively. In other terms, the performance of the models remained essentially unchanged, indicating that the results were robust to the handling of duplicated measurements.
+To examine the robustness of the results, several sensitivity analyses were performed.
+
+First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. This resulted in only minimal changes in the time-dependent AUC and Brier scores. The majority of AUC values were the same as in the main analysis to two significant figures.
+
+**For example, for the multivariate JM model, the AUC for predictions at year 2 changed from 0.967 in the main analysis to 0.956 when using the first value and to 0.965 when using the last value. The corresponding Brier score for predictions made 5 years from baseline changed from 0.115 in the main analysis to 0.114 and 0.113, respectively.**
+
+In other terms, the performance of the models remained essentially unchanged, indicating that the results were robust to the handling of duplicated measurements.
 
 However, when the baseline was defined as the first biomarker specific examination date, more noticeable changes in predictive performance were observed. Time-dependent AUC values decreased in the Cox PH models and the JMs, with the largest reduction seen for the JM model including both biomarkers at the two year follow-up, from 0.967 to 0.844. At the same time, higher AUC values were observed for JLCMMs, which therefore performed the best at the two-year follow-up. In the main analysis, the JMs performed the best at this point. At later follow up times, however, differences between models remained smaller, while Cox PH models consistently showed the lowest performance overall. The combination of both biomarkers generally performed best, except at the two year follow up, where ptau-181 based models performed best.
 
