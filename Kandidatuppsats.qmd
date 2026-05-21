@@ -34,11 +34,11 @@ include-before-body:
     {\Huge\bfseries No 2026:x\par}
     \vspace{0.5cm}
 
-    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers: A Comparative Assessment of Modelling Approaches and Biomarker Strategies \par}
+    {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers: A Comparative Analysis of Modelling Approaches and Biomarker Strategies \par}
     
     \vspace{0.5cm}
     
-    {\normalsize Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers: A Comparative Assessment of Modelling Approaches and Biomarker Strategies\par}
+    {\normalsize Att Predicera Progression till Alzheimers Sjukdomsdemens med hjälp av Blodbaserade Biomarkörer: en Komparativ Analys av Modelleringsmetoder och Biomarkörstrategier\par}
     
     \vfill
 
