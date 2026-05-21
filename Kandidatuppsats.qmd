@@ -38,7 +38,7 @@ include-before-body:
     
     \vspace{0.5cm}
     
-    {\normalsize Att Predicera Progression till Alzheimers Sjukdomsdemens med hjälp av Blodbaserade Biomarkörer: en Komparativ Analys av Modelleringsmetoder och Biomarkörstrategier\par}
+    {\normalsize Att predicera progression till demens av Alzheimers sjukdom med hjälp av blodbaserade biomarkörer: en komparativ analys av modelleringsmetoder och biomarkörstrategier\par}
     
     \vfill
 
@@ -457,7 +457,7 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 13. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 12 and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12 & 13. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 12 and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
