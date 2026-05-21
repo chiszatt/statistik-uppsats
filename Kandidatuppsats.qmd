@@ -395,9 +395,7 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 
 ### Time-dependent AUC
 
-Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
-
-When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
+Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1). When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
 
 Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
 
@@ -414,32 +412,6 @@ The time-dependent area under the curve (AUC) is then defined as:
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
-
-Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
-
-**QUESTIONS:**
-
-1.  **When is** $Z_i$ **used after defining it?**
-
-2.  **What is the difference between** $\delta_i$ **and** $D_i(t)$**? Does** $\delta_i$ **refer to whether the event happens at all, whereas** $D_i(t)$ **refers to whether the event has occured by time** $t$**? If they are different, where is** $\delta_i$ **referenced after being defined?**
-
-The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2).
-
-In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017, p. 2).
-
-For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are defined as:
-
-$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
-
-$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
-
-Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting the time-dependent sensitivity $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds $c$ (Kamarudin et al., 2017, p. 2).
-
-The time-dependent area under the curve (AUC) is then defined as:
-
-$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
-
-An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the marker performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
 
 ### Time-dependent Brier score
 
