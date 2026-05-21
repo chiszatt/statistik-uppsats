@@ -214,7 +214,7 @@ which is the proportional hazards assumption (Moore, p. 55). Further, covariate 
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model. In order to properly incorporate both biomarkers in the same Cox PH model, their multicollinearity should also be assessed. Multicollinearity occurs when at least two covariates in the regression model are highly correlated, potentially resulting in unstable estimates and misleading interpretations of the regression coefficients (Vatcheva et al., 2016, p. 2).
+where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
 ### Model Assumptions
 
@@ -758,8 +758,6 @@ Scollard, P., Mukherjee, S., Choi, S. E., Lee, M. L., Klinedinst, B., Gibbons, L
 
 Therneau, T.M. & Grambsch, P.M (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. <https://doi.org/10.1007/978-1-4757-3294-8>
 
-Vatcheva, K. P., Lee, M., McCormick, J. B., & Rahbar, M. H. (2016). Multicollinearity in Regression Analyses Conducted in Epidemiologic Studies. *Epidemiology (Sunnyvale, Calif.)*, 6(2), 227. <https://doi.org/10.4172/2161-1165.1000227>
-
 Verbeke, G., & Molenberghs, G. (2000). *Linear mixed models for longitudinal data*. Springer Science & Business Media.
 
 Wang, C., Shen, J., Charalambous, C., & Pan, J. (2024). Modeling biomarker variability in joint analysis of longitudinal and time-to-event data. *Biostatistics* (Oxford, England), 25(2), 577-596. <https://doi.org/10.1093/biostatistics/kxad009>
@@ -811,7 +809,7 @@ Distributions of log transformed biomarkers
 ::: {#fig-corr layout-ncol="2"}
 ![Variables in the Cox PH models](figures/corrplot_cox.png){#fig-corr-cox}
 
-![Varibles in the LME models](figures/corrplot_lme.png){#fig-corr-lme}
+![Variables in the LME models](figures/corrplot_lme.png){#fig-corr-lme}
 
 Correlation plots of numerical variables
 :::
