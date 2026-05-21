@@ -214,9 +214,7 @@ which is the proportional hazards assumption (Moore, p. 55). Further, covariate 
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
-
-Relatedly, multicollinearity among the covariates should also be assessed. This occurs when at least two covariates in the regression model are highly correlated, potentially resulting in unstable estimates and misleading interpretations of the regression coefficients (Vatcheva et al., 2016, p. 2).
+where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model. In order to properly incorporate both biomarkers in the same Cox PH model, their multicollinearity should also be assessed. Multicollinearity occurs when at least two covariates in the regression model are highly correlated, potentially resulting in unstable estimates and misleading interpretations of the regression coefficients (Vatcheva et al., 2016, p. 2).
 
 ### Model Assumptions
 
