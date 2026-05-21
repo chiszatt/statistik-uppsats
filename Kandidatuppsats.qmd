@@ -488,11 +488,13 @@ Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting pro
 
 ## Model Fit Overview
 
+Prior to evaluating predictive performance, model fit was assessed for each modelling approach to ensure appropriate model specification.
+
 ### Cox PH Models
 
-First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: 0 alleles (non-carriers), 1 allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and 2 alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
+First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
 
-Prior to interpreting the predictive performance of the models, the proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 14 (Appendix 8.2).
+The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 14 (Appendix 8.2).
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for gender, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
@@ -526,7 +528,7 @@ Thus, JMs with a random intercept and slope were estimated for longitudinal meas
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
-A similar pattern was observed for the JM including NfL, as shown in Appendix 8.4; Figure 10a. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
+A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4; Figure 10a. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
 
 Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 10b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
