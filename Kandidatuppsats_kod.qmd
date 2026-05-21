@@ -70,31 +70,31 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```{r}
 # Loading data
 # Milou
-#NfL data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-nfl_data <- BLENNOWPLASMANFLLONG
-# P-tau181 data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-ptau_data <- UGOTPTAU181
-# Diagnosis data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-diagnosis_data <- DXSUM
-# Demographics data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-demographics <- PTDEMOG
-# # Apoe data
-load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-apoe <- APOERES
+# #NfL data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+# nfl_data <- BLENNOWPLASMANFLLONG
+# # P-tau181 data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+# ptau_data <- UGOTPTAU181
+# # Diagnosis data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+# diagnosis_data <- DXSUM
+# # Demographics data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+# demographics <- PTDEMOG
+# # # Apoe data
+# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+# apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-#library(ADNIMERGE2)
-#nfl_data = BLENNOWPLASMANFLLONG
-#ptau_data = UGOTPTAU181
-#diagnosis_data = DXSUM
-#demographics = PTDEMOG
-#apoe = APOERES
+library(ADNIMERGE2)
+nfl_data = BLENNOWPLASMANFLLONG
+ptau_data = UGOTPTAU181
+diagnosis_data = DXSUM
+demographics = PTDEMOG
+apoe = APOERES
 ```
 
 ```{r}
@@ -1734,47 +1734,6 @@ get_pprob_table <- function(model) {
 }
 ```
 
-```{r}
-# defining a function to extract the model parameters
-get_jlcmm_params <- function(model) {
-  
-  p_full <- length(model$best)
-#   model$V is a vector of the upper triangle of a matrix, not the var-covar matrix itself 
-  V_mat <- matrix(0, nrow = p_full, ncol = p_full)
-  V_mat[upper.tri(V_mat, diag = TRUE)] <- model$V
-#   Fill the matrix by adding its transpose, then removing the doubled values on the diagonal
-  V_mat <- V_mat + t(V_mat) - diag(diag(V_mat))
-  
-#   Dropping unwanted values stored in model$best
-  drop <- "varcov|stderr"
-#   Creates a logical vector in orer to drop values from estimates and var-covar matrix 
-  keep <- !grepl(drop, names(model$best))
-  estimates <- model$best[keep]
-  V_mat <- V_mat[keep, keep]
-  parameters <- names(estimates)
-
-  se <- sqrt(diag(V_mat))
-  z <- estimates / se
-  p_values <- 2 * (1 - pnorm(abs(z)))
-  
-  submodel <- c("Class Membership",
-                "Survival", "Survival", "Survival", "Survival",
-                "Longitudinal", "Longitudinal", "Longitudinal")
-  
-  out <- data.frame(
-    "Submodel" = submodel,
-    "Parameter" = parameters,
-    "Estimate" = round(estimates, 3),
-    "SE" = round(se, 3),
-    "Z" = round(z, 3),
-    "P value" = round(p_values, 3),
-    check.names = FALSE
-  )
-  
-  return(out)
-}
-```
-
 ## M2 (3 latent classes)
 
 ```{r}
@@ -2513,75 +2472,6 @@ auc_multi_jm <- get_jm_auc(multi_joint_model, times)
 
 ## Time-dependent AUC for latent class joint models
 
-#### Function for getting predictions from multivariate joint latent class model
-
-```{r}
-# Defining a function to predict cumulative hazard (1 - S(t)) for multivariate joint latent class models (these cannot be passed to dynpred in the lcmm package)
-predict_mjlcmm <- function(model, data, ID, landmark, times) {
-  
-#   Extracting the unique ID's
-  ids <- unique(data[[ID]])
-#   Extracting number of individuals to make predictions for
-  N <- length(unique(data[[ID]]))
-#   Extracting the nuber of classes
-  G <- model$ng
-#   Number of horizons
-  n_h <- length(times)
-  print(n_h)
-  
-#   Extracting the posterior probabilities (given a two class model)
-  post_prob <- model$pprob[, 3:4]
-  
-#   Extracting the Weibull hazard parameters from the model object 
-  scale <- sapply(1:G, function(g) {
-                   exp(model$best[paste0("event1 +/-sqrt(Weibull2) class ", as.character(g))])})
-  shape <- sapply(1:G, function(g) {
-                   exp(model$best[paste0("event1 +/-sqrt(Weibull1) class ", as.character(g))])})
-  
-#   Initiating a matrix to save the predictions for each individual at each horizon
-  S_pred <- matrix(0, nrow = N, ncol = n_h)
-  
-#   Saving the class-specific survivals at the landmark time
-  S_land <- sapply(1:G, function(g)
-    exp(-(landmark / scale[g])^shape[g]))
-  
-#   Looping over all indiivudals
-  for(i in 1:N) {
-    
-#     GEtting the posterior probabilities for each individual
-    pp_i <- post_prob[i, ]
-    
-#     Looping over the horizons
-    for(j in 1:n_h) {
-      t <- times[j]
-    
-#      Getting the conditional class-specific survivals
-      Sg <- sapply(1:G, function(g)
-        exp(-((t) / scale[g])^shape[g]) / S_land[g])
-
-#      Calculating the cumulative hazard (1 - survival) for inidivudal i based on their posterior probabilities and the class-specific survival functions
-      S_pred[i, j] <- 1 - sum(pp_i * Sg)
-    }
-  }  
-#   Convert to long format matching dynpred() output structure
-  S_pred <- as.data.frame(S_pred)
-  colnames(S_pred) <- as.character(times)
-  S_pred[[ID]] <- ids
-
-  S_pred_long <- S_pred %>%
-    pivot_longer(
-      cols = -all_of(ID),
-      names_to  = "horizon",
-      values_to = "pred"
-    ) %>%
-    mutate(horizon = as.numeric(horizon))
-  
-  names(S_pred_long) <- c("RID", "horizon", "pred")
-
-  return(S_pred_long)
-  }
-```
-
 #### Function for extracting time-dependent AUC
 
 ```{r}
@@ -2596,6 +2486,7 @@ jlcmm_timeAUC <- function(model, newdata, ID, time_var, surv_time_var, event_var
     AUC = NA
   )
 
+#   No longer using multivariate jlcmm
 #   Calculating the survival predictions previously defined function
   if(class(model) == "mpjlcmm") {
     dfpred <- predict_mjlcmm(
