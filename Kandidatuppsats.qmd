@@ -477,7 +477,7 @@ The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was
 
 P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
-Here, it is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression.
+Here, it is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (Appendix 8.1.4), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression. Moreoever, they showed low to medium correlation with the other numerical covariates, indicating no major concerns regarding multicollinearity and suggesting that they are all suitable for inclusion in the models.
 
 Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
 
@@ -811,7 +811,7 @@ kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
-kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
+kable_standard(readRDS("tables/event_table_full"))
 ```
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
