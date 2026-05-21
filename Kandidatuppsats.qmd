@@ -163,8 +163,6 @@ The simultaneous modelling of multivariate longitudinal biomarkers and clinical 
 
 Additionally, while the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and data conditions, few studies have systematically compared them within a unified framework, particularly for blood-based biomarkers such as p-tau181 and NfL. Such comparisons have been conducted in other domains. For instance, a 2025 study compared modelling approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox PH models using baseline, time-averaged, and time-dependent biomarker values, as well as JMs (Goksuluk et al., 2025, pp. 1, 4-5). Overall, JMs demonstrated superior predictive performance, with multivariate JMs performing slightly better than separate JMs fitted for each biomarker (Goksuluk et al., 2025, p. 8).
 
-Given the recent developments in blood-based biomarkers, it is of critical importance to validate an optimal panel of biomarkers for AD diagnosis **(REF)**. A full panel has been suggested using several blood-based biomarkers, including p-tau181, NfL and an additional phosphorylated tau protein, p-tau217 (DuBois, K. N., et al., 2025). However, models using this full panel might suffer when sample sizes are small as well as from issues concerning multicollinearity between p-tau217 and p-tau181. Validation of a model using fewer biomarkers would require fewer blood-tests, meaning quicker and cheaper implementation. Therefore, the question arises as to which of p-tau181 and NfL perform best in isolation, as well as how much predictive performance increases when accounting for both biomarkers within the proposed modeling frameworks.
-
 ## Research Aims
 
 This study investigates the prediction of progression to Alzheimer’s disease-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
@@ -397,11 +395,7 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 
 ### Time-dependent AUC
 
-Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
-
-When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
-
-# ---
+Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1). When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
 
 Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
 
@@ -419,34 +413,6 @@ $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
 
-# ---
-
-Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
-
-**QUESTIONS:**
-
-1.  **When is** $Z_i$ **used after defining it?**
-
-2.  **What is the difference between** $\delta_i$ **and** $D_i(t)$**? Does** $\delta_i$ **refer to whether the event happens at all, whereas** $D_i(t)$ **refers to whether the event has occured by time** $t$**? If they are different, where is** $\delta_i$ **referenced after being defined?**
-
-The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censoring time. In addition, let $\delta_i$ be an indicator variable that takes the value 1 if the event (disease) occurs and 0 otherwise. Furthermore, let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2).
-
-In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017, p. 2).
-
-For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are defined as:
-
-$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
-
-$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
-
-Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting the time-dependent sensitivity $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds $c$ (Kamarudin et al., 2017, p. 2).
-
-The time-dependent area under the curve (AUC) is then defined as:
-
-$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
-
-An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the marker performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
-
 ### Time-dependent Brier score
 
 The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted time-dependent Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). IPCW weights are calculated for each individual $i = 1 , ... , n$ at each time point $t$, such that:
@@ -459,13 +425,13 @@ where $G(t)$ is the censoring survival function, which quantifies the probabilit
 
 The commonly formulated Brier score:
 
-$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
+$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$
 
 where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score is given as:
 
 $$BS =
-\frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
-\frac{\widehat (S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
+\frac{1}{ \tilde n(t)}\sum_{i = 1}^{n} \left(
+\frac{( \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}
 \right)$$
 
@@ -491,7 +457,7 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 10.1; Table 12 & Table 13. The corresponding distributions and summary statistics for the variables of interest are also presented there and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12 & 13. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 12 and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
