@@ -648,7 +648,7 @@ The models' performances in predicting progression to AD-dementia were also exam
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox}
 
-Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values than the model incorporating p-tau181 across all horizons, with the exception of predictions made three years from baseline. However, both single-marker models are consistently outperformed by the combined model.
+Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values overall than the model incorporating p-tau181 across the follow-up period. However, both single-marker models are consistently outperformed by the combined model, indicating superior discriminative ability in distinguishing between individuals who progress to AD dementia and those who do not over time.
 
 Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 13a demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
 
@@ -660,7 +660,9 @@ When observing the time-dependent Brier score curves, such as Figure 5 presentin
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
-All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, meaning a slightly lower AUC value, which suggests that this model performs slightly better than the two models at this time-point. In a similar manner, the multivariate JM demonstrates lower AUC compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 14a). These two are consistently at a similar height, which can also be said for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 14b).
+All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, indicating a lower Brier score and thus better overall predictive accuracy at this time point compared to the two single-marker models
+
+In a similar manner, the multivariate JM demonstrates lower AUC compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 14a). These two models consistently show similar AUC values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 14b).
 
 Table 11, containing the time-dependent Brier scores for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modeling baseline values for both biomarkers yields a value of 0.142 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
