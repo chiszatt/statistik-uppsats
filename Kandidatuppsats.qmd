@@ -218,11 +218,11 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 ### Model Assumptions
 
-A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood . At the same time, minor violations of this assumption are generally unlikely to have substantial effects on inference and parameter estimation (Moore, p. 94).
+A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood.
 
 ### Concordance Index
 
-The concordance index ($C$ index) is an evaluation measure for the predictive performance of survival models. All pairs of individuals in the sample population are selected, and the $C$ index evaluates the proportion of pairs who are concordant. Pairs are said to be concordant if the individual with a higher cumulative risk, given by $F(t)$, has the shorter time-to-event (Park et al., 2021, p. 1701). The $C$ index will be considered as an initial evaluation metric for the different Cox PH models estimated in this study.
+The concordance index ($C$ index) is an evaluation measure for the predictive performance of survival models. All pairs of individuals in the sample population are selected and the proportion of concordant pairs is evaluated. Pairs are said to be concordant if the individual with a higher cumulative risk, given by $F(t)$, has the shorter time-to-event (Park et al., 2021, p. 1701). The $C$ index will be considered as an initial evaluation metric for the different Cox PH models estimated in this study.
 
 ## Joint Modelling of Longitudinal and Survival Data
 
