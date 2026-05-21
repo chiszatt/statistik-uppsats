@@ -216,13 +216,13 @@ which is the proportional hazards assumption (Moore, p. 55). Further, covariate 
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates may also be included simultaneously, resulting in a multivariable Cox PH model.
+where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
 Relatedly, multicollinearity among the covariates should also be assessed. This occurs when at least two covariates in the regression model are highly correlated, potentially resulting in unstable estimates and misleading interpretations of the regression coefficients (Vatcheva et al., 2016, p. 2).
 
 ### Model Assumptions
 
-A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood. At the same time, minor violations of this assumption are generally unlikely to have substantial effects on inference and parameter estimation (Moore, p. 94).
+A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood . At the same time, minor violations of this assumption are generally unlikely to have substantial effects on inference and parameter estimation (Moore, p. 94).
 
 ### Concordance Index
 
@@ -230,39 +230,37 @@ The concordance index ($C$ index) is an evaluation measure for the predictive pe
 
 ## Joint Modelling of Longitudinal and Survival Data
 
-In the joint model of longitudinal and survival data, the hazard function at time $t$ is directly dependent on the value of the biomarker level at time $t$. In AD research, biomarkers such as p-tau181 and NfL are measured repeatedly over time, and the relationship between their trajectories and disease progression analysed.
-
-The longitudinal process - modeled by a linear mixed-effects model - and the survival process - modeled by a proportional hazards model - are linked by a specified association structure. This structure can link the survival process to the current value of the biomarker estimate only, or include the current rate of change of the biomarker trajectory. For longitudinal data where measurements are repeated over the span of months, the current rate of change is better described as the difference between biomarker measurements. For instance, if both the current value and current rate of change are specified in the proportional hazards model, this becomes:
-
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\} \qquad m_i'(t) = m_i(t) - m_i(t-1)$$
-
-where $\alpha_1$ and $\alpha_2$ link the current value of the biomarker, $m_i(t)$, and its current rate of change, $m_i'(t)$, respectively to the hazard function. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
-
-This univariate framework is applied to the longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. Multivariate JMs extend the standard joint modeling framework by allowing two or more longitudinal biomarkers to be modeled jointly while being linked to a shared survival outcome describing progression to AD or dementia. Therefore, both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology. Ignoring their correlation may lead to biased estimation (Xu, 2021, p. 6)
+Joint models simultaneously model longitudinal and survival data, allowing for the coupling of a biomarker trajectory to some related survival outcome. In these models, the hazard function at time $t$ is directly dependent on the value of the longitudinal biomarker at time $t$. The biomarker process is modeled by a linear mixed-effects (LME) model whilst a Cox PH model describes the survival process.
 
 ### Linear Mixed-Effects Submodel
 
-The longitudinal component of the joint model is specified by the linear mixed-effects (LME) model (**LAIRD & WAIRE**), which captures both population-level trends and individual variability in biomarker trajectories.
+The longitudinal component of the joint model is specified by a LME model (**LAIRD & WAIRE**), capturing both population-level trends described by the fixed effects as well as individual variability, modeled by the random effects.
 
-Longitudinal data consists of repeated measurements from the same individuals, whereby the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, $t$, are correlated with the measurements made on prior and subsequent occasions. Therefore, the responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data which can be considered grouped with non-independence between observations, is handled well by LME models.
+Since longitudinal data consists of repeated measurements from the same individuals, the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, $t$, are correlated with measurements made on prior and subsequent occasions. Therefore, responses from an individual are expected to be more highly correlated than those between individuals. The modeling of this type of data, which can be considered grouped with non-independence within groups, is handled well by LME models.
 
-Following the notation of Rizopoulos (2012, p. 54), the biomarker process for p-tau181 and NfL can be considered such that:
+Following the notation of Rizopoulos (2012, p. 54), the biomarker processes are modeled such that:
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
 
 $$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
 
-where $y_i(t)$ is the observed biomarker measurement at time $t$ for individual $i$. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ then is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for patient $i$. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the dependence between repeated measurements. Combining the true biomarker trajectory function with the error term gives:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Geert Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
 
 $$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
 
-### Survival Submodel
+### The Joint Model
 
-Assuming the survival submodel is defined as a Cox PH model, the longitudinal biomarker process is incorporated with the survival process, given a current value only association structure, such that:
+The LME and Cox PH models are linked by a specified association structure. This structure can link the survival process to the current model estimate of the biomarker, $m_i(t)$, and the current rate of change of the biomarker trajectory, $m'_i(t)$. If both the current value and current rate of change are specified in the proportional hazards model, this becomes:
 
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\gamma^T\mathbf{w_i} + \alpha m_i(t) \right\} \qquad M_i = \left\{m_i,  0 \le s \le t\right\}$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$
 
-where $M_i$ represents the true unobserved biomarker profile up to time $t$.
+$$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$
+
+In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
+
+This univariate framework is applied to longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. This study will then apply multivariate JMs to simultaneously model both biomarkers and link their trajectories to the shared survival process describing progression to dementia due to AD.
+
+**Both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology (SOURCE). Ignoring their correlation may lead to biased estimation (Xu, 2021, p. 6)**
 
 ### Model Assumptions
 
@@ -280,9 +278,9 @@ The package uses weakly informative priors, allowing stable estimation while let
 
 ### The Gelman-Rubin Statistic
 
-Within Bayesian joint modeling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman–Rubin statistic ($R$) (Peng, 2022).
+Within Bayesian joint modeling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman–Rubin statistic, $R$ (Peng, 2022).
 
-Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j$-th chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
+Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j^{th}$ chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
 Then calculate the chain mean for each chain,
 
@@ -318,7 +316,7 @@ In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and
 
 ### Class Submodel
 
-The JLCMM consists of three submodels; a multinomial logistic submodel, a linear mixed-effects submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
+The JLCMM consists of three submodels; a multinomial logistic submodel, an LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
 
 $$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$
 
@@ -401,7 +399,9 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 
 Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
 
-When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study. Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
+When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
+
+Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
 
 **QUESTIONS:**
 
@@ -413,7 +413,7 @@ The observed time is defined as $Z_i = \min(T_i, C_i)$, where $C_i$ is the censo
 
 In what follows, $X$ is referred to as a marker, although it may also represent a risk score derived from a regression model or another predictive model, including previously published scores (Kamarudin et al., 2017, p. 2).
 
-For a given threshold $c$, the time-dependent sensitivity and specificity are defined as:
+For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are defined as:
 
 $$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
 
