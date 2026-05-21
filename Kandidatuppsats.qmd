@@ -316,7 +316,7 @@ In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and
 
 ### Class Submodel
 
-The JLCMM consists of three submodels; a multinomial logistic submodel, an LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
+The JLCMM consists of three submodels; a multinomial logistic submodel, a LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
 
 $$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$
 
@@ -342,7 +342,7 @@ The score test assumes the null hypothesis of conditional independence, that is,
 
 $$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
 
-Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared-random effects in the model (Proust-Lima et al., p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
+Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
 ### Estimation
 
@@ -358,7 +358,7 @@ $$\theta_{G}^{\ (l + 1)} =
 
 where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2017, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2017, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). Therefore, it is necessary to assess whether the hazard is best modeled by the Weibull or by a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
 
 ### Class Enumeration
 
@@ -389,7 +389,7 @@ Nlog(G)
 
 where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$. Relative entropy values closer to 1 demonstrate good discriminative ability of the model, where, for one class latent models, $EN(1) = 1$.
 
-In addition to fulfilling the requirements for minimised BIC and maximised entropy, the chosen classes should be clinically meaningful. Analysis of the distribution of covariates by class can help elucidate the nature of the chosen latent classes.
+In addition to fulfilling the requirements for minimised BIC and maximised entropy, the chosen classes should be clinically meaningful. Analysis of the distribution of covariates by class can help elucidate the nature of the estimated latent classes.
 
 ## Evaluation of Predictive Performance
 
@@ -400,6 +400,26 @@ Information criteria such as the Akaike Information Criterion (AIC) are often us
 Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1).
 
 When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
+
+# ---
+
+Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
+
+$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
+
+$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
+
+where sensitivity refers to the probability of the model correctly detecting individuals who have experienced the event of interest before time $t$, whilst specificity is defined as the probability of the model correctly discerning individuals who remain event-free at time $t$.
+
+Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds (Kamarudin et al., 2017, p. 2).
+
+The time-dependent area under the curve (AUC) is then defined as:
+
+$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
+
+An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
+
+# ---
 
 Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
 
@@ -429,17 +449,19 @@ An AUC value of 1 means perfect ability to distinguish between patients with and
 
 ### Time-dependent Brier score
 
-The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). IPCW weights are calculated for each individual $i = 1 , ... , n_{sample}$ at each time point $t$, such that:
+The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). IPCW weights are calculated for each individual $i = 1 , ... , n$ at each time point $t$, such that:
 
 $$\omega_i(t) =
 \frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$
 
-where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). The commonly formulated Brier score:
+where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5).
 
-$$\text{BS} = \frac{1}{n_{sample}}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
+The commonly formulated Brier score:
 
-where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score becomes:
+$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
+
+where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score is given as:
 
 $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
@@ -465,7 +487,7 @@ All missing values were removed prior to the analysis to ensure a complete-case 
 
 ### Diagnosis status
 
-The variable of primary interest represents three diagnostic states - cognitively normal (CN), mild cognitive impairment (MCI) and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
+The variable of primary interest represents three diagnostic states - cognitively normal (CN), MCI and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
