@@ -1,0 +1,63 @@
+---
+title: "PCA_plasma_2026"
+format: pdf
+editor: visual
+---
+
+# PCA plasma 2026
+
+```{r}
+# We load necessary packages 
+library(dplyr) # To manipulate and transform data
+library(corrplot) # To visualize correlation matrix
+```
+
+## 1.1 Loading the dataset (plasma biomarkers)
+
+```{r}
+library(readr)
+plasma_data <- read.csv("UPENN_PLASMA_FUJIREBIO_QUANTERIX_27Mar2026.csv")
+```
+
+## 1.2 Extracting the plasma biomarkers
+
+```{r}
+# selecting the relevant variables -> why these ones???
+biomarkers = plasma_data %>%
+  select(
+    "pT217_F", 
+    "AB42_F", 
+    "AB40_F", 
+    "AB42_AB40_F", 
+    "pT217_AB42_F", 
+    "NfL_Q", 
+    "GFAP_Q"
+    )
+```
+
+## 1.3 Checking for and removing missing values
+
+```{r}
+# We count missing values per column in merged_data
+sapply(biomarkers, function(x) sum(is.na(x)))
+```
+
+## 1.4 Korrelationer mellan plasma-biomarkörerna
+
+```{r}
+# We compute correlation matrix 
+cor_matrix <- cor(biomarkers)  
+
+# Correlation plot 
+corrplot(cor_matrix,
+         method = "color",
+         type = "upper",
+         order = "hclust",
+         tl.cex = 0.6,
+         number.cex = 0.5,
+         addCoef.col = "black",
+         diag = FALSE
+         )
+```
+
+....

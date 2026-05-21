@@ -1,0 +1,11 @@
+---
+title: "testttttt"
+format: pdf
+editor: visual
+---
+
+## tabell över cox värden
+
+```{r}
+knitr::kable(readRDS("tables/cox_table.rds"))
+```

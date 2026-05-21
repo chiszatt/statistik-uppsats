@@ -1,0 +1,338 @@
+---
+title: "test"
+format: pdf
+editor: visual
+---
+
+# AVTOT1-6 värden
+
+Joint model för AVTOT1 gav i sig höga Rhat-värden så chansen att en multivariat modell med alla 6 skulle se bra ut är väldigt liten då...
+
+```{r}
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/NEUROBAT.rda")
+cdt_data <- NEUROBAT
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+```
+
+```{r}
+library(dplyr)
+
+# Välj CDT-variabler
+cdt_data <- cdt_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, VISDATE,
+         AVDELTOT, AVTOT1, AVTOT2, AVTOT3, AVTOT4, AVTOT5, AVTOT6)
+
+# Välj diagnosdata
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# Slå ihop CDT-data med diagnosdata via RID
+merged_data <- cdt_data %>%
+  merge(diagnosis_data, by = "RID", suffix = c("_cdt", "_dx"))
+```
+
+```{r}
+hist(merged_data$AVTOT1)
+hist(merged_data$AVTOT2)
+hist(merged_data$AVTOT3)
+hist(merged_data$AVTOT4)
+hist(merged_data$AVTOT5)
+hist(merged_data$AVTOT6)
+```
+
+```{r}
+merged_data$log_AVTOT1 <- log(merged_data$AVTOT1)
+merged_data$log_AVTOT2 <- log(merged_data$AVTOT2)
+merged_data$log_AVTOT3 <- log(merged_data$AVTOT3)
+merged_data$log_AVTOT4 <- log(merged_data$AVTOT4)
+merged_data$log_AVTOT5 <- log(merged_data$AVTOT5)
+merged_data$log_AVTOT6 <- log(merged_data$AVTOT6)
+```
+
+```{r}
+hist(merged_data$log_AVTOT1)
+hist(merged_data$log_AVTOT2)
+hist(merged_data$log_AVTOT3)
+hist(merged_data$log_AVTOT4)
+hist(merged_data$log_AVTOT5)
+hist(merged_data$log_AVTOT6)
+```
+
+```{r}
+# We keep only the variables we need (RID, birth year, gender)
+demographics_small <- demographics[, c("RID", "PTDOBYY", "PTGENDER")]
+
+# We make sure we only have one row per person
+demographics_small <- demographics_small[!duplicated(demographics_small$RID), ]
+
+# We merge age and gender into merged_data
+merged_data <- merge(
+  merged_data,
+  demographics_small,
+  by = "RID"
+)
+
+# We make sure that gender is categorical (factor)
+merged_data$PTGENDER <- as.factor(merged_data$PTGENDER)
+
+# We create age at each visit using the visit date (EXAMDATE.plasma)
+merged_data$age_at_visit <- as.numeric(format(merged_data$VISDATE, "%Y")) - merged_data$PTDOBYY
+```
+
+```{r}
+keep = unique((cdt_data %>% group_by(RID) %>% filter(n() > 5))$RID)
+merged_data <- merged_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 5 measurements 
+length(keep)
+```
+
+```{r}
+# Skapar baseline-datum
+merged_data <- merged_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(VISDATE)) %>%
+  ungroup()
+
+# Skapar event + time_to_event (Dementia räknas som event)
+surv_data <- merged_data %>%
+  group_by(RID) %>%
+  summarise(
+    age_at_baseline = age_at_visit[which.min(VISDATE)],
+    PTGENDER = PTGENDER[which.min(VISDATE)],
+    time_to_event = case_when(
+      any(DIAGNOSIS == "Dementia") ~
+        as.numeric(min(VISDATE[DIAGNOSIS == "Dementia"]) -
+                   min(c(VISDATE, EXAMDATE))),
+      TRUE ~ as.numeric(max(c(VISDATE, EXAMDATE)) -
+                        min(c(VISDATE, EXAMDATE)))
+    ) / 365,
+    event = as.integer(any(DIAGNOSIS == "Dementia"))
+  ) %>%
+  ungroup()
+
+# Lägger survival-data tillbaka i merged_data
+merged_data <- merged_data %>%
+  left_join(surv_data, by = "RID")
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+# 5) Skapa time_years (tid från baseline)
+merged_data <- merged_data %>%
+  mutate(time_years = as.numeric(VISDATE - baseline_date) / 365.25)
+```
+
+```{r}
+# We count missing values per column in merged_data
+sapply(merged_data, function(x) sum(is.na(x)))
+
+# We count missing values per column in surv_data
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+merged_data = merged_data %>%
+  na.omit()
+
+surv_data = surv_data %>%
+  na.omit()
+
+# We check again
+sapply(merged_data, function(x) sum(is.na(x)))
+sapply(surv_data, function(x) sum(is.na(x)))
+```
+
+```{r}
+summary(merged_data$log_AVTOT1)
+any(is.infinite(merged_data$log_AVTOT1)) # should be FALSE
+# Inf = extreme values 
+```
+
+```{r}
+# Remove rows with -Inf or Inf in log_CENTILOIDS
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT1), ]
+any(is.infinite(merged_data$log_AVTOT1))  # should be FALSE
+any(is.na(merged_data$log_AVTOT1))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT2), ]
+any(is.infinite(merged_data$log_AVTOT2))  # should be FALSE
+any(is.na(merged_data$log_AVTOT2))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT3), ]
+any(is.infinite(merged_data$log_AVTOT3))  # should be FALSE
+any(is.na(merged_data$log_AVTOT3))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT4), ]
+any(is.infinite(merged_data$log_AVTOT4))  # should be FALSE
+any(is.na(merged_data$log_AVTOT4))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT5), ]
+any(is.infinite(merged_data$log_AVTOT5))  # should be FALSE
+any(is.na(merged_data$log_AVTOT5))       # also FALSE
+
+merged_data <- merged_data[is.finite(merged_data$log_AVTOT6), ]
+any(is.infinite(merged_data$log_AVTOT6))  # should be FALSE
+any(is.na(merged_data$log_AVTOT6))       # also FALSE
+```
+
+```{r}
+length(unique(merged_data$RID))   # longitudinala data
+length(unique(surv_data$RID))     # survival data
+```
+
+```{r}
+# Gör RID till character (säkerhet)
+merged_data$RID <- as.character(merged_data$RID)
+surv_data$RID   <- as.character(surv_data$RID)
+
+# Hitta gemensamma ID:n
+common_IDs <- intersect(unique(merged_data$RID), unique(surv_data$RID))
+
+# Behåll endast gemensamma individer
+merged_data <- merged_data %>% filter(RID %in% common_IDs)
+surv_data   <- surv_data %>% filter(RID %in% common_IDs)
+
+# Kontroll
+length(unique(merged_data$RID))  # ska matcha
+length(unique(surv_data$RID))    # ska matcha
+```
+
+# Longitudinal model
+
+```{r}
+# Longitudinal model
+long_model <- lme(
+  log_AVTOT1 ~ time_years + PTGENDER.y, 
+  random = ~ time_years | RID,   # random intercept + slope
+  data = merged_data
+  )
+
+summary(long_model)
+```
+
+# Survival model
+
+```{r}
+# We create a Surv object: time and event
+surv_object <- Surv(
+  time = surv_data$time_to_event, 
+  event = surv_data$event
+)
+```
+
+```{r}
+# We fit Kaplan-Meier curve
+km_fit <- survfit(surv_object ~ 1, data = surv_data)
+
+# Plot
+plot(
+  km_fit, 
+  xlab = "Days since baseline amyloid", 
+  ylab = "Survival probability (no dementia)", 
+  main = "Kaplan-Meier Curve for Dementia"
+)
+```
+
+```{r}
+# Cox survival-model with covariates
+surv_model <- coxph(
+  surv_object ~ age_at_baseline + PTGENDER,
+  data = surv_data
+)
+
+summary(surv_model)
+```
+
+```{r}
+cox.zph(surv_model)
+```
+
+# Joint model
+
+```{r}
+# Joint model 
+joint_model <- jm(
+  surv_model,
+  long_model,
+  time_var = "time_years"
+  )
+
+summary(joint_model)
+```
+
+```{r}
+summary <- summary(joint_model)
+summary$Survival
+```
+
+```{r}
+
+fm1 <- lme(log_AVTOT1 ~ time_years + PTGENDER.x,
+                random = ~ time_years | RID,
+                data = merged_data)
+
+fm2 <- lme(log_AVTOT2 ~ time_years + PTGENDER.x,
+                  random = ~ time_years | RID,
+                  data = merged_data)
+
+fm3 <- lme(log_AVTOT3 ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+
+fm4 <- lme(log_AVTOT4 ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+
+fm5 <- lme(log_AVTOT5 ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+  
+fm6 <- lme(log_AVTOT6 ~ time_years + PTGENDER.x,
+              random = ~ time_years | RID,
+              data = merged_data)
+```
+
+```{r}
+Mixed <- list(fm1, fm2, fm3, fm4, fm5, fm6)
+```
+
+```{r}
+# Har modellen stabila random slopes?
+VarCorr(fm1)
+VarCorr(fm2)
+VarCorr(fm3)
+VarCorr(fm4)
+VarCorr(fm5)
+VarCorr(fm6)
+# Om slope-variansen är runt 0 → den biomarkören bidrar nästan inget i en joint model
+```
+
+```{r}
+fForms <- list(
+  "log_AVTOT1" = ~ value(log_AVTOT1),
+  "log_AVTOT2" = ~ value(log_AVTOT2),
+  "log_AVTOT3" = ~ value(log_AVTOT3),
+  "log_AVTOT4" = ~ value(log_AVTOT4),
+  "log_AVTOT5" = ~ value(log_AVTOT5),
+  "log_AVTOT6" = ~ value(log_AVTOT6)
+)
+```
+
+```{r}
+multi_joint_model <- jm(surv_model, Mixed,
+                  time_var = "time_years",
+                  functional_forms = fForms,
+                  n_chains = 3L,    
+                  n_iter = 20000L,
+                  n_burnin = 2000L
+                  )
+summary(multi_joint_model)
+```

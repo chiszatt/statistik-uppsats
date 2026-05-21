@@ -1,0 +1,135 @@
+---
+title: "test"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(dplyr)
+library(JMbayes2)
+library(lme4) # decide which package will we use for lme
+library(nlme) # decide which package will we use for lme
+library(survival)
+library(ggplot2)
+library(glmmTMB)
+library(DHARMa) # for running residual diagnostics on GLMM
+```
+
+```{r}
+#Milou
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+nfl_data <- BLENNOWPLASMANFLLONG
+# #
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ptau_data <- UGOTPTAU181
+# #
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+diagnosis_data <- DXSUM
+# #
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+demographics <- PTDEMOG
+# #
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
+```
+
+```{r, warning=FALSE}
+# We select the required nfl variables
+nfl_data <- nfl_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMA_NFL)
+
+# We select the required ptau variables
+ptau_data <- ptau_data %>%
+  select(RID, VISCODE2, EXAMDATE, PLASMAPTAU181)
+
+# We select the required diagnosis variables
+diagnosis_data <- diagnosis_data %>%
+  select(ORIGPROT, COLPROT, RID, VISCODE2, EXAMDATE, DIAGNOSIS)
+
+# We add _dx on the diagnosis variables 
+diagnosis_data_dx <- diagnosis_data %>%
+  rename_with(~paste0(.x, "_dx"), -c(RID, VISCODE2))
+
+# We merge NFL and ptau for longitudinal data by RID and viscode 
+long_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau"))
+
+# We merge NFL and ptau for survival data only by RID 
+surv_data <- nfl_data %>%
+  left_join(ptau_data, by = c("RID", "VISCODE2"), suffix = c("_nfl", "_ptau")) %>%
+  left_join(diagnosis_data_dx, by = c("RID"))
+```
+
+```{r}
+joint_data <- long_data %>%
+  left_join(diagnosis_data_dx, by = c("RID", "VISCODE2"))
+```
+
+```{r}
+# We only keep the demographics variables we need and one row per person 
+demographics_small <- demographics %>%
+  select(RID, PTDOBYY, PTGENDER) %>%
+  distinct(RID, .keep_all = TRUE)
+
+# We create a variable for apoe4 status
+apoe$APOE4_status <- ifelse(apoe$GENOTYPE %in% c("2/4","3/4","4/4"), 1, 0)
+
+# We merge gender with merged_data and surv_data
+long_data <- long_data %>%
+  left_join(demographics_small, by = "RID")
+surv_data <- surv_data %>%
+  left_join(demographics_small, by = "RID")
+
+# We make sure that gender is a factor 
+long_data$PTGENDER <- as.factor(long_data$PTGENDER)
+surv_data$PTGENDER <- as.factor(surv_data$PTGENDER)
+
+# We merge apoe with merged_data and surv_data
+long_data <- merge(long_data, apoe[, c("RID", "APOE4_status")], by="RID")
+surv_data <- merge(surv_data, apoe[, c("RID", "APOE4_status")], by="RID")
+```
+
+```{r}
+# We filter individuals with at least 3 measurements of ptau_data
+keep = unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
+
+# We check number of individuals with at least 3 measurements 
+length(keep)
+```
+
+```{r}
+# We create a baseline-date
+surv_data <- surv_data %>%
+  group_by(RID) %>%
+  mutate(baseline_date = min(EXAMDATE_ptau)) %>%
+  ungroup()
+
+# We create event and time_to_event (where dementia is the event) and add age och gender 
+surv_data <- surv_data %>%
+group_by(RID) %>%
+  summarise(
+    age_at_baseline = as.numeric(min(baseline_date), "%Y") - min(PTDOBYY),
+    PTGENDER = PTGENDER[which.min(EXAMDATE_ptau)],
+    APOE4_status = APOE4_status[which.min(EXAMDATE_ptau)],
+    
+    time_to_event = case_when(
+
+    any(DIAGNOSIS_dx == "Dementia") ~
+      as.numeric(min(EXAMDATE_ptau[DIAGNOSIS_dx == "Dementia"]) -
+                   min(c(EXAMDATE_ptau, EXAMDATE_dx))),
+
+    TRUE ~ as.numeric(max(c(EXAMDATE_ptau, EXAMDATE_dx)) -
+                    min(c(EXAMDATE_ptau, EXAMDATE_dx)))) / 365,
+
+  event = as.integer(any(DIAGNOSIS_dx == "Dementia"))
+) %>% ungroup()
+
+# We check the number of events 
+table(surv_data$event)
+```
+
+```{r}
+
+```
