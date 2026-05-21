@@ -163,8 +163,6 @@ The simultaneous modelling of multivariate longitudinal biomarkers and clinical 
 
 Additionally, while the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and data conditions, few studies have systematically compared them within a unified framework, particularly for blood-based biomarkers such as p-tau181 and NfL. Such comparisons have been conducted in other domains. For instance, a 2025 study compared modelling approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox PH models using baseline, time-averaged, and time-dependent biomarker values, as well as JMs (Goksuluk et al., 2025, pp. 1, 4-5). Overall, JMs demonstrated superior predictive performance, with multivariate JMs performing slightly better than separate JMs fitted for each biomarker (Goksuluk et al., 2025, p. 8).
 
-Given the recent developments in blood-based biomarkers, it is of critical importance to validate an optimal panel of biomarkers for AD diagnosis **(REF)**. A full panel has been suggested using several blood-based biomarkers, including p-tau181, NfL and an additional phosphorylated tau protein, p-tau217 (DuBois, K. N., et al., 2025). However, models using this full panel might suffer when sample sizes are small as well as from issues concerning multicollinearity between p-tau217 and p-tau181. Validation of a model using fewer biomarkers would require fewer blood-tests, meaning quicker and cheaper implementation. Therefore, the question arises as to which of p-tau181 and NfL perform best in isolation, as well as how much predictive performance increases when accounting for both biomarkers within the proposed modeling frameworks.
-
 ## Research Aims
 
 This study investigates the prediction of progression to Alzheimer’s disease-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
@@ -459,13 +457,13 @@ where $G(t)$ is the censoring survival function, which quantifies the probabilit
 
 The commonly formulated Brier score:
 
-$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n_{sample}}(Y_i(t) - \widehat S_i(t))^2$$
+$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$
 
 where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score is given as:
 
 $$BS =
-\frac{1}{ \tilde n(t)}\sum_{i = 1}^{n_{sample}} \left(
-\frac{\widehat (S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
+\frac{1}{ \tilde n(t)}\sum_{i = 1}^{n} \left(
+\frac{( \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}
 \right)$$
 
