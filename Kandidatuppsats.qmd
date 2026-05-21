@@ -399,8 +399,6 @@ Receiver Operating Characteristic (ROC) analysis is commonly used to evaluate th
 
 When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
 
-# ---
-
 Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
 
 $$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
@@ -416,8 +414,6 @@ The time-dependent area under the curve (AUC) is then defined as:
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
-
-# ---
 
 Let $T_i$ denote the time of disease onset for individual $i$, and let $X_i$ represent a marker value (typically measured at baseline) for individual $i$, where $i = 1, \ldots, n$ (Kamarudin et al., 2017, p. 2).
 
@@ -489,7 +485,7 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in **Appendix X**. The corresponding distributions and summary statistics for the variables of interest are also presented there and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 13. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 12 and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
