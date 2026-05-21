@@ -167,7 +167,7 @@ Additionally, while the predictive performance of most of these modelling approa
 
 This study investigates the prediction of progression to AD due to dementia (AD-dementia) using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
 
-1.  What provides the best prediction of progression to AD-dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with latent class structure?
+1.  What provides the best prediction of time to progression to AD-dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with latent class structure?
 2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to AD-dementia?
 
 # Methodology
