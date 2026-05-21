@@ -231,7 +231,7 @@ Joint models simultaneously model longitudinal and survival data, allowing for t
 
 ### Linear Mixed-Effects Submodel
 
-The longitudinal component of the joint model is specified by a LME model (**LAIRD & WAIRE**), capturing both population-level trends described by the fixed effects as well as individual variability, modeled by the random effects.
+The longitudinal component of the joint model is specified by a LME model (Fitzmaurice et al., 2011, p. 17), capturing both population-level trends described by the fixed effects as well as individual variability, modeled by the random effects.
 
 Since longitudinal data consists of repeated measurements from the same individuals, the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, $t$, are correlated with measurements made on prior and subsequent occasions. Therefore, responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, which can be considered grouped with non-independence within groups, is handled well by LME models.
 
