@@ -141,7 +141,7 @@ library(kableExtra)
 
 ## Background
 
-According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world with no definitive cure (WHO, 2025). The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (pre-clinical AD), a pre-dementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes due to AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
+According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world with no definitive cure. The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (pre-clinical AD), a pre-dementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes due to AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
 
 In the context of AD, the term "biomarker" is commonly used and is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (Biomarkers Definitions Working Group, 2001, p. 91).
 
@@ -153,7 +153,7 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of statistical models to predict progression to dementia using biomarker data in order to evaluate their predictive performance For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
+Recent research has applied a range of statistical models to predict progression to dementia using biomarker data in order to evaluate their predictive performance. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using receiver operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed dementia during follow-up (Wang et al., 2021, pp. 1-2).
 
 Similarly, a large population-based study of 2148 older adults from Sweden applied a single multivariable Cox PH model including p-tau181, p-tau217, neurofilament light (NfL), and GFAP as simultaneous baseline predictors, to examine their predictive value for progression to all-cause and Alzheimer’s disease dementia. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 0.74, 0.77, and 0.81 for AD-dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD-dementia (Grande et al., 2025, pp. 2027-2031).
 
@@ -165,7 +165,7 @@ Additionally, while the predictive performance of most of these modelling approa
 
 ## Research Aims
 
-This study investigates the prediction of progression to Alzheimer’s disease-related dementia using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
+This study investigates the prediction of progression to AD due to dementia (AD-dementia) using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
 
 1.  What provides the best prediction of progression to AD-dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with latent class structure?
 2.  Across these modelling approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of progression to AD-dementia?
@@ -413,7 +413,7 @@ $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
 
-### Time-dependent Brier score
+### Time-dependent Brier Score
 
 The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted time-dependent Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). IPCW weights are calculated for each individual $i = 1 , ... , n$ at each time point $t$, such that:
 
@@ -451,7 +451,7 @@ All missing values were removed prior to the analysis to ensure a complete-case 
 
 ## Variables
 
-### Diagnosis status
+### Diagnosis Status
 
 The variable of primary interest represents three diagnostic states - cognitively normal (CN), MCI and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
@@ -715,8 +715,6 @@ Celeux, G. & Soromenho, G. (1996). An entropy criterion for assessing the number
 Chang, L., Rissin, D. M., Fournier, D. R., Piech, T., Patel, P. P., Wilson, D. H., & Duffy, D. C. (2012). Single Molecule Enzyme-Linked Immunosorbent Assays: Theoretical Considerations. *Journal of Immunological Methods*, 378(1-2), 102–115. <https://doi.org/10.1016/j.jim.2012.02.011>
 
 Clark, C., Lewczuk, P., Kornhuber, J., Richiardi, J., Maréchal, B., Karikari, T. K., Blennow, K., Zetterberg, H., & Popp, J. (2021). Plasma neurofilament light and phosphorylated tau 181 as biomarkers of Alzheimer’s disease pathology and clinical disease progression. *Alzheimer’s Research & Therapy*, 13(1). <https://doi.org/10.1186/s13195-021-00805-8>
-
-DuBois, K. N., Pal, S., Reader, J. M., Jackman, B., Perkins, M. D., Khobeir, N., Bakulski, K. M., Heidebrink, J., Hampstead, B. M., Morgan, D. G., & Kanaan, N. M. (2025). Evaluation of a panel of plasma biomarkers for Alzheimer’s disease in a diverse research cohort. *Journal of Alzheimer’s Disease*, *109*(1), 247–265. <https://doi.org/10.1177/13872877251393405>
 
 Fitzmaurice, G. M., Laird, N. M., & Ware, J. H. (2011). *Applied longitudinal analysis* (2nd ed.). John Wiley & Sons.
 
