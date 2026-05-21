@@ -38,7 +38,7 @@ include-before-body:
     
     \vspace{0.5cm}
     
-    {\normalsize Att Predicera Progression till Alzheimers Sjukdomsdemens med hjälp av Blodbaserade Biomarkörer: en Komparativ Analys av Modelleringsmetoder och Biomarkörstrategier\par}
+    {\normalsize Att predicera progression till demens av Alzheimers sjukdom med hjälp av blodbaserade biomarkörer: en komparativ analys av modelleringsmetoder och biomarkörstrategier\par}
     
     \vfill
 
