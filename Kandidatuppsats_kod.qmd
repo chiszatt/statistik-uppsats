@@ -21,7 +21,7 @@ format:
         {\large \today\par}
         \vspace{3cm}
         
-        {\Huge Charlotte Emily Iszatt & Milou Rossi\par}
+        {\Huge Charlotte Emily Iszatt \& Milou Rossi\par}
         
         \vfill
         
@@ -585,8 +585,6 @@ dx_post <- dx_full_cohort %>%
   ) %>%
   dplyr::filter(EXAMDATE_dx >= EXAMDATE_baseline)
 
-table(dx_post$DIAGNOSIS_dx)
-
 # Diagnosis distributions
 dx_full_counts <- table(dx_full_cohort$DIAGNOSIS_dx)
 dx_post_counts <- table(dx_post$DIAGNOSIS_dx)
@@ -602,15 +600,11 @@ nfl_table <- long_data %>%
   count(RID) %>%
   count(n, name = "n_RID")
 
-# Diagnosis visits per participant (min/median/max)
+# Diagnosis visits per participant
 dx_visits <- dx_full_cohort %>%
   filter(!is.na(DIAGNOSIS_dx)) %>%
   count(RID) %>%
-  summarise(
-    min = min(n),
-    median = median(n),
-    max = max(n)
-  )
+  summarise(min = min(n), median = median(n), max = max(n))
 
 # Examination date ranges
 ptau_range <- range(long_data$EXAMDATE_ptau, na.rm = TRUE)
@@ -635,23 +629,24 @@ cohort_summary_table <- tibble(
     "Diagnosis visits per participant (median [range])"
   ),
   Value = c(
-    paste0(median(surv_data$age_at_baseline, na.rm = TRUE),
-           " (", min(surv_data$age_at_baseline, na.rm = TRUE),
-           ", ", max(surv_data$age_at_baseline, na.rm = TRUE), ")"),
+    paste0(median(surv_data$age_at_baseline, na.rm = TRUE), " (",
+           min(surv_data$age_at_baseline, na.rm = TRUE), ", ",
+           max(surv_data$age_at_baseline, na.rm = TRUE), ")"),
 
     paste(names(table(surv_data$PTGENDER)),
           table(surv_data$PTGENDER), collapse = "; "),
 
-    paste(names(table(surv_data$genotype)),
-          table(surv_data$genotype), collapse = "; "),
+    paste0(table(surv_data$genotype), " (",
+           names(table(surv_data$genotype)), ")",
+           collapse = "; "),
 
-    paste0(median(long_data$PLASMAPTAU181, na.rm = TRUE),
-           " (", min(long_data$PLASMAPTAU181, na.rm = TRUE),
-           ", ", max(long_data$PLASMAPTAU181, na.rm = TRUE), ")"),
+    paste0(median(long_data$PLASMAPTAU181, na.rm = TRUE), " (",
+           min(long_data$PLASMAPTAU181, na.rm = TRUE), ", ",
+           max(long_data$PLASMAPTAU181, na.rm = TRUE), ")"),
 
-    paste0(median(long_data$PLASMA_NFL, na.rm = TRUE),
-           " (", min(long_data$PLASMA_NFL, na.rm = TRUE),
-           ", ", max(long_data$PLASMA_NFL, na.rm = TRUE), ")"),
+    paste0(median(long_data$PLASMA_NFL, na.rm = TRUE), " (",
+           min(long_data$PLASMA_NFL, na.rm = TRUE), ", ",
+           max(long_data$PLASMA_NFL, na.rm = TRUE), ")"),
 
     paste(ptau_range, collapse = " – "),
     paste(nfl_range, collapse = " – "),
@@ -660,8 +655,8 @@ cohort_summary_table <- tibble(
     paste(names(dx_full_counts), dx_full_counts, collapse = "; "),
     paste(names(dx_post_counts), dx_post_counts, collapse = "; "),
 
-    paste(ptau_table$n_RID, collapse = ", "),
-    paste(nfl_table$n_RID, collapse = ", "),
+    paste0(ptau_table$n_RID, " (", ptau_table$n, ")", collapse = ", "),
+    paste0(nfl_table$n_RID, " (", nfl_table$n, ")", collapse = ", "),
 
     paste0(dx_visits$min, " (", dx_visits$median, ", ", dx_visits$max, ")")
   )
@@ -1383,89 +1378,6 @@ surv_lrt_table <- data.frame(
   )
 ```
 
-### Cox model comparison table
-
-```{r}
-# Building Cox model comparison table
-# Extracting model output
-extract_model_cox <- function(model) {
-  s <- summary(model)
-
-  data.frame(
-    Variable = rownames(s$coefficients),
-    HR = exp(s$coefficients[, "coef"]),
-    CI_low = s$conf.int[, "lower .95"],
-    CI_high = s$conf.int[, "upper .95"],
-    P = s$coefficients[, "Pr(>|z|)"],
-    row.names = NULL
-  )
-}
-
-# Formatting HR and CI
-format_hr_ci <- function(hr, low, high) {
-  paste0(round(hr, 3), " (", round(low, 3), "–", round(high, 3), ")")
-}
-
-# Formatting P-values
-format_p <- function(x) {
-  ifelse(is.na(x), NA,
-         ifelse(x < 0.001, "<0.001", round(x, 3)))
-}
-
-# Extracting models
-ptau_cox <- extract_model_cox(surv_model_ptau_bl_final)
-nfl_cox <- extract_model_cox(surv_model_nfl_bl_final)
-both_cox <- extract_model_cox(surv_model_both_bl_final)
-
-# Building variable set
-all_vars_cox <- unique(c(ptau_cox$Variable, nfl_cox$Variable, both_cox$Variable))
-
-# Value extraction
-get_value <- function(df, var, col) {
-  out <- rep(NA, length(var))
-
-  for (i in seq_along(var)) {
-    idx <- which(df$Variable == var[i])
-    if (length(idx) == 1) {
-      out[i] <- df[idx, col]
-    }
-  }
-  out
-}
-
-# Building final table
-table_cox <- data.frame(
-  Variable = all_vars_cox,
-
-  "PTau HR (CI)" = format_hr_ci(
-    get_value(ptau_cox, all_vars_cox, "HR"),
-    get_value(ptau_cox, all_vars_cox, "CI_low"),
-    get_value(ptau_cox, all_vars_cox, "CI_high")
-  ),
-  "PTau P" = format_p(get_value(ptau_cox, all_vars_cox, "P")),
-
-  "NfL HR (CI)" = format_hr_ci(
-    get_value(nfl_cox, all_vars_cox, "HR"),
-    get_value(nfl_cox, all_vars_cox, "CI_low"),
-    get_value(nfl_cox, all_vars_cox, "CI_high")
-  ),
-  "NfL P" = format_p(get_value(nfl_cox, all_vars_cox, "P")),
-
-  "Both HR (CI)" = format_hr_ci(
-    get_value(both_cox, all_vars_cox, "HR"),
-    get_value(both_cox, all_vars_cox, "CI_low"),
-    get_value(both_cox, all_vars_cox, "CI_high")
-  ),
-  "Both P" = format_p(get_value(both_cox, all_vars_cox, "P")),
-
-  row.names = NULL, 
-  check.names = FALSE
-)
-
-# Showing table
-table_cox
-```
-
 ### Concordance Index Table
 
 ```{r}
@@ -1552,68 +1464,6 @@ multi_joint_model <- jm(surv_model_final, mixed ,
 ```{r}
 # Checking convergence 
 ggtraceplot(multi_joint_model, "alphas")
-```
-
-### Joint model comparison table
-
-```{r}
-# Building joint model comparison table
-# Extracting models (JMbayes2 joint models use log-HR scale with HR = exp(Mean)), where Mean is the posterior mean of the log-hazard ratio
-extract_model_jm <- function(model) {
-
-  s <- summary(model)$Survival
-
-  data.frame(
-    Variable = rownames(s),
-
-    HR = exp(s[, "Mean"]),
-    CI_low = exp(s[, "2.5%"]),
-    CI_high = exp(s[, "97.5%"]),
-
-    P = s[, "P"],
-    row.names = NULL
-  )
-}
-
-# Extracting models
-ptau_jm <- extract_model_jm(joint_model_ptau)
-nfl_jm <- extract_model_jm(joint_model_nfl)
-both_jm <- extract_model_jm(multi_joint_model)
-
-# Building variable set
-all_vars_jm <- unique(c(ptau_jm$Variable, nfl_jm$Variable, both_jm$Variable))
-
-# Building final table
-table_jm <- data.frame(
-  Variable = all_vars_jm,
-
-  "PTau HR (CI)" = format_hr_ci(
-    get_value(ptau_jm, all_vars_jm, "HR"),
-    get_value(ptau_jm, all_vars_jm, "CI_low"),
-    get_value(ptau_jm, all_vars_jm, "CI_high")
-  ),
-  "PTau P" = format_p(get_value(ptau_jm, all_vars_jm, "P")),
-
-  "NfL HR (CI)" = format_hr_ci(
-    get_value(nfl_jm, all_vars_jm, "HR"),
-    get_value(nfl_jm, all_vars_jm, "CI_low"),
-    get_value(nfl_jm, all_vars_jm, "CI_high")
-  ),
-  "NfL P" = format_p(get_value(nfl_jm, all_vars_jm, "P")),
-
-  "Both HR (CI)" = format_hr_ci(
-    get_value(both_jm, all_vars_jm, "HR"),
-    get_value(both_jm, all_vars_jm, "CI_low"),
-    get_value(both_jm, all_vars_jm, "CI_high")
-  ),
-  "Both P" = format_p(get_value(both_jm, all_vars_jm, "P")),
-
-  row.names = NULL,
-  check.names = FALSE
-)
-
-# Showing table
-table_jm
 ```
 
 ## Rhat value comparison table
@@ -3831,7 +3681,7 @@ dev.off()
 ```{r}
 # Saving the table showing cohort characteristics and measurement distributions
 #saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
-saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
+#saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
 ```
 
 ```{r}
@@ -3934,11 +3784,6 @@ saveRDS(surv_lrt_table, "tables/surv_lrt_table.rds")
 ```
 
 ```{r}
-# Savig the cox models comparison table
-saveRDS(table_cox, "tables/table_cox1.rds")
-```
-
-```{r}
 # Saving the C-index table
 saveRDS(c_index_table, "tables/c_index_table.rds")
 ```
@@ -3967,11 +3812,6 @@ png("figures/convergence_plot_multi.png",
  dev.off()
  
  # Note: Since the function does not allow direct extraction of both plots, one is saved here, # while the other was captured via screenshot and added manually.
-```
-
-```{r}
-# Saving the joint model comparison table
-saveRDS(table_jm, "tables/table_jm1.rds")
 ```
 
 ```{r}
@@ -4066,11 +3906,11 @@ dev.off()
 
 ```{r}
 # Saving the posterior probability table for the 2 class jlcmm for ptau and NfL
-pprob_m1_ptau_nfl <- get_pprob_table(mult_jlcmm_m1)
-saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
+#pprob_m1_ptau_nfl <- get_pprob_table(mult_jlcmm_m1)
+#saveRDS(pprob_m1_ptau_nfl, "tables/pprob_m1_ptau_nfl.rds")
 ```
 
 ```{r}
 # Comparing M0, M1, M2 (NfL and p-tau181)
-saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
+#saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
 ```
