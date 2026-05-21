@@ -813,7 +813,7 @@ kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
-kable_standard(readRDS("tables/event_table_full"))
+kable_standard(readRDS("tables/event_table_full.rds"))
 ```
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
