@@ -239,7 +239,7 @@ Following the notation of Rizopoulos (2012, p. 54), the biomarker processes are 
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
 
-$$ m_i(t) = \mathbf{X_i^T}\bm{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
+$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
 
 where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
 
@@ -593,7 +593,6 @@ The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and basel
 
 ## Model Comparison
 
-In order to compare the predictive performance of the different modelling approaches, time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 In order to compare the predictive performance of the different modelling approaches, the time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
