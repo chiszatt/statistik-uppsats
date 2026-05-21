@@ -477,7 +477,7 @@ Additionally, age is included as a covariate when predicting progression to deme
 
 ### Gender
 
-Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between sexes. More precisely, women aged over 80 have a slightly higher risk of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b). As for age, the variable was retrieved from the PTDEMOG dataset.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between sexes. More precisely, women aged over 80 have a slightly higher risk of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b). Among the included participants, 315 were female, while 389 were male. As for age, the variable was retrieved from the PTDEMOG dataset.
 
 ### APOE4-status
 
