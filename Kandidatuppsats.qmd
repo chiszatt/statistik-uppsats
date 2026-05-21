@@ -38,7 +38,7 @@ include-before-body:
     
     \vspace{0.5cm}
     
-    {\normalsize Att predicera progression till demens av Alzheimers sjukdom med hjälp av blodbaserade biomarkörer: en komparativ analys av modelleringsmetoder och biomarkörstrategier\par}
+    {\normalsize Att predicera progression till demens vid Alzheimers sjukdom med hjälp av blodbaserade biomarkörer: en komparativ analys av modelleringsmetoder och biomarkörstrategier\par}
     
     \vfill
 
@@ -598,7 +598,7 @@ In order to compare the predictive performance of the different modelling approa
 
 Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong discriminative ability to distinguish between individuals who progressed to AD-dementia and those who did not over time. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
-Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows higher a slightly higher value for the JLCMM at for the latest prediction horizon.
+Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows a slightly higher value for the JLCMM at for the latest prediction horizon.
 
 Appendix 8.6; Figure 11b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions. These results are also indicated by Table 10 which contains the AUC values for each modelling approach and at each horizon.
 
@@ -646,7 +646,7 @@ When observing the time-dependent Brier score curves, such as Figure 5 presentin
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
-All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, indicating a lower Brier score and thus better overall predictive accuracy at this time point compared to the two single-marker models
+All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, indicating a lower Brier score and thus better overall predictive accuracy at this time point compared to the two single-marker models.
 
 In a similar manner, the multivariate JM demonstrates lower AUC compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 14a). These two models consistently show similar AUC values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 14b).
 
