@@ -1734,6 +1734,47 @@ get_pprob_table <- function(model) {
 }
 ```
 
+```{r}
+# defining a function to extract the model parameters
+get_jlcmm_params <- function(model) {
+  
+  p_full <- length(model$best)
+#   model$V is a vector of the upper triangle of a matrix, not the var-covar matrix itself 
+  V_mat <- matrix(0, nrow = p_full, ncol = p_full)
+  V_mat[upper.tri(V_mat, diag = TRUE)] <- model$V
+#   Fill the matrix by adding its transpose, then removing the doubled values on the diagonal
+  V_mat <- V_mat + t(V_mat) - diag(diag(V_mat))
+  
+#   Dropping unwanted values stored in model$best
+  drop <- "varcov|stderr"
+#   Creates a logical vector in orer to drop values from estimates and var-covar matrix 
+  keep <- !grepl(drop, names(model$best))
+  estimates <- model$best[keep]
+  V_mat <- V_mat[keep, keep]
+  parameters <- names(estimates)
+
+  se <- sqrt(diag(V_mat))
+  z <- estimates / se
+  p_values <- 2 * (1 - pnorm(abs(z)))
+  
+  submodel <- c("Class Membership",
+                "Survival", "Survival", "Survival", "Survival",
+                "Longitudinal", "Longitudinal", "Longitudinal")
+  
+  out <- data.frame(
+    "Submodel" = submodel,
+    "Parameter" = parameters,
+    "Estimate" = round(estimates, 3),
+    "SE" = round(se, 3),
+    "Z" = round(z, 3),
+    "P value" = round(p_values, 3),
+    check.names = FALSE
+  )
+  
+  return(out)
+}
+```
+
 ## M2 (3 latent classes)
 
 ```{r}
@@ -1924,6 +1965,23 @@ saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
 ```
 
 ### Survival curves by class
+
+```{r}
+plot(
+  jlcmm_m1_nfl,
+  which = "survival",
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  legend.loc = "bottomleft",
+  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = ""
+)
+```
 
 ```{r}
 # Saving the plot 
@@ -2339,6 +2397,23 @@ saveRDS(class_summary_ptau, "tables/class_summary_ptau.rds")
 ```
 
 ### Survival curves by class
+
+```{r}
+plot(
+  jlcmm_m1_ptau,
+  which = "survival",
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  legend.loc = "bottomleft",
+  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = ""
+)
+```
 
 ```{r}
 # Saving the plot 
