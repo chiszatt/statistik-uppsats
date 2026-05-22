@@ -67,7 +67,7 @@ include-before-body:
     
     \begin{justify}
     
-    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provide the most accurate prediction of progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards (Cox PH) models, joint models (JMs), and joint latent class mixed models (JLCMMs), incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons, based on time-dependent AUC and the time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and follow-up time, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly at earlier horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded the best predictive performance, while each biomarker alone showed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers.\par}
+    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of time to progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models, and joint latent class mixed models, incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons at a landmark time of 1 year, based on time-dependent AUC and the time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and follow-up time, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly at earlier horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded superior predictive performance, while NfL and p-tau181 alone displayed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers.\par}
     
     \end{justify}
     
@@ -142,11 +142,9 @@ library(kableExtra)
 
 ## Background
 
-According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world with no definitive cure. The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (pre-clinical AD), a pre-dementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes due to AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
+According to the World Health Organization (2025), Alzheimer's disease (AD) is the most common neurodegenerative disorder and a leading cause of dementia around the world with no definitive cure. The 2011 National Institute on Aging-Alzheimer’s Association (NIA-AA) diagnostic guidelines describe the disease as a continuum with three stages: a symptom-free stage (pre-clinical AD), a pre-dementia stage (mild cognitive impairment (MCI) due to AD) and a dementia stage (dementia due to AD) (Carrillo et al. 2013, p. 596). Pathophysiological changes symptomatic of AD can begin up to 20 years before clinical symptoms appear, highlighting the crucial importance of early diagnosis and timely intervention to potentially slow the progression of the disease (Carrillo et al., p. 595).
 
-In the context of AD, the term "biomarker" is commonly used and is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (Biomarkers Definitions Working Group, 2001, p. 91).
-
-AD pathophysiology has typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain or by quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattsson et al., 2017, p. 557). The former method involves radiation and the latter requires a lumbar puncture in order to extract the CSF, both of which are invasive procedures. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6). Specifically, recent breakthroughs in technology (Rissin et al., 2010) have allowed for quantification of biomarkers at much smaller concentrations than previous methods, typically being up to 1000 times more sensitive (Chang et al., 2012, p. 2). Using this method, biomarkers can be detected peripherally from their origin where concentrations are much smaller. These advances mean that the previously utilised invasive procedures can be substituted with easy to administer blood tests.
+In the context of AD, the term "biomarker" is commonly used and is defined as "a characteristic that is objectively measured and evaluated as an indicator of normal biological processes, pathogenic processes, or pharmacologic responses to a therapeutic intervention." (Biomarkers Definitions Working Group, 2001, p. 91). One method for diagnosing AD involves the quantification of biomarkers implicated in AD pathology in cerbrospinal fluid (CSF) (Mattsson et al., 2017, p. 557). AD pathophysiology has also typically been detected by positron emission topography (PET) to confirm the presence and degree of amyloid plaques in the brain. The former method requires a lumbar puncture to the spine in order to extract the CSF, whilst the latter method involves radiation, both of which are highly invasive procedures. WHO published a report in 2024 highlighting the promising progress made in recent years regarding the use of blood-based biomarkers to support AD diagnosis (WHO, p. 6). Specifically, recent breakthroughs in technology (Rissin et al., 2010) have allowed for quantification of biomarkers at much smaller concentrations than previous methods, typically being up to 1000 times more sensitive (Chang et al., 2012, p. 2). Using this method, biomarkers can be detected peripherally from their origin where concentrations are much smaller. These advances mean that the previously utilised invasive procedures can be substituted with blood tests that are both less invasive and can be administered at scale.
 
 There are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024), such as tau protein phosphorylated at the threonine-181 position (p-tau181), with concentrations expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Neurofilament light chain (NfL), a marker of neuronal injury not specific to AD (Jack et al., p. 5158), is also of importance. NfL is usually present inside neurons, and therefore concentrations are expected to be higher in individuals with neuronal injury symptomatic of AD (Clark et al., 2021, p. 7). Research suggests that NfL may be used as a prognostic marker of cognitive decline, supporting the diagnosis of a myriad of diseases including frontotemporal dementia, whilst p-tau181 is more useful for differentiating AD from other neurodegenerative conditions (WHO, 2024, p. 7).
 
@@ -599,7 +597,7 @@ The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and basel
 
 In order to compare the predictive performance of the different modelling approaches, the time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
-![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau_test.png){#fig-auc-ptau}
+![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
 
 Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong discriminative ability in distinguishing between individuals who progressed to AD dementia and those who did not over time. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
@@ -611,14 +609,14 @@ These results are also indicated by Table 10 which contains the AUC values for e
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent AUC by model and prediction time point"
-kable_standard(readRDS("tables/results_table_AUC_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC.rds"))
 ```
 
 For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.905 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
 When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
-![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau_test.png){#fig-brier-ptau}
+![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain consistently low, across all modelling approaches, although they show a slight increase over time. This suggests stable overall predictive accuracy and relatively low prediction error for progression to AD dementia. However, the curve for the Cox PH model curve remain slightly higher than the curves representing the JM and the JLCMM models, meaning that it consistently yields higher Brier scores than the two other models. More precisely, the Brier scores for this model range from approximately 0.05 for early predictions to 0.16 for late predictions, while the corresponding Brier scores for the other models range from approximately 0.02 to 0.14. In other terms, two other curves remain closely aligned, although the curve for the JM is slightly lower at the two year-follow-up, indicating a slightly better predictive performance at this time-point.
 
@@ -630,7 +628,7 @@ Table 11 presents the Brier scores for each modelling approach and at each horiz
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent Brier score by model and prediction time point"
-kable_standard(readRDS("tables/results_table_Brier_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier.rds"))
 ```
 
 For predictions at two years, the Cox PH incorporating p-tau181 achieves a Brier score of 0.054, which is notably higher than the corresponding AUC values for the JM and JLCMM incorporating p-tau181, which yield Brier scores of 0.018 and 0.023, respectively. This indicates that the Cox PH model performs the worst at this early horizon, with the JLCMM coming in second and the JM performing the best. The same results are observed among the models incorporating NfL, as well as among those incorporating both biomarkers.
@@ -810,11 +808,11 @@ kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
-![Log-transformed NfL distribution](figures/hist_log_p_tau.png){#fig-hist-ptau}
+![Distribution of log-transformed p-tau181 measurements](figures/hist_log_p_tau.png){#fig-hist-ptau}
 
-![Log-transformed NfL distribution](figures/hist_log_nfl.png){#fig-hist-nfl}
+![Distribution of log-transformed NfL measurements](figures/hist_log_nfl.png)
 
-Distributions of log transformed biomarkers
+Distributions of log-transformed biomarkers
 :::
 
 ::: {#fig-corr layout-ncol="2"}
@@ -915,17 +913,17 @@ Class-specific survival curves estimated from the JLCMMs
 ## AUC and Brier Curves: Model Comparison
 
 ::: {#fig-auc-model layout-ncol="2"}
-![Models using NfL](figures/q1_auc_nfl_test.png){#fig-auc-nfl}
+![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
 
-![Models using p-tau181 & NfL](figures/q1_auc_multi_test.png){#fig-auc-multi}
+![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
 
 Time-dependent AUC curves
 :::
 
 ::: {#fig-brier-model layout-ncol="2"}
-![Models using NfL](figures/q1_brier_nfl_test.png){#fig-brier-nfl}
+![Models using NfL](figures/q1_brier_nfl.png){#fig-brier-nfl}
 
-![Models using p-tau181 & NfL](figures/q1_brier_multi_test.png){#fig-brier-multi}
+![Models using p-tau181 & NfL](figures/q1_brier_multi.png){#fig-brier-multi}
 
 Time-dependent Brier score curves
 :::
@@ -933,7 +931,7 @@ Time-dependent Brier score curves
 ## AUC and Brier Curves: Biomarker Comparison
 
 ::: {#fig-auc-bm layout-ncol="2"}
-![JM](figures/q2_auc_jm_test.png){#fig-auc-jm}
+![JM](figures/q2_auc_jm.png){#fig-auc-jm}
 
 ![JLCMM](figures/q2_auc_lcjm.png){#fig-auc-jlcmm}
 
@@ -941,7 +939,7 @@ Time-dependent AUC curves
 :::
 
 ::: {#fig-brier-bm layout-ncol="2"}
-![JM](figures/q2_brier_jm_test.png){#fig-brier-jm}
+![JM](figures/q2_brier_jm.png){#fig-brier-jm}
 
 ![JLCMM](figures/q2_brier_lcjm.png){#fig-brier-jlcmm}
 
@@ -954,91 +952,91 @@ Time-dependent Brier score curves
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
+# kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
+```
+
+```{r}
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
+# kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
+kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/results_table_Brier_last_duplicate_test_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
+# kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
+```
+
+```{r}
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
+# kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
-kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
-kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
+# kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
-kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
 
 ```{r}
@@ -1052,26 +1050,26 @@ kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
-```
-
-```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
+# kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
+```
+
+```{r}
+# #| pos: "H"
+# #| tbl-pos: "H"
+# #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
+# kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
