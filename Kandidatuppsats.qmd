@@ -67,7 +67,7 @@ include-before-body:
     
     \begin{justify}
     
-    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of time to progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models, and joint latent class mixed models, incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons at a landmark time of 1 year, based on time-dependent AUC and the time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and follow-up time, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly at earlier horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded superior predictive performance, while NfL and p-tau181 alone displayed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers.\par}
+    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of time to progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models, and joint latent class mixed models, incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons at a landmark time of 1 year, based on time-dependent AUC and time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and follow-up time, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly at earlier horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded superior predictive performance, while NfL and p-tau181 alone displayed similar but weaker performance, indicating complementary prognostic information. Consequently, this study may improve the understanding of optimal approaches for early disease prediction using blood-based biomarkers.\par}
     
     \end{justify}
     
@@ -982,10 +982,24 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
+#kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
+```
+
+```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+```
+
+```{r}
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+#kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
@@ -1038,10 +1052,10 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
-kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
+#kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 ```
 
 ```{r}
