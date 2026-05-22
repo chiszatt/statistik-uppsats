@@ -219,7 +219,7 @@ nfl_data <- nfl_data %>%
 #### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
 
 ```{r}
-#ptau_data <- ptau_data %>%
+# ptau_data <- ptau_data %>%
 #  group_by(RID, EXAMDATE) %>%
 #  arrange(RID, EXAMDATE) %>%
 #  mutate(
@@ -227,8 +227,8 @@ nfl_data <- nfl_data %>%
 #    ) %>%
 #  ungroup() %>%
 #  distinct()
-
-#nfl_data <- nfl_data %>%
+# 
+# nfl_data <- nfl_data %>%
 #  group_by(RID, EXAMDATE) %>%
 #  arrange(RID, EXAMDATE) %>%
 #  mutate(
@@ -439,22 +439,22 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 3 measurements
-#length(keep)
+length(keep)
 ```
 
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
-# We filter individuals with at least 1 measurement of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
-# We check number of individuals with at least 1 measurement
-length(keep)
+# # We filter individuals with at least 1 measurement of ptau_data
+# keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+# long_data <- long_data %>% filter(RID %in% keep)
+# surv_data <- surv_data %>% filter(RID %in% keep)
+# # We check number of individuals with at least 1 measurement
+# length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -1938,9 +1938,11 @@ class_preds <- jlcmm_m1_nfl$pprobY
 
 # Merging with model variables
 data_preds <- class_preds %>% merge(
-  jlcmm_data, by = "RID") %>% merge(
-    surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
-  )
+  jlcmm_data, by = "RID")
+
+# %>% merge(
+#     surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
+#   )
 
 # Merging with baseline biomarker values
 data_preds <- data_preds %>% merge(
@@ -2370,9 +2372,11 @@ class_preds <- jlcmm_m1_ptau$pprobY
 
 # Merging with model variables
 data_preds <- class_preds %>% merge(
-  jlcmm_data, by = "RID") %>% merge(
-    surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
-  )
+  jlcmm_data, by = "RID")
+
+# %>% merge(
+#     surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
+#   )
 
 # Merging with baseline biomarker values
 data_preds <- data_preds %>% merge(
@@ -3010,8 +3014,8 @@ dir.create("tables", showWarnings = FALSE)
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
-#saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate.rds")
-#saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
+# saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate_test.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate_test.rds")
 ```
 
 #### The duplicate biomarker measurements are replaced by the last measurement
