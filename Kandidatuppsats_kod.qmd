@@ -439,22 +439,22 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 3 measurements
-#length(keep)
+length(keep)
 ```
 
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-length(keep)
+#length(keep)
 ```
 
 ## Preparing for Cox PH model
@@ -506,6 +506,11 @@ surv_data <- surv_data %>%
         as.numeric(last_followup - EXAMDATE_baseline) / 365
     )
 )
+```
+
+```{r}
+# Adding age at baseline to the longitudinal dataset, to use in the LME models 
+long_data <- long_data %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
 ```
 
 ```{r}
@@ -796,6 +801,7 @@ corrplot(cox_cor,
 
 # Saving the numerical variables used in the LME models
 lme_vars <- long_data_in[, c("time_years",
+                             "age_at_baseline",
                              "log_PLASMAPTAU181",
                              "log_PLASMA_NFL")]
 
@@ -975,10 +981,6 @@ long_model_ptau <- lme(
 
 ```{r}
 summary(long_model_ptau)
-```
-
-```{r}
-long_data_in <- long_data_in %>% merge(surv_data_in %>% dplyr::select(RID, age_at_baseline), by = "RID")
 ```
 
 ```{r}
