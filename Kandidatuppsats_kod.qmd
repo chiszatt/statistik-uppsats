@@ -1119,7 +1119,7 @@ long_re_lrt_table <- data.frame(
 
 ```{r}
 # Mixed object for multivariate joint model
-mixed <- list(long_model_ptau, long_model_nfl)
+mixed <- list(long_model_ptau_test, long_model_nfl_test)
 ```
 
 ## Residual check
@@ -1128,10 +1128,10 @@ mixed <- list(long_model_ptau, long_model_nfl)
 
 ```{r}
 # residuals of the p-tau181 LME model
-res_ptau <- residuals(long_model_ptau, type = "pearson")  
+res_ptau <- residuals(long_model_ptau_test, type = "pearson")  
 
 # fitted values of the p-tau181 LME model
-fitted_vals_ptau <- fitted(long_model_ptau)  
+fitted_vals_ptau <- fitted(long_model_ptau_test)  
 
 # plot of residuals vs fitted values 
 plot(fitted_vals_ptau, res_ptau,
@@ -1143,10 +1143,10 @@ abline(h = 0, col = "red", lty = 2)
 
 ```{r}
 # residuals of the NfL LME model
-res_nfl <- residuals(long_model_nfl, type = "pearson")  
+res_nfl <- residuals(long_model_nfl_test, type = "pearson")  
 
 # fitted values of the NfL LME model
-fitted_vals_nfl <- fitted(long_model_nfl)  
+fitted_vals_nfl <- fitted(long_model_nfl_test)  
 
 # plot of residuals vs fitted values 
 plot(fitted_vals_nfl, res_nfl,
@@ -1428,7 +1428,7 @@ c_index_table <- data.frame(
 # Joint model for p-tau181
 joint_model_ptau <- jm(
   surv_model_final,
-  long_model_ptau,
+  long_model_ptau_test,
   time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
@@ -1447,7 +1447,7 @@ ggtraceplot(joint_model_ptau, "alphas")
 # Joint model for NfL
 joint_model_nfl <- jm(
   surv_model_final,
-  long_model_nfl,
+  long_model_nfl_test,
   time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
