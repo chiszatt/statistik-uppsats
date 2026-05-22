@@ -851,9 +851,9 @@ fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            #data = long_data_in,
-                            #family = students.t(df = 3, link = "identity"))
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            data = long_data_in,
+                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
@@ -868,8 +868,8 @@ testResiduals(lme_residuals_cubed_ptau)
 lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
 testResiduals(lognormal_residuals_ptau)
 
-#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-#testResiduals(student_residuals_ptau)
+student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+testResiduals(student_residuals_ptau)
 ```
 
 #### Shapiro-Wilk test
@@ -880,7 +880,7 @@ shapiro.test(gamma_residuals_ptau$fittedResiduals)
 shapiro.test(lme_residuals_log_ptau$fittedResiduals)
 shapiro.test(lme_residuals_cubed_ptau$fittedResiduals)
 shapiro.test(lognormal_residuals_ptau$fittedResiduals)
-#shapiro.test(student_residuals_ptau$fittedResiduals)
+shapiro.test(student_residuals_ptau$fittedResiduals)
 ```
 
 ### NfL
@@ -913,9 +913,9 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           #data = long_data_in,
-                           #family = students.t(df = 3, link = "identity"))
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           data = long_data_in,
+                           family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
@@ -930,8 +930,8 @@ testResiduals(lme_residuals_cubed_nfl)
 lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
 testResiduals(lognormal_residuals_nfl)
 
-#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-#testResiduals(student_residuals_nfl)
+student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+testResiduals(student_residuals_nfl)
 ```
 
 #### Shapiro-Wilk test
@@ -942,7 +942,7 @@ shapiro.test(gamma_residuals_nfl$fittedResiduals)
 shapiro.test(lme_residuals_log_nfl$fittedResiduals)
 shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
 shapiro.test(lognormal_residuals_nfl$fittedResiduals)
-#shapiro.test(student_residuals_nfl$fittedResiduals)
+shapiro.test(student_residuals_nfl$fittedResiduals)
 ```
 
 # Fitted LME models
@@ -956,7 +956,7 @@ shapiro.test(lognormal_residuals_nfl$fittedResiduals)
 ```{r}
 # Longitudinal model for log p-tau181 with normal distribution 
 long_model_ptau_full <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + genotype,
+  fixed = log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + genotype,
   random = ~ time_years | RID,                    
   data = long_data_in
 )
@@ -973,7 +973,7 @@ summary(long_model_ptau_full)
 ```{r}
 # Longitudinal model for log p-tau181 with APOE4 status 
 long_model_ptau <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status,
+  fixed = log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + APOE4_status,
   random = ~ time_years | RID,                    
   data = long_data_in
 )
@@ -983,18 +983,6 @@ long_model_ptau <- lme(
 summary(long_model_ptau)
 ```
 
-```{r}
-long_model_ptau_test <- lme(
-  fixed = log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + APOE4_status,
-  random = ~ time_years | RID,                    
-  data = long_data_in
-)
-```
-
-```{r}
-summary(long_model_ptau_test)
-```
-
 #### Determining random effects
 
 - Fitting the model with ML estimation in order to compare models using likelihood ratio test
@@ -1002,10 +990,10 @@ summary(long_model_ptau_test)
 - The results give support to fitting the simpler model with only a random intercept. However, $jm()$ does not currently support model fitting for univariate longitudinal data with only a random intercept.
 
 ```{r}
-m1 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (1 | RID),
+m1 <- lmer(log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + APOE4_status + (1 | RID),
            data = long_data_in, REML = FALSE)
 
-m2 <- lmer(log_PLASMAPTAU181 ~ time_years + PTGENDER + APOE4_status + (time_years | RID),
+m2 <- lmer(log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + APOE4_status + (time_years | RID),
            data = long_data_in, REML = FALSE)
 ```
 
@@ -1020,7 +1008,7 @@ anova(m1, m2, type = "LRT")
 ```{r}
 # Longitudinal model for log NfL with normal distribution, all genotype levels
 long_model_nfl_full <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER + genotype, 
+  log_PLASMA_NFL ~ time_years + age_at_baseline + PTGENDER + genotype, 
   random = ~ time_years | RID,
   data = long_data_in
   )
@@ -1037,7 +1025,7 @@ summary(long_model_nfl_full)
 ```{r}
 # Longitudinal model for log NfL with normal distribution, APOE4_status
 long_model_nfl <- lme(
-  fixed = log_PLASMA_NFL ~ time_years + PTGENDER + APOE4_status, 
+  fixed = log_PLASMA_NFL ~ time_years + age_at_baseline + PTGENDER + APOE4_status, 
   random = ~ time_years | RID,
   data = long_data_in
   )
@@ -1047,28 +1035,12 @@ long_model_nfl <- lme(
 summary(long_model_nfl)
 ```
 
-```{r}
-long_model_nfl_test <- lme(
-  fixed = log_PLASMA_NFL ~ time_years + age_at_baseline + PTGENDER + APOE4_status, 
-  random = ~ time_years | RID,
-  data = long_data_in
-  )
-```
-
-```{r}
-summary(long_model_nfl_test)
-```
-
-```{r}
-anova(long_model_nfl_test, long_model_nfl)
-```
-
 #### Removing APOE4 status
 
 ```{r}
 # Longitudinal model for log NfL without APOE4_status
 long_model_nfl_reduced1 <- lme(
-  log_PLASMA_NFL ~ time_years + PTGENDER, 
+  log_PLASMA_NFL ~ time_years + age_at_baseline + PTGENDER, 
   random = ~ time_years | RID,
   data = long_data_in
   )
@@ -1083,7 +1055,7 @@ summary(long_model_nfl_reduced1)
 ```{r}
 # Longitudinal model for log NfL without covariates
 long_model_nfl_reduced2 <- lme(
-  log_PLASMA_NFL ~ time_years, 
+  log_PLASMA_NFL ~ time_years + age_at_baseline, 
   random = ~ time_years | RID,
   data = long_data_in
   )
@@ -1121,7 +1093,7 @@ long_re_lrt_table <- data.frame(
 
 ```{r}
 # Mixed object for multivariate joint model
-mixed <- list(long_model_ptau_test, long_model_nfl_test)
+mixed <- list(long_model_ptau, long_model_nfl)
 ```
 
 ## Residual check
@@ -1130,10 +1102,10 @@ mixed <- list(long_model_ptau_test, long_model_nfl_test)
 
 ```{r}
 # residuals of the p-tau181 LME model
-res_ptau <- residuals(long_model_ptau_test, type = "pearson")  
+res_ptau <- residuals(long_model_ptau, type = "pearson")  
 
 # fitted values of the p-tau181 LME model
-fitted_vals_ptau <- fitted(long_model_ptau_test)  
+fitted_vals_ptau <- fitted(long_model_ptau)  
 
 # plot of residuals vs fitted values 
 plot(fitted_vals_ptau, res_ptau,
@@ -1145,10 +1117,10 @@ abline(h = 0, col = "red", lty = 2)
 
 ```{r}
 # residuals of the NfL LME model
-res_nfl <- residuals(long_model_nfl_test, type = "pearson")  
+res_nfl <- residuals(long_model_nfl, type = "pearson")  
 
 # fitted values of the NfL LME model
-fitted_vals_nfl <- fitted(long_model_nfl_test)  
+fitted_vals_nfl <- fitted(long_model_nfl)  
 
 # plot of residuals vs fitted values 
 plot(fitted_vals_nfl, res_nfl,
@@ -1436,7 +1408,7 @@ c_index_table <- data.frame(
 # Joint model for p-tau181
 joint_model_ptau <- jm(
   surv_model_final,
-  long_model_ptau_test,
+  long_model_ptau,
   time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
@@ -1455,7 +1427,7 @@ ggtraceplot(joint_model_ptau, "alphas")
 # Joint model for NfL
 joint_model_nfl <- jm(
   surv_model_final,
-  long_model_nfl_test,
+  long_model_nfl,
   time_var = "time_years",
   n_chains = 3L,
   n_iter = 11000L,
@@ -3012,9 +2984,9 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-# saveRDS(results_table_AUC, "tables/results_table_AUC_test.rds")
+# saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
 # # Saving the table of the Brier score results
-# saveRDS(results_table_Brier, "tables/results_table_Brier_test.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
@@ -3022,8 +2994,8 @@ dir.create("tables", showWarnings = FALSE)
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
-# saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate_test.rds")
-# saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate_test.rds")
+# saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
 ```
 
 #### The duplicate biomarker measurements are replaced by the last measurement
