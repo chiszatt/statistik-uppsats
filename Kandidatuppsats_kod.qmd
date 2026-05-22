@@ -198,22 +198,22 @@ head(nfl_data %>%
 
 ```{r}
 #Defining plasma ptau as the mean and collapsing to unique RID and EXAMDATE
-ptau_data <- ptau_data %>%
-  group_by(RID, EXAMDATE) %>%
-  mutate(
-    PLASMAPTAU181 = mean(PLASMAPTAU181)
-  ) %>%
-  ungroup() %>%
-  distinct()
+#ptau_data <- ptau_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMAPTAU181 = mean(PLASMAPTAU181)
+#  ) %>%
+#  ungroup() %>%
+#  distinct()
 
 # Defining plasma nfl as the mean and collapsing to unique RID and EXAMDATE
-nfl_data <- nfl_data %>%
-  group_by(RID, EXAMDATE) %>%
-  mutate(
-    PLASMA_NFL = mean(PLASMA_NFL)
-  ) %>%
-  ungroup() %>%
-  distinct()
+#nfl_data <- nfl_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMA_NFL = mean(PLASMA_NFL)
+#  ) %>%
+#  ungroup() %>%
+#  distinct()
 ```
 
 #### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
@@ -241,22 +241,22 @@ nfl_data <- nfl_data %>%
 #### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
 
 ```{r}
-# ptau_data <- ptau_data %>%
-#  group_by(RID, EXAMDATE) %>%
-#  arrange(RID, EXAMDATE) %>%
-#  mutate(
-#    PLASMAPTAU181 = last_ptau,
-#    ) %>%
-#  ungroup() %>%
-#  distinct()
-# nfl_data <- nfl_data %>%
-#  group_by(RID, EXAMDATE) %>%
-#  arrange(RID, EXAMDATE) %>%
-#  mutate(
-#   PLASMA_NFL = last_nfl
-#    ) %>%
-#  ungroup() %>%
-#  distinct()
+ ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+    PLASMAPTAU181 = last_ptau,
+    ) %>%
+  ungroup() %>%
+  distinct()
+ nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  arrange(RID, EXAMDATE) %>%
+  mutate(
+   PLASMA_NFL = last_nfl
+    ) %>%
+  ungroup() %>%
+  distinct()
 ```
 
 ## Merging NfL and ptau-181 data for the longitudinal data set
@@ -506,6 +506,11 @@ surv_data <- surv_data %>%
         as.numeric(last_followup - EXAMDATE_baseline) / 365
     )
 )
+```
+
+```{r}
+# Adding age at baseline to the longitudinal dataset, to use in the LME models 
+long_data <- long_data %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
 ```
 
 ```{r}
@@ -796,6 +801,7 @@ corrplot(cox_cor,
 
 # Saving the numerical variables used in the LME models
 lme_vars <- long_data_in[, c("time_years",
+                             "age_at_baseline",
                              "log_PLASMAPTAU181",
                              "log_PLASMA_NFL")]
 
@@ -975,10 +981,6 @@ long_model_ptau <- lme(
 
 ```{r}
 summary(long_model_ptau)
-```
-
-```{r}
-long_data_in <- long_data_in %>% merge(surv_data_in %>% dplyr::select(RID, age_at_baseline), by = "RID")
 ```
 
 ```{r}
@@ -3802,7 +3804,7 @@ dev.off()
 png("figures/hist_log_p_tau.png",
     width = 6, height = 4, units = "in", res = 300)
 hist(long_data$log_PLASMAPTAU181,
-     xlab = "Log-transformed p-tau181")
+     main = "Log-transformed p-tau181")
 dev.off()
 ```
 
@@ -3811,7 +3813,7 @@ dev.off()
 png("figures/hist_log_nfl.png",
     width = 6, height = 4, units = "in", res = 300)
 hist(long_data$log_PLASMA_NFL,
-     xlab = "Log-transformed NfL" 
+     main = "Log-transformed NfL" 
      )
 dev.off()
 ```
