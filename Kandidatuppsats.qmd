@@ -150,7 +150,7 @@ AD pathophysiology has typically been detected by positron emission topography (
 
 There are several core biomarkers used in the diagnosis and staging of AD (Jack et al., 2024), such as tau protein phosphorylated at the threonine-181 position (p-tau181), with concentrations expected to be higher in individuals with AD pathology (Wong et al., 2012, p. 815). Neurofilament light chain (NfL), a marker of neuronal injury not specific to AD (Jack et al., p. 5158), is also of importance. NfL is usually present inside neurons, and therefore concentrations are expected to be higher in individuals with neuronal injury symptomatic of AD (Clark et al., 2021, p. 7). Research suggests that NfL may be used as a prognostic marker of cognitive decline, supporting the diagnosis of a myriad of diseases including frontotemporal dementia, whilst p-tau181 is more useful for differentiating AD from other neurodegenerative conditions (WHO, 2024, p. 7).
 
-These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.-a). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. Blood samples from the ADNI cohort have been retrospectively analysed using the recently developed quantification method in order to measure p-tau181 and NfL concentrations (Zetterberg & Blennow, 2020; Blennow, 2018).
+These two blood-based biomarkers, along with various other biomarkers and clinical measures related to AD, are the focus of the *Alzheimer’s Disease Neuroimaging Initiative* (ADNI), whose main goals are to provide open-access data to researchers worldwide and to improve the diagnosis of AD (ADNI, n.d.-a). Since 2004, researchers across more than 60 clinical sites in the USA and Canada have continuously collected and analyzed data throughout the different phases of the study. Blood samples from the ADNI cohort have been retrospectively analysed in 2018 for NfL and 2020 for p-tau181 using the recently developed quantification method (Zetterberg & Blennow, 2011; Blennow, 2011).
 
 ## Research Context
 
@@ -703,6 +703,8 @@ Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https:/
 
 Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
 
+Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma neurofilament light (NFL) method* (Rev. Jan. 31, 2011) \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/BLENNOWPLASMANFLLONG/Blennow_Lab\_-*ADNI-1-2*-*Method*-\_Plasma_NFL_longitudinal_UA.pdf](#0)
+
 Brown, E. R., & Ibrahim, J. G. (2003). A Bayesian semiparametric joint hierarchical model for longitudinal and survival data. *Biometrics*, 59(2), 221-228. <https://doi.org/10.1111/1541-0420.00028>
 
 Carlin, B. P., & Louis, T. A. (2008). *Bayesian methods for data analysis* (3rd ed.). CRC Press.
@@ -717,7 +719,7 @@ Clark, C., Lewczuk, P., Kornhuber, J., Richiardi, J., Maréchal, B., Karikari, T
 
 Fitzmaurice, G. M., Laird, N. M., & Ware, J. H. (2011). *Applied longitudinal analysis* (2nd ed.). John Wiley & Sons.
 
-Goksuluk, M. B., Goksuluk, D., & Sipahioglu, M. H. (2025). Assessing biomarker trajectories for mortality risk in peritoneal dialysis: A focus on multivariate joint modeling. *PloS one*, 20(7), e0320385. <https://doi.org/10.1371/journal.pone.0320385> 
+Goksuluk, M. B., Goksuluk, D., & Sipahioglu, M. H. (2025). Assessing biomarker trajectories for mortality risk in peritoneal dialysis: A focus on multivariate joint modeling. *PloS one*, 20(7), e0320385. <https://doi.org/10.1371/journal.pone.0320385>
 
 Grande, G., Valletta, M., Rizzuto, D., et al. (2025). Blood-based biomarkers of Alzheimer’s disease and incident dementia in the community. *Nature Medicine*, 31(1), 2027-2035. <https://doi.org/10.1038/s41591-025-03605-x>
 
@@ -780,6 +782,8 @@ Xia, X., Duffner, L. A., Bintener, C., Bradshaw, A., Lamirel, D., & Jönsson, L.
 Xu, L. (2021). Bayesian Multivariate Joint Modeling for Skewed-longitudinal and Time-to-event Data. *USF Tampa Graduate Theses and Dissertations*. <https://digitalcommons.usf.edu/etd/9268>
 
 Yuan, M., Lian, S., Li, X., Long, X., Fang, Y., & Alzheimer's Disease Neuroimaging Initiative (ADNI) (2024). Blood biomarkers in dynamic prediction of conversion to Alzheimer's disease: An application of joint modeling. *International journal of geriatric psychiatry*, 39(3), e6079. <https://doi.org/10.1002/gps.6079>
+
+Zetterberg, H., & Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma P-tau181: Method* (Rev. Jan. 31, 2011). \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/UGOTPTAU181/UGOT_Lab\_-\_ADNI_1-Go-2\_-\_Method\_-\_Plasma_P-tau181_longitudinal.pdf](#0)
 
 Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). *Statistical evaluation of diagnostic performance: Topics in ROC analysis* (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b11031>
 
