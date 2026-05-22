@@ -331,7 +331,7 @@ In JLCMM, the biomarker and the time-to-event are considered to be conditionally
 
 2.  The relationship between biomarker trajectory and the time-to-diagnosis is captured completely by the latent class indicator, $c_i$.
 
-There are various methods for assessing the conditional independence assumption, but simulations have demonstrated the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival processes, even against two misspecified alternative hypotheses (Jacqmin-Gadda et al., 2010, p. 17).
+There are various methods for assessing the conditional independence assumption, but simulations have demonstrated the superior performance of the score-test statistic in evaluating residual independence between the longitudinal and survival processes, even against two miss-specified alternative hypotheses (Jacqmin-Gadda et al., 2010, p. 17).
 
 The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and time-to-event is captured entirely by group membership. Given the class membership is known, there is assumed to be no remaining dependence between the biomarker response and the time-to-event response. Assuming a model with a current value association structure, the association parameter, $\alpha_1$, is assumed to be zero under the null hypothesis (Jacqmin-Gadda et al., p. 13), such that:
 
@@ -595,7 +595,7 @@ The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and basel
 
 In order to compare the predictive performance of the different modelling approaches, the time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
-![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau.png){#fig-auc-ptau}
+![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau_test.png){#fig-auc-ptau}
 
 Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong discriminative ability in distinguishing between individuals who progressed to AD dementia and those who did not over time. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
@@ -607,14 +607,14 @@ These results are also indicated by Table 10 which contains the AUC values for e
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent AUC by model and prediction time point"
-kable_standard(readRDS("tables/results_table_AUC.rds"))
+kable_standard(readRDS("tables/results_table_AUC_test.rds"))
 ```
 
 For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.905 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
 When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
-![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau.png){#fig-brier-ptau}
+![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau_test.png){#fig-brier-ptau}
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain consistently low, across all modelling approaches, although they show a slight increase over time. This suggests stable overall predictive accuracy and relatively low prediction error for progression to AD dementia. However, the curve for the Cox PH model curve remain slightly higher than the curves representing the JM and the JLCMM models, meaning that it consistently yields higher Brier scores than the two other models. More precisely, the Brier scores for this model range from approximately 0.05 for early predictions to 0.16 for late predictions, while the corresponding Brier scores for the other models range from approximately 0.02 to 0.14. In other terms, two other curves remain closely aligned, although the curve for the JM is slightly lower at the two year-follow-up, indicating a slightly better predictive performance at this time-point.
 
@@ -626,7 +626,7 @@ Table 11 presents the Brier scores for each modelling approach and at each horiz
 
 ```{r, echo=FALSE}
 #| tbl-cap: "Time-dependent Brier score by model and prediction time point"
-kable_standard(readRDS("tables/results_table_Brier.rds"))
+kable_standard(readRDS("tables/results_table_Brier_test.rds"))
 ```
 
 For predictions at two years, the Cox PH incorporating p-tau181 achieves a Brier score of 0.054, which is notably higher than the corresponding AUC values for the JM and JLCMM incorporating p-tau181, which yield Brier scores of 0.018 and 0.023, respectively. This indicates that the Cox PH model performs the worst at this early horizon, with the JLCMM coming in second and the JM performing the best. The same results are observed among the models incorporating NfL, as well as among those incorporating both biomarkers.
@@ -911,17 +911,17 @@ Class-specific survival curves estimated from the JLCMMs
 ## AUC and Brier Curves: Model Comparison
 
 ::: {#fig-auc-model layout-ncol="2"}
-![Models using NfL](figures/q1_auc_nfl.png){#fig-auc-nfl}
+![Models using NfL](figures/q1_auc_nfl_test.png){#fig-auc-nfl}
 
-![Models using p-tau181 & NfL](figures/q1_auc_multi.png){#fig-auc-multi}
+![Models using p-tau181 & NfL](figures/q1_auc_multi_test.png){#fig-auc-multi}
 
 Time-dependent AUC curves
 :::
 
 ::: {#fig-brier-model layout-ncol="2"}
-![Models using NfL](figures/q1_brier_nfl.png){#fig-brier-nfl}
+![Models using NfL](figures/q1_brier_nfl_test.png){#fig-brier-nfl}
 
-![Models using p-tau181 & NfL](figures/q1_brier_multi.png){#fig-brier-multi}
+![Models using p-tau181 & NfL](figures/q1_brier_multi_test.png){#fig-brier-multi}
 
 Time-dependent Brier score curves
 :::
@@ -929,7 +929,7 @@ Time-dependent Brier score curves
 ## AUC and Brier Curves: Biomarker Comparison
 
 ::: {#fig-auc-bm layout-ncol="2"}
-![JM](figures/q2_auc_jm.png){#fig-auc-jm}
+![JM](figures/q2_auc_jm_test.png){#fig-auc-jm}
 
 ![JLCMM](figures/q2_auc_lcjm.png){#fig-auc-jlcmm}
 
@@ -937,7 +937,7 @@ Time-dependent AUC curves
 :::
 
 ::: {#fig-brier-bm layout-ncol="2"}
-![JM](figures/q2_brier_jm.png){#fig-brier-jm}
+![JM](figures/q2_brier_jm_test.png){#fig-brier-jm}
 
 ![JLCMM](figures/q2_brier_lcjm.png){#fig-brier-jlcmm}
 
