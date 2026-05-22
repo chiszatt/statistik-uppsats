@@ -960,6 +960,20 @@ kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
+kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
+kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
 ```
@@ -988,8 +1002,29 @@ kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
+kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
+kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
 ```
 
 ```{r}
@@ -1009,8 +1044,29 @@ kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
+kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
+kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
+```
+
+```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
+kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
 
 ```{r}
