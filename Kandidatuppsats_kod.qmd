@@ -514,6 +514,11 @@ table((surv_data %>% filter(time_to_event > 0))$event)
 table((surv_data %>% filter(time_to_event == 0))$event)
 ```
 
+```{r}
+# Adding age at baseline to the longitudinal dataset, to use in the LME models 
+long_data <- long_data %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
+```
+
 ## Removing individuals with dementia at start
 
 ```{r}
@@ -777,9 +782,6 @@ event_table
 ## Checking correlation between the log-transformed biomarkers as well as the numerical variables going to be used in the models
 
 ```{r}
-# Adding age at baseline to the longitudinal dataset, to use in the LME models 
-long_data_in <- long_data_in %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
-
 # Saving the numerical variables used in the Cox PH models
 cox_vars <- surv_data_in[, c("age_at_baseline",
                               "baseline_value_ptau",
