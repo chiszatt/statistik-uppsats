@@ -231,7 +231,7 @@ Joint models simultaneously model longitudinal and survival data, allowing for t
 
 ### Linear Mixed-Effects Submodel
 
-The longitudinal component of the joint model is specified by a LME model (Fitzmaurice et al., 2011, p. 17), capturing both population-level trends described by the fixed effects as well as individual variability, modeled by the random effects.
+The longitudinal component of the JM is specified by a LME model (Fitzmaurice et al., 2011, p. 17), capturing both population-level trends described by the fixed effects as well as individual variability, modeled by the random effects.
 
 Since longitudinal data consists of repeated measurements from the same individuals, the assumption of independence between observations is illogical. In this analysis, the levels of p-tau181 and NfL for an individual at a specific time point, $t$, are correlated with measurements made on prior and subsequent occasions. Therefore, responses from an individual are expected to be more highly correlated than those between individuals. The modelling of this type of data, which can be considered grouped with non-independence within groups, is handled well by LME models.
 
@@ -259,15 +259,15 @@ This univariate framework is applied to longitudinal p-tau181 and NfL measuremen
 
 ### Model Assumptions
 
-A core assumption of the joint model for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
+A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
 
 ### Estimation: Frequentist vs Bayesian Approach
 
-The primary estimation approach that has been proposed for joint models is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62). However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be infeasible (Wu et al., 2008).
+The primary estimation approach that has been proposed for JMs is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62). However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be infeasible (Wu et al., 2008).
 
 A Bayesian alternative treats parameters as random variables and combines prior distributions with observed data to obtain posterior distributions, in contrast to the frequentist view where parameters are fixed but unknown (Carlin & Louis, 2008). This approach can simplify inference in complex models, and with weakly informative priors, it often yields results similar to maximum likelihood estimation (Brown & Ibrahim., 2003, p. 222).
 
-Using the R package $JMbayes2$, joint models can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
+Using the R package $JMbayes2$, JMs can be fitted via Markov chain Monte Carlo (MCMC) algorithms (Rizopoulos, 2018). MCMC generates dependent samples from the posterior distribution using a Markov chain, where each step depends only on the current state. As the chain evolves, its distribution converges to its stationary distribution, allowing the generated samples to be treated as representative of the posterior distribution and used for inference via Monte Carlo integration (Hamra et al., 2013, p. 628).
 
 The package uses weakly informative priors, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
@@ -325,7 +325,7 @@ $$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alp
 
 ### Model Assumptions
 
-In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2018, p. 122). This is in contrast to regular joint models, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
+In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2018, p. 122). This is in contrast to regular JMs, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
 
 1.  Correlations between observations of the longitudinal biomarker are modeled by the random effects, $b_i$, in the longitudinal model.
 
@@ -341,7 +341,7 @@ Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distribute
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular joint model (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of s which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
+The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of s which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
 
 The Marquardt algorithm used in estimating JLCMMs updates the vector of model parameters to be used for log-likelihood evaluation, $\theta_{G}$, such that for iteration $l + 1$:
 
@@ -388,7 +388,7 @@ In addition to fulfilling the requirements for minimised BIC and maximised entro
 
 ## Evaluation of Predictive Performance
 
-Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate model fit in joint models combining longitudinal and survival data. However, when the main focus is the survival outcome and the predictive ability of a longitudinal biomarker, model performance is commonly assessed using measures of discrimination and overall prediction error. Discrimination refers to the ability of the model to distinguish between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent AUC is an example of a discrimination measure, while the time-dependent Brier score quantifies overall prediction error over time.
+Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate model fit in JMs combining longitudinal and survival data. However, when the main focus is the survival outcome and the predictive ability of a longitudinal biomarker, model performance is commonly assessed using measures of discrimination and overall prediction error. Discrimination refers to the ability of the model to distinguish between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent AUC is an example of a discrimination measure, while the time-dependent Brier score quantifies overall prediction error over time.
 
 ### Time-dependent AUC
 
@@ -530,7 +530,7 @@ A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4
 
 Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 10b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
-Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each joint model, with the survival $\widehat{R}$ values presented in Table 3.
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in Table 3.
 
 ```{r, echo=FALSE}
 #| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
@@ -681,7 +681,7 @@ The difference between JMs and the other models were more pronounced at earlier 
 
 The corresponding time-dependent Brier scores presented a consistent but complementary pattern. The JMs and the JLCMMs generally achieved better predictive performance compared to the Cox PH models, reflecting lower overall prediction error when longitudinal information was incorporated. The difference between these two modelling approaches, however, remained small, as similarly shown by the time-dependent AUC.
 
-Goksuluk et al. (2025, p. 11) further reported that models including multiple biomarkers simultaneously performed better than models including a single biomarker, which is also supported by the findings of Yuan et al. (2024), who investigated joint models incorporating p-tau181 and NfL, as well as by the findings of the present study. Across all modelling approaches, the combination of p-tau181 and NfL provided the best overall predictive performance for progression to AD dementia compared to either biomarker alone. This was evident in both discrimination and overall prediction error. For predictions made two years from baseline, NfL displayed higher AUC values accross all three modelling approaches, suggesting short-term longitudinal NfL data may have better discriminative ability than p-tau181. Brier scores for predictions over all horizons were broadly comparable, without a consistent advantage of one biomarker over the other, indicating that neither biomarker alone fully captures the available prognostic information. Instead, the two biomarkers appear to provide complementary information, with p-tau181 reflecting AD specific pathology and NfL capturing more general neurodegenerative processes. When combined, they improved both the ranking of individuals according to risk and the accuracy of absolute risk predictions.
+Goksuluk et al. (2025, p. 11) further reported that models including multiple biomarkers simultaneously performed better than models including a single biomarker, which is also supported by the findings of Yuan et al. (2024), who investigated JMs incorporating p-tau181 and NfL, as well as by the findings of the present study. Across all modelling approaches, the combination of p-tau181 and NfL provided the best overall predictive performance for progression to AD dementia compared to either biomarker alone. This was evident in both discrimination and overall prediction error. For predictions made two years from baseline, NfL displayed higher AUC values accross all three modelling approaches, suggesting short-term longitudinal NfL data may have better discriminative ability than p-tau181. Brier scores for predictions over all horizons were broadly comparable, without a consistent advantage of one biomarker over the other, indicating that neither biomarker alone fully captures the available prognostic information. Instead, the two biomarkers appear to provide complementary information, with p-tau181 reflecting AD specific pathology and NfL capturing more general neurodegenerative processes. When combined, they improved both the ranking of individuals according to risk and the accuracy of absolute risk predictions.
 
 Sensitivity analyses showed however that including participants with only one biomarker measurement substantially reduced the performance of the JMs and the JLCMMs. While this reduction may partly reflect differences in sample size and number of events after inclusion of participants sparse data, the relatively stable Cox PH models suggest that reduced longitudinal information was likely the main contributing factor. This further indicates that the predictive benefit of the longitudinal approaches depends on sufficient repeated biomarker measurements. Additionally, the reduced performance of combined biomarker models indicates that the added value of NfL depends on the availability of sufficient longitudinal information.
 
