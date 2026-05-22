@@ -806,9 +806,9 @@ kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
-![Distribution of log-transformed p-tau181 measurements](figures/hist_log_p_tau.png){#fig-hist-ptau}
+![Distribution of log-transformed p-tau181 values](figures/hist_log_p_tau.png){#fig-hist-ptau}
 
-![Distribution of log-transformed NfL measurements](figures/hist_log_nfl.png)
+![Distribution of log-transformed NfL values](figures/hist_log_nfl.png){#fig-hist-nfl}
 
 Distributions of log-transformed biomarkers
 :::
