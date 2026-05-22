@@ -2012,8 +2012,8 @@ saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
 plot(
   jlcmm_m1_nfl,
   which = "survival",
-  col = c("cornflowerblue", "firebrick"),
-  lty = c(1, 2, 3),
+  col = c("firebrick", "cornflowerblue"),
+  lty = c(2, 1),
   lwd = 2,
   legend.loc = "bottomleft",
   legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
@@ -2032,8 +2032,8 @@ png("figures/class_specific_nfl.png",
 plot(
   jlcmm_m1_nfl,
   which = "survival",
-  col = c("cornflowerblue", "firebrick"),
-  lty = c(1, 2, 3),
+  col = c("firebrick", "cornflowerblue"),
+  lty = c(2, 1),
   lwd = 2,
   legend.loc = "bottomleft",
   legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
@@ -2450,7 +2450,7 @@ plot(
   lty = c(1, 2, 3),
   lwd = 2,
   legend.loc = "bottomleft",
-  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  legend = c("Class 1 (low risk)", "Class 2 (high risk)"),
   cex = 0.6,
   bty = "l",
   xlab = "Time (years)",
@@ -2470,7 +2470,7 @@ plot(
   lty = c(1, 2, 3),
   lwd = 2,
   legend.loc = "bottomleft",
-  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  legend = c("Class 1 (low risk)", "Class 2 (high risk)"),
   cex = 0.6,
   bty = "l",
   xlab = "Time (years)",
@@ -3000,6 +3000,10 @@ results_table_Brier <- data.frame(
 )
 
 results_table_Brier[, -1] <- round(results_table_Brier[, -1], 3)
+results_table_Brier
+```
+
+```{r}
 results_table_Brier
 ```
 
