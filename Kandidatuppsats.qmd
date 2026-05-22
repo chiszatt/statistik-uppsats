@@ -152,7 +152,7 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of statistical models to biomarker data to predict progression to AD dementia and evaluate their predictive performance. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, gender, and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using Receiver Operating Characteristic (ROC) analysis at a fixed prediction horizon, yielding an Area Under the Curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed AD dementia during follow-up (Wang et al., 2021, pp. 1-2).
+Recent research has applied a range of statistical models to biomarker data to predict progression to AD dementia and evaluate their predictive performance. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, gender and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using reciever operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed AD dementia during follow-up (Wang et al., 2021, pp. 1-2).
 
 Similarly, a large population-based study of 2,148 older adults in Sweden used a single multivariable Cox proportional hazards model with p-tau181 and NfL, along with other biomarkers, as baseline predictors to assess their predictive value for progression to all-cause and Alzheimer’s disease dementia. The model was additionally adjusted for age, gender, education, and relevant cardiovascular and metabolic comorbidities, as well as APOE-$ε4$ status. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 0.74, 0.77, and 0.81 for AD dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD dementia (Grande et al., 2025, pp. 2027-2031).
 
@@ -256,8 +256,6 @@ $$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and}
 In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 
 This univariate framework is applied to longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. This study will then apply multivariate JMs to simultaneously model both biomarkers and link their trajectories to the shared survival process describing progression to dementia due to AD.
-
-**Both p-tau181 and NfL are considered simultaneously, as they capture complementary aspects of neurodegeneration and Alzheimer-related pathology (SOURCE). Ignoring their correlation may lead to biased estimation (Xu, 2021, p. 6)**
 
 ### Model Assumptions
 
@@ -404,7 +402,7 @@ $$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
 
 where sensitivity refers to the probability of the model correctly detecting individuals who have experienced the event of interest before time $t$, whilst specificity is defined as the probability of the model correctly discerning individuals who remain event-free at time $t$.
 
-Based on the definitions above, the corresponding receiver operating characteristic (ROC) curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds (Kamarudin et al., 2017, p. 2).
+Based on the definitions above, the corresponding ROC curve at a given time $t$, denoted by $ROC(t)$, can be constructed by plotting $Se(c,t)$ against $1 - Sp(c,t)$ across all possible thresholds (Kamarudin et al., 2017, p. 2).
 
 The time-dependent AUC is then defined as:
 
@@ -492,7 +490,7 @@ Prior to evaluating predictive performance, model fit was assessed for each mode
 
 ### Cox PH Models
 
-First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$).
+First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite gender being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without gender as a covariate (Appendix 8.2; Table 16), gender was retained in the models due it's theoretical relevance.
 
 The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 15 (Appendix 8.2).
 
