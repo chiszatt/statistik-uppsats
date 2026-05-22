@@ -67,7 +67,7 @@ include-before-body:
     
     \begin{justify}
     
-    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of time to progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models, and joint latent class mixed models, incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons at a landmark time of 1 year, based on time-dependent AUC and the time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and horizons, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly for the joint models at earlier horizons. Joint latent class mixed models offered slightly increased AUC compared to the Cox PH and joint models for predictions 6 years from baseline, suggesting these may offer more stable predictions over longer horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded superior predictive performance, while NfL and p-tau181 alone displayed similar but weaker performance, indicating complementary prognostic information. Consequently, this study offers avenues for further research into optimal approaches for early and late predictions for time to dementia diagnosis using blood-based biomarkers.\par}
+    {\normalsize The purpose of this study is to identify which modelling framework and biomarker strategy provides the most accurate prediction of time to progression to Alzheimer’s disease dementia using longitudinal blood-based biomarkers. Phosphorylated tau-181 (p-tau181) and neurofilament light chain (NfL) are promising indicators of Alzheimer’s disease pathology and neurodegeneration, but their comparative and combined prognostic value across modelling approaches remains unclear. Using data from the ADNI cohort, predictive performance was evaluated across Cox proportional hazards models, joint models, and joint latent class mixed models, incorporating baseline and longitudinal biomarker information. Model performance was assessed using time-dependent discrimination and overall prediction error across 1-5 year horizons at a landmark time of 1 year, based on time-dependent AUC and time-dependent Brier score. The results demonstrated that predictive performance varied across modelling frameworks and horizons, with joint modelling approaches improving discrimination and overall prediction error relative to Cox PH models, particularly for the joint models at earlier horizons. Joint latent class mixed models offered slightly increased AUC compared to the Cox PH and joint models for predictions 6 years from baseline, suggesting these may offer more stable predictions over longer horizons. Across all modelling approaches, combining p-tau181 and NfL consistently yielded superior predictive performance, while NfL and p-tau181 alone displayed similar but weaker performance, indicating complementary prognostic information. Consequently, this study offers avenues for further research into optimal approaches for early and late predictions for time to dementia diagnosis using blood-based biomarkers.\par}
     
     \end{justify}
     
@@ -217,7 +217,7 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 ### Model Assumptions
 
-A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratios are constant over time. A low p-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
+A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratios are constant over time. A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
 
 Other assumptions are that the survival times of individuals are independent and that censoring is non-informative (Moore, 2016, p. 112). Censoring is considered non-informative when patients drop out for reasons unrelated to the outcome, such as being alive at the end of follow-up. In contrast, censoring is informative when individuals leave the study due to reasons related to the failure process, which can introduce bias that is difficult to adjust for (Moore, 2016, pp. 5-6). Even though this assumption is harder to satisfy in dementia progression studies, due to competing risk of death and dropout related to cognitive decline, the Cox model is still widely used because of its flexibility, but results should be interpreted with caution.
 
@@ -612,7 +612,7 @@ kable_standard(readRDS("tables/results_table_AUC_test.rds"))
 
 For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.905 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
-When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed, with the key difference that lower values, and therefore lower curves, indicate better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
+When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed. In contrast to the AUC, where higher values indicate better discrimination, lower Brier scores and therefore lower curves indicate lower overall prediction error and better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau_test.png){#fig-brier-ptau}
 
@@ -659,13 +659,13 @@ Table 11, containing the time-dependent Brier scores for each biomarker specific
 
 To examine the robustness of the results, several sensitivity analyses were performed.
 
-First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal. This indicates that the results were robust to the handling of duplicated measurements.
+First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal (Appendix 8.8; Tables 21, 22, 23 & 24). This indicates that the results were robust to the handling of duplicated measurements.
 
-A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period.
+A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period (Appendix 8.8; Tables 25 & 26).
 
-In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis.
+In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis (Appendix 8.8; Tables 27 & 28).
 
-Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons. These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
+Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons (Appendix 8.8; Tables 29 & 30). These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
 
 # Discussion
 
@@ -982,10 +982,24 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
+#kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
+```
+
+```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+```
+
+```{r}
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
+#kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
@@ -1038,10 +1052,10 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
 
 ```{r}
-#| pos: "H"
-#| tbl-pos: "H"
-#| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
-kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
+##| pos: "H"
+##| tbl-pos: "H"
+##| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
+#kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 ```
 
 ```{r}
