@@ -3804,7 +3804,8 @@ dev.off()
 png("figures/hist_log_p_tau.png",
     width = 6, height = 4, units = "in", res = 300)
 hist(long_data$log_PLASMAPTAU181,
-     main = "Log-transformed p-tau181")
+     xlab = "Log-transformed p-tau181",
+     main = "")
 dev.off()
 ```
 
@@ -3813,7 +3814,8 @@ dev.off()
 png("figures/hist_log_nfl.png",
     width = 6, height = 4, units = "in", res = 300)
 hist(long_data$log_PLASMA_NFL,
-     main = "Log-transformed NfL" 
+     xlab = "Log-transformed NfL",
+     main = ""
      )
 dev.off()
 ```
