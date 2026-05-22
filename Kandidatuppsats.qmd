@@ -643,7 +643,7 @@ Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Fi
 
 Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except for predictions made at the three-year point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; Figure 13b).
 
-The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.967, compared to 0.953 for the NfL model and 0.902 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
+The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.966, compared to 0.947 for the NfL model and 0.905 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
 
 When observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, a similar pattern can be observed, although not as evident.
 
