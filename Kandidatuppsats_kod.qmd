@@ -1327,6 +1327,12 @@ surv_model_both_bl_final <- coxph(
 )
 ```
 
+```{r}
+summary(surv_model_ptau_bl_final)
+summary(surv_model_nfl_bl_final)
+summary(surv_model_both_bl_final)
+```
+
 #### Final test of the assumption of proportional hazards
 
 ```{r}
