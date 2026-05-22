@@ -198,22 +198,22 @@ head(nfl_data %>%
 
 ```{r}
 #Defining plasma ptau as the mean and collapsing to unique RID and EXAMDATE
-#ptau_data <- ptau_data %>%
-#  group_by(RID, EXAMDATE) %>%
-#  mutate(
-#    PLASMAPTAU181 = mean(PLASMAPTAU181)
-#  ) %>%
-#  ungroup() %>%
-#  distinct()
+ptau_data <- ptau_data %>%
+  group_by(RID, EXAMDATE) %>%
+  mutate(
+    PLASMAPTAU181 = mean(PLASMAPTAU181)
+  ) %>%
+  ungroup() %>%
+  distinct()
 
 # Defining plasma nfl as the mean and collapsing to unique RID and EXAMDATE
-#nfl_data <- nfl_data %>%
-#  group_by(RID, EXAMDATE) %>%
-#  mutate(
-#    PLASMA_NFL = mean(PLASMA_NFL)
-#  ) %>%
-#  ungroup() %>%
-#  distinct()
+nfl_data <- nfl_data %>%
+  group_by(RID, EXAMDATE) %>%
+  mutate(
+    PLASMA_NFL = mean(PLASMA_NFL)
+  ) %>%
+  ungroup() %>%
+  distinct()
 ```
 
 #### Sensitivity analysis: Replacing visits with double measurements with visits with the first measurement
@@ -241,22 +241,22 @@ head(nfl_data %>%
 #### Sensitivity analysis: Replacing visits with double measurements with visits with the last measurement
 
 ```{r}
- ptau_data <- ptau_data %>%
-  group_by(RID, EXAMDATE) %>%
-  arrange(RID, EXAMDATE) %>%
-  mutate(
-    PLASMAPTAU181 = last_ptau,
-    ) %>%
-  ungroup() %>%
-  distinct()
- nfl_data <- nfl_data %>%
-  group_by(RID, EXAMDATE) %>%
-  arrange(RID, EXAMDATE) %>%
-  mutate(
-   PLASMA_NFL = last_nfl
-    ) %>%
-  ungroup() %>%
-  distinct()
+# ptau_data <- ptau_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#    PLASMAPTAU181 = last_ptau,
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
+# nfl_data <- nfl_data %>%
+#  group_by(RID, EXAMDATE) %>%
+#  arrange(RID, EXAMDATE) %>%
+#  mutate(
+#   PLASMA_NFL = last_nfl
+#    ) %>%
+#  ungroup() %>%
+#  distinct()
 ```
 
 ## Merging NfL and ptau-181 data for the longitudinal data set
@@ -506,11 +506,6 @@ surv_data <- surv_data %>%
         as.numeric(last_followup - EXAMDATE_baseline) / 365
     )
 )
-```
-
-```{r}
-# Adding age at baseline to the longitudinal dataset, to use in the LME models 
-long_data <- long_data %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
 ```
 
 ```{r}
@@ -782,6 +777,9 @@ event_table
 ## Checking correlation between the log-transformed biomarkers as well as the numerical variables going to be used in the models
 
 ```{r}
+# Adding age at baseline to the longitudinal dataset, to use in the LME models 
+long_data_in <- long_data_in %>% merge(surv_data %>% dplyr::select(RID, age_at_baseline), by = "RID")
+
 # Saving the numerical variables used in the Cox PH models
 cox_vars <- surv_data_in[, c("age_at_baseline",
                               "baseline_value_ptau",
