@@ -2572,9 +2572,11 @@ auc_ptau_jm <- get_jm_auc(joint_model_ptau, times)
 # We compute time-dependent AUC for the joint model including NfL 
 auc_nfl_jm <- get_jm_auc(joint_model_nfl, times)
 
+```
+
+```{r}
 # We compute time-dependent AUC for the multivariate joint model 
 auc_multi_jm <- get_jm_auc(multi_joint_model, times)
-
 ```
 
 ## Time-dependent AUC for latent class joint models
@@ -2997,10 +2999,10 @@ results_table_Brier
 # Creating a directory to save tables into
 dir.create("tables", showWarnings = FALSE)
 
-# # # Saving the AUC results table
-# saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+# Saving the AUC results table
+# saveRDS(results_table_AUC, "tables/results_table_AUC_test.rds")
 # # Saving the table of the Brier score results
-# saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+# saveRDS(results_table_Brier, "tables/results_table_Brier_test.rds")
 ```
 
 ### Sensitivity analysis tables
