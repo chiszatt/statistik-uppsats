@@ -613,8 +613,8 @@ dx_visits <- dx_full_cohort %>%
 
 # Examination date ranges
 ptau_range <- range(long_data$EXAMDATE_ptau, na.rm = TRUE)
-nfl_range  <- range(long_data$EXAMDATE_nfl, na.rm = TRUE)
-dx_range   <- range(dx_full_cohort$EXAMDATE_dx, na.rm = TRUE)
+nfl_range <- range(long_data$EXAMDATE_nfl, na.rm = TRUE)
+dx_range <- range(dx_full_cohort$EXAMDATE_dx, na.rm = TRUE)
 
 # Cohort summary table
 cohort_summary_table <- tibble(
@@ -1469,8 +1469,7 @@ multi_joint_model <- jm(surv_model_final, mixed ,
                          n_chains = 3L,
                          n_iter = 20000L,
                          n_burnin = 2000L
-                         )
- 
+                        )
 ```
 
 ```{r}
@@ -1715,7 +1714,7 @@ get_pprob_table <- function(model) {
   
 #  Mean posterior probabilities per class 
   mean_pprob <- do.call(rbind, lapply(1:G, function(g) {
-    # Individuals assigned to class g
+#    Individuals assigned to class g
     members <- pprobs[pprobs$class == g, 3:(2 + G)]
     colMeans(members)
   }))
@@ -1747,7 +1746,7 @@ get_pprob_table <- function(model) {
 ```
 
 ```{r}
-# defining a function to extract the model parameters
+# Defining a function to extract the model parameters
 get_jlcmm_params <- function(model) {
   
   p_full <- length(model$best)
@@ -1883,10 +1882,10 @@ get_entropy <- function(model) {
 ```{r}
 models <- list(jlcmm_m0_1, jlcmm_m1_nfl, jlcmm_m2_nfl)
 
-# Find max number of classes across all models
+# Determining the max number of classes out of all models
 G_max <- max(sapply(models, function(m) m$ng))
 
-# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
+# Extracting proportions for each model, with NA for cells where the model has fewer classes than the given row
 props <- do.call(rbind, lapply(models, function(m) {
   p <- get_class_proportions(m)
   padded <- c(p, rep(NA, G_max - length(p)))
@@ -2321,10 +2320,10 @@ postprob(jlcmm_m3_ptau)
 ```{r}
 models <- list(jlcmm_m0_1, jlcmm_m1_ptau, jlcmm_m2_ptau, jlcmm_m3_ptau)
 
-# Find max number of classes across all models
+# Determining the model with the highest number of classes
 G_max <- max(sapply(models, function(m) m$ng))
 
-# Extract proportions for each model, with NA for cells where the model has fewer classes than the given row
+# Extracting class proportions from each model, with NA for cells where the model has fewer classes than the given row
 props <- do.call(rbind, lapply(models, function(m) {
   p <- get_class_proportions(m)
   padded <- c(p, rep(NA, G_max - length(p)))
@@ -2801,13 +2800,6 @@ brier_jlcmm <- function(model, data, ID, time_var, surv_time_var, event_var, tim
   brier_scores <- sapply(times, brier_one_time)
 #   Saving to output
   output$Brier <- brier_scores
-  
-#   Integrated Brier Score (IBS)
-  IBS <- sum(diff(times) *
-               (brier_scores[-1] + brier_scores[-length(brier_scores)]) / 2) /
-         (max(times) - landmark)
-#   Saving to output
-  output$IBS <- IBS
   
   return(output)
 }
