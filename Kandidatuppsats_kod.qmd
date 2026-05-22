@@ -977,6 +977,22 @@ long_model_ptau <- lme(
 summary(long_model_ptau)
 ```
 
+```{r}
+long_data_in <- long_data_in %>% merge(surv_data_in %>% dplyr::select(RID, age_at_baseline), by = "RID")
+```
+
+```{r}
+long_model_ptau_test <- lme(
+  fixed = log_PLASMAPTAU181 ~ time_years + age_at_baseline + PTGENDER + APOE4_status,
+  random = ~ time_years | RID,                    
+  data = long_data_in
+)
+```
+
+```{r}
+summary(long_model_ptau_test)
+```
+
 #### Determining random effects
 
 - Fitting the model with ML estimation in order to compare models using likelihood ratio test
@@ -1027,6 +1043,22 @@ long_model_nfl <- lme(
 
 ```{r}
 summary(long_model_nfl)
+```
+
+```{r}
+long_model_nfl_test <- lme(
+  fixed = log_PLASMA_NFL ~ time_years + age_at_baseline + PTGENDER + APOE4_status, 
+  random = ~ time_years | RID,
+  data = long_data_in
+  )
+```
+
+```{r}
+summary(long_model_nfl_test)
+```
+
+```{r}
+anova(long_model_nfl_test, long_model_nfl)
 ```
 
 #### Removing APOE4 status
