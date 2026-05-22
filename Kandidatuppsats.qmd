@@ -458,7 +458,7 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12 & 13. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 12 and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 13 and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
@@ -681,11 +681,9 @@ The predictive performance of these models was assessed by comparing time-depend
 
 At the same time, the time-dependent AUC showed that the predictive performance differed across the three levels of information considered. Overall, incorporating longitudinal biomarker trajectories improved discriminatory ability compared to baseline only measurements. This improvement was consistent across biomarkers (p-tau181, NfL, and their combination) and was most pronounced for early predictions, where JMs achieved the highest AUC values relative to the Cox PH models. These findings are consistent with those of Goksuluk et al. (2025, p. 14), who, in the context of mortality risk prediction in peritoneal dialysis patients, reported improved predictive performance of joint modelling approaches compared to Cox PH models using, among other specifications, baseline biomarker values.
 
-The difference between JMs and the other models were more pronounced at earlier time horizons, suggesting that JMs may offer better discrimination. This is clinically meaningful, as identification of those at risk of progression to AD dementia in the near future is beneficial, for example in determining individuals best placed for clinical trial enrollment.
+The difference between JMs and the other models were more pronounced at earlier time horizons, suggesting that JMs may offer better discrimination. This is clinically meaningful, as identification of those at risk of progression to AD dementia in the near future is beneficial, for example in determining individuals best placed for clinical trial enrollment. However, JLCMMs achieved comparable or higher AUC values at intermediate to longer horizons, indicating that these models may have value for predictions made further into the future. This indicates that there is no single modelling approach that consistently dominates in terms of time-dependent AUC across all time horizons.
 
-However, JLCMMs achieved comparable or higher AUC values at intermediate to longer horizons, indicating that these models may have value for predictions made further into the future. This indicates that there is no single modelling approach that consistently dominates in terms of time-dependent AUC across all time horizons.
-
-The corresponding time-dependent Brier scores presented a consistent but complementary pattern. The JMs and the JLCMMs generally achieved better predictive performance compared to the Cox PH models over intermediate and longer horizons, reflecting lower overall prediction error when longitudinal information was incorporated. The difference between these two modelling approaches, however, remained small, as similarly shown by the time-dependent AUC.
+The corresponding time-dependent Brier scores presented a consistent but complementary pattern. The JMs and the JLCMMs generally achieved better predictive performance compared to the Cox PH models, reflecting lower overall prediction error when longitudinal information was incorporated. The difference between these two modelling approaches, however, remained small, as similarly shown by the time-dependent AUC.
 
 Goksuluk et al. (2025, p. 11) further reported that models including multiple biomarkers simultaneously performed better than models including a single biomarker, which is also supported by the findings of Yuan et al. (2024), who investigated joint models incorporating p-tau181 and NfL, as well as by the findings of the present study. Across all modelling approaches, the combination of p-tau181 and NfL provided the best overall predictive performance for progression to AD dementia compared to either biomarker alone. This was evident in both discrimination and overall prediction error. For predictions made two years from baseline, NfL displayed higher AUC values accross all three modelling approaches, suggesting short-term longitudinal NfL data may have better discriminative ability than p-tau181. Brier scores for predictions over all horizons were broadly comparable, without a consistent advantage of one biomarker over the other, indicating that neither biomarker alone fully captures the available prognostic information. Instead, the two biomarkers appear to provide complementary information, with p-tau181 reflecting AD specific pathology and NfL capturing more general neurodegenerative processes. When combined, they improved both the ranking of individuals according to risk and the accuracy of absolute risk predictions.
 
@@ -800,15 +798,15 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Participants with at least one biomarker measurement: characteristics and measurement distributions "
-kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
+#| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
+kable_standard(readRDS("tables/event_table_full.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
-kable_standard(readRDS("tables/event_table_full.rds"))
+#| tbl-cap: "Participants with at least one biomarker measurement: characteristics and measurement distributions "
+kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
 
 ::: {#fig-hist-ptau-nfl layout-ncol="2"}
@@ -956,68 +954,68 @@ Time-dependent Brier score curves
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
+kable_standard(readRDS("tables/results_table_Brier_last_duplicate_test_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
+kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
-kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
+kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
-kable_standard(readRDS("tables/results_table_AUC_full.rds"))
+kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
-kable_standard(readRDS("tables/results_table_Brier_full.rds"))
+kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
+kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
+kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
