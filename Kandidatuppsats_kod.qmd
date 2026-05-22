@@ -70,31 +70,31 @@ The data was loaded from the ADNIMERGE2 package accessed via the Alzheimer's Dis
 ```{r}
 # Loading data
 # Milou
-# #NfL data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
-# nfl_data <- BLENNOWPLASMANFLLONG
-# # P-tau181 data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
-# ptau_data <- UGOTPTAU181
-# # Diagnosis data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
-# diagnosis_data <- DXSUM
-# # Demographics data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
-# demographics <- PTDEMOG
-# # # Apoe data
-# load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
-# apoe <- APOERES
+ #NfL data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/BLENNOWPLASMANFLLONG.rda")
+ nfl_data <- BLENNOWPLASMANFLLONG
+ # P-tau181 data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/UGOTPTAU181.rda")
+ ptau_data <- UGOTPTAU181
+# Diagnosis data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/DXSUM.rda")
+ diagnosis_data <- DXSUM
+ # Demographics data
+ load("ADNIMERGE2_unpacked/ADNIMERGE2/data/PTDEMOG.rda")
+ demographics <- PTDEMOG
+# Apoe data
+load("ADNIMERGE2_unpacked/ADNIMERGE2/data/APOERES.rda")
+apoe <- APOERES
 ```
 
 ```{r}
 # Charley
-library(ADNIMERGE2)
-nfl_data = BLENNOWPLASMANFLLONG
-ptau_data = UGOTPTAU181
-diagnosis_data = DXSUM
-demographics = PTDEMOG
-apoe = APOERES
+#library(ADNIMERGE2)
+#nfl_data = BLENNOWPLASMANFLLONG
+#ptau_data = UGOTPTAU181
+#diagnosis_data = DXSUM
+#demographics = PTDEMOG
+#apoe = APOERES
 ```
 
 ```{r}
@@ -439,22 +439,22 @@ surv_data$age_at_visit <- as.numeric(format(surv_data$EXAMDATE_ptau, "%Y")) - su
 
 ```{r}
 # We filter individuals with at least 3 measurements of ptau_data
-keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
-long_data <- long_data %>% filter(RID %in% keep)
-surv_data <- surv_data %>% filter(RID %in% keep)
+#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 2))$RID)
+#long_data <- long_data %>% filter(RID %in% keep)
+#surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 3 measurements
-length(keep)
+#length(keep)
 ```
 
 ### Sensitivity analysis: Selecting participants with at least 1 measurement
 
 ```{r}
 # We filter individuals with at least 1 measurement of ptau_data
-#keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
-#long_data <- long_data %>% filter(RID %in% keep)
-#surv_data <- surv_data %>% filter(RID %in% keep)
+keep <- unique((ptau_data %>% group_by(RID) %>% filter(n() > 0))$RID)
+long_data <- long_data %>% filter(RID %in% keep)
+surv_data <- surv_data %>% filter(RID %in% keep)
 # We check number of individuals with at least 1 measurement
-#length(keep)
+length(keep)
 ```
 
 ## Preparing for Cox PH model
