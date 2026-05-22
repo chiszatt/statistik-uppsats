@@ -809,15 +809,14 @@ kable_standard(readRDS("tables/event_table_full.rds"))
 kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
 
-:::: {#fig-hist-ptau-nfl layout-ncol="2"}
-![Distribution of log-transformed NfL measurements](figures/hist_log_p_tau.png){#fig-hist-ptau}
+::: {#fig-hist-ptau-nfl layout-ncol="2"}
+![Distribution of log-transformed p-tau181 measurements](figures/hist_log_p_tau.png){#fig-hist-ptau}
 
-::: {layout-ncol="2"}
-![Distribution of log-transformed NfL measurements](figures/hist_log_p_tau.png)
-:::
+![Distribution of log-transformed NfL measurements](figures/hist_log_nfl.png)
 
 Distributions of log-transformed biomarkers
-::::
+:::
+
 
 ::: {#fig-corr layout-ncol="2"}
 ![Variables in the Cox PH models](figures/corrplot_cox.png){#fig-corr-cox}
