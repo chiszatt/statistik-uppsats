@@ -851,9 +851,9 @@ fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            #data = long_data_in,
-                            #family = students.t(df = 3, link = "identity"))
+fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            data = long_data_in,
+                            family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
@@ -868,8 +868,8 @@ testResiduals(lme_residuals_cubed_ptau)
 lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
 testResiduals(lognormal_residuals_ptau)
 
-#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-#testResiduals(student_residuals_ptau)
+student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+testResiduals(student_residuals_ptau)
 ```
 
 #### Shapiro-Wilk test
@@ -912,10 +912,10 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              data = long_data_in,
                              family = lognormal(link = "log"))
 
-# Student-t
-#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           #data = long_data_in,
-                           #family = students.t(df = 3, link = "identity"))
+ Student-t
+fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           data = long_data_in,
+                           family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
@@ -930,8 +930,8 @@ testResiduals(lme_residuals_cubed_nfl)
 lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
 testResiduals(lognormal_residuals_nfl)
 
-#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-#testResiduals(student_residuals_nfl)
+student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+testResiduals(student_residuals_nfl)
 ```
 
 #### Shapiro-Wilk test
@@ -942,7 +942,7 @@ shapiro.test(gamma_residuals_nfl$fittedResiduals)
 shapiro.test(lme_residuals_log_nfl$fittedResiduals)
 shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
 shapiro.test(lognormal_residuals_nfl$fittedResiduals)
-#shapiro.test(student_residuals_nfl$fittedResiduals)
+shapiro.test(student_residuals_nfl$fittedResiduals)
 ```
 
 # Fitted LME models
