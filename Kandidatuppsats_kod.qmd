@@ -227,7 +227,7 @@ nfl_data <- nfl_data %>%
 #    ) %>%
 #  ungroup() %>%
 #  distinct()
-# 
+ 
 # nfl_data <- nfl_data %>%
 #  group_by(RID, EXAMDATE) %>%
 #  arrange(RID, EXAMDATE) %>%
@@ -323,10 +323,10 @@ long_data <- long_data %>%
 ```{r}
 # dates aren't too different, and only one observation at baseline, but to be sure create the baseline date out of the earlier of the two dates
 #long_data <- long_data %>%
- # group_by(RID) %>%
-  #mutate(
-    # first biomarker exam across NFL and pTau 
-   # EXAMDATE = pmin(EXAMDATE_nfl, EXAMDATE_ptau, na.rm = TRUE),
+#  group_by(RID) %>%
+# mutate(
+#    # first biomarker exam across NFL and pTau 
+#    EXAMDATE = pmin(EXAMDATE_nfl, EXAMDATE_ptau, na.rm = TRUE),
 #
 #    EXAMDATE_baseline = min(EXAMDATE, na.rm = TRUE),
 #
@@ -851,9 +851,9 @@ fit_lognormal_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
-                            data = long_data_in,
-                            family = students.t(df = 3, link = "identity"))
+#fit_student_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID),
+                            #data = long_data_in,
+                            #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_ptau <- simulateResiduals(fit_gamma_ptau)
@@ -868,8 +868,8 @@ testResiduals(lme_residuals_cubed_ptau)
 lognormal_residuals_ptau <- simulateResiduals(fit_lognormal_ptau)
 testResiduals(lognormal_residuals_ptau)
 
-student_residuals_ptau <- simulateResiduals(fit_student_ptau)
-testResiduals(student_residuals_ptau)
+#student_residuals_ptau <- simulateResiduals(fit_student_ptau)
+#testResiduals(student_residuals_ptau)
 ```
 
 #### Shapiro-Wilk test
@@ -880,7 +880,7 @@ shapiro.test(gamma_residuals_ptau$fittedResiduals)
 shapiro.test(lme_residuals_log_ptau$fittedResiduals)
 shapiro.test(lme_residuals_cubed_ptau$fittedResiduals)
 shapiro.test(lognormal_residuals_ptau$fittedResiduals)
-shapiro.test(student_residuals_ptau$fittedResiduals)
+#shapiro.test(student_residuals_ptau$fittedResiduals)
 ```
 
 ### NfL
@@ -913,9 +913,9 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              family = lognormal(link = "log"))
 
 # Student-t
-fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
-                           data = long_data_in,
-                           family = students.t(df = 3, link = "identity"))
+#fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
+                           #data = long_data_in,
+                           #family = students.t(df = 3, link = "identity"))
 
 # residual tests for each model
 gamma_residuals_nfl <- simulateResiduals(fit_gamma_nfl)
@@ -930,8 +930,8 @@ testResiduals(lme_residuals_cubed_nfl)
 lognormal_residuals_nfl <- simulateResiduals(fit_lognormal_nfl)
 testResiduals(lognormal_residuals_nfl)
 
-student_residuals_nfl <- simulateResiduals(fit_student_nfl)
-testResiduals(student_residuals_nfl)
+#student_residuals_nfl <- simulateResiduals(fit_student_nfl)
+#testResiduals(student_residuals_nfl)
 ```
 
 #### Shapiro-Wilk test
@@ -942,7 +942,7 @@ shapiro.test(gamma_residuals_nfl$fittedResiduals)
 shapiro.test(lme_residuals_log_nfl$fittedResiduals)
 shapiro.test(lme_residuals_cubed_nfl$fittedResiduals)
 shapiro.test(lognormal_residuals_nfl$fittedResiduals)
-shapiro.test(student_residuals_nfl$fittedResiduals)
+#shapiro.test(student_residuals_nfl$fittedResiduals)
 ```
 
 # Fitted LME models
@@ -2523,7 +2523,7 @@ auc_both_bl <- get_cox_auc(surv_model_both_bl_final, times)
 # We construct prediction datasets for the joint models by merging the longitudinal and survival data
 newdata <- dplyr::left_join(
   long_data_out,
-  dplyr::select(surv_data_out, RID, age_at_baseline, time_to_event, event),
+  dplyr::select(surv_data_out, RID, time_to_event, event),
   by = "RID"
 )
 ```
@@ -2990,15 +2990,15 @@ dir.create("tables", showWarnings = FALSE)
 #### The duplicate biomarker measurements are replaced by the first measurement
 
 ```{r}
-# saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate.rds")
-# saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
+#saveRDS(results_table_AUC, "tables/results_table_AUC_first_duplicate.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_first_duplicate.rds")
 ```
 
 #### The duplicate biomarker measurements are replaced by the last measurement
 
 ```{r}
 #saveRDS(results_table_AUC, "tables/results_table_AUC_last_duplicate.rds")
-# saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
+#saveRDS(results_table_Brier, "tables/results_table_Brier_last_duplicate.rds")
 ```
 
 #### Baseline date is the first examination date across biomarkers
