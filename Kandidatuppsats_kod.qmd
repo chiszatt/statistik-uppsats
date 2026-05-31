@@ -912,7 +912,7 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              data = long_data_in,
                              family = lognormal(link = "log"))
 
- Student-t
+ # Student-t
 fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                            data = long_data_in,
                            family = students.t(df = 3, link = "identity"))

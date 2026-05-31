@@ -1062,26 +1062,12 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-# kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-# kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
