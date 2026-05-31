@@ -273,7 +273,7 @@ The package uses weakly informative priors, allowing stable estimation while let
 
 ### The Gelman-Rubin Statistic
 
-Within Bayesian joint modelling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman–Rubin statistic, $R$ (Peng, 2022).
+Within Bayesian joint modelling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalised by the Gelman–Rubin statistic, $R$ (Peng, 2022).
 
 Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j^{th}$ chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
@@ -305,7 +305,7 @@ As the number of iterations $L$ increases and the between-chain variation $B$ de
 
 ## Joint Latent Class Mixed Model
 
-JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterised by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
 In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished and to assess predictive performance of time-to-diagnosis when modelling survival risks by these latent classes. Additionally, this study will compare the predictive performance of these biomarkers using this model.
 
@@ -341,7 +341,7 @@ Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distribute
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of s which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
+The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of JMs which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
 
 The Marquardt algorithm used in estimating JLCMMs updates the vector of model parameters to be used for log-likelihood evaluation, $\theta_{G}$, such that for iteration $l + 1$:
 
@@ -353,13 +353,13 @@ $$\theta_{G}^{\ (l + 1)} =
 
 where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2017, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2017, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
 
 ### Class Enumeration
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimization of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2014, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2014, p. 7):
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2014, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2014, p. 7):
 
 $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 = \frac{
@@ -468,7 +468,7 @@ Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while di
 
 52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.
 
-Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonized examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
+Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonised examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
 
 ### Age
 
