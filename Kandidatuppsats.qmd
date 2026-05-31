@@ -259,7 +259,7 @@ This univariate framework is applied to longitudinal p-tau181 and NfL measuremen
 
 ### Model Assumptions
 
-A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
+A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopoulos, 2012, pp. 62-63).
 
 ### Estimation: Frequentist vs Bayesian Approach
 
@@ -305,7 +305,7 @@ As the number of iterations $L$ increases and the between-chain variation $B$ de
 
 ## Joint Latent Class Mixed Model
 
-JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterised by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterised by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2012, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
 In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished and to assess predictive performance of time-to-diagnosis when modelling survival risks by these latent classes. Additionally, this study will compare the predictive performance of these biomarkers using this model.
 
@@ -325,7 +325,7 @@ $$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alp
 
 ### Model Assumptions
 
-In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2018, p. 122). This is in contrast to regular JMs, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
+In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2012, p. 12). This is in contrast to regular JMs, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Rizopoulos, 2012, p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
 
 1.  Correlations between observations of the longitudinal biomarker are modeled by the random effects, $b_i$, in the longitudinal model.
 
@@ -337,11 +337,11 @@ The score test assumes the null hypothesis of conditional independence, that is,
 
 $$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
 
-Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
+Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., 2012, p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of JMs which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
+The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2012, p. 5), which is computationally advantageous when compared with the estimation of JMs which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2012, p. 10).
 
 The Marquardt algorithm used in estimating JLCMMs updates the vector of model parameters to be used for log-likelihood evaluation, $\theta_{G}$, such that for iteration $l + 1$:
 
@@ -351,15 +351,15 @@ $$\theta_{G}^{\ (l + 1)} =
 \quad \text{where} \quad
 \nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
 
-where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2017, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2017, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
+where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2012, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2012, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2012, p. 5).
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
 
 ### Class Enumeration
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2014, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2014, p. 7):
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2012, p. 7):
 
 $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 = \frac{
@@ -368,7 +368,7 @@ $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 {
 \sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
 
-Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2014, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
+Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2012, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
 **Entropy**
 
@@ -705,7 +705,7 @@ Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https:/
 
 Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
 
-Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma neurofilament light (NFL) method* (Rev. Jan. 31, 2011) \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/BLENNOWPLASMANFLLONG/Blennow_Lab\_-*ADNI-1-2*-*Method*-\_Plasma_NFL_longitudinal_UA.pdf](#0)
+Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma neurofilament light (NFL) method* (Rev. Jan. 31, 2011) \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/BLENNOWPLASMANFLLONG/Blennow_Lab\_-*ADNI-1-2*-*Method*-\_Plasma_NFL_longitudinal_UA.pdf](#0)
 
 Brown, E. R., & Ibrahim, J. G. (2003). A Bayesian semiparametric joint hierarchical model for longitudinal and survival data. *Biometrics*, 59(2), 221-228. <https://doi.org/10.1111/1541-0420.00028>
 
@@ -729,7 +729,7 @@ Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z
 
 Hamra, G., MacLehose, R., & Richardson, D. (2013). Markov chain Monte Carlo: an introduction for epidemiologists. *International journal of epidemiology*, 42(2), 627-634. <https://doi.org/10.1093/ije/dyt043>
 
-Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, 20(8). <https://doi.org/10.1002/alz.13859>
+Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, 20(8). <https://doi.org/10.1002/alz.13859>
 
 Jacqmin-Gadda, H., Proust-Lima, C., Taylor, J. M. G., & Commenges, D. (2010). Score Test for Conditional Independence Between Longitudinal Outcome and Time to Event Given the Classes in the Joint Latent Class Model. *Biometrics*, 66(1), 11-19. <http://www.jstor.org/stable/40663147>
 
@@ -751,7 +751,9 @@ Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpen
 
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. <https://doi.org/10.1371/journal.pone.0318349>
 
-Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
+Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844>
+
+Proust-Lima, C., Séne, M., Taylor, J. M., & Jacqmin-Gadda, H. (2012). Joint latent class models for longitudinal and time-to-event data: A review. *Statistical Methods in Medical Research*, *23*(1), 74–90. <https://doi.org/10.1177/0962280212445839>
 
 Rissin, D. M., Kan, C. W., Campbell, T. G., Howes, S. C., Fournier, D. R., Song, L., Piech, T., Patel, P. P., Chang, L., Rivnak, A. J., Ferrell, E. P., Randall, J. D., Provuncher, G. K., Walt, D. R., & Duffy, D. C. (2010). Single-molecule enzyme-linked immunosorbent assay detects serum proteins at subfemtomolar concentrations. *Nature Biotechnology*, 28(6), 595-599. <https://doi.org/10.1038/nbt.1641>
 
@@ -775,7 +777,7 @@ World Health Organization (2024). *Preferred product characteristics of blood-ba
 
 - (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
-Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors.*Biometrics*,*66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
 
 Xia, X., Duffner, L. A., Bintener, C., Bradshaw, A., Lamirel, D., & Jönsson, L. (2025). Diagnostic and prognostic multimodal prediction models in Alzheimer's disease: A scoping review. *Journal of Alzheimer's disease* *: JAD*, 108(1), 209-221. [https://doi.org/10.1177/13872877251351630](http://127.0.0.1:14086/#0)
 
