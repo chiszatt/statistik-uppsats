@@ -305,9 +305,9 @@ As the number of iterations $L$ increases and the between-chain variation $B$ de
 
 ## Joint Latent Class Mixed Model
 
-JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
-In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished, and to ascertain any differences in predictive performance of these biomarkers.
+In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished and to assess predictive performance of time-to-diagnosis when modelling survival risks by these latent classes. Additionally, this study will compare the predictive performance of these biomarkers using this model.
 
 ### Class Submodel
 
