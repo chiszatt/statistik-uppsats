@@ -152,13 +152,13 @@ These two blood-based biomarkers, along with various other biomarkers and clinic
 
 ## Research Context
 
-Recent research has applied a range of statistical models to biomarker data to predict progression to AD dementia and evaluate their predictive performance. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, gender and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using reciever operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed AD dementia during follow-up (Wang et al., 2021, pp. 1-2).
+Recent research has applied a range of statistical models to biomarker data to predict progression to AD dementia and evaluate their predictive performance. For instance, a 2021 study fitted a Cox proportional hazards (Cox PH) model incorporating baseline values of p-tau181, alongside demographic and genetic covariates such as age, sex and apolipoprotein-$ε4$ (APOE-$ε4$) status. The study included a total of 767 participants from the ADNI database. Predictive performance was evaluated using reciever operating characteristic (ROC) analysis at a fixed prediction horizon, yielding an area under the curve (AUC) value of 0.78. This suggests that the model demonstrated good discriminative ability in identifying individuals who later developed AD dementia during follow-up (Wang et al., 2021, pp. 1-2).
 
-Similarly, a large population-based study of 2,148 older adults in Sweden used a single multivariable Cox proportional hazards model with p-tau181 and NfL, along with other biomarkers, as baseline predictors to assess their predictive value for progression to all-cause and Alzheimer’s disease dementia. The model was additionally adjusted for age, gender, education, and relevant cardiovascular and metabolic comorbidities, as well as APOE-$ε4$ status. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 0.74, 0.77, and 0.81 for AD dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD dementia (Grande et al., 2025, pp. 2027-2031).
+Similarly, a large population-based study of 2,148 older adults in Sweden used a single multivariable Cox proportional hazards model with p-tau181 and NfL, along with other biomarkers, as baseline predictors to assess their predictive value for progression to all-cause and Alzheimer’s disease dementia. The model was additionally adjusted for age, sex, education, and relevant cardiovascular and metabolic comorbidities, as well as APOE-$ε4$ status. Predictive performance was assessed using a fixed 10-year prediction horizon, where the AUC was calculated based on dementia occurrence within 10 years. Within this framework, the presence of elevated values of one, two, or three biomarkers yielded AUC values of 0.74, 0.77, and 0.81 for AD dementia, respectively, demonstrating progressively improved discriminative ability for identifying individuals who subsequently developed AD dementia (Grande et al., 2025, pp. 2027-2031).
 
-The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the progression risk to AD in a cohort of 1191 participants, adjusted for age, gender, APOE-$ε4$ status and marital status. By evaluating AUC and Brier score at different time points and time spans, the researchers found that p-tau181 and NfL exhibited comparable performance in terms of both discriminative capability and predictive accuracy, with AUC values around 0.65 to 0.68 and Brier scores ranging from approximately 0.07 to 0.20 for the models. Additionally, they found that model incorporating biomarkers simultaneosuly showed improved performance, with slightly higher AUC values and lower Brier scores (Yuan et al., 2024, pp. 1, 4).
+The joint modelling framework extends the Cox PH model by linking a longitudinal model which accounts for the effect of an endogenous time-dependent covariate measured with error, such as a biomarker (Rizopoulos, 2012, p. vii). This approach has been applied to model the relationship between repeated plasma p-tau181 and NfL measurements on the progression risk to AD in a cohort of 1191 participants, adjusted for age, sex, APOE-$ε4$ status and marital status. By evaluating AUC and Brier score at different time points and time spans, the researchers found that p-tau181 and NfL exhibited comparable performance in terms of both discriminative capability and predictive accuracy, with AUC values around 0.65 to 0.68 and Brier scores ranging from approximately 0.07 to 0.20 for the models. Additionally, they found that model incorporating biomarkers simultaneosuly showed improved performance, with slightly higher AUC values and lower Brier scores (Yuan et al., 2024, pp. 1, 4).
 
-Furthermore, the simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE-$ε4$ status, gender, race, education and neuropathological burden (Scollard et al., 2026, p. 383). Despite these advances, such modelling approaches have rarely been applied to longitudinal blood-based biomarkers in AD research.
+Furthermore, the simultaneous modelling of multivariate longitudinal biomarkers and clinical endpoints when heterogeneity is highly suspected has been handled by joint latent class mixed models (JLCMMs) (Proust-Lima et al., 2023, p. 3996). JLCMMs model complex disease progression whilst offering a method for the exploration of new pathological hypotheses and identification of subphenotypes. One application of a multi-dimensional JLCMM captured heterogeneity in the trajectories of three cognitive domains (memory, language, and executive functioning) from the time of Alzheimer’s dementia diagnosis (Scollard et al., 2026, p. 383). They identified five latent classes differentiated by overall level of impairment (low-high) and rate of decline (slow-fast). Within each latent class, the pattern of decline was relatively consistent across cognitive domains, suggesting parallel deterioration across functions rather than domain-specific divergence. In addition, class membership was associated with several key variables, such as APOE-$ε4$ status, sex, race, education and neuropathological burden (Scollard et al., 2026, p. 383). Despite these advances, such modelling approaches have rarely been applied to longitudinal blood-based biomarkers in AD research.
 
 While the predictive performance of most of these modelling approaches has been examined separately, often using different datasets and under different data conditions, few studies have systematically compared them within a unified framework, particularly for blood-based biomarkers such as p-tau181 and NfL. Such comparisons have however been conducted in other domains. For instance, a 2025 study compared modelling approaches for mortality risk prediction in peritoneal dialysis patients, evaluating Cox PH models using baseline, time-averaged, and time-dependent biomarker values, as well as JMs (Goksuluk et al., 2025, pp. 1, 4-5). Overall, JMs demonstrated superior predictive performance based on AUC, with multivariate JMs performing slightly better than separate JMs fitted for each biomarker (Goksuluk et al., 2025, p. 8).
 
@@ -175,7 +175,7 @@ To address the research questions, a series of statistical models will be implem
 
 First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. As with the JM approach, both univariate and multivariate models will be evaluated. For all modelling approaches, model fit will be assessed to evaluate the adequacy of model assumptions and overall model specification.
 
-All models will additionally be adjusted for baseline age, gender, and APOE-$ε4$ status to improve predictive accuracy. In the JMs, these covariates will be included in both submodels, as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components.
+All models will additionally be adjusted for baseline age, sex, and APOE-$ε4$ status to improve predictive accuracy. In the JMs, these covariates will be included in both submodels, as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components.
 
 Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD dementia, predictions are most commonly made 2-4 years from baseline (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter. Furthermore, sensitivity analyses will be conducted under alternative model specifications to assess the robustness of the predictive performance results.
 
@@ -213,7 +213,7 @@ which is the proportional hazards assumption (Moore, p. 55). Further, covariate 
 
 $$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, gender, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
+where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, sex, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
 ### Model Assumptions
 
@@ -263,7 +263,7 @@ This univariate framework is applied to longitudinal p-tau181 and NfL measuremen
 
 ### Model Assumptions
 
-A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
+A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopoulos, 2012, pp. 62-63).
 
 For the longitudinal submodel (LME model), it is assumed that the residuals are approximately normally distributed with constant variance. Heteroscedasticity can be checked using a scatter plot of residuals versus fitted values. A non-random pattern, such as a funnel- or wedge-shaped shape, may indicate heteroscedasticity (Pinheiro & Bates, 2000, p. 341). Q-Q plots can be used to assess whether the residuals are normally distributed, where deviations from the line suggest non-normality (Pinheiro & Bates, 2000, p. 253).
 
@@ -313,9 +313,9 @@ As the number of iterations $L$ increases and the between-chain variation $B$ de
 
 ## Joint Latent Class Mixed Model
 
-JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterized by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2018, p. 5) and the classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
+JLCMMs address suspected disease heterogenity by assuming that the sample population consists of a finite number of unobserved subgroups (latent classes), each characterised by distinct longitudinal trajectories and survival risks (Kyheng et al., 2025, p. 2). Individuals within latent classes are assumed to share longitudinal biomarker trajectories and survival risks (Proust-Lima et al., 2012, p. 5). Further, the latent classes are not described by the observed covariates (Rizopoulos, 2012, p. 122).
 
-In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished, and to ascertain any differences in predictive performance of these biomarkers.
+In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished and to assess predictive performance of time-to-diagnosis when modelling survival risks by these latent classes. Additionally, this study will compare the predictive performance of these biomarkers using this model.
 
 ### Class Submodel
 
@@ -333,7 +333,7 @@ $$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alp
 
 ### Model Assumptions
 
-In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2018, p. 122). This is in contrast to regular JMs, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Proust-Lima et al., p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
+In JLCMM, the biomarker and the time-to-event are considered to be conditionally independent given the latent classes, where all correlation between repeated measures of the biomarker is handled by the random effects in the longitudinal model (Proust-Lima et al., 2012, p. 12). This is in contrast to regular JMs, where the biomarker and time-to-event are assumed to be conditionally independent given the random effects (Rizopoulos, 2012, p. 62-63). The conditional independence assumptions for the JLCMM are as follows;
 
 1.  Correlations between observations of the longitudinal biomarker are modeled by the random effects, $b_i$, in the longitudinal model.
 
@@ -345,11 +345,11 @@ The score test assumes the null hypothesis of conditional independence, that is,
 
 $$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
 
-Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
+Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., 2012, p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
 ### Estimation
 
-The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2014, p. 5), which is computationally advantageous when compared with the estimation of s which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2017, p. 10).
+The log-likelihood for the JLCMM is much more tractable than for the regular JM (Rizopoulos, 2012, p. 123), making estimation less computationally demanding. Log-likelihood estimation for JLCMM involves summing over the latent classes (Proust-Lima et al., 2012, p. 5), which is computationally advantageous when compared with the estimation of JMs which require mathematical approximation through, for example, the previously defined MCMC algorithm, due to integration over the random effects. For JLCMM, the log-likelihood is maximised using an iterative Marquardt algorithm (Proust-Lima et al., 2012, p. 10).
 
 The Marquardt algorithm used in estimating JLCMMs updates the vector of model parameters to be used for log-likelihood evaluation, $\theta_{G}$, such that for iteration $l + 1$:
 
@@ -359,15 +359,15 @@ $$\theta_{G}^{\ (l + 1)} =
 \quad \text{where} \quad
 \nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
 
-where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2017, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2017, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2014, p. 5).
+where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2012, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2012, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2012, p. 5).
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default and it is not possible to estimate a Cox PH model, in order to stay in the full-likelihood framework (Proust-Lima et al., 2014, p. 5). Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
 
 ### Class Enumeration
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimization of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2014, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2014, p. 7):
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2012, p. 7):
 
 $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 = \frac{
@@ -376,7 +376,7 @@ $$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
 {
 \sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
 
-Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2014, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
+Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2012, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
 **Entropy**
 
@@ -476,15 +476,15 @@ Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while di
 
 52 participants had two measurements with different values recorded on the same examination date. To ensure consistency, the mean value of these measurements was selected as the primary approach. Sensitivity analyses consisted of defining the measurements by their first and last measurement, respectively.
 
-Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonized examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
+Furthermore, discrepancies were observed between the p-tau181 and NfL examination dates despite sharing the same visit code. Five cases exceeded 30 days, with differences of up to 231 days, indicating that these did not represent the same examination occasion. To address this, a harmonised examination date was constructed as the midpoint between the two biomarker examination dates. This date was used to define the baseline. An additional sensitivity analysis was conducted in which baseline was defined as the first examination date across biomarkers.
 
 ### Age
 
 Additionally, age is included as a covariate when predicting progression to dementia, as risk of dementia is known to increase with age (Alzheimer’s Society, n.d.). The variable was retrieved from the PTDEMOG data set and was initially recorded as year of birth for each participant (ADNI, n.d.-b) which was transformed into age at baseline. Baseline age ranged from 55 to 94 years, with a median age of 74 years.
 
-### Gender
+### Sex
 
-Another covariate included when predicting progression to dementia is participants’ gender at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between genders. More precisely, women aged over 80 have a slightly higher risk of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b). Among the included participants, 315 were female, while 389 were male. As for age, the variable was retrieved from the PTDEMOG dataset.
+Another covariate included when predicting progression to dementia is participants’ sex at birth, as recorded on their original birth certificate, due to reported differences in disease risk and progression between sexs. More precisely, women aged over 80 have a slightly higher risk of developing Alzheimer’s disease compared to men of the same age (Alzheimer’s Society, n.d.). This binary variable includes two categories: male and female (ADNI, n.d.-b). Among the included participants, 315 were female, while 389 were male. As for age, the variable was retrieved from the PTDEMOG dataset.
 
 ### APOE4-status
 
@@ -498,11 +498,11 @@ Prior to evaluating predictive performance, model fit was assessed for each mode
 
 ### Cox PH Models
 
-First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were gender, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite gender being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without gender as a covariate (Appendix 8.2; Table 16), gender was retained in the models due it's theoretical relevance.
+First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were sex, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite sex being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without sex as a covariate (Appendix 8.2; Table 16), sex was retained in the models due it's theoretical relevance.
 
 The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 15 (Appendix 8.2).
 
-At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for gender, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
+At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
 Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in Table 1.
 
@@ -597,7 +597,7 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-The distribution of age at baseline, gender, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
+The distribution of age at baseline, sex, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
 
 ## Model Comparison
 
@@ -679,7 +679,7 @@ Finally, to address the interval-censored nature of the data, event times were d
 
 ## Main Findings and Conclusions
 
-This study compared the predictive performance of different modelling frameworks for time-to-diagnosis in individuals from the ADNI cohort with AD dementia as the event of interest, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was used in Cox PH models estimated with either p-tau181 or NfL, or both simultaneously. The second level incorporated longitudinal biomarker information by extending these Cox PH models within a joint modelling framework, accounting for repeated measurements over time. The most complex level combined longitudinal biomarker trajectories with latent class structure using the JLCMM framework to capture heterogeneity in disease progression by modelling class-specific trajectories and survival processes. For both JLCMMs, a two class model was determined to best model the data. These models estimated one high-risk class and one low-risk class. All reported models were adjusted for age, gender and APOE-$ε4$ status.
+This study compared the predictive performance of different modelling frameworks for time-to-diagnosis in individuals from the ADNI cohort with AD dementia as the event of interest, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was used in Cox PH models estimated with either p-tau181 or NfL, or both simultaneously. The second level incorporated longitudinal biomarker information by extending these Cox PH models within a joint modelling framework, accounting for repeated measurements over time. The most complex level combined longitudinal biomarker trajectories with latent class structure using the JLCMM framework to capture heterogeneity in disease progression by modelling class-specific trajectories and survival processes. For both JLCMMs, a two class model was determined to best model the data. These models estimated one high-risk class and one low-risk class. All reported models were adjusted for age, sex and APOE-$ε4$ status.
 
 The predictive performance of these models was assessed by comparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Both evaluations demonstrated that all three modelling approaches showed relatively good predictive performance in terms of both discriminative ability and overall predictive accuracy, with AUC values above 0.75 and Brier scores below approximately 0.15 across all horizons.
 
@@ -713,7 +713,7 @@ Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https:/
 
 Biomarkers Definitions Working Group. (2001). Biomarkers and surrogate endpoints: preferred definitions and conceptual framework". *Clinical pharmacology and therapeutics*, 69(3), 89-95. <https://doi.org/10.1067/mcp.2001.113989>
 
-Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma neurofilament light (NFL) method* (Rev. Jan. 31, 2011) \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/BLENNOWPLASMANFLLONG/Blennow_Lab\_-*ADNI-1-2*-*Method*-\_Plasma_NFL_longitudinal_UA.pdf](#0)
+Blennow, K. (2011). *ADNI-1/GO/2 longitudinal plasma neurofilament light (NFL) method* (Rev. Jan. 31, 2011) \[Technical report\]. Clinical Neurochemistry Laboratory, Department of Neuroscience and Physiology, University of Gothenburg, Sweden. [https://adni.bitbucket.io/reference/docs/BLENNOWPLASMANFLLONG/Blennow_Lab\_-*ADNI-1-2*-*Method*-\_Plasma_NFL_longitudinal_UA.pdf](#0)
 
 Brown, E. R., & Ibrahim, J. G. (2003). A Bayesian semiparametric joint hierarchical model for longitudinal and survival data. *Biometrics*, 59(2), 221-228. <https://doi.org/10.1111/1541-0420.00028>
 
@@ -737,7 +737,7 @@ Guo, G., Song, W., Wang, A., Cui, Q., Yang, X., Wang, Y., Ma, Y., Han, H., Li, Z
 
 Hamra, G., MacLehose, R., & Richardson, D. (2013). Markov chain Monte Carlo: an introduction for epidemiologists. *International journal of epidemiology*, 42(2), 627-634. <https://doi.org/10.1093/ije/dyt043>
 
-Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, 20(8). <https://doi.org/10.1002/alz.13859>
+Jack, C. R., Andrews, J. S., Beach, T. G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, W., McDade, E., Molinuevo, J. L., Okonkwo, O. C., Pani, L., Rafii, M. S., Scheltens, P., Siemers, E., Snyder, H. M., Sperling, R., Teunissen, C. E., & Carrillo, M. C. (2024). Revised criteria for diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. *Alzheimer’s & Dementia*, 20(8). <https://doi.org/10.1002/alz.13859>
 
 Jacqmin-Gadda, H., Proust-Lima, C., Taylor, J. M. G., & Commenges, D. (2010). Score Test for Conditional Independence Between Longitudinal Outcome and Time to Event Given the Classes in the Joint Latent Class Model. *Biometrics*, 66(1), 11-19. <http://www.jstor.org/stable/40663147>
 
@@ -761,7 +761,9 @@ Pinheiro, J. C., & Bates, D. M. (2000). *Mixed-effects models in S and S-PLUS*. 
 
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. <https://doi.org/10.1371/journal.pone.0318349>
 
-Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
+Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844>
+
+Proust-Lima, C., Séne, M., Taylor, J. M., & Jacqmin-Gadda, H. (2012). Joint latent class models for longitudinal and time-to-event data: A review. *Statistical Methods in Medical Research*, *23*(1), 74–90. <https://doi.org/10.1177/0962280212445839>
 
 Rissin, D. M., Kan, C. W., Campbell, T. G., Howes, S. C., Fournier, D. R., Song, L., Piech, T., Patel, P. P., Chang, L., Rivnak, A. J., Ferrell, E. P., Randall, J. D., Provuncher, G. K., Walt, D. R., & Duffy, D. C. (2010). Single-molecule enzyme-linked immunosorbent assay detects serum proteins at subfemtomolar concentrations. *Nature Biotechnology*, 28(6), 595-599. <https://doi.org/10.1038/nbt.1641>
 
@@ -787,7 +789,7 @@ World Health Organization (2024). *Preferred product characteristics of blood-ba
 
 - (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
-Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors.*Biometrics*,*66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
 
 Xia, X., Duffner, L. A., Bintener, C., Bradshaw, A., Lamirel, D., & Jönsson, L. (2025). Diagnostic and prognostic multimodal prediction models in Alzheimer's disease: A scoping review. *Journal of Alzheimer's disease* *: JAD*, 108(1), 209-221. [https://doi.org/10.1177/13872877251351630](http://127.0.0.1:14086/#0)
 
@@ -852,7 +854,7 @@ kable_standard(readRDS("tables/table_ph.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
-#| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without gender as a covariate"
+#| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without sex as a covariate"
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
@@ -1074,26 +1076,12 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_AUC_midpoint.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
-# kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-kable_standard(readRDS("tables/results_table_Brier_midpoint.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
-# kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
+kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
