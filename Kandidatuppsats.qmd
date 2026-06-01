@@ -32,7 +32,7 @@ include-before-body:
 
     \raggedleft
 
-    {\Huge\bfseries No 2026:x\par}
+    {\Huge\bfseries No 2026:9\par}
     \vspace{0.5cm}
 
     {\LARGE \bfseries Predicting Progression to Alzheimer's Disease Dementia Using Blood-Based Biomarkers: A Comparative Analysis of Modelling Approaches and Biomarker Strategies \par}
@@ -173,11 +173,11 @@ This study investigates the prediction of progression to AD due to dementia (AD 
 
 To address the research questions, a series of statistical models will be implemented. In all models, time to progression to AD dementia, defined as the first recorded diagnosis of dementia after baseline time, serves as the survival outcome. Given the relatively recent focus on blood-based biomarkers in AD research, their inclusion was considered timely and relevant. Blood-based p-tau181 and NfL were selected due to their established relevance for predicting dementia and AD progression, as well as the availability of rich longitudinal data with repeated measurements and overlapping follow-up information. In addition, they reflect two distinct pathological processes, making them suitable for comparative analyses of disease progression.
 
-First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. As with the JM approach, both univariate and multivariate models will be evaluated.
+First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. As with the JM approach, both univariate and multivariate models will be evaluated. For all modelling approaches, model fit will be assessed to evaluate the adequacy of model assumptions and overall model specification.
 
 All models will additionally be adjusted for baseline age, gender, and APOE-$ε4$ status to improve predictive accuracy. In the JMs, these covariates will be included in both submodels, as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components.
 
-Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD dementia, predictions are most commonly made 2-4 years from baseline (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter.
+Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD dementia, predictions are most commonly made 2-4 years from baseline (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter. Furthermore, sensitivity analyses will be conducted under alternative model specifications to assess the robustness of the predictive performance results.
 
 The modelling approaches were chosen based on their methodological relevance and their ability to capture different aspects of the data, providing an overview of different approaches for modelling longitudinal biomarker data and survival outcomes. They will all be applied to data from the ADNI dataset, in accordance with its data use and access policies (ADNI, n.d.-b).
 
@@ -217,7 +217,11 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 ### Model Assumptions
 
-A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratios are constant over time. A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
+A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The test is performed separately for each covariate and evaluates whether the effect of a covariate on the hazard is constant over time.
+
+$$ H_0: \text{Hazard ratios for each covariate are constant over time.} $$ $$ H_1: \text{Hazard ratio for covariate } X_j \text{ is not constant over time.} $$
+
+A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
 
 Other assumptions are that the survival times of individuals are independent and that censoring is non-informative (Moore, 2016, p. 112). Censoring is considered non-informative when patients drop out for reasons unrelated to the outcome, such as being alive at the end of follow-up. In contrast, censoring is informative when individuals leave the study due to reasons related to the failure process, which can introduce bias that is difficult to adjust for (Moore, 2016, pp. 5-6). Even though this assumption is harder to satisfy in dementia progression studies, due to competing risk of death and dropout related to cognitive decline, the Cox model is still widely used because of its flexibility, but results should be interpreted with caution.
 
@@ -261,6 +265,8 @@ This univariate framework is applied to longitudinal p-tau181 and NfL measuremen
 
 A core assumption of the JM for longitudinal and survival data is full conditional independence between the longitudinal outcome and the survival outcome. All dependence is assumed to be explained by the random effects, resulting in independence of the longitudinal and survival outcomes and the repeated biomarker measurements are independent of each other (Rizopolos, 2012, pp. 62-63).
 
+For the longitudinal submodel (LME model), it is assumed that the residuals are approximately normally distributed with constant variance. Heteroscedasticity can be checked using a scatter plot of residuals versus fitted values. A non-random pattern, such as a funnel- or wedge-shaped shape, may indicate heteroscedasticity (Pinheiro & Bates, 2000, p. 341). Q-Q plots can be used to assess whether the residuals are normally distributed, where deviations from the line suggest non-normality (Pinheiro & Bates, 2000, p. 253).
+
 ### Estimation: Frequentist vs Bayesian Approach
 
 The primary estimation approach that has been proposed for JMs is (semiparametric) maximum likelihood (Rizopoulos, 2012, p. 62). However, a key difficulty in joint modelling is that the estimation process can be very computationally demanding and may sometimes be infeasible (Wu et al., 2008).
@@ -271,9 +277,11 @@ Using the R package $JMbayes2$, JMs can be fitted via Markov chain Monte Carlo (
 
 The package uses weakly informative priors, allowing stable estimation while letting the data primarily drive inference. The framework also accommodates multivariate settings, by introducing additional association parameters and regularising priors to handle higher-dimensional parameter structures (Rizopoulos, 2018).
 
-### The Gelman-Rubin Statistic
+### Convergence and The Gelman-Rubin Statistic
 
-Within Bayesian joint modelling, convergence of the Markov chains can be assessed by examining whether the parameters have stabilised over iterations, for example through trace plots. Additionally, it can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman–Rubin statistic, $R$ (Peng, 2022).
+Within Bayesian joint modelling, convergence of the Markov chains can be assessed by examining trace plots of the sampled values across iterations. These plots provide a visual diagnostic of whether the chains have reached a stationary region, indicated by fluctuations around a stable level with approximately constant mean and variance and no clear trends or systematic drift. They also provide insight into the mixing behaviour of the chains, where good mixing is reflected in substantial overlap and efficient exploration of the parameter space, indicating sampling from the same posterior distribution (SAS Institute Inc., 2020).
+
+Additionally, convergence of the Markov chains can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman-Rubin statistic, $R$ (Peng, 2022).
 
 Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j^{th}$ chain. For each chain, remove the first $D$ samples as “burn-in” and retain the following $L$ samples: $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$. One common choice is to set $D = L$.
 
@@ -749,6 +757,8 @@ Park, S. Y., Park, J. E., Kim, H., & Park, S. H. (2021). Review of Statistical M
 
 Peng, R.E. (2022). *Advanced Statistical Computing*. <https://bookdown.org/rdpeng/advstatcomp/monitoring-convergence.html#gelman-rubin-statistic>
 
+Pinheiro, J. C., & Bates, D. M. (2000). *Mixed-effects models in S and S-PLUS*. Springer. <https://doi.org/10.1007/b98882> 
+
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. <https://doi.org/10.1371/journal.pone.0318349>
 
 Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844> 
@@ -758,6 +768,8 @@ Rissin, D. M., Kan, C. W., Campbell, T. G., Howes, S. C., Fournier, D. R., Song,
 Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b12208>
 
 - (2018). *Multivariate joint models*. <https://www.drizopoulos.com/vignettes/multivariate%20joint%20models>
+
+SAS Institute Inc. (2020). *Introduction to Bayesian analysis procedures*. <https://documentation.sas.com/doc/en/statug/15.2/statug_introbayes_sect025.htm> 
 
 Scollard, P., Mukherjee, S., Choi, S. E., Lee, M. L., Klinedinst, B., Gibbons, L. E., Trittschuh, E. H., Mez, J., Saykin, A. J., James, B. D., Proust-Lima, C., & Crane, P. K. (2026). Heterogeneous patterns of cognitive decline in Alzheimer's disease across three domains of cognition. *Journal of Alzheimer's disease : JAD*, 110(1), 383-396. <https://doi.org/10.1177/13872877251414975>
 
