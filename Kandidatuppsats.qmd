@@ -166,7 +166,7 @@ While the predictive performance of most of these modelling approaches has been 
 
 This study investigates the prediction of progression to AD due to dementia (AD dementia) using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
 
-1.  What provides the best prediction of time to AD dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with **a purely data-driven** latent class structure?
+1.  What provides the best prediction of time to AD dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with a purely data-driven latent class structure?
 2.  Across these approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of time to AD dementia?
 
 # Methodology
@@ -175,7 +175,7 @@ To address the research questions, a series of statistical models will be implem
 
 First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. For all modelling approaches, model fit will be assessed to evaluate the adequacy of model assumptions and overall model specification.
 
-**The inclusion of age, sex and APOE-**$\epsilon4$ **status as covariates will be assessed on a model by model basis. In the JMs, covariates will be included in both submodels as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components. However, for the JLCMMs no covariates will be specified in either the class or survival submodels in order to ensure latent classes are assigned purely by biomarker trajectories and survival processes.**
+The inclusion of age, sex and APOE-$\epsilon4$ status as covariates will be assessed on a model by model basis. In the JMs, covariates will be included in both submodels as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components. In contrast, for the JLCMMs no covariates will be specified in either the class or survival submodels in order to ensure latent classes are assigned purely by biomarker trajectories and survival processes.
 
 Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD dementia, predictions are most commonly made 2-4 years from baseline (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter. Furthermore, sensitivity analyses will be conducted under alternative model specifications to assess the robustness of the predictive performance results.
 
@@ -464,8 +464,6 @@ Moreover, the inclusion criteria also related to the number of biomarker measure
 
 Application of these criteria yielded a sample of 704 participants with at least three biomarker measurements. Inclusion of participants with at least one biomarker measurement increased the sample size to 934.
 
-All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
-
 ## Variables
 
 ### Diagnosis Status
@@ -501,6 +499,12 @@ Another covariate included when predicting progression to dementia is participan
 ### APOE4-status
 
 Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). 83 participants carried no APOE-$𝜀4$ alleles, 578 carried one allele, and 43 carried two alleles
+
+## Missing values
+
+Missing data were low for biomarker variables (1-13 missing values), but higher for follow-up and diagnostic variables (up to 47-49 missing values), mainly due to incomplete follow-up information. This suggests that data are unlikely to be missing completely at random (MCAR). The missingness may be related to observed factors such as age or baseline cognitive status, which is consistent with missing at random (MAR). However, we cannot rule out missing not at random (MNAR), for example if participants with worse cognitive decline were less likely to attend follow-ups.
+
+All cases with missing values were removed before analysis to perform a complete-case analysis. While this approach simplifies the analysis, it may reduce statistical power and introduce bias if the missingness mechanism is not completely random.
 
 # Results
 
