@@ -572,7 +572,7 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 SENTENCES ABOUT HOW LCMM WERE FIT WITH AND WITHOUT COVARIATES, COVARIATES CAUSED LATENT CLASSES TO BE FOUND WHEN MODEL WO COVARIATES COULD NOT FIND... EVIDENCE FOR REMOVING COVARIATES SO LATENT CLASS WAS ASSURED TO BE ACTUALL LATENT.
 
-Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
+Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters. For all models, the Weibull resulted in a lower BIC, despite . The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
 
 The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
@@ -874,7 +874,7 @@ kable_standard(readRDS("tables/table_ph.rds"))
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
-## Residual Diagnositics
+## Diagnositics
 
 ::: {#fig-lme-ptau layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_ptau.png){#fig-resid-ptau}
@@ -902,6 +902,10 @@ LME model with longitudinal NfL measurements
 ![Multivariate JM, p-tau181](figures/convergence_plot_multi_ptau181.png){#fig-alpha-ptau-multi}
 
 Trace plots of the $α$-parameters (convergence)
+:::
+
+::: {layout-ncol="1"}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption}
 :::
 
 ## Model Results
