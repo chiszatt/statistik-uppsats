@@ -711,7 +711,7 @@ Goksuluk et al. (2025, p. 11) further reported that models including multiple bi
 
 Sensitivity analyses showed however that including participants with only one biomarker measurement substantially reduced the performance of the JMs and the JLCMMs. While this reduction may partly reflect differences in sample size and number of events after inclusion of participants sparse data, the relatively stable Cox PH models suggest that reduced longitudinal information was likely the main contributing factor. This further indicates that the predictive benefit of the longitudinal approaches depends on sufficient repeated biomarker measurements. Additionally, the reduced performance of combined biomarker models indicates that the added value of NfL depends on the availability of sufficient longitudinal information.
 
-## Further Research
+## Limitations and Further Research
 
 Diagnostic exam dates were used as a proxy for AD onset in this analysis despite the exact time of dementia onset is unknown and individuals being interval censored. This has the potential to introduce bias in the estimated event times, as the time-to-diagnosis is overestimated. Despite this, interval censoring was not adequately accounted for given the level of this thesis and its time constraints. This would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. Results from the sensitivity analysis support this suggestion, as crudely estimating event times was proven to reduce overall predictive performance. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
 
@@ -909,7 +909,7 @@ Trace plots of the $α$-parameters (convergence)
 :::
 
 ::: {layout-ncol="1"}
-![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width=70%}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width="70%"}
 :::
 
 ## Model Results
@@ -992,24 +992,10 @@ kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
 ```
 
 ```{r}
@@ -1020,24 +1006,10 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
-##| pos: "H"
-##| tbl-pos: "H"
-##| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
-#kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
-```
-
-```{r}
-##| pos: "H"
-##| tbl-pos: "H"
-##| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-#kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
@@ -1048,24 +1020,10 @@ kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
 
 ```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
-# kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
-# kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
