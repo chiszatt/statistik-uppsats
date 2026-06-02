@@ -319,7 +319,7 @@ In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and
 
 ### Survival Submodel
 
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or by a flexible baseline hazard model.
 
 The Weibull survival model can be parameterised with a rate and shape parameter, giving:
 
@@ -329,7 +329,7 @@ where $\lambda$ is the rate parameter and $\alpha$ is the shape parameter (Moore
 
 $$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$
 
-which is a linear function of $t$ and can be re-expressed in the form $f(t) = b + m \cdot log (t)$ (Moore, 2016, pp. 138 - 139). Therefore, plotting the complementary log-log transformed survival estimates against time provides a visual diagnostic, with a straight line giving support to the Weibull hazard model whereas deviations from linearity call this model in to question.
+which is a linear function of $t$ and can be re-expressed in the form $f(t) = b + m \cdot log (t)$ (Moore, 2016, pp. 138 - 139). Therefore, plotting the complementary log-log transformed survival estimates against time provides a visual diagnostic, with a straight line giving support to the Weibull hazard model whereas deviations from linearity call this model in to question. Alternatively, flexible hazard models can be specified in the $lcmm$ package, where piecewise exponential and cubic M-splines hazard models are available (Proust-Lima et al., 2025).
 
 ### Class Submodel
 
@@ -572,7 +572,7 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 SENTENCES ABOUT HOW LCMM WERE FIT WITH AND WITHOUT COVARIATES, COVARIATES CAUSED LATENT CLASSES TO BE FOUND WHEN MODEL WO COVARIATES COULD NOT FIND... EVIDENCE FOR REMOVING COVARIATES SO LATENT CLASS WAS ASSURED TO BE ACTUALL LATENT.
 
-Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. A Weibull baseline hazard was chosen and checked against whether a flexible baseline hazard with the same number of parameters resulted in a lower BIC, which was the case for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
+Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters. For all models, the Weibull resulted in a lower BIC, despite . The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
 
 The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
@@ -775,6 +775,8 @@ Pinheiro, J. C., & Bates, D. M. (2000). *Mixed-effects models in S and S-PLUS*. 
 
 Prince, T., Bommert, A., Rahnenführer, J., & Schmid, M. (2025). On the estimation of inverse-probability-of-censoring weights for the evaluation of survival prediction error. *PLOS ONE*, 20(1), e0318349. <https://doi.org/10.1371/journal.pone.0318349>
 
+Proust-Lima, C., Diakite, A., & Philipps, V. (2025). *Jointlcmm: Estimation of joint latent class models for longitudinal and time-to-event data* (lcmm package version 2.2.2) \[R documentation\]. RDocumentation. [https://www.rdocumentation.org/packages/lcmm/versions/2.2.2/topics/Jointlcmm](#0)
+
 Proust-Lima, C., Saulnier, T., Philipps, V., Traon, A. P., Péran, P., Rascol, O., Meissner, W. G., & Foubert-Samier, A. (2023). Describing complex disease progression using joint latent class models for multivariate longitudinal markers and clinical endpoints. *Statistics in medicine*, 42(22), 3996-4014. <https://doi.org/10.1002/sim.9844>
 
 Proust-Lima, C., Séne, M., Taylor, J. M., & Jacqmin-Gadda, H. (2012). Joint latent class models for longitudinal and time-to-event data: A review. *Statistical Methods in Medical Research*, *23*(1), 74–90. <https://doi.org/10.1177/0962280212445839>
@@ -872,7 +874,7 @@ kable_standard(readRDS("tables/table_ph.rds"))
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
 
-## Residual Diagnositics
+## Diagnositics
 
 ::: {#fig-lme-ptau layout-ncol="2"}
 ![Residuals vs fitted values](figures/residuals_vs_fitted_ptau.png){#fig-resid-ptau}
@@ -900,6 +902,10 @@ LME model with longitudinal NfL measurements
 ![Multivariate JM, p-tau181](figures/convergence_plot_multi_ptau181.png){#fig-alpha-ptau-multi}
 
 Trace plots of the $α$-parameters (convergence)
+:::
+
+::: {layout-ncol="1"}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption}
 :::
 
 ## Model Results

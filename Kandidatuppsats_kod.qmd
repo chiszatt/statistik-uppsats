@@ -1553,9 +1553,24 @@ Choice of p-value <https://pmc.ncbi.nlm.nih.gov/articles/PMC5059270/>
 # JLCMM: NFL
 
 ```{r}
+# Kaplan-Meier survival estimates
 surv <- survfit(Surv(surv_data_in$time_to_event, surv_data_in$event) ~ 1)
 
-plot(log(surv$time), log(-log(surv$surv)), main="Weibull Check")
+# saving the complementary log-log transformed Kaplan-Meier survival estimates
+loglog_surv_est <- log(-log(surv$surv))
+
+# saving values of log(t)
+log_surv_time <- log(surv$time)
+
+# estimating a straight line to plot 
+lm_result <- lm(loglog_surv_est ~ log_surv_time)
+
+# plotting the complementary log-log against log(t) along with the straight line to check Weibull assumption
+plot(log_surv_time, loglog_surv_est,
+     col = "cornflowerblue",
+     xlab = "log(t)",
+     ylab = "log[-log(S(t))]")
+abline(lm_result)
 ```
 
 ```{r}
@@ -3972,4 +3987,16 @@ dev.off()
 ```{r}
 # Comparing M0, M1, M2 (NfL and p-tau181)
 #saveRDS(summary_jlcmm_ptau_nfl, "tables/summary_jlcmm_ptau_nfl.rds")
+```
+
+```{r}
+# Saving the Weibull assumption check plot
+png("figures/weibull_assumption.png",
+    width = 6, height = 4, units = "in", res = 300)
+plot(log_surv_time, loglog_surv_est,
+     col = "cornflowerblue",
+     xlab = "log(t)",
+     ylab = "log[-log(S(t))]")
+abline(lm_result)
+dev.off()
 ```
