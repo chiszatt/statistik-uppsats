@@ -317,6 +317,20 @@ JLCMMs address suspected disease heterogenity by assuming that the sample popula
 
 In this analysis, univariate JLCMMs will be fit on the longitudinal p-tau181 and NfL measurements separately to assess whether any latent classes can be distinguished and to assess predictive performance of time-to-diagnosis when modelling survival risks by these latent classes. Additionally, this study will compare the predictive performance of these biomarkers using this model.
 
+### Survival Submodel
+
+In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
+
+The Weibull survival model can be parameterised with a rate and shape parameter, giving:
+
+$$h(t) = \alpha \lambda (\lambda t) ^{\alpha - 1}$$
+
+where $\lambda$ is the rate parameter and $\alpha$ is the shape parameter (Moore, 2016, p. 16). For $\alpha < 1$ the hazard is decreasing whilst for $\alpha > 1$ the hazard is increasing. A diagnostic tool for assessing the appropriateness of the Weibull hazard model is to apply a complementary log-log transformation to the survival estimates such that:
+
+$$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$
+
+which is a linear function of $t$ and can be re-expressed in the form $f(t) = b + m \cdot log (t)$ (Moore, 2016, pp. 138 - 139). Therefore, plotting the complementary log-log transformed survival estimates against time provides a visual diagnostic, with a straight line giving support to the Weibull hazard model whereas deviations from linearity call this model in to question.
+
 ### Class Submodel
 
 The JLCMM consists of three submodels; a multinomial logistic submodel, a LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
@@ -360,8 +374,6 @@ $$\theta_{G}^{\ (l + 1)} =
 \nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
 
 where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2012, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2012, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2012, p. 5).
-
-In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a Weibull baseline hazard model is estimated by default in order to stay in the full-likelihood framework (Proust-Lima et al., 2012, p. 5). It is not possible to estimate a Cox PH model. Therefore, it is necessary to assess whether the hazard is better modeled by the Weibull or a flexible baseline hazard model.
 
 ### Class Enumeration
 
