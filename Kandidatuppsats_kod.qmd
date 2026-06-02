@@ -1918,10 +1918,6 @@ class_preds <- jlcmm_m1_nfl$pprobY
 data_preds <- class_preds %>% merge(
   jlcmm_data, by = "RID")
 
-# %>% merge(
-#     surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
-#   )
-
 # Merging with baseline biomarker values
 data_preds <- data_preds %>% merge(
   baseline, by = "RID"
@@ -1972,10 +1968,6 @@ class_summary_nfl$Variable <- c("Age at baseline",
                                 "Gender: Female", "Gender: Male")
 ```
 
-```{r}
-saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
-```
-
 ### Survival curves by class
 
 ```{r}
@@ -1993,27 +1985,6 @@ plot(
   ylab = "Event-free probability",
   main = ""
 )
-```
-
-```{r}
-# Saving the plot 
-png("figures/class_specific_nfl.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(
-  jlcmm_m1_nfl,
-  which = "survival",
-  col = c("firebrick", "cornflowerblue"),
-  lty = c(2, 1),
-  lwd = 2,
-  legend.loc = "bottomleft",
-  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
-  cex = 0.6,
-  bty = "l",
-  xlab = "Time (years)",
-  ylab = "Event-free probability",
-  main = ""
-)
-dev.off()
 ```
 
 ### Longitudinal trajectory by class
@@ -2352,10 +2323,6 @@ class_preds <- jlcmm_m1_ptau$pprobY
 data_preds <- class_preds %>% merge(
   jlcmm_data, by = "RID")
 
-# %>% merge(
-#     surv_data %>% dplyr::select(age_at_baseline, RID), by = "RID"
-#   )
-
 # Merging with baseline biomarker values
 data_preds <- data_preds %>% merge(
   baseline, by = "RID"
@@ -2406,10 +2373,6 @@ class_summary_ptau$Variable <- c("Age at baseline",
                                 "Gender: Female", "Gender: Male")
 ```
 
-```{r}
-saveRDS(class_summary_ptau, "tables/class_summary_ptau.rds")
-```
-
 ### Survival curves by class
 
 ```{r}
@@ -2427,27 +2390,6 @@ plot(
   ylab = "Event-free probability",
   main = ""
 )
-```
-
-```{r}
-# Saving the plot 
-png("figures/class_specific_ptau.png",
-    width = 6, height = 4, units = "in", res = 300)
-plot(
-  jlcmm_m1_ptau,
-  which = "survival",
-  col = c("cornflowerblue", "firebrick"),
-  lty = c(1, 2, 3),
-  lwd = 2,
-  legend.loc = "bottomleft",
-  legend = c("Class 1 (low risk)", "Class 2 (high risk)"),
-  cex = 0.6,
-  bty = "l",
-  xlab = "Time (years)",
-  ylab = "Event-free probability",
-  main = ""
-)
-dev.off()
 ```
 
 ### Longitudinal trajectories by class
@@ -3757,13 +3699,13 @@ dev.off()
 
 ```{r}
 # Saving the table showing number of participants, event distribution, and event rates in in-sample and out-of-sample data
-#saveRDS(event_table, "tables/event_table.rds")
+saveRDS(event_table, "tables/event_table.rds")
 #saveRDS(event_table, "tables/event_table_full.rds")
 ```
 
 ```{r}
 # Saving the table showing cohort characteristics and measurement distributions
-#saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
+saveRDS(cohort_summary_table, "tables/cohort_summary_table.rds")
 #saveRDS(cohort_summary_table, "tables/cohort_summary_table_full.rds")
 ```
 
@@ -3927,17 +3869,33 @@ saveRDS(summary_jlcmm_nfl, "tables/summary_jlcmm_nfl.rds")
 ```
 
 ```{r}
-# Survival curves by class (NfL) 
-png("figures/class-specific-survival-jlcmm-nfl.png",
+# Saving table for class descriptions (NfL)
+saveRDS(class_summary_nfl, "tables/class_summary_nfl.rds")
+```
+
+```{r}
+# Saving the survival curves by class (NfL) 
+png("figures/class_specific_nfl.png",
     width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_nfl, which = "survival",
-     main = "",
-     xlab = "Time (years)", ylab = "Survival Probability")
+plot(
+  jlcmm_m1_nfl,
+  which = "survival",
+  col = c("firebrick", "cornflowerblue"),
+  lty = c(2, 1),
+  lwd = 2,
+  legend.loc = "bottomleft",
+  legend = c("Class 1 (high risk)", "Class 2 (low risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = ""
+)
 dev.off()
 ```
 
 ```{r}
-# Longitudinal trajectory by class (NfL) 
+# Saving the longitudinal trajectories by class (NfL) 
 png("figures/longitudinal-jlcmm-nfl.png",
     width = 6, height = 4, units = "in", res = 300)
 plot(jlcmm_m1_nfl, var.time = "time_years", which = "fit",
@@ -3970,17 +3928,33 @@ saveRDS(summary_jlcmm_ptau, "tables/summary_jlcmm_ptau.rds")
 ```
 
 ```{r}
-# Survival curves by class (p-tau181)
-png("figures/class-specific-survival-jlcmm-ptau.png",
+# Saving table for class descriptions (p-tau181)
+saveRDS(class_summary_ptau, "tables/class_summary_ptau.rds")
+```
+
+```{r}
+# Saving the survival curves by class (p-tau181)
+png("figures/class_specific_ptau.png",
     width = 6, height = 4, units = "in", res = 300)
-plot(jlcmm_m1_nfl, which = "survival",
-     main = "",
-     xlab = "Time (years)", ylab = "Survival Probability")
+plot(
+  jlcmm_m1_ptau,
+  which = "survival",
+  col = c("cornflowerblue", "firebrick"),
+  lty = c(1, 2, 3),
+  lwd = 2,
+  legend.loc = "bottomleft",
+  legend = c("Class 1 (low risk)", "Class 2 (high risk)"),
+  cex = 0.6,
+  bty = "l",
+  xlab = "Time (years)",
+  ylab = "Event-free probability",
+  main = ""
+)
 dev.off()
 ```
 
 ```{r}
-# Longitudinal trajectories by class (p-tau181)
+# Saving the longitudinal trajectories by class (p-tau181)
 png("figures/longitudinal-jlcmm-ptau.png",
     width = 6, height = 4, units = "in", res = 300)
 plot(jlcmm_m1_ptau, var.time = "time_years", which = "fit",
