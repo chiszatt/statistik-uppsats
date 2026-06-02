@@ -13,7 +13,7 @@ format:
         {\Large Statistiska Instiutionen\par}
         \vspace{3cm}
         
-        {\Huge\bfseries Nr 2026:x\par}
+        {\Huge\bfseries Nr 2026:9\par}
         \vspace{0.5cm}
         
         {\LARGE \bfseries Code \par}
@@ -59,7 +59,7 @@ library(pec) # Version 2025.6.24
 ```
 
 ```{r}
-# Set seed for reproducibility
+# Setting seed for reproducibility
 set.seed(123)
 ```
 
@@ -757,13 +757,13 @@ event_table <- data.frame(
     length(unique(surv_data_out$RID))
   ),
 
-  # Number of events (event == 1)
+  # Number of events 
   Events = c(
     sum(surv_data_in$event == 1),
     sum(surv_data_out$event == 1)
   ),
 
-  # Number of censored observations (event == 0)
+  # Number of censored observations 
   Censored = c(
     sum(surv_data_in$event == 0),
     sum(surv_data_out$event == 0)
@@ -880,7 +880,7 @@ shapiro.test(gamma_residuals_ptau$fittedResiduals)
 shapiro.test(lme_residuals_log_ptau$fittedResiduals)
 shapiro.test(lme_residuals_cubed_ptau$fittedResiduals)
 shapiro.test(lognormal_residuals_ptau$fittedResiduals)
-#shapiro.test(student_residuals_ptau$fittedResiduals)
+shapiro.test(student_residuals_ptau$fittedResiduals)
 ```
 
 ### NfL
@@ -912,7 +912,7 @@ fit_lognormal_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                              data = long_data_in,
                              family = lognormal(link = "log"))
 
- Student-t
+ # Student-t
 fit_student_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID),
                            data = long_data_in,
                            family = students.t(df = 3, link = "identity"))
@@ -1331,7 +1331,6 @@ table_ph_final
 
 ```{r}
 # Cox survival-models, with covariates including baseline values of each biomarker
-
 # For p-tau181 without PTGENDER
 surv_model_reduced <- coxph(
   Surv(time_to_event, event) ~ APOE4_status,
@@ -2455,7 +2454,6 @@ dev.off()
 
 ```{r}
 # longitudnal trajectories by class
-# longitudinal trajectories by class
 plot(
   jlcmm_m1_ptau,
   which = "fit",
@@ -2967,10 +2965,6 @@ results_table_Brier[, -1] <- round(results_table_Brier[, -1], 3)
 results_table_Brier
 ```
 
-```{r}
-results_table_Brier
-```
-
 ## Saving the tables
 
 ### Original tables
@@ -2980,9 +2974,9 @@ results_table_Brier
 dir.create("tables", showWarnings = FALSE)
 
 # Saving the AUC results table
-# saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
-# # Saving the table of the Brier score results
-# saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
+saveRDS(results_table_AUC, "tables/results_table_AUC.rds")
+# Saving the table of the Brier score results
+saveRDS(results_table_Brier, "tables/results_table_Brier.rds")
 ```
 
 ### Sensitivity analysis tables
