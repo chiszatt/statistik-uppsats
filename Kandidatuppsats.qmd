@@ -79,7 +79,7 @@ include-before-body:
     
     \begin{justify}
     
-    {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how_to_apply/ADNI_Acknowledgement_List.pdf$}
+    {\tiny *Data used in preparation of this article were obtained from the Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within the ADNI contributed to the design and implementation of ADNI and/or provided data but did not participate in the analysis or writing of this report. A complete listing of ADNI investigators can be found at: $http://adni.loni.usc.edu/wp-content/upload/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf$}
     
     \end{justify}
 
@@ -625,9 +625,9 @@ In order to compare the predictive performance of the different modelling approa
 
 Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong discriminative ability in distinguishing between individuals who progressed to AD dementia and those who did not over time. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
-Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 11a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows a slightly higher value for the JLCMM at for the latest prediction horizon.
+Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 13a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows a slightly higher value for the JLCMM at for the latest prediction horizon.
 
-Appendix 8.6; Figure 11b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions.
+Appendix 8.6; Figure 13b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions.
 
 These results are also indicated by Table 10 which contains the AUC values for each modelling approach and at each horizon.
 
@@ -644,9 +644,9 @@ When evaluating the models' predictive performances using time-dependent Brier s
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain consistently low, across all modelling approaches, although they show a slight increase over time. This suggests stable overall predictive accuracy and relatively low prediction error for progression to AD dementia. However, the curve for the Cox PH model curve remain slightly higher than the curves representing the JM and the JLCMM models, meaning that it consistently yields higher Brier scores than the two other models. More precisely, the Brier scores for this model range from approximately 0.05 for early predictions to 0.16 for late predictions, while the corresponding Brier scores for the other models range from approximately 0.02 to 0.14. In other terms, two other curves remain closely aligned, although the curve for the JM is slightly lower at the two year-follow-up, indicating a slightly better predictive performance at this time-point.
 
-This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 12a). The curves remain consistently high, at around the same AUC range as the curves representing the models incorporating p-tau181. At the same time, the curve for the Cox PH model remain slightly higher than the curves representing the curves for the JM and the JLCMM, indicating a worse predictive performance.
+This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 14a). The curves remain consistently high, at around the same AUC range as the curves representing the models incorporating p-tau181. At the same time, the curve for the Cox PH model remain slightly higher than the curves representing the curves for the JM and the JLCMM, indicating a worse predictive performance.
 
-The same can be said for the time-dependent Brier scores among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 12b demonstrates that the values for the Cox PH model with both biomarkers are consistently higher than those for the multivariate JM, again indicating poorer overall predictive performance and higher prediction error.
+The same can be said for the time-dependent Brier scores among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 14b demonstrates that the values for the Cox PH model with both biomarkers are consistently higher than those for the multivariate JM, again indicating poorer overall predictive performance and higher prediction error.
 
 Table 11 presents the Brier scores for each modelling approach and at each horizon.
 
@@ -665,9 +665,9 @@ The models' performances in predicting progression to AD dementia were also exam
 
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values overall than the model incorporating p-tau181 across the follow-up period. However, both single-marker models are consistently outperformed by the combined model, indicating superior discriminative ability in distinguishing between individuals who progress to AD dementia and those who do not over time.
 
-Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 13a demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
+Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 15a demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
 
-Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except for predictions made at the three-year point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; Figure 13b).
+Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except for predictions made at the three-year point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; Figure 15b).
 
 The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.966, compared to 0.947 for the NfL model and 0.905 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
 
@@ -677,7 +677,7 @@ When observing the time-dependent Brier score curves, such as Figure 5 presentin
 
 All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, indicating a lower Brier score and thus better overall predictive accuracy at this time point compared to the two single-marker models.
 
-In a similar manner, the multivariate JM demonstrates lower AUC compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 14a). These two models consistently show similar AUC values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 14b).
+In a similar manner, the multivariate JM demonstrates lower Brier scores compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 16a). These two models consistently show similar Brier values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 16b).
 
 Table 11, containing the time-dependent Brier scores for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modelling baseline values for both biomarkers yields a value of 0.142 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
@@ -909,7 +909,7 @@ Trace plots of the $α$-parameters (convergence)
 :::
 
 ::: {layout-ncol="1"}
-![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width=70%}
 :::
 
 ## Model Results
