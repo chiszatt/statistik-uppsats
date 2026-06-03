@@ -518,9 +518,9 @@ Prior to evaluating predictive performance, model fit was assessed for each mode
 
 ### Cox PH Models
 
-First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were sex, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite sex being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without sex as a covariate (Appendix 8.2; Table 16), sex was retained in the models due it's theoretical relevance.
+First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were sex, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite sex being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without sex as a covariate (Appendix 8.2; @tbl-coxph-lrt-sex), sex was retained in the models due it's theoretical relevance.
 
-The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 15 (Appendix 8.2).
+The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in @tbl-coxph-pht (Appendix 8.2).
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
@@ -622,7 +622,7 @@ kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
-The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modelling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in Table 16 (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
+The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modelling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in @tbl-jlcmm-ptau (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
 
 The log-likelihood, BIC and entropy provided in @tbl-summary-jlcmm-nfl for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
 
@@ -634,7 +634,7 @@ The log-likelihood, BIC and entropy provided in @tbl-summary-jlcmm-nfl for candi
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (@tbl-pprob-m1-nfl). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
+Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (@tbl-pprob-m1-nfl). Again, all model parameters were significant ($p < 0.001$, Appendix 8.5; @tbl-jlcmm-nfl). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
 
 ```{r}
 #| pos: "H"
@@ -644,7 +644,7 @@ Class sizes were reasonable and good class discrimination was shown when assessi
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-The distribution of age at baseline, sex, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
+The distribution of age at baseline, sex, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.5; @tbl-ptau-class. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.5; @tbl-nfl-class presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
 
 ## Model Comparison
 
@@ -720,13 +720,13 @@ Table 11, containing the time-dependent Brier scores for each biomarker specific
 
 To examine the robustness of the results, several sensitivity analyses were performed.
 
-First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal (Appendix 8.8; Tables 21, 22, 23 & 24). This indicates that the results were robust to the handling of duplicated measurements.
+First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal (Appendix 8.8; @tbl-auc-first, @tbl-brier-first, @tbl-auc-last, @tbl-brier-last). This indicates that the results were robust to the handling of duplicated measurements.
 
-A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period (Appendix 8.8; Tables 25 & 26).
+A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period (Appendix 8.8; @tbl-auc-first-date, @tbl-brier-first-date).
 
-In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis (Appendix 8.8; Tables 27 & 28).
+In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis (Appendix 8.8; @tbl-auc-1-bm, @tbl-brier-1-bm).
 
-Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons (Appendix 8.8; Tables 29 & 30). These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
+Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons (Appendix 8.8; @tbl-auc-mid, @tbl-brier-mid). These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
 
 # Discussion
 
@@ -899,6 +899,7 @@ Correlation plots of numerical variables
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-lrt-re
 #| tbl-cap: "Results of the likelihood ratio tests to determine the random effects structure for LME models"
 kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```
@@ -906,6 +907,7 @@ kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```{r, echo=FALSE}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-pht
 #| tbl-cap: "p-values for the proportional hazards assumption tests for all covariates in the Cox PH models"
 kable_standard(readRDS("tables/table_ph.rds"))
 ```
@@ -913,6 +915,7 @@ kable_standard(readRDS("tables/table_ph.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-lrt-sex
 #| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without sex as a covariate"
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
@@ -956,6 +959,7 @@ Trace plots of the $α$-parameters (convergence)
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-jlcmm-ptau
 #| tbl-cap: "Model parameters for the two class JLCMM with longitudinal measurements for p-tau181"
 kable_standard(readRDS("tables/jlcmm_m1_ptau_output.rds"))
 ```
@@ -963,16 +967,23 @@ kable_standard(readRDS("tables/jlcmm_m1_ptau_output.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-jlcmm-nfl
 #| tbl-cap: "Model parameters for the two class JLCMM with longitudinal measurements for NfL"
 kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-ptau-class
 #| tbl-cap: "Comparison between latent classes estimated from longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/class_summary_ptau.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-nfl-class
 #| tbl-cap: "Comparison between latent classes estimated from longitudinal NfL measurements"
 kable_standard(readRDS("tables/class_summary_nfl.rds"))
 ```
@@ -1026,6 +1037,7 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-first
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
@@ -1033,6 +1045,7 @@ kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-first
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
@@ -1040,6 +1053,7 @@ kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-last
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
@@ -1047,6 +1061,7 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-last
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
@@ -1054,6 +1069,7 @@ kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-first-date
 #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
@@ -1061,6 +1077,7 @@ kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-first-date
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```
@@ -1068,6 +1085,7 @@ kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-1-bm
 #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
 kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```
@@ -1082,6 +1100,7 @@ kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-1-bm
 #| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
@@ -1096,6 +1115,7 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-mid
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
@@ -1103,6 +1123,7 @@ kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-mid
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
