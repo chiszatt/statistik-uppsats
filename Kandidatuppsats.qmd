@@ -432,7 +432,7 @@ The time-dependent AUC is then defined as:
 
 $$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$ {#eq-AUC}
 
-An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
+An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196).
 
 ### Time-dependent Brier Score
 
@@ -732,7 +732,7 @@ Finally, to address the interval-censored nature of the data, event times were d
 
 ## Main Findings and Conclusions
 
-This study compared the predictive performance of different modelling frameworks for time-to-diagnosis in individuals from the ADNI cohort with AD dementia as the event of interest, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was used in Cox PH models estimated with either p-tau181 or NfL, or both simultaneously. The second level incorporated longitudinal biomarker information by extending these Cox PH models within a joint modelling framework, accounting for repeated measurements over time. The most complex level combined longitudinal biomarker trajectories with latent class structure using the JLCMM framework to capture heterogeneity in disease progression by modelling class-specific trajectories and survival processes. For both JLCMMs, a two class model was determined to best model the data. These models estimated one high-risk class and one low-risk class. All reported models were adjusted for age, sex and APOE-$ε4$ status.
+This study compared the predictive performance of different modelling frameworks for time-to-diagnosis in individuals from the ADNI cohort with AD dementia as the event of interest, structured across three levels of information and their corresponding model approaches. At the most basic level, baseline biomarker information was analysed using Cox PH models with p-tau181 and NfL, either separately or jointly. Due to violations of the PH assumption, these models were adjusted only for sex and APOE-$ε4$ status. The second level extended these analyses using JMs for longitudinal biomarker data, adjusting for sex, age at baseline, and APOE-$ε4$ status. The most complex level used JLCMMs to combine longitudinal trajectories and survival with latent class structure; these models included no covariates to ensure class membership was driven solely by biomarker trajectories and survival processes. For both JLCMMs, a two-class solution with high- and low-risk classes provided the best fit.
 
 The predictive performance of these models was assessed by comparing time-dependent AUC and Brier scores with a landmark time of 1 year over horizons spanning 1-5 years. Both evaluations demonstrated that all three modelling approaches showed relatively good predictive performance in terms of both discriminative ability and overall predictive accuracy, with AUC values above 0.75 and Brier scores below approximately 0.15 across all horizons.
 
