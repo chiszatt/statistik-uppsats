@@ -507,9 +507,9 @@ Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting pro
 
 ## Missing values
 
-Missing data were low for biomarker variables (1-13 missing values), but higher for follow-up and diagnostic variables (up to 47-49 missing values), mainly due to incomplete follow-up information. This suggests that data are unlikely to be missing completely at random (MCAR). The missingness may be related to observed factors such as age or baseline cognitive status, which is consistent with missing at random (MAR). However, we cannot rule out missing not at random (MNAR), for example if participants with worse cognitive decline were less likely to attend follow-ups.
+Missing data were low for biomarker variables (1-13 missing values), while somewhat higher for follow-up and diagnostic variables (up to 47-49 missing values), mainly due to incomplete follow-up information. This suggests that data are unlikely to be missing completely at random (MCAR). The missingness may be related to observed factors such as age or baseline cognitive status, which is consistent with missing at random (MAR). However, missing not at random (MNAR) cannot be ruled out, for example if participants with worse cognitive decline were less likely to attend follow-ups.
 
-All cases with missing values were removed before analysis to perform a complete-case analysis. While this approach simplifies the analysis, it may reduce statistical power and introduce bias if the missingness mechanism is not completely random.
+All cases with missing values were removed before analysis to perform a complete-case analysis. This approach simplifies the analysis and, given the relatively low amount of missing data, any resulting bias from non-random missingness is likely small, although this cannot be ruled out.
 
 # Results
 
