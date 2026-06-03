@@ -166,7 +166,7 @@ While the predictive performance of most of these modelling approaches has been 
 
 This study investigates the prediction of progression to AD due to dementia (AD dementia) using longitudinal blood biomarker data, comparing traditional and advanced statistical modelling approaches, as well as different biomarker specifications. More specifically, the research questions are:
 
-1.  What provides the best prediction of time to AD dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with **a purely data-driven** latent class structure?
+1.  What provides the best prediction of time to AD dementia: accounting for baseline biomarker values only, longitudinal biomarker trajectories, or longitudinal biomarker trajectories together with a purely data-driven latent class structure?
 2.  Across these approaches, which biomarker strategy (NfL, p-tau181, or a combination of the biomarkers) provides the best prediction of time to AD dementia?
 
 # Methodology
@@ -175,7 +175,7 @@ To address the research questions, a series of statistical models will be implem
 
 First, Cox PH models will be used to assess associations between baseline biomarker levels and progression risk. In these models, p-tau181 and NfL will be included either separately or jointly to allow comparison of their individual and combined effects. Second, JMs will be used to investigate how longitudinal biomarker trajectories are associated with the survival outcome. Initially, univariate JMs will be fitted for each biomarker separately. After that, multivariate JMs including both p-tau181 and NfL simultaneously will be applied to account for their combined and potentially correlated effects on disease progression. Finally, JLCMMs will be used to identify subgroups with distinct longitudinal biomarker trajectories and associated progression risks. For all modelling approaches, model fit will be assessed to evaluate the adequacy of model assumptions and overall model specification.
 
-**The inclusion of age, sex and APOE-**$\epsilon4$ **status as covariates will be assessed on a model by model basis. In the JMs, covariates will be included in both submodels as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components. However, for the JLCMMs no covariates will be specified in either the class or survival submodels in order to ensure latent classes are assigned purely by biomarker trajectories and survival processes.**
+The inclusion of age, sex and APOE-$\epsilon4$ status as covariates will be assessed on a model by model basis. In the JMs, covariates will be included in both submodels as they are assumed to have direct effects on both the longitudinal trajectory and the time-to-event process, ensuring coherent and well-specified predictions across the joint model components. In contrast, for the JLCMMs no covariates will be specified in either the class or survival submodels in order to ensure latent classes are assigned purely by biomarker trajectories and survival processes.
 
 Subsequently, the different modelling approaches will be compared based on their predictive performance. The same evaluation framework will also be used to compare different biomarker specifications, including p-tau181, NfL, and a combination of the two biomarkers. For prognostic models predicting progression from MCI to AD dementia, predictions are most commonly made 2-4 years from baseline (Xia et al., 2025, p. 213). This reflects typical disease progression, where around one-third of individuals with MCI due to AD develop dementia within five years (Alzheimer’s Association, n.d.). Based on this, a landmark time of 1 year and prediction horizons of 2-6 years will be used to capture short- to mid-term progression. To ensure an unbiased assessment of model performance and generalisability, in-sample data will be used for model development with three quarters of the sample population, whilst out-of-sample data will be reserved for model evaluation with the remaining quarter. Furthermore, sensitivity analyses will be conducted under alternative model specifications to assess the robustness of the predictive performance results.
 
@@ -217,9 +217,11 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 ### Model Assumptions
 
-A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The test is performed separately for each covariate and evaluates whether the effect of a covariate on the hazard is constant over time.
+A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratio for each covariate is constant over time, meaning that the proportional hazards assumption holds, while the alternative hypothesis is that the hazard ratio for at least one covariate varies over time, where $j$ denotes the covariates in the model and $t$ denotes time:
 
-$$ H_0: \text{Hazard ratios for each covariate are constant over time.} $$ $$ H_1: \text{Hazard ratio for covariate } X_j \text{ is not constant over time.} $$
+$$H_0: \beta_j(t) = \beta_j \ \text{for all } t$$
+
+$$H_A: \beta_j(t) \neq \beta_j \ \text{for at least one } t$$
 
 A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
 
@@ -464,8 +466,6 @@ Moreover, the inclusion criteria also related to the number of biomarker measure
 
 Application of these criteria yielded a sample of 704 participants with at least three biomarker measurements. Inclusion of participants with at least one biomarker measurement increased the sample size to 934.
 
-All missing values were removed prior to the analysis to ensure a complete-case data set and avoid bias introduced by incomplete observations.
-
 ## Variables
 
 ### Diagnosis Status
@@ -501,6 +501,12 @@ Another covariate included when predicting progression to dementia is participan
 ### APOE4-status
 
 Finally, APOE-$\epsilon 4$ status is included as a covariate when predicting progression to dementia, due to its well-established role as a genetic risk factor for AD. The $\epsilon 4$ allele of apolipoprotein E (APOE) increases the risk of AD, whereas the -$\epsilon 2$ allele has been shown to have a protective effect (Wong et al.). The variable was retrieved from the APOERES dataset (ADNI, n.d.-b). Initially coded numerically based on the number of $\epsilon 4$ alleles, the variable was recoded into three ordinal categories: 0 alleles (non-carriers), 1 allele (heterozygous carriers; 2/4 or 3/4), and 2 alleles (homozygous carriers; 4/4). 83 participants carried no APOE-$𝜀4$ alleles, 578 carried one allele, and 43 carried two alleles
+
+## Missing values
+
+Missing data were low for biomarker variables (1-13 missing values), but higher for follow-up and diagnostic variables (up to 47-49 missing values), mainly due to incomplete follow-up information. This suggests that data are unlikely to be missing completely at random (MCAR). The missingness may be related to observed factors such as age or baseline cognitive status, which is consistent with missing at random (MAR). However, we cannot rule out missing not at random (MNAR), for example if participants with worse cognitive decline were less likely to attend follow-ups.
+
+All cases with missing values were removed before analysis to perform a complete-case analysis. While this approach simplifies the analysis, it may reduce statistical power and introduce bias if the missingness mechanism is not completely random.
 
 # Results
 
@@ -707,11 +713,15 @@ Goksuluk et al. (2025, p. 11) further reported that models including multiple bi
 
 Sensitivity analyses showed however that including participants with only one biomarker measurement substantially reduced the performance of the JMs and the JLCMMs. While this reduction may partly reflect differences in sample size and number of events after inclusion of participants sparse data, the relatively stable Cox PH models suggest that reduced longitudinal information was likely the main contributing factor. This further indicates that the predictive benefit of the longitudinal approaches depends on sufficient repeated biomarker measurements. Additionally, the reduced performance of combined biomarker models indicates that the added value of NfL depends on the availability of sufficient longitudinal information.
 
-## Further Research
+## Limitations and Further Research
+
+A limitation of this study is that covariate inclusion differed between models, as it was adapted to the assumptions and requirements of each modelling framework. Although this ensures appropriate model specification and avoids unnecessary loss of predictive information, it also means that differences in predictive performance cannot be attributed only to the modelling approach, since they may also be due to differences in covariate adjustment. Given this model-specific setup, the choice of random effects structures also differed between the JM and JLCMM frameworks. Therefore, the results should be interpreted as a comparison of the models as developed in this study, rather than as a fully systematic comparison of modelling frameworks.
+
+Additionally, while multivariate models including both p-tau181 and NfL were fitted within both the Cox PH and JM frameworks, enabling comparison of biomarker strategies across multiple modelling frameworks, a corresponding multivariate model was not fitted within the JLCMM framework due to time constraints. The $lcmm$ package does not currently offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. As a result, the predictive performance for the different biomarker specifications were not compared in a complete manner within this modelling approach. Further research could therefore work to assess the benefit in class-specific modelling of these biomarkers simultaneously. From the results of this analysis, the JLCMMs appeared to offer better late predictions, and further work could be done to assess whether the performance of these models diverges further over longer horizons.
 
 Diagnostic exam dates were used as a proxy for AD onset in this analysis despite the exact time of dementia onset is unknown and individuals being interval censored. This has the potential to introduce bias in the estimated event times, as the time-to-diagnosis is overestimated. Despite this, interval censoring was not adequately accounted for given the level of this thesis and its time constraints. This would require more complex statistical methods, for which standard Cox PH models would no longer be directly applicable. Results from the sensitivity analysis support this suggestion, as crudely estimating event times was proven to reduce overall predictive performance. As a direction for future research, it is therefore recommended that progression to dementia be modeled using interval censored survival methods in order to reduce potential bias and better reflect the underlying disease process.
 
-Additionally, an issue with this analysis is that it did not compare a multivariate JLCMM modelling both p-tau181 and NfL measurements, due to time constraints. Currently, the $lcmm$ package does not offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. The predictive performance for the different biomarker specifications were subsequently not compared in a complete manner within this modelling approach. Therefore, further research could work to assess the benefit in class-specific modelling of these biomarkers simultaneously. From the results of this analysis, the JLCMMs appeared to offer better late predictions, and further work could be done to assess whether the performance of these models diverges further over longer horizons.
+Furthermore, while multivariate models including both p-tau181 and NfL were fitted within both the Cox PH and JM frameworks, enabling comparison of biomarker strategies across multiple modelling frameworks, a corresponding multivariate model was not fitted within the JLCMM framework due to time constraints. The $lcmm$ package does not currently offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. As a result, the predictive performance for the different biomarker specifications were not compared in a complete manner within this modelling approach. Further research could therefore work to assess the benefit in class-specific modelling of these biomarkers simultaneously. From the results of this analysis, the JLCMMs appeared to offer better late predictions, and further work could be done to assess whether the performance of these models diverges further over longer horizons.
 
 Finally, as blood-based biomarker research is still emerging, rich longitudinal data sets for these biomarkers remain limited. For example, individuals in the data used for this analysis had at most five biomarker measurements. Future studies should therefore aim to replicate and extend this analysis once longitudinal biomarker data is available over longer time frames or cohorts with more frequent longitudinal sampling become available. This would improve the precision of both trajectory estimation and the assessment of associations between biomarker dynamics and disease progression.
 
@@ -893,7 +903,7 @@ LME model with longitudinal NfL measurements
 :::
 
 ::: {layout-ncol="1"}
-![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width=70%}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width="70%"}
 :::
 
 ## Convergence
@@ -907,7 +917,6 @@ LME model with longitudinal NfL measurements
 
 Trace plots of the $α$-parameters (convergence)
 :::
-
 
 ## Model Results
 
@@ -989,24 +998,10 @@ kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
 
 ```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/results_table_AUC_first_duplicate_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
-# kable_standard(readRDS("tables/results_table_Brier_first_duplicate_test.rds"))
 ```
 
 ```{r}
@@ -1017,24 +1012,10 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
 
 ```{r}
-##| pos: "H"
-##| tbl-pos: "H"
-##| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
-#kable_standard(readRDS("tables/results_table_AUC_last_duplicate_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
-```
-
-```{r}
-##| pos: "H"
-##| tbl-pos: "H"
-##| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
-#kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
 
 ```{r}
@@ -1045,24 +1026,10 @@ kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
 
 ```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
-# kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
-```
-
-```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
-# kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl_test.rds"))
 ```
 
 ```{r}
