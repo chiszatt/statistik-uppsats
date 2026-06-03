@@ -478,7 +478,7 @@ The sample size of the in-sample data set was 528, among which 128 experienced t
 
 ### p-tau181 and NfL
 
-The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
+The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
 
 P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
