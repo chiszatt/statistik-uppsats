@@ -446,14 +446,12 @@ $$\omega_i(t) =
 where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed event time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). For example, given an individual who converts to dementia with $T_i^* \le t$, the IPCW will be such that:
 
 $$\omega_i(t) =
-\frac{1}{G(T^*_i-)}$$
- {#eq-IPCW-event}
+\frac{1}{G(T^*_i-)}$$ {#eq-IPCW-event}
 
 whilst the IPCW for an individual whose is censored at time $t$ is therefore:
 
 $$\omega_i(t) =
-\frac{1}{G(t)}$$
- {#eq-IPCW-censured}
+\frac{1}{G(t)}$$ {#eq-IPCW-censured}
 
 The commonly formulated Brier score:
 
@@ -749,7 +747,7 @@ The predictive performance of these models was assessed by comparing time-depend
 
 At the same time, the time-dependent AUC indicated some differences in predictive performance across the three levels of information considered. Overall, incorporating longitudinal biomarker trajectories improved discriminatory ability compared to baseline only measurements. This improvement was consistent across biomarkers (p-tau181, NfL, and their combination) and was most pronounced for early predictions, where JMs achieved the highest AUC values relative to the Cox PH models. These findings are consistent with those of Goksuluk et al. (2025, p. 14), who, in the context of mortality risk prediction in peritoneal dialysis patients, reported improved predictive performance of joint modelling approaches compared to Cox PH models using, among other specifications, baseline biomarker values.
 
-The difference between JMs and the other models were more pronounced at earlier time horizons, suggesting that JMs may offer better discrimination. This is clinically meaningful, as identification of those at risk of progression to AD dementia in the near future is beneficial, for example in determining individuals best placed for clinical trial enrollment. However, JLCMMs achieved comparable or higher AUC values at intermediate to longer horizons, indicating that these models may have value for predictions made further into the future. This indicates that there is no single modelling approach that consistently dominates in terms of time-dependent AUC across all time horizons.
+The difference between JMs and the other models were more pronounced at earlier time horizons, suggesting that JMs may offer better discrimination. This would be clinically meaningful, as identification of those at risk of progression to AD dementia in the near future is beneficial, for example in determining individuals best placed for clinical trial enrollment. However, JLCMMs achieved comparable or higher AUC values at intermediate to longer horizons, indicating that these models may have value for predictions made further into the future. This indicates that there is no single modelling approach that consistently dominates in terms of time-dependent AUC across all time horizons.
 
 The corresponding time-dependent Brier scores presented a consistent but complementary pattern. The JMs and the JLCMMs generally achieved better predictive performance compared to the Cox PH models, reflecting lower overall prediction error when longitudinal information was incorporated. The difference between these two modelling approaches, however, remained small, as similarly shown by the time-dependent AUC.
 
