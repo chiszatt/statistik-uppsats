@@ -3076,7 +3076,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3135,7 +3135,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3186,7 +3186,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3247,7 +3247,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3306,7 +3306,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3357,7 +3357,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3420,7 +3420,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3479,7 +3479,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3530,7 +3530,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3591,7 +3591,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3650,7 +3650,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3701,7 +3701,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
