@@ -286,7 +286,7 @@ Within Bayesian joint modelling, convergence of the Markov chains can be assesse
 
 Additionally, convergence of the Markov chains can be assessed by running multiple chains with different starting values and comparing within-chain and between-chain variability, which is formalized by the Gelman-Rubin statistic, $R$ (Peng, 2022).
 
-Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j^{th}$ chain. Each sample corresponds to one MCMC iteration. For each chain, the first $D$ iterations are discarded as burn-in, corresponding to the initial phase of the chain before convergence, when it may still be influenced by its starting values and not yet represent the target posterior distribution. The remaining $L$ samples are retained, denoted $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$ (SAS Institute Inc., 2020; Peng, 2022).
+Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from the $j^{th}$ chain. Each sample corresponds to one MCMC iteration. For each chain, the first $D$ iterations are discarded as burn-in, corresponding to the initial phase of the chain before convergence, when it may still be influenced by its starting values and not yet represent the target posterior distribution. The remaining $L$ samples are retained, denoted by $x_D^{(j)}, x_{D+1}^{(j)}, \dots, x_{D+L-1}^{(j)}$ (SAS Institute Inc., 2020; Peng, 2022).
 
 Then calculate the chain mean for each chain,
 
@@ -493,7 +493,7 @@ The sample size of the in-sample data set was 528, among which 128 experienced t
 
 ### p-tau181 and NfL
 
-The p-tau181 measurements were retrieved from the UGOPTAU181 dataset, which was processed by the University of Gothenburg, while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG dataset, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
+The p-tau181 measurements were retrieved from the UGOPTAU181 dataset, which was processed by the University of Gothenburg, while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG dataset, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is picogram per millilitre (pg/mL) (Blennow, 2011).
 
 P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; @fig-hist-ptau, @fig-hist-nfl). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
