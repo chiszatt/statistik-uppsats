@@ -474,13 +474,13 @@ Application of these criteria yielded a sample of 704 participants with at least
 
 The variable of primary interest represents three diagnostic states - cognitively normal (CN), MCI and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
-Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The ADNI 1 and ADNI 2 protocols only include AD participants that meet criteria for probable AD, whilst the ADNI 3 protocol excludes any individuals with any significant neurological disease other than AD (ADNI, n.d.-b, n.d.-c, n.d-d). Therefore, individuals with dementia diagnoses are assumed to have dementia due to AD. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The ADNI 1 and ADNI 2 protocols only include AD participants that meet criteria for probable AD, whilst the ADNI 3 protocol excludes any individuals with any significant neurological disease other than AD (ADNI, n.d.-c, n.d.-d, n.d-e). Therefore, individuals with dementia diagnoses are assumed to have dementia due to AD. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
 The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; @tbl-event-full. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; @tbl-cohort-full and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
-The p-tau181 measurements were retrieved from the UGOPTAU181 dataset, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG dataset, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
+The p-tau181 measurements were retrieved from the UGOPTAU181 dataset, which was processed by the University of Gothenburg, while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG dataset, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
 
 P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; @fig-hist-ptau, @fig-hist-nfl). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
@@ -748,7 +748,7 @@ Sensitivity analyses showed however that including participants with only one bi
 
 ## Limitations and Further Research
 
-A limitation of this study is that covariate inclusion differed between models, as it was adapted to the assumptions and requirements of each modelling framework. Although this ensures appropriate model specification and avoids unnecessary loss of predictive information, it also means that differences in predictive performance cannot be attributed only to the modelling approach, since they may also be due to differences in covariate adjustment. Given this model-specific setup, the choice of random effects structures also differed between the JM and JLCMM frameworks. The $JMBayes2$ package is not yet developed for a simple random effects structure with only random intercept, yet the JLCMMs with only a random intercept provided the best fit according to BIC values. Therefore, the results should be interpreted as a comparison of the models as developed in this study, rather than as a fully systematic comparison of modelling frameworks. The decision to exclude covariates in the JLCMM submodels could have been compared thoroughly against models including age at baseline, sex and genotype in order to better understand their role in latent class modelling, however the limited scope of this study meant that the focus remained on comparison of the chosen models. Therefore, it is suggested that further research is done to evaluate how predictive performance and latent class structure changes with covariate inclusion.
+A limitation of this study is that covariate inclusion differed between models, as it was adapted to the assumptions and requirements of each modelling framework. Although this ensures appropriate model specification and avoids unnecessary loss of predictive information, it also means that differences in predictive performance cannot be attributed only to the modelling approach, since they may also be due to differences in covariate adjustment. Given this model-specific setup, the choice of random effects structures also differed between the JM and JLCMM frameworks. The $JMBayes2$ package is not yet developed for a simple random effects structure with only random intercept, yet the JLCMMs with only a random intercept provided the best fit according to BIC values. Therefore, the results should be interpreted as a comparison of the models as developed in this study, rather than as a fully systematic comparison of modelling frameworks. The decision to exclude covariates in the JLCMM submodels could have been compared thoroughly against models including age at baseline, sex and APOE-$ε4$ status in order to better understand their role in latent class modelling, however the limited scope of this study meant that the focus remained on comparison of the chosen models. Therefore, it is suggested that further research is done to evaluate how predictive performance and latent class structure changes with covariate inclusion.
 
 Additionally, while multivariate models including both p-tau181 and NfL were fitted within both the Cox PH and JM frameworks, enabling comparison of biomarker strategies across multiple modelling frameworks, a corresponding multivariate model was not fitted within the JLCMM framework due to time constraints. The $lcmm$ package does not currently offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. As a result, the predictive performance for the different biomarker specifications were not compared in a complete manner within this modelling approach. Further research could therefore work to assess the benefit in class-specific modelling of these biomarkers simultaneously. From the results of this analysis, the JLCMMs appeared to offer better late predictions, and further work could be done to assess whether the performance of these models diverges further over longer horizons.
 
@@ -762,15 +762,15 @@ Finally, as blood-based biomarker research is still emerging, rich longitudinal 
 
 Alzheimer’s Association (n.d.). *Mild cognitive impairment (MCI)*. <https://www.alz.org/alzheimers-dementia/what-is-dementia/related_conditions/mild-cognitive-impairment>
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.-a). *About ADNI*. <https://adni.loni.usc.edu/about/>
+Alzheimer’s Disease Neuroimaging Initiative (n.d.-a). *About ADNI*. <https://adni.loni.usc.edu/about/>
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-b) *ADNI Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-1_Protocol.pdf>
+Alzheimer’s Disease Neuroimaging Initiative (n.d.-b). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-c) *ADNI 2 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-2_Protocol.pdf>
+Alzheimer’s Disease Neuroimaging Initiative (n.d.-c). *ADNI Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-1_Protocol.pdf>
 
-Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-d) *ADNI 3 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/consentForms/ADNI3_ProtocolVersion3.1_20201204.pdf>
+Alzheimer’s Disease Neuroimaging Initiative (n.d.-d). *ADNI 2 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-2_Protocol.pdf>
 
-- (n.d.-e). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
+Alzheimer’s Disease Neuroimaging Initiative (n.d.-e). *ADNI 3 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/consentForms/ADNI3_ProtocolVersion3.1_20201204.pdf>
 
 Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https://www.alzheimers.org.uk/about-dementia/types-dementia/who-gets-alzheimers-disease>
 
@@ -834,7 +834,7 @@ Rissin, D. M., Kan, C. W., Campbell, T. G., Howes, S. C., Fournier, D. R., Song,
 
 Rizopoulos, D. (2012). *Joint Models for Longitudinal and Time-to-Event Data: With Applications in R* (1st ed.). Chapman and Hall/CRC. <https://doi.org/10.1201/b12208>
 
-- (2018). *Multivariate joint models*. <https://www.drizopoulos.com/vignettes/multivariate%20joint%20models>
+Rizopoulos, D. (2018). *Multivariate joint models*. <https://www.drizopoulos.com/vignettes/multivariate%20joint%20models>
 
 SAS Institute Inc. (2020). *Introduction to Bayesian analysis procedures*. <https://documentation.sas.com/doc/en/statug/15.2/statug_introbayes_sect025.htm> 
 
@@ -852,9 +852,9 @@ Wong, P.C., Savonenko, A., Li, T., Price, DL. (2012). 'Neurobiology of Alzheimer
 
 World Health Organization (2024). *Preferred product characteristics of blood-based biomarker diagnostics for Alzheimer disease*. <https://iris.who.int/server/api/core/bitstreams/43c83ef7-7a34-4b56-ae17-b584f2fc0798/content>
 
-- (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
+World Health Organization (2025). *Dementia*. [https://www.who.int/news-room/fact-sheets/detal/dementia](https://www.who.int/news-room/fact-sheets/detail/dementia)
 
-Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors.*Biometrics*,*66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
+Wu, L., Liu, W., & Hu, X. J. (2010). Joint inference on HIV viral dynamics and immune suppression in presence of measurement errors. *Biometrics*, *66*(2), 327-335. <https://doi.org/10.1111/j.1541-0420.2009.01308.x>
 
 Xia, X., Duffner, L. A., Bintener, C., Bradshaw, A., Lamirel, D., & Jönsson, L. (2025). Diagnostic and prognostic multimodal prediction models in Alzheimer's disease: A scoping review. *Journal of Alzheimer's disease* *: JAD*, 108(1), 209-221. [https://doi.org/10.1177/13872877251351630](http://127.0.0.1:14086/#0)
 
@@ -1099,25 +1099,11 @@ kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```
 
 ```{r}
-# #| pos: "H"
-# #| tbl-pos: "H"
-# #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
-# kable_standard(readRDS("tables/results_table_AUC_full_test.rds"))
-```
-
-```{r}
 #| pos: "H"
 #| tbl-pos: "H"
 #| label: tbl-brier-1-bm
 #| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
-```
-
-```{r}
-##| pos: "H"
-##| tbl-pos: "H"
-##| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
-#kable_standard(readRDS("tables/results_table_Brier_full_test.rds"))
 ```
 
 ```{r}
