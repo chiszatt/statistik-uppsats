@@ -6,6 +6,9 @@ format:
         \usepackage{ragged2e}
         \usepackage{unicode-math}
         \justifying
+        \usepackage{etoolbox}
+        \pretocmd{\tableofcontents}{\hypersetup{linkcolor=black}}{}{}
+        \apptocmd{\tableofcontents}{\hypersetup{linkcolor=blue}}{}{}
         
 include-before-body:
   text: |
@@ -101,7 +104,6 @@ include-before-body:
     \end{titlepage}
 
 toc: false
-colorlinks: false
 number-sections: true
 fig-pos: "H"
 tbl-pos: "H"
@@ -113,6 +115,10 @@ editor: visual
 \tableofcontents
 
 \newpage
+```
+
+```{=latex}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=cyan, citecolor=green}
 ```
 
 ```{r setup, include=FALSE}
@@ -561,7 +567,7 @@ Next, JMs that incorporated the longitudinal trajectories of p-tau181 and NfL wi
 
 Plotting the residuals against the fitted values for the LME model with p-tau181 showed no clear evidence of heteroscedasticity (Appendix 8.3; @fig-resid-ptau). The slight deviations in the tails of the Q-Q plot were also not considered to be of concern, indicating that the residuals were approximately normally distributed (Appendix 8.3; @fig-qq-ptau). A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values demonstrated even less evidence of heteroscedasticity compared to the corresponding plot for p-tau181 (Appendix 8.3; @fig-resid-nfl). The Q-Q plot for NfL showed similar results to those observed for p-tau181 (Appendix 8.3; @fig-qq-nfl). Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME models with log-transformed biomarker measurements. Consequently, these models were retained as the longitudinal submodels within the joint modelling framework.
 
-The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; @tbl-coxph-pht).
+The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; @tbl-coxph-lrt-re).
 
 Thus, JMs with a random intercept and slope were estimated for longitudinal measurements of p-tau181, NfL, or both simultaneously. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM. To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in @fig-converg-ptau.
 
