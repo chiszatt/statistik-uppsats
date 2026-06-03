@@ -4,6 +4,7 @@ format:
     include-in-header:
       text: |
         \usepackage{ragged2e}
+        \usepackage{unicode-math}
         \justifying
         
 include-before-body:
@@ -211,9 +212,9 @@ $$h(t) = \psi h_0(t)$$ {#eq-prop-haz}
 
 which is the proportional hazards assumption (Moore, p. 55). Further, covariate information is linked to the proportional hazards constant exponentially, yielding the following model:
 
-$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$ {#eq-prop-haz-cov}
+$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \symbf{\beta} \right\}$$ {#eq-prop-haz-cov}
 
-where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, sex, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
+where $\mathbf{x}$ is a vector of covariates and $\symbf{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, sex, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
 ### Model Assumptions
 
@@ -245,21 +246,21 @@ Following the notation of Rizopoulos (2012, p. 54), the biomarker processes are 
 
 $$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-obs}
 
-$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$ {#eq-lme-latent}
+$$ m_i(t) = \mathbf{X_i^T}\symbf{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$ {#eq-lme-latent}
 
-where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
+where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\symbf{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\symbf{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
 
-$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-full}
+$$ y_i(t) = \mathbf{X_i^T}\symbf{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-full}
 
 ### The Joint Model
 
 The LME and Cox PH models are linked by a specified association structure. This structure can link the survival process to the current model estimate of the biomarker, $m_i(t)$, and the current rate of change of the biomarker trajectory, $m'_i(t)$. If both the current value and current rate of change are specified in the proportional hazards model, this becomes:
 
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$ {#eq-jm-full}
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\symbf{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$ {#eq-jm-full}
 
 $$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$ {#eq-jm-extra}
 
-In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
+In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\symbf{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 
 This univariate framework is applied to longitudinal p-tau181 and NfL measurements separately to model their trajectories jointly with survival outcomes. This study will then apply multivariate JMs to simultaneously model both biomarkers and link their trajectories to the shared survival process describing progression to dementia due to AD.
 
@@ -337,15 +338,15 @@ which is a linear function of $t$ and can be re-expressed in the form $f(t) = b 
 
 The JLCMM consists of three submodels; a multinomial logistic submodel, a LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
 
-$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$ {#eq-class-submodel-covariates}
+$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \symbf{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \symbf{\beta}_l}}$$ {#eq-class-submodel-covariates}
 
-where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual, $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ latent class and $c_i$ is the class indicator for the $i^{th}$ individual. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
+where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual, $\symbf{\beta}_g$ is the set of coefficients for the $g^{th}$ latent class and $c_i$ is the class indicator for the $i^{th}$ individual. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
 
-$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$ {#eq-class-submodel}
+$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\symbf{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\symbf{\beta}_{0,l}}}$$ {#eq-class-submodel}
 
 where $\pi_{i,g}$ is the probability that the $i^{th}$ individual belongs to latent class $g$. Linking the class submodel to the longitudinal submodel and the survival submodel, assuming only a random intercept, results in the following:
 
-$$h_i(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$ {#eq-jlcmm-full}
+$$h_i(t | c_i = g) = h_{0, g}(t)exp\left\{\symbf{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$ {#eq-jlcmm-full}
 
 ### Model Assumptions
 
