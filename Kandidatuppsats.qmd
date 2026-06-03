@@ -524,18 +524,24 @@ The proportional hazards assumption was assessed for all covariates to verify th
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
-Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in Table 1.
+Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in @tbl-ph-final.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-ph-final
 #| tbl-cap: "p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
 kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
 After excluding age at baseline, the GLOBAL test yielded $p$-values above the 5% significance level, no longer indicating any violation of the proportional hazards assumption. All other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
 
-Furthermore, an initial comparison of model performance by assessment of the concordance indices for all Cox PH models was performed. The results presented in Table 2 show that the concordance index evaluates all three models similarly, with results indicating adequate discrimination.
+Furthermore, an initial comparison of model performance by assessment of the concordance indices for all Cox PH models was performed. The results presented in @tbl-c-index show that the concordance index evaluates all three models similarly, with results indicating adequate discrimination.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-c-index
 #| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values"
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
@@ -558,18 +564,24 @@ A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4
 
 Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 11b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
-Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in Table 3.
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in @tbl-rhat-surv.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-rhat-surv
 #| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
 kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
 The $\widehat{R}$ values for the survival outcomes remained very close to 1 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
 
-While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in Table 4.
+The corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in @tbl-rhat-long.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-rhat-long
 #| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
 kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
@@ -580,39 +592,54 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters as the Weibull alternative. A visual check for the appropriateness of the Weibull hazard model was done as presented in section 3.4.1 and @eq-weibull-check. The plot of complementary log-log transformed Kaplan-Meier survival estimates displayed deviations from linearity (Appendix 2.3; Figure 11). However, the model specified with a Weibull hazard resulted in a lower BIC for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models. No covariates were included in any of the submodels in order to allow for a purely data-driven latent class structure to emerge based solely from biomarker trajectories and survival outcomes. Therefore, all heterogeneity is modelled through the latent classes.
 
-The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
+The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (@tbl-summary-jlcmm-ptau). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-summary-jlcmm-ptau
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
 Posterior classifications show the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
-For the two class model (Table 6), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (Table 7) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
+For the two class model (@tbl-pprob-m1-ptau, the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (@tbl-pprob-m2-ptau) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m1-ptau
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m2-ptau
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
 The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modelling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in Table 16 (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
 
-The log-likelihood, BIC and entropy provided in Table 8 for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
+The log-likelihood, BIC and entropy provided in @tbl-summary-jlcmm-nfl for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-summary-jlcmm-nfl
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (Table 9). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
+Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (@tbl-pprob-m1-nfl). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m1-nfl
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
@@ -631,9 +658,12 @@ Among the models incorporating NfL, a similar overall pattern is observed. As sh
 
 Appendix 8.6; Figure 13b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions.
 
-These results are also indicated by Table 10 which contains the AUC values for each modelling approach and at each horizon.
+These results are also indicated by @tbl-results-AUC which contains the AUC values for each modelling approach and at each horizon.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-results-AUC
 #| tbl-cap: "Time-dependent AUC by model and prediction time point"
 kable_standard(readRDS("tables/results_table_AUC_test.rds"))
 ```
@@ -650,9 +680,12 @@ This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 14a). 
 
 The same can be said for the time-dependent Brier scores among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 14b demonstrates that the values for the Cox PH model with both biomarkers are consistently higher than those for the multivariate JM, again indicating poorer overall predictive performance and higher prediction error.
 
-Table 11 presents the Brier scores for each modelling approach and at each horizon.
+@tbl-results-brier presents the Brier scores for each modelling approach and at each horizon.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-results-brier
 #| tbl-cap: "Time-dependent Brier score by model and prediction time point"
 kable_standard(readRDS("tables/results_table_Brier_test.rds"))
 ```
