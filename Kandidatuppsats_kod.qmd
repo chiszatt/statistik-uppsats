@@ -836,7 +836,7 @@ var(long_data$PLASMAPTAU181)
 fit_gamma_ptau <- glmmTMB(PLASMAPTAU181 ~ time_years + (1|RID), 
                    data = long_data_in,
                    family = Gamma(link = "log"))
-
+ 
 # LME approach with log transformed data
 fit_lme_log_ptau <- lmer(log(PLASMAPTAU181) ~ time_years + (1|RID), 
                 data = long_data_in)
@@ -894,7 +894,7 @@ var(long_data$PLASMA_NFL)
 #### Fitting the models
 
 ```{r}
-# GLMM
+# # GLMM
 fit_gamma_nfl <- glmmTMB(PLASMA_NFL ~ time_years + (1|RID), 
                    data = long_data_in,
                    family = Gamma(link = "log"))
@@ -1236,13 +1236,20 @@ summary(surv_model_both_bl)
 ### Test of the assumption of proportional hazards
 
 ```{r}
-# Extracting p-values from cox.zph models
+# Variable name mapping
+var_map <- c(
+  age_at_baseline = "Age at baseline",
+  PTGENDER = "Sex",
+  APOE4_status = "APOE-ε4 status",
+  baseline_value_ptau = "Baseline p-tau181",
+  baseline_value_nfl = "Baseline NfL"
+)
+
+# Extracting p-values from Cox PH test
 extract_ph_p <- function(model, model_name) {
-  test <- cox.zph(model)
-  df <- as.data.frame(test$table)
-  
+  df <- as.data.frame(cox.zph(model)$table)
   data.frame(
-    variable = rownames(df),
+    variable = dplyr::recode(rownames(df), !!!var_map),
     p_value = round(df$p, 3),
     model = model_name
   )
@@ -1256,12 +1263,11 @@ ph_all <- rbind(
   extract_ph_p(surv_model_both_bl, "Both baseline")
 )
 
-# Forming a table where each model has its own column
+# Reshaping into wide format
 table_ph <- ph_all %>%
-  dplyr::select(variable, model, p_value) %>%
-  tidyr::pivot_wider(names_from = model, values_from = p_value)
+  pivot_wider(names_from = model, values_from = p_value)
 
-# Displaying final table
+# Final table
 table_ph
 ```
 
@@ -1318,10 +1324,8 @@ ph_all_final <- rbind(
   extract_ph_p(surv_model_both_bl_final, "Both baseline")
 )
 
-# Forming a table where each final model has its own column
 table_ph_final <- ph_all_final %>%
-  dplyr::select(variable, model, p_value) %>%
-  tidyr::pivot_wider(names_from = model, values_from = p_value)
+  pivot_wider(names_from = model, values_from = p_value)
 
 # Displaying final PH table 
 table_ph_final
@@ -1479,7 +1483,7 @@ ggtraceplot(multi_joint_model, "alphas")
 ## Rhat value comparison table
 
 ```{r}
-# Extracting Rhat for each model (survival component)
+# Extracting Rhat for survival component
 extract_rhat_surv <- function(model) {
 
   s <- summary(model)$Survival
@@ -1506,7 +1510,27 @@ rhat_survival_table <- bind_rows(
     names_from = Model,
     values_from = Rhat
   ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
+  mutate(across(where(is.numeric), ~round(.x, 3))) %>%
+
+  # Clean variable names
+  mutate(
+    Variable = dplyr::recode(
+      Variable,
+      "(Intercept)" = "Intercept",
+      "time_years" = "Time since baseline (years)",
+      
+      "PTGENDERMale" = "Sex (male)",
+      
+      "APOE4_status0 alleles" = "Genotype: 0 alleles (ref)",
+      "APOE4_status1 allele" = "Genotype: 1 allele",
+      "APOE4_status2 alleles" = "Genotype: 2 alleles",
+
+      "value(log_PLASMAPTAU181)" = "p-tau181 (current value)",
+      "value(log_PLASMA_NFL)" = "NfL (current value)",
+
+      "sigma" = "Residual SD"
+    )
+  )
 
 # Showing table
 rhat_survival_table
@@ -1530,7 +1554,7 @@ ptau_long <- extract_rhat_long(joint_model_ptau)
 nfl_long <- extract_rhat_long(joint_model_nfl)
 multi_long <- extract_rhat_long(multi_joint_model)
 
-# Combining with model labels to form a table
+# Combining with model labels
 rhat_longitudinal_table <- bind_rows(
   ptau_long %>% mutate(Model = "p-tau181"),
   nfl_long %>% mutate(Model = "NfL"),
@@ -1540,7 +1564,22 @@ rhat_longitudinal_table <- bind_rows(
     names_from = Model,
     values_from = Rhat
   ) %>%
-  mutate(across(where(is.numeric), ~round(.x, 3)))
+  mutate(across(where(is.numeric), ~round(.x, 3))) %>%
+
+  # Clean variable names
+  mutate(
+    Variable = dplyr::recode(
+      Variable,
+      "(Intercept)" = "Intercept",
+      "time_years" = "Time since baseline (years)",
+      "age_at_baseline" = "Age at baseline",
+      "PTGENDERMale" = "Sex (male)",
+      "APOE4_status0 alleles" = "Genotype: 0 alleles (ref)",
+      "APOE4_status1 allele" = "Genotype: 1 allele",
+      "APOE4_status2 alleles" = "Genotype: 2 alleles",
+      "sigma" = "Residual SD"
+    )
+  )
 
 # Showing table
 rhat_longitudinal_table
@@ -3076,7 +3115,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3135,7 +3174,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3186,7 +3225,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Model",
     shape = "Model"
@@ -3247,7 +3286,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3306,7 +3345,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16, "JLCMM" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3357,7 +3396,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("Cox PH" = 15, "JM" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Model",
     shape = "Model"
@@ -3420,7 +3459,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3479,7 +3518,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3530,7 +3569,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "AUC",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3591,7 +3630,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariable" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3650,7 +3689,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16, "Multivariate" = 17)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
@@ -3701,7 +3740,7 @@ ggplot(data.frame(
   scale_shape_manual(values = c("NfL" = 15, "p-tau181" = 16)) +
   ylim(0,1) +
   labs(
-    x = "Time", 
+    x = "Time (years)", 
     y = "Brier score",
     color = "Biomarker",
     shape = "Biomarker"
