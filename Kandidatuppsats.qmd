@@ -195,23 +195,23 @@ To quantify the association between biomarkers and disease progression, relative
 
 Given that $T$ denotes either the time-to-event or the censuring time, the survival function models the probability of an individual remaining event-free up until time $t$, such that:
 
-$$S(t) = Pr(T > t)$$
+$$S(t) = Pr(T > t)$$ {#eq-surv-function}
 
 where the corresponding hazard function is given as the probability that the event occurs in the vicinity of time $t$ divided by the probability of being event-free at time $t$:
 
-$$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$
+$$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$ {#eq-haz-function}
 
 and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11-14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
 
-$$S(t) = [S_0(t)]^{\psi}$$
+$$S(t) = [S_0(t)]^{\psi}$$ {#eq-prop-surv}
 
 where $\psi$ is the proportional hazards constant (Moore, 2016, pp. 43-44). This relationship can be re-expressed in terms of their hazard functions to give:
 
-$$h(t) = \psi h_0(t)$$
+$$h(t) = \psi h_0(t)$$ {#eq-prop-haz}
 
 which is the proportional hazards assumption (Moore, p. 55). Further, covariate information is linked to the proportional hazards constant exponentially, yielding the following model:
 
-$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
+$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$ {#eq-prop-haz-cov}
 
 where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, sex, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
@@ -219,9 +219,9 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratio for each covariate is constant over time, meaning that the proportional hazards assumption holds, while the alternative hypothesis is that the hazard ratio for at least one covariate varies over time, where $j$ denotes the covariates in the model and $t$ denotes time:
 
-$$H_0: \beta_j(t) = \beta_j \ \text{for all } t$$
+$$H_0: \beta_j(t) = \beta_j \ \text{for all } t$$ {#eq-null-pht}
 
-$$H_A: \beta_j(t) \neq \beta_j \ \text{for at least one } t$$
+$$H_A: \beta_j(t) \neq \beta_j \ \text{for at least one } t$$ {#eq-alt-pht}
 
 A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
 
@@ -243,21 +243,21 @@ Since longitudinal data consists of repeated measurements from the same individu
 
 Following the notation of Rizopoulos (2012, p. 54), the biomarker processes are modeled such that:
 
-$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
+$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-obs}
 
-$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
+$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$ {#eq-lme-latent}
 
 where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
 
-$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
+$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-full}
 
 ### The Joint Model
 
 The LME and Cox PH models are linked by a specified association structure. This structure can link the survival process to the current model estimate of the biomarker, $m_i(t)$, and the current rate of change of the biomarker trajectory, $m'_i(t)$. If both the current value and current rate of change are specified in the proportional hazards model, this becomes:
 
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$ {#eq-jm-full}
 
-$$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$
+$$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$ {#eq-jm-extra}
 
 In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 
@@ -289,27 +289,27 @@ Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from
 
 Then calculate the chain mean for each chain,
 
-$$\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}$$
+$$\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}$$ {#eq-chain-mean}
 
 the overall mean across all chains (the grand mean),
 
-$$\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j$$
+$$\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j$$ {#eq-grand-mean}
 
 the between-chain variance,
 
-$$B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2$$
+$$B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2$$ {#eq-bchain-var}
 
 the within-chain variance for each chain,
 
-$$s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2$$
+$$s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2$$ {#eq-wchain-var}
 
 and finally, the average within-chain variance,
 
-$$W = \frac{1}{J} \sum_{j=1}^{J} s_j^2$$
+$$W = \frac{1}{J} \sum_{j=1}^{J} s_j^2$$ {#eq-mean-wchain-var}
 
 Subsequently, the Gelman-Rubin statistic is:
 
-$$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
+$$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$ {#eq-r-stat}
 
 As the number of iterations $L$ increases and the between-chain variation $B$ decreases, $R$ approaches 1. Thus, chains are typically run until $R$ is near this number. Being a unit-free ratio, $R$ provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
@@ -325,11 +325,11 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 The Weibull survival model can be parameterised with a rate and shape parameter, giving:
 
-$$h(t) = \alpha \lambda (\lambda t) ^{\alpha - 1}$$
+$$h(t) = \alpha \lambda (\lambda t) ^{\alpha - 1}$$ {#eq-weibull-hazard}
 
 where $\lambda$ is the rate parameter and $\alpha$ is the shape parameter (Moore, 2016, p. 16). For $\alpha < 1$ the hazard is decreasing whilst for $\alpha > 1$ the hazard is increasing. A diagnostic tool for assessing the appropriateness of the Weibull hazard model is to apply a complementary log-log transformation to the survival estimates such that:
 
-$$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$
+$$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$ {#eq-weibull-check}
 
 which is a linear function of $t$ and can be re-expressed in the form $f(t) = b + m \cdot log (t)$ (Moore, 2016, pp. 138 - 139). Therefore, plotting the complementary log-log transformed survival estimates against time provides a visual diagnostic, with a straight line giving support to the Weibull hazard model whereas deviations from linearity call this model in to question. Alternatively, flexible hazard models can be specified in the $lcmm$ package, where piecewise exponential and cubic M-splines hazard models are available (Proust-Lima et al., 2025).
 
@@ -337,15 +337,15 @@ which is a linear function of $t$ and can be re-expressed in the form $f(t) = b 
 
 The JLCMM consists of three submodels; a multinomial logistic submodel, a LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
 
-$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$
+$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$ {#eq-class-submodel-covariates}
 
-where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual and $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ group. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
+where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual, $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ latent class and $c_i$ is the class indicator for the $i^{th}$ individual. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
 
-$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$
+$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$ {#eq-class-submodel}
 
 where $\pi_{i,g}$ is the probability that the $i^{th}$ individual belongs to latent class $g$. Linking the class submodel to the longitudinal submodel and the survival submodel, assuming only a random intercept, results in the following:
 
-$$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$
+$$h_i(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$ {#eq-jlcmm-full}
 
 ### Model Assumptions
 
@@ -359,7 +359,7 @@ There are various methods for assessing the conditional independence assumption,
 
 The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and time-to-event is captured entirely by group membership. Given the class membership is known, there is assumed to be no remaining dependence between the biomarker response and the time-to-event response. Assuming a model with a current value association structure, the association parameter, $\alpha_1$, is assumed to be zero under the null hypothesis (Jacqmin-Gadda et al., p. 13), such that:
 
-$$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
+$$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$ {#eq-score-test-hyp}
 
 Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., 2012, p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
@@ -373,7 +373,7 @@ $$\theta_{G}^{\ (l + 1)} =
 \theta_{G}^{\ (l)} - \delta \left( \tilde{\mathbf{H}}^{\ (l)} \right)^{-1}
 \nabla (\ell(\theta_{G}^{\ (l)}))
 \quad \text{where} \quad
-\nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
+\nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$ {#eq-jlcmm-marquardt}
 
 where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2012, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2012, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2012, p. 5).
 
@@ -381,14 +381,16 @@ where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ i
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2012, p. 7):
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by:
 
-$$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
-= \frac{
-\widehat\pi_{i,g}f(Y_i | c_i=g; \widehat\theta_G)\lambda_i(T_i | c_i=g; \widehat\theta_G)S_i(T_i | c_i=g; \widehat\theta_G)
+$$\widehat\pi_{i,g} =
+\frac{
+\widehat\pi_{i,g}f(Y_i | c_i=g; \widehat\theta_G)h_i(T_i | c_i=g; \widehat\theta_G)S_i(T_i | c_i=g; \widehat\theta_G)
 }
 {
-\sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
+\sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)h_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$ {#eq-post-prob}
+
+where the posterior probability of belonging to the $g^{th}$ latent class for the $i^{th}$ individual is $\pi_{i,g}$ whilst the prior is given by $\widehat \pi_{i,g}$ (Proust-Lima et al., 2012, p. 7). Further, $T_i$ is the event time for the $i^{th}$ individual, $h_i(T_i | c_i = g)$ is presented in @eq-jlcmm-full and is defined here given the vector of model parameters $\widehat \theta _G$ for the $g^{th}$ class and $S_i(T_i | c_i = g; \widehat \theta _G)$ is the corresponding class-specific survival function.
 
 Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2012, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
@@ -402,7 +404,7 @@ $$EN(G) = 1 -
 }
 {
 Nlog(G)
-}$$
+}$$ {#eq-entropy}
 
 where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$. Relative entropy values closer to 1 demonstrate good discriminative ability of the model, where, for one class latent models, $EN(1) = 1$.
 
@@ -418,9 +420,9 @@ ROC analysis is commonly used to evaluate the ability of a marker or model to di
 
 Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
 
-$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
+$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$ {#eq-sensitivity}
 
-$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
+$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$ {#eq-specificity}
 
 where sensitivity refers to the probability of the model correctly detecting individuals who have experienced the event of interest before time $t$, whilst specificity is defined as the probability of the model correctly discerning individuals who remain event-free at time $t$.
 
@@ -428,7 +430,7 @@ Based on the definitions above, the corresponding ROC curve at a given time $t$,
 
 The time-dependent AUC is then defined as:
 
-$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
+$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$ {#eq-AUC}
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
 
@@ -438,13 +440,13 @@ The Brier score can be thought of as the mean squared error of a prediction fore
 
 $$\omega_i(t) =
 \frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
-\frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$
+\frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$ {#eq-IPCW}
 
 where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5).
 
 The commonly formulated Brier score:
 
-$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$
+$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$ {#eq-brier}
 
 where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score is given as:
 
@@ -452,7 +454,7 @@ $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n} \left(
 \frac{( \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}
-\right)$$
+\right)$$ {#eq-brier-IPCW}
 
 where $\tilde n(t)$ is the sum of all IPCW weights at time $t$ (Prince et al., 2025, p. 6). The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability.
 
