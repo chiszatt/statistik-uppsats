@@ -6,6 +6,9 @@ format:
         \usepackage{ragged2e}
         \usepackage{unicode-math}
         \justifying
+        \usepackage{etoolbox}
+        \pretocmd{\tableofcontents}{\hypersetup{linkcolor=black}}{}{}
+        \apptocmd{\tableofcontents}{\hypersetup{linkcolor=blue}}{}{}
         
 include-before-body:
   text: |
@@ -101,7 +104,6 @@ include-before-body:
     \end{titlepage}
 
 toc: false
-colorlinks: false
 number-sections: true
 fig-pos: "H"
 tbl-pos: "H"
@@ -113,6 +115,10 @@ editor: visual
 \tableofcontents
 
 \newpage
+```
+
+```{=latex}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=cyan, citecolor=green}
 ```
 
 ```{r setup, include=FALSE}
