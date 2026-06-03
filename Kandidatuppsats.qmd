@@ -190,19 +190,19 @@ All of the modelling approaches considered in this study are grounded in the sur
 
 Additionally, individuals with AD dementia are either considered as right censored, meaning that they do not reach the event during the follow-up period, or as interval censored, meaning that the exact date of the event is unknown (Kleinbaum & Klein, 2012, pp. 7, 286). In the ADNI cohort, diagnostic exams are made either every half year or yearly, depending on the individuals cognition status and the stage of the study protocol. This means the exact date of transition to dementia can only be approximated. Therefore, participants in this study are principally treated as right-censored and compared with a sensitivity analysis defining event times as the midpoint between diagnostic exams when a positive dementia diagnosis was given.
 
-## Cox Proportional Hazards Model
+## Cox Proportional Hazards Model {#sec-coxph-theory}
 
 To quantify the association between biomarkers and disease progression, relative hazards models are commonly used. These models compare the hazard of progression between individuals with different covariate profiles, and assume that their hazards are proportional.
 
-Given that $T$ denotes either the time-to-event or the censuring time, the survival function models the probability of an individual remaining event-free up until time $t$, such that:
+Given that $T_i^* = min(T_i, C_i)$ where $T_i$ and $C_i$ represent the event time and the censoring time for the $i^{th}$ individual, the survival function models the probability of an individual remaining event-free up until time $t$, such that:
 
-$$S(t) = Pr(T > t)$$ {#eq-surv-function}
+$$S(t) = Pr(T_i^* > t)$$ {#eq-surv-function}
 
 where the corresponding hazard function is given as the probability that the event occurs in the vicinity of time $t$ divided by the probability of being event-free at time $t$:
 
 $$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$ {#eq-haz-function}
 
-and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11-14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
+and $1 - S(t)$ is the corresponding cumulative risk function, $F(t)$ (Moore, 2016, pp. 11-14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
 
 $$S(t) = [S_0(t)]^{\psi}$$ {#eq-prop-surv}
 
@@ -415,7 +415,7 @@ In addition to fulfilling the requirements for minimised BIC and maximised entro
 
 Information criteria such as the Akaike Information Criterion (AIC) are often used to evaluate model fit in JMs combining longitudinal and survival data. However, when the main focus is the survival outcome and the predictive ability of a longitudinal biomarker, model performance is commonly assessed using measures of discrimination and overall prediction error. Discrimination refers to the ability of the model to distinguish between individuals who experience the event earlier versus later (Rizopoulos, 2012, p. 194). Time-dependent AUC is an example of a discrimination measure, while the time-dependent Brier score quantifies overall prediction error over time.
 
-### Time-dependent AUC
+### Time-dependent AUC {#sec-auc-theory}
 
 ROC analysis is commonly used to evaluate the ability of a marker or model to discriminate between binary outcomes, such as diseased and non-diseased individuals (Zou et al., 2012, p. 3). However, the traditional ROC framework assumes that both disease status and marker values are fixed over time (Kamarudin et al., 2017, p. 1). In survival settings, this assumption is often violated, as event status changes during follow-up and marker values may vary over time. To account for this, time-dependent ROC curves have been developed, incorporating the timing of events and censoring, and providing a more appropriate framework for assessing prognostic accuracy (Kamarudin et al., 2017, p. 1). When a time-dependent framework is adopted, the disease status is evaluated at each time point, meaning that sensitivity and specificity may change over the course of the study.
 
@@ -437,13 +437,25 @@ An AUC value of 1 means perfect ability to distinguish between patients with and
 
 ### Time-dependent Brier Score
 
-The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted time-dependent Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). IPCW weights are calculated for each individual $i = 1 , ... , n$ at each time point $t$, such that:
+The Brier score can be thought of as the mean squared error of a prediction forecast. However, for survival data, the true event status cannot be known for censored individuals. Therefore, an inverse-probability-of-censoring weighting (IPCW) adjusted time-dependent Brier score has been formulated to account for bias due to censoring, where those with earlier event times are over-represented, leading to underestimation of survival probabilities (Prince et al., 2025, p. 4). Given $T_i^*$ as defined in @sec-coxph-theory and $D_i(t)$ as definied in @sec-auc-theory, IPCW weights can be calculated for each individual $i = 1 , ... , n$ at each time point $t$, such that:
 
 $$\omega_i(t) =
-\frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
+\frac{\mathbb{I} \left\{ T_i^*\le t, D_i(t) = 1 \right\} }{G(T^*_i-)} +
 \frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$ {#eq-IPCW}
 
-where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5).
+where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed event time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). For example, given an individual who converts to dementia with $T_i^* \le t$, the IPCW will be such that:
+
+$$
+\omega_i(t) =
+\frac{1}{G(T^*_i-)}
+$${#eq-IPCW-event}
+
+whilst the IPCW for an individual whose is censored at time $t$ is therefore:
+
+$$
+\omega_i(t) =
+\frac{1}{G(t)}
+$${#eq-IPCW-censured}
 
 The commonly formulated Brier score:
 
