@@ -476,7 +476,7 @@ The variable of primary interest represents three diagnostic states - cognitivel
 
 Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 13 and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; @tbl-event-full. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; @tbl-cohort-full and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
@@ -604,7 +604,7 @@ kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 
 Posterior classifications show the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
-For the two class model (@tbl-pprob-m1-ptau, the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (@tbl-pprob-m2-ptau) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
+For the two class model (@tbl-pprob-m1-ptau), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (@tbl-pprob-m2-ptau) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
 
 ```{r}
 #| pos: "H"
@@ -867,6 +867,7 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-event-full
 #| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
 kable_standard(readRDS("tables/event_table_full.rds"))
 ```
@@ -874,6 +875,7 @@ kable_standard(readRDS("tables/event_table_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-cohort-full
 #| tbl-cap: "Participants with at least one biomarker measurement: characteristics and measurement distributions "
 kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
