@@ -382,7 +382,7 @@ where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ i
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by:
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities. Given that $T_i$ is the event time for the $i^{th}$ individual, the posterior probability of belonging to the $g^{th}$ latent class for the $i^{th}$ individual is given by:
 
 $$\widehat\pi_{i,g} =
 \frac{
@@ -391,7 +391,7 @@ $$\widehat\pi_{i,g} =
 {
 \sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)h_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$ {#eq-post-prob}
 
-where the posterior probability of belonging to the $g^{th}$ latent class for the $i^{th}$ individual is $\pi_{i,g}$ whilst the prior is given by $\widehat \pi_{i,g}$ (Proust-Lima et al., 2012, p. 7). Further, $T_i$ is the event time for the $i^{th}$ individual, $h_i(T_i | c_i = g)$ is presented in @eq-jlcmm-full and is defined here given the vector of model parameters $\widehat \theta _G$ for the $g^{th}$ class and $S_i(T_i | c_i = g; \widehat \theta _G)$ is the corresponding class-specific survival function.
+where the prior probability is given by $\widehat \pi_{i,g}$ (Proust-Lima et al., 2012, p. 7). The numerator provides the joint likelihood (Wackerly, 2008, p. 797) given by the prior probability and the likelihood contributions from the longitudinal biomarker process, given by $f(Y_i | c_i = g; \theta_G)$ and from the survival process, given by both the hazard function as presented in @eq-jlcmm-full together with the corresponding survival function. The denominator is the marginal density (Wackerly, 2008, p. 797) which serves as a normalising constant.
 
 Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2012, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
@@ -445,17 +445,15 @@ $$\omega_i(t) =
 
 where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed event time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5). For example, given an individual who converts to dementia with $T_i^* \le t$, the IPCW will be such that:
 
-$$
-\omega_i(t) =
-\frac{1}{G(T^*_i-)}
-$${#eq-IPCW-event}
+$$\omega_i(t) =
+\frac{1}{G(T^*_i-)}$$
+ {#eq-IPCW-event}
 
 whilst the IPCW for an individual whose is censored at time $t$ is therefore:
 
-$$
-\omega_i(t) =
-\frac{1}{G(t)}
-$${#eq-IPCW-censured}
+$$\omega_i(t) =
+\frac{1}{G(t)}$$
+ {#eq-IPCW-censured}
 
 The commonly formulated Brier score:
 
@@ -854,6 +852,8 @@ Scollard, P., Mukherjee, S., Choi, S. E., Lee, M. L., Klinedinst, B., Gibbons, L
 Therneau, T.M. & Grambsch, P.M (2000). *Modeling Survival Data: Extending the Cox Model*. Springer, Berlin. <https://doi.org/10.1007/978-1-4757-3294-8>
 
 Verbeke, G., & Molenberghs, G. (2000). *Linear mixed models for longitudinal data*. Springer Science & Business Media.
+
+Wackerly, D. D., Mendenhall, W., & Scheaffer, R. L. (2008). *Mathematical statistics with applications*. 7th edition. Brooks-Cole.
 
 Wang, C., Shen, J., Charalambous, C., & Pan, J. (2024). Modeling biomarker variability in joint analysis of longitudinal and time-to-event data. *Biostatistics* (Oxford, England), 25(2), 577-596. <https://doi.org/10.1093/biostatistics/kxad009>
 
