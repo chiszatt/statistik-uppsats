@@ -546,9 +546,9 @@ Thus, JMs with a random intercept and slope were estimated for longitudinal meas
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
-A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4; Figure 10a. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
+A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4; Figure 11a. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
 
-Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 10b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
+Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 11b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
 Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in Table 3.
 
@@ -572,7 +572,7 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 SENTENCES ABOUT HOW LCMM WERE FIT WITH AND WITHOUT COVARIATES, COVARIATES CAUSED LATENT CLASSES TO BE FOUND WHEN MODEL WO COVARIATES COULD NOT FIND... EVIDENCE FOR REMOVING COVARIATES SO LATENT CLASS WAS ASSURED TO BE ACTUALL LATENT.
 
-Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters. For all models, the Weibull resulted in a lower BIC, despite . The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
+Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters. For all models, the Weibull resulted in a lower BIC, despite the plot of complementary log-log transformed Kaplan-Meier survival estimates displaying deviations from linearity (Appendix 2.3; Figure 11). The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
 
 The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
@@ -892,6 +892,10 @@ LME model with longitudinal p-tau181 measurements
 LME model with longitudinal NfL measurements
 :::
 
+::: {layout-ncol="1"}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width=70%}
+:::
+
 ## Convergence
 
 ::: {#fig-alpha layout-ncol="3"}
@@ -904,9 +908,6 @@ LME model with longitudinal NfL measurements
 Trace plots of the $α$-parameters (convergence)
 :::
 
-::: {layout-ncol="1"}
-![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width=70%}
-:::
 
 ## Model Results
 
