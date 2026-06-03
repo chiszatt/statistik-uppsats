@@ -195,23 +195,23 @@ To quantify the association between biomarkers and disease progression, relative
 
 Given that $T$ denotes either the time-to-event or the censuring time, the survival function models the probability of an individual remaining event-free up until time $t$, such that:
 
-$$S(t) = Pr(T > t)$$
+$$S(t) = Pr(T > t)$$ {#eq-surv-function}
 
 where the corresponding hazard function is given as the probability that the event occurs in the vicinity of time $t$ divided by the probability of being event-free at time $t$:
 
-$$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$
+$$h(t) = \frac{f(t)}{S(t)} \quad \text{where} \quad f(t) = \frac{d}{dt} \left[1 - S(t) \right]$$ {#eq-haz-function}
 
 and $1 - S(t)$ is the cumulative risk function, $F(t)$ (Moore, 2016, pp. 11-14). The Lehmann alternative for comparing survival functions assumes that two survival functions, $S_0(t)$ and $S(t)$, are related such that:
 
-$$S(t) = [S_0(t)]^{\psi}$$
+$$S(t) = [S_0(t)]^{\psi}$$ {#eq-prop-surv}
 
 where $\psi$ is the proportional hazards constant (Moore, 2016, pp. 43-44). This relationship can be re-expressed in terms of their hazard functions to give:
 
-$$h(t) = \psi h_0(t)$$
+$$h(t) = \psi h_0(t)$$ {#eq-prop-haz}
 
 which is the proportional hazards assumption (Moore, p. 55). Further, covariate information is linked to the proportional hazards constant exponentially, yielding the following model:
 
-$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$
+$$h(t) = h_0(t) exp\left\{ \mathbf{x}^T \boldsymbol{\beta} \right\}$$ {#eq-prop-haz-cov}
 
 where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vector of model parameters. In this study, the covariates of interest in the hazard model are age, sex, APOE-$\epsilon 4$ status and baseline values of p-tau181 and NfL. The latter two covariates are also included simultaneously, resulting in a multivariable Cox PH model.
 
@@ -219,9 +219,9 @@ where $\mathbf{x}$ is a vector of covariates and $\boldsymbol{\beta}$ is a vecto
 
 A key assumption of the Cox PH model is the assumed proportionality between hazard functions for different values of the specified covariates. This assumption is crucial for the construction of the partial likelihood, which allows the survival distribution to remain unspecified, since it allows the baseline hazard function to be dropped from the partial likelihood (Moore, 2016, p. 96). In R, the proportional hazards assumption can be tested using the cox.zph() function based on Schoenfeld residuals. The null hypothesis is that the hazard ratio for each covariate is constant over time, meaning that the proportional hazards assumption holds, while the alternative hypothesis is that the hazard ratio for at least one covariate varies over time, where $j$ denotes the covariates in the model and $t$ denotes time:
 
-$$H_0: \beta_j(t) = \beta_j \ \text{for all } t$$
+$$H_0: \beta_j(t) = \beta_j \ \text{for all } t$$ {#eq-null-pht}
 
-$$H_A: \beta_j(t) \neq \beta_j \ \text{for at least one } t$$
+$$H_A: \beta_j(t) \neq \beta_j \ \text{for at least one } t$$ {#eq-alt-pht}
 
 A low $p$-value, such as below 0.05, indicates evidence against the null hypothesis and suggests that the proportional hazards assumption is violated.
 
@@ -243,21 +243,21 @@ Since longitudinal data consists of repeated measurements from the same individu
 
 Following the notation of Rizopoulos (2012, p. 54), the biomarker processes are modeled such that:
 
-$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
+$$ y_i(t) = m_i(t) + \epsilon_i(t) \qquad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-obs}
 
-$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$
+$$ m_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}) $$ {#eq-lme-latent}
 
 where $y_i(t)$ is the observed biomarker measurement at time $t$ for the $i^{th}$ individual. Assuming that the true biomarker value is not observed due to measurement and other errors, $m_i(t)$ is the trajectory function which represents the true unobserved value of the biomarker at time $t$ for the $i^{th}$ individual. The fixed effects are described by $\mathbf{X_i}^T(t)\boldsymbol{\beta}$ and the random effects by $\mathbf{Z_i}^T\mathbf{b_i}$, where $\boldsymbol{\beta}$ are population-specific parameters and $\mathbf{b}_i$ are subject-specific parameters (Verbeke & Molenberghs, 2000, p. 23). These subject-specific parameters handle the observed dependence between repeated measurements. Combining the latent biomarker trajectory function with the error term gives:
 
-$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$
+$$ y_i(t) = \mathbf{X_i^T}\boldsymbol{\beta} + \mathbf{Z_i}^T\mathbf{b_i} + \epsilon_i(t) \qquad \mathbf{b_i}(t) \sim N(0, \sigma^2_{\mathbf{b}}), \quad \epsilon_i(t) \sim N(0, \sigma^2_{\epsilon}) $$ {#eq-lme-full}
 
 ### The Joint Model
 
 The LME and Cox PH models are linked by a specified association structure. This structure can link the survival process to the current model estimate of the biomarker, $m_i(t)$, and the current rate of change of the biomarker trajectory, $m'_i(t)$. If both the current value and current rate of change are specified in the proportional hazards model, this becomes:
 
-$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$
+$$h(t|M_i, \mathbf{v_i}) = h_0(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) + \alpha_2 m_i'(t) \right\}$$ {#eq-jm-full}
 
-$$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$
+$$\text{where }\qquad M_i = \left\{m_i,  0 \le s \le t\right\} \qquad \text{and} \qquad m_i'(t) = \frac{\delta} {\delta t} m_i(t)$$ {#eq-jm-extra}
 
 In this formulation, $M_i$ represents the true unobserved biomarker profile up to time $t$, and the association parameters $\alpha_1$ and $\alpha_2$ link $m_i(t)$ and $m_i'(t)$ to the hazard function respectively. Further, $\boldsymbol{\gamma}$ is a vector of log-hazard ratios and $\mathbf{w}_i$ is a vector of time-independent covariates for the $i^{th}$ individual.
 
@@ -289,27 +289,27 @@ Consider $J$ Markov chains, each with samples $x_1^{(j)}, x_2^{(j)}, \dots$ from
 
 Then calculate the chain mean for each chain,
 
-$$\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}$$
+$$\bar{x}_j = \frac{1}{L} \sum_{t=1}^{L} x_t^{(j)}$$ {#eq-chain-mean}
 
 the overall mean across all chains (the grand mean),
 
-$$\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j$$
+$$\bar{x}_\cdot = \frac{1}{J} \sum_{j=1}^{J} \bar{x}_j$$ {#eq-grand-mean}
 
 the between-chain variance,
 
-$$B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2$$
+$$B = \frac{L}{J-1} \sum_{j=1}^{J} \left(\bar{x}_j - \bar{x}_\cdot\right)^2$$ {#eq-bchain-var}
 
 the within-chain variance for each chain,
 
-$$s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2$$
+$$s_j^2 = \frac{1}{L-1} \sum_{t=1}^{L} \left(x_t^{(j)} - \bar{x}_j\right)^2$$ {#eq-wchain-var}
 
 and finally, the average within-chain variance,
 
-$$W = \frac{1}{J} \sum_{j=1}^{J} s_j^2$$
+$$W = \frac{1}{J} \sum_{j=1}^{J} s_j^2$$ {#eq-mean-wchain-var}
 
 Subsequently, the Gelman-Rubin statistic is:
 
-$$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$
+$$R = \frac{\frac{L-1}{L} W + \frac{1}{L} B}{W}$$ {#eq-r-stat}
 
 As the number of iterations $L$ increases and the between-chain variation $B$ decreases, $R$ approaches 1. Thus, chains are typically run until $R$ is near this number. Being a unit-free ratio, $R$ provides a convenient summary of convergence without requiring specification of a particular parameter, making it a practical tool for monitoring MCMC chains before any inference is made (Peng, 2022).
 
@@ -325,11 +325,11 @@ In the $lcmm$ package developed by Proust-Lima et al. for estimating JLCMMs, a W
 
 The Weibull survival model can be parameterised with a rate and shape parameter, giving:
 
-$$h(t) = \alpha \lambda (\lambda t) ^{\alpha - 1}$$
+$$h(t) = \alpha \lambda (\lambda t) ^{\alpha - 1}$$ {#eq-weibull-hazard}
 
 where $\lambda$ is the rate parameter and $\alpha$ is the shape parameter (Moore, 2016, p. 16). For $\alpha < 1$ the hazard is decreasing whilst for $\alpha > 1$ the hazard is increasing. A diagnostic tool for assessing the appropriateness of the Weibull hazard model is to apply a complementary log-log transformation to the survival estimates such that:
 
-$$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$
+$$log [-log (\widehat S(t_i))] = \alpha log (\lambda) + \alpha log(t_i)$$ {#eq-weibull-check}
 
 which is a linear function of $t$ and can be re-expressed in the form $f(t) = b + m \cdot log (t)$ (Moore, 2016, pp. 138 - 139). Therefore, plotting the complementary log-log transformed survival estimates against time provides a visual diagnostic, with a straight line giving support to the Weibull hazard model whereas deviations from linearity call this model in to question. Alternatively, flexible hazard models can be specified in the $lcmm$ package, where piecewise exponential and cubic M-splines hazard models are available (Proust-Lima et al., 2025).
 
@@ -337,15 +337,15 @@ which is a linear function of $t$ and can be re-expressed in the form $f(t) = b 
 
 The JLCMM consists of three submodels; a multinomial logistic submodel, a LME submodel and a proportional hazards submodel. Multinomial logistic regression models classes such that:
 
-$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$
+$$\pi_{i,g} = Pr(c_i = g | \mathbf{X}_i) = \frac{e^{\mathbf{X}_i \boldsymbol{\beta}_g}}{\sum^{G}_{l = 1}e^{\mathbf{X}_i \boldsymbol{\beta}_l}}$$ {#eq-class-submodel-covariates}
 
-where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual and $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ group. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
+where $\mathbf{X}_i$ is the set of covaritates for the $i^{th}$ individual, $\boldsymbol{\beta}_g$ is the set of coefficients for the $g^{th}$ latent class and $c_i$ is the class indicator for the $i^{th}$ individual. Given there are no prior assumptions about the latent classes, no covariates are specified in the multinomial logistic regression model (Kyheng et al., 2025, p. 2). The class submodel then simplifies to:
 
-$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$
+$$\pi_{i,g} = Pr(c_i = g) = \frac{e^{\boldsymbol{\beta}_{0,g}}}{\sum^{G}_{l = 1}e^{\boldsymbol{\beta}_{0,l}}}$$ {#eq-class-submodel}
 
 where $\pi_{i,g}$ is the probability that the $i^{th}$ individual belongs to latent class $g$. Linking the class submodel to the longitudinal submodel and the survival submodel, assuming only a random intercept, results in the following:
 
-$$h(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$
+$$h_i(t | c_i = g) = h_{0, g}(t)exp\left\{\boldsymbol{\gamma}^T\mathbf{w}_i + \alpha_1 m_i(t) \right\} $$ {#eq-jlcmm-full}
 
 ### Model Assumptions
 
@@ -359,7 +359,7 @@ There are various methods for assessing the conditional independence assumption,
 
 The score test assumes the null hypothesis of conditional independence, that is, all correlation between the biomarker trajectory and time-to-event is captured entirely by group membership. Given the class membership is known, there is assumed to be no remaining dependence between the biomarker response and the time-to-event response. Assuming a model with a current value association structure, the association parameter, $\alpha_1$, is assumed to be zero under the null hypothesis (Jacqmin-Gadda et al., p. 13), such that:
 
-$$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$
+$$H_0: \alpha_1 = 0 \qquad H_A: \alpha_1 \ne 0$$ {#eq-score-test-hyp}
 
 Under the null hypothesis, the score test statistic, $U$, is $\chi^2$ distributed with degrees of freedom equal to the number of shared random effects in the model (Proust-Lima et al., 2012, p. 8). A significant test statistic supports the alternative hypothesis that there is residual dependence between the biomarker and time-to-event responses.
 
@@ -373,7 +373,7 @@ $$\theta_{G}^{\ (l + 1)} =
 \theta_{G}^{\ (l)} - \delta \left( \tilde{\mathbf{H}}^{\ (l)} \right)^{-1}
 \nabla (\ell(\theta_{G}^{\ (l)}))
 \quad \text{where} \quad
-\nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$
+\nabla(\ell(\theta_{G}^{\ (l)})) = \frac{\delta}{\delta\theta} \ell(\theta_{G}^{\ (l)})$$ {#eq-jlcmm-marquardt}
 
 where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ iteration and, by default, $\delta$ equals $1$ but is updated to ensure improvement in the log-likelihood at each iteration (Proust-Lima et al., 2012, p.10). If necessary, the algorithm inflates the diagonal terms in the Hessian, producing $\tilde{\mathbf{H}}$, in order to ensure the next iteration produces an improved log-likelihood. According to Proust-Lima et al. (2012, p.10 ), this method is an update on the Newton-Raphson estimation algorithm that increases convergence rate and speed. It should be considered that there may be several local maxima, meaning the algorithm should be run several times using different starting values (Proust-Lima et al., 2012, p. 5).
 
@@ -381,14 +381,16 @@ where $\mathbf{H}$ is the Hessian matrix for parameter values for the $l^{th}$ i
 
 Determining the number of latent classes (class enumeration) is one of the challenges of model selection for JLCMMs. Likelihood ratio tests cannot be performed for nested latent class models with differing number of classes, as regularity conditions which ensure a $\chi^2$ distributed test statistic do not hold (Celeux & Soromenho, 1996, p. 196). Therefore, other metrics must be utilised for this purpose.
 
-One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by (Proust-Lima et al., 2012, p. 7):
+One aspect of determining the optimal number of classes is minimisation of the Bayesian Information Criterion (BIC), which is the preferred criterion for mixture models (Proust-Lima et al., 2012, p. 7). Classes must also be adequately discriminated, which is assessed by analysis of posterior class membership probabilities, given by:
 
-$$\widehat\pi_{i,g} = P(c_i = g |Y_i, (T^*_i, E_i); \widehat\theta_G) \\
-= \frac{
-\widehat\pi_{i,g}f(Y_i | c_i=g; \widehat\theta_G)\lambda_i(T_i | c_i=g; \widehat\theta_G)S_i(T_i | c_i=g; \widehat\theta_G)
+$$\widehat\pi_{i,g} =
+\frac{
+\widehat\pi_{i,g}f(Y_i | c_i=g; \widehat\theta_G)h_i(T_i | c_i=g; \widehat\theta_G)S_i(T_i | c_i=g; \widehat\theta_G)
 }
 {
-\sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)\lambda_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$
+\sum_{l = 1}^{G} \widehat\pi_{i,l}f(Y_i | c_i=l; \widehat\theta_G)h_i(T_i | c_i=l; \widehat\theta_G)S_i(T_i | c_i=l; \widehat\theta_G)}$$ {#eq-post-prob}
+
+where the posterior probability of belonging to the $g^{th}$ latent class for the $i^{th}$ individual is $\pi_{i,g}$ whilst the prior is given by $\widehat \pi_{i,g}$ (Proust-Lima et al., 2012, p. 7). Further, $T_i$ is the event time for the $i^{th}$ individual, $h_i(T_i | c_i = g)$ is presented in @eq-jlcmm-full and is defined here given the vector of model parameters $\widehat \theta _G$ for the $g^{th}$ class and $S_i(T_i | c_i = g; \widehat \theta _G)$ is the corresponding class-specific survival function.
 
 Reporting the proportion of individuals who have a posterior probability over a certain threshold (Proust-Lima et al., 2012, p. 7) - typically 0.7, 0.8 or 0.9 - illustrates the ability of the model to discriminate classes from one another. Mean posterior probabilities for each class can also be reported, with $\mu(\widehat\pi_g)$ values close to 0.5 showing poor class discrimination. Class sizes are also important, as classes that are made up of less than $5\%$ of the total sample population may be driven by outliers and therefore not be clinically meaningful.
 
@@ -402,7 +404,7 @@ $$EN(G) = 1 -
 }
 {
 Nlog(G)
-}$$
+}$$ {#eq-entropy}
 
 where $G$ is the number of latent classes specified by the model and $\widehat\pi_{i,g}$ is the posterior probability that the $i^{th}$ individual belongs to class $g$. Relative entropy values closer to 1 demonstrate good discriminative ability of the model, where, for one class latent models, $EN(1) = 1$.
 
@@ -418,9 +420,9 @@ ROC analysis is commonly used to evaluate the ability of a marker or model to di
 
 Let $X_i$ represent the cumulative risk for the $i^{th}$ individual and let $D_i(t)$ denote the disease status at time $t$, where $D_i(t) = 1$ indicates presence of disease at time $t$, and $D_i(t) = 0$ otherwise (Kamarudin et al., 2017, p. 2). For a given threshold $c$, the time-dependent sensitivity and specificity, for time $t$, are then defined as:
 
-$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$
+$$ Se(c,t) = P(X_i > c \mid D_i(t) = 1) $$ {#eq-sensitivity}
 
-$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$
+$$ Sp(c,t) = P(X_i \le c \mid D_i(t) = 0) $$ {#eq-specificity}
 
 where sensitivity refers to the probability of the model correctly detecting individuals who have experienced the event of interest before time $t$, whilst specificity is defined as the probability of the model correctly discerning individuals who remain event-free at time $t$.
 
@@ -428,7 +430,7 @@ Based on the definitions above, the corresponding ROC curve at a given time $t$,
 
 The time-dependent AUC is then defined as:
 
-$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$
+$$ AUC(t) = \int_{-\infty}^{\infty} Se(c,t)\, d[1 - Sp(c,t)] $$ {#eq-AUC}
 
 An AUC value of 1 means perfect ability to distinguish between patients with and without the condition, while an AUC of 0.5 means no discrimination at all, meaning the model performs no better than random guessing such as flipping a coin (Rizopoulos, 2012, p. 196)
 
@@ -438,13 +440,13 @@ The Brier score can be thought of as the mean squared error of a prediction fore
 
 $$\omega_i(t) =
 \frac{\mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
-\frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$
+\frac{\mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}$$ {#eq-IPCW}
 
 where $G(t)$ is the censoring survival function, which quantifies the probability of surviving a censoring event, $T_i^* -$ is a time point infinitesimally smaller than the observed time $T_i^*$, and $\mathbb{I} \left\{ \cdot \right\}$ is an indicator function (Prince et al., 2025, pp. 4-5).
 
 The commonly formulated Brier score:
 
-$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$
+$$\text{BS} = \frac{1}{n}\sum_{i = 1}^{n }(Y_i(t) - \widehat S_i(t))^2$$ {#eq-brier}
 
 where $\widehat S_i(t)$ is the predicted survival probability for the $i^{th}$ individual at time $t$ and $Y_i(t)$ is their observed outcome at that time (Park et al., 2021, p. 1704) is insufficient for censored survival data. Adjusting for censoring, the IPCW-adjusted Brier score is given as:
 
@@ -452,7 +454,7 @@ $$BS =
 \frac{1}{ \tilde n(t)}\sum_{i = 1}^{n} \left(
 \frac{( \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^*\le t, \delta_i = 1 \right\} }{G(T^*_i-)} +
 \frac{ (1 - \widehat S_i(t))^2 \mathbb{I} \left\{ T_i^* > t \right\} }{G(t)}
-\right)$$
+\right)$$ {#eq-brier-IPCW}
 
 where $\tilde n(t)$ is the sum of all IPCW weights at time $t$ (Prince et al., 2025, p. 6). The Brier score takes values from 0 to 1, where a score closer to 0 is given to a model with better predictive ability.
 
@@ -472,17 +474,17 @@ Application of these criteria yielded a sample of 704 participants with at least
 
 The variable of primary interest represents three diagnostic states - cognitively normal (CN), MCI and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
-Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The ADNI 1 and ADNI 2 protocols only include AD participants that meet criteria for probable AD, whilst the ADNI 3 protocol excludes any individuals with any significant neurological disease other than AD (ADNI, n.d.-b, n.d.-c, n.d-d). Therefore, individuals with dementia diagnoses are assumed to have dementia due to AD. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
-The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; Table 12. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; Table 13 and are described below for participants with at least three measurements.
+The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; @tbl-event-full. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; @tbl-cohort-full and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
-The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
+The p-tau181 measurements were retrieved from the UGOPTAU181 dataset, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG dataset, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is pg/mL (Blennow, 2011).
 
-P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; Figure 6a & 6b). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
+P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; @fig-hist-ptau, @fig-hist-nfl). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
-Here, it is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (Appendix 8.1; 7a & 7b), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression. Moreoever, they showed low to medium correlation with the other numerical covariates, indicating no major concerns regarding multicollinearity and suggesting that they are all suitable for inclusion in the models.
+Here, it is also worth noting that the correlation between log-transformed p-tau181 and NfL was 0.34 (Appendix 8.1; @fig-corr-cox, @fig-corr-lme), indicating a weak positive association. This suggests that the biomarkers share some common variation while largely capturing distinct biological processes. Overall, this supports the use of a multivariate framework, as it allows their dependence to be accounted for while evaluating both their individual and combined associations with disease progression. Moreoever, they showed low to medium correlation with the other numerical covariates, indicating no major concerns regarding multicollinearity and suggesting that they are all suitable for inclusion in the models.
 
 Biomarker examination dates ranged from 1 February 2007 to 6 June 2016, while diagnostic assessment dates spanned 29 September 2005 to 7 November 2025. In this analysis, baseline was defined as the first biomarker examination date, ensuring alignment of biomarker follow-up with dementia onset.
 
@@ -516,24 +518,30 @@ Prior to evaluating predictive performance, model fit was assessed for each mode
 
 ### Cox PH Models
 
-First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were sex, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite sex being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without sex as a covariate (Appendix 8.2; Table 16), sex was retained in the models due it's theoretical relevance.
+First, Cox PH models incorporating baseline values of p-tau181, NfL, or both biomarkers were estimated. Additional covariates were sex, age at baseline and APOE genotype. Initially, fitting the model with all levels of genotype - which denotes the specific APOE allele combination - resulted in non-significant coefficients for all levels. Therefore, genotype was collapsed into three levels denoting the presence of the APOE-$\epsilon 4$ allele, taking the following values: zero alleles (non-carriers), one allele (heterozygous carriers; $\epsilon 2$/$\epsilon 4$ or $\epsilon 3$/$\epsilon 4$), and two alleles (homozygous carriers; $\epsilon 4$/$\epsilon 4$). Despite sex being non-significant for all three Cox PH models, and significant results from likelihood ratio tests between these models and reduced models without sex as a covariate (Appendix 8.2; @tbl-coxph-lrt-sex), sex was retained in the models due it's theoretical relevance.
 
-The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in Table 15 (Appendix 8.2).
+The proportional hazards assumption was assessed for all covariates to verify that the effects remained constant over time. Considering the Cox PH model is defined as the survival submodel in the subsequent JMs, it is critical this assumption is met in order to reliably evaluate the JMs. The resulting $p$-values are presented in @tbl-coxph-pht (Appendix 8.2).
 
 At a 5% significance level, most covariates satisfied the proportional hazards assumption across all models, as indicated by non-significant $p$-values for sex, APOE-$ε4$ status, and the biomarker variables. However, age at baseline consistently showed significant $p$-values, indicating a violation of the assumption. The same pattern was observed for the GLOBAL test, which jointly evaluates the proportional hazards assumption across all covariates and is sensitive to covariate-specific departures from the assumption; it also yielded significant or borderline significant $p$-values.
 
-Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in Table 1.
+Given this violation, age at baseline was excluded from the final Cox PH models. The refitted models yielded the $p$-values presented in @tbl-ph-final.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-ph-final
 #| tbl-cap: "p-values for the proportional hazards assumption tests after exclusion of age at baseline in the Cox PH models"
 kable_standard(readRDS("tables/table_ph_final.rds"))
 ```
 
 After excluding age at baseline, the GLOBAL test yielded $p$-values above the 5% significance level, no longer indicating any violation of the proportional hazards assumption. All other covariates also remained non-significant, suggesting that they jointly do not exhibit systematic time-dependent effects in any of the refitted models.
 
-Furthermore, an initial comparison of model performance by assessment of the concordance indices for all Cox PH models was performed. The results presented in Table 2 show that the concordance index evaluates all three models similarly, with results indicating adequate discrimination.
+Furthermore, an initial comparison of model performance by assessment of the concordance indices for all Cox PH models was performed. The results presented in @tbl-c-index show that the concordance index evaluates all three models similarly, with results indicating adequate discrimination.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-c-index
 #| tbl-cap: "Concordance indices for the fitted Cox PH models with baseline biomarker values"
 kable_standard(readRDS("tables/c_index_table.rds"))
 ```
@@ -542,32 +550,38 @@ kable_standard(readRDS("tables/c_index_table.rds"))
 
 Next, JMs that incorporated the longitudinal trajectories of p-tau181 and NfL with the time-to-diagnosis data were estimated. For the longitudinal component, an LME model was estimated separately for p-tau181 and NfL.
 
-Plotting the residuals against the fitted values for the LME model with p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 8.3; Figure 8a. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (Appendix 8.3; Figure 8b). A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values demonstrated even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (Appendix 8.3; Figure 9a). The Q-Q plot for NfL showed similar results to those observed for p-tau181 (Appendix 8.3; Figure 9b). Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME models with log-transformed biomarker measurements. Consequently, these models were retained as the longitudinal submodels within the joint modelling framework.
+Plotting the residuals against the fitted values for the LME model with p-tau181 showed no clear evidence of heteroskedasticity, as shown in Appendix 8.3; @fig-resid-ptau. The slight deviations in the tails of the Q-Q plot were also not considered to be of concern (Appendix 8.3; @fig-qq-ptau). A similar pattern was observed for the LME model of NfL, where the plot of residuals against fitted values demonstrated even less evidence of heteroskedasticity compared to the corresponding plot for p-tau181 (Appendix 8.3; @fig-resid-nfl). The Q-Q plot for NfL showed similar results to those observed for p-tau181 (Appendix 8.3; @fig-qq-nfl). Generalised LME models with different link functions were also fit and their residuals analysed, however none of these models demonstrated a better fit than the LME models with log-transformed biomarker measurements. Consequently, these models were retained as the longitudinal submodels within the joint modelling framework.
 
-The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; Table 14).
+The choice of random effects structure for the JMs was limited due to the $JMBayes2$ package currently only supporting those including a random slope. Therefore, all LME models were fit with a random intercept and slope. However, models with a simple structure with only a random intercept and an extended structure including a random slope were fit using maximum likelihood estimation in order to perform likelihood ratio tests. The results show that the extended structure was a better fit for NfL, but a simpler structure would have been preferable for p-tau181 (Appendix 8.2; @tbl-coxph-pht).
 
-Thus, JMs with a random intercept and slope were estimated for longitudinal measurements of p-tau181, NfL, or both simultaneously. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM. To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in Figure 1.
+Thus, JMs with a random intercept and slope were estimated for longitudinal measurements of p-tau181, NfL, or both simultaneously. For each model, three MCMC chains were used, with 11,000 iterations and 1,000 burn-in iterations for the univariate JMs, and 20,000 iterations with 2,000 burn-in iterations for the multivariate JM. To ensure convergence of the JMs, trace plots of the $\alpha$-parameters, which represent the associations between the longitudinal and survival submodels, were examined for each model. The evaluation started with the JM for p-tau181, presented in @fig-converg-ptau.
 
 ![Traceplot of log-transformed p-tau181](figures/convergence_plot_ptau.png){#fig-converg-ptau}
 
 The trace plot shows that the three MCMC chains fluctuate around a stable mean value throughout the iterations, without any clear trend or drift. This suggests that the chains have reached a stable region. In addition, the chains overlap well and mix with each other, indicating that they are sampling from the same posterior distribution. Although some random variation is present, this is expected in MCMC sampling. Overall, the plot supports good convergence.
 
-A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4; Figure 10a. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
+A similar pattern is observed for the JM including NfL, as shown in Appendix 8.4; @fig-alpha-nfl-jm. The chains likewise fluctuate around a stable mean value with good mixing, indicating convergence of the $α$-parameters comparable to the JM including p-tau181.
 
-Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; Figure 10b-c). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
+Finally, the multivariate JM also exhibited a similar overall behaviour (Appendix 8.4; @fig-alpha-nfl-multi, @fig-alpha-ptau-multi). Compared to the single-biomarker models, however, the trace plot for the multivariate JM shows a slightly wider range of $α$-values, indicating a somewhat larger variability in the $α$-parameters. This suggests increased uncertainty in the parameter estimates, which is expected given the higher complexity of the model. Despite this, the chains still fluctuate around a stable mean value with no visible trend or drift, and they continue to overlap and mix well. Thus, all three models appear to have converged adequately.
 
-Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in Table 3.
+Additionally, convergence of the models was assessed by examining the $\widehat{R}$ values of the survival outcome and the longitudinal outcome in each JM, with the survival $\widehat{R}$ values presented in @tbl-rhat-surv.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-rhat-surv
 #| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the survival outcome in the joint models"
 kable_standard(readRDS("tables/rhat_survival_table.rds"))
 ```
 
 The $\widehat{R}$ values for the survival outcomes remained very close to 1 across all JMs. This indicates good convergence of the MCMC chains for these components and confirms the convergence patterns observed in the $α$-parameter trace plots, with no evidence of convergence issues.
 
-While Table 3 presents the $\widehat{R}$ values for the survival outcomes, the corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in Table 4.
+The corresponding $\widehat{R}$ values for the longitudinal outcomes in each JM are shown in @tbl-rhat-long.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-rhat-long
 #| tbl-cap: "$\\widehat{\\mathbf{R}}$ values of the longitudinal outcome in the joint models"
 kable_standard(readRDS("tables/rhat_longitudinal_table.rds"))
 ```
@@ -576,83 +590,102 @@ In a similar manner, the $\widehat{R}$ values for the longitudinal outcomes are 
 
 ### Joint Latent Class Mixed Models
 
-SENTENCES ABOUT HOW LCMM WERE FIT WITH AND WITHOUT COVARIATES, COVARIATES CAUSED LATENT CLASSES TO BE FOUND WHEN MODEL WO COVARIATES COULD NOT FIND... EVIDENCE FOR REMOVING COVARIATES SO LATENT CLASS WAS ASSURED TO BE ACTUALL LATENT.
+Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters as the Weibull alternative. A visual check for the appropriateness of the Weibull hazard model was done as presented in section 3.4.1 and @eq-weibull-check. The plot of complementary log-log transformed Kaplan-Meier survival estimates displayed deviations from linearity (Appendix 8.3; @fig-weibull-assumption). However, the model specified with a Weibull hazard resulted in a lower BIC for all models. The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models. No covariates were included in any of the submodels in order to allow for a purely data-driven latent class structure to emerge based solely from biomarker trajectories and survival outcomes. Therefore, all heterogeneity is modelled through the latent classes.
 
-Finally, JLCMMs were estimated. The models were selected via comparison of BIC and entropy as well as assessment of posterior probabilities and classifications for models with up to four latent classes. An intercept only random effects structure was chosen due to minimised BIC for all models. The Weibull baseline hazard was compared against a 3-quant-piecewise hazard model with the same number of parameters. For all models, the Weibull resulted in a lower BIC, despite . The results of each model were verified using the $gridsearch()$ function which allows for better exploration of the parameter space to ensure finding the global instead of a local maximum solution. This check confirmed that using random starts from the one class model was sufficient for finding the global maximum for all models.
-
-The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (Table 5). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
+The log-likelihood, BIC and entropy of the models using longitudinal p-tau181 measurements are presented below (@tbl-summary-jlcmm-ptau). Log-likelihood and entropy increased with additional latent classes, however the BIC was minimised for the model with two latent classes.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-summary-jlcmm-ptau
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/summary_jlcmm_ptau.rds"))
 ```
 
 Posterior classifications show the number of individuals assigned to each class, whereas the mean posterior probabilities show, for individuals in each class, the average probability of being assigned to each class. For example, values for $class1$, $prob1$ close to $1$ and $class2$, $prob1$ close to $0$ show good class discrimination.
 
-For the two class model (Table 6), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (Table 7) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
+For the two class model (@tbl-pprob-m1-ptau), the class sizes are reasonable and the mean posterior probabilities show good class discrimination, meaning the model has high certainty in assigning individuals to their respective classes. Comparison with the three class model (@tbl-pprob-m2-ptau) shows somewhat poorer class discrimination as well as a questionably small $class3$, with only $3.79\%$ of individuals being assigned to this class.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m1-ptau
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/pprob_m1_ptau.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m2-ptau
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the three class JLCMM for longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/pprob_m2_ptau.rds"))
 ```
 
-The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modelling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in Table 16 (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
+The score test statistic for the conditional independence assumption was significant for the one class model ($50.336, p < 0.001$) but became non-significant ($0.122, p = 0.727$) upon modelling two latent classes, further evidence that the data supports two latent classes in the sample population. All model parameters were significant ($p < 0.001$) and are presented in @tbl-jlcmm-ptau (Appendix 8.5). Therefore, the two class model was chosen for this analysis.
 
-The log-likelihood, BIC and entropy provided in Table 8 for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
+The log-likelihood, BIC and entropy provided in @tbl-summary-jlcmm-nfl for candidate models using longitudinal NfL data suggest that also in this instance the two class model provided the best fit for the data and had the highest classification certainty. Log-likelihood increased most between the one class and the two class model, whilst only a slight increase was exhibited between the two and three class models. BIC was minimised and entropy was maxmised for the two class model.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-summary-jlcmm-nfl
 #| tbl-cap: "Log-likelihood, BIC and entropy for JLCMMs with longitudinal NfL measurements"
 kable_standard(readRDS("tables/summary_jlcmm_nfl.rds"))
 ```
 
-Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (Table 9). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
+Class sizes were reasonable and good class discrimination was shown when assessing the average posterior probabilities (@tbl-pprob-m1-nfl). Again, all model parameters were significant ($p < 0.001$, Appendix 8.5; @tbl-jlcmm-nfl). The one class model had a significant score test statistic ($33.409, p < 0.001$) which became non-significant for the two class model ($0.368, p = 0.544$). The two class model was therefore chosen.
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-pprob-m1-nfl
 #| tbl-cap: "Posterior classification table and mean posterior probabilities for the two class JLCMM for longitudinal NfL measurements"
 kable_standard(readRDS("tables/pprob_m1_nfl.rds"))
 ```
 
-The distribution of age at baseline, sex, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.6; Table 10. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.6; Table 11 presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.6; Figure 10.
+The distribution of age at baseline, sex, APOE-$\epsilon 4$ status, and baseline biomarker values for each class estimated from the JLCMM using longitudinal p-tau181 measurements are displayed in Appendix 8.5; @tbl-ptau-class. For the continuous variables, median values as well as first and third quartiles are reported. For the categorical variables, raw values as well as percentage of individuals per class are given. Appendix 8.5; @tbl-nfl-class presents the same results for the JLCMM estimated for longitudinal NfL measurements. The results show that both models estimate a high-risk and a low-risk class, where the high-risk class has higher median values for both biomarker baselines and age, as well as a higher proportion of those with two APOE-$\epsilon 4$ alleles than the low-risk class. The class-specific survival curves are found in Appendix 8.5; @fig-class-surv.
 
 ## Model Comparison
 
-In order to compare the predictive performance of the different modelling approaches, the time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. Figure 2 provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
+In order to compare the predictive performance of the different modelling approaches, the time-dependent AUC for each model was calculated at yearly time points from a landmark time of one year over horizons of one to five years. @fig-auc-ptau provides the time-dependent AUC of the different models across all prediction horizons, with the biomarker fixed as p-tau181.
 
 ![Time-Dependent AUC (p-tau181)](figures/q1_auc_ptau_test.png){#fig-auc-ptau}
 
 Among these models, the time-dependent AUC curves remain consistently high, with values exceeding 0.75 for all horizons, regardless of modelling approach. This indicates that the models demonstrate stable and relatively strong discriminative ability in distinguishing between individuals who progressed to AD dementia and those who did not over time. The values are slightly higher for earlier predictions, especially for the JM. Differences between the models decrease over time, resulting in increasingly similar curves, yet the AUC values suggest that the best predictions made at year six were from the JLCMM. The Cox PH model consistently yields the lowest AUC values.
 
-Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; Figure 13a, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows a slightly higher value for the JLCMM at for the latest prediction horizon.
+Among the models incorporating NfL, a similar overall pattern is observed. As shown in Appendix 8.6; @fig-auc-nfl, the curves remain at comparable levels to those seen for the p-tau181 models, with time-dependent AUC values exceeding 0.75 across all horizons. For earlier predictions, where the values are slightly higher across models, the JM once again yields the highest AUC values. These values then decline over time, becoming more similar to those of the other models. In addition, it shows a slightly higher value for the JLCMM at for the latest prediction horizon.
 
-Appendix 8.6; Figure 13b presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions.
+Appendix 8.6; @fig-auc-multi presents the models incorporating both biomarkers simultaneously, demonstrating higher AUC values for early predictions made using the JM. These values gradually decline over time, yielding values more similar to those of the Cox PH model for later predictions.
 
-These results are also indicated by Table 10 which contains the AUC values for each modelling approach and at each horizon.
+These results are also indicated by @tbl-results-AUC which contains the AUC values for each modelling approach and at each horizon.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-results-AUC
 #| tbl-cap: "Time-dependent AUC by model and prediction time point"
 kable_standard(readRDS("tables/results_table_AUC_test.rds"))
 ```
 
-For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.905 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, Table 10 confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
+For instance, by showing that the JM among the p-tau181-based models has an AUC value of 0.905 for predictions made at year two, while the Cox PH model has an AUC value of 0.823 and the JLCMM has an AUC value of 0.862, @tbl-results-AUC confirms the results previously observed in the figure. The differences between the models then decrease over time; for predictions at four years, the AUC values are 0.802 for the Cox PH model, 0.806 for the JM, and 0.811 for the JLCMM.
 
-When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed. In contrast to the AUC, where higher values indicate better discrimination, lower Brier scores and therefore lower curves indicate lower overall prediction error and better predictive performance. Figure 3 presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
+When evaluating the models' predictive performances using time-dependent Brier scores instead, the same overall patterns are observed. In contrast to the AUC, where higher values indicate better discrimination, lower Brier scores and therefore lower curves indicate lower overall prediction error and better predictive performance. @fig-brier-ptau presents the time-dependent Brier score curves for the different modelling approaches, with the biomarker specification fixed to p-tau181.
 
 ![Time-dependent Brier scores (p-tau181)](figures/q1_brier_ptau_test.png){#fig-brier-ptau}
 
 Among the models incorporating p-tau181, the time-dependent Brier score curves remain consistently low, across all modelling approaches, although they show a slight increase over time. This suggests stable overall predictive accuracy and relatively low prediction error for progression to AD dementia. However, the curve for the Cox PH model curve remain slightly higher than the curves representing the JM and the JLCMM models, meaning that it consistently yields higher Brier scores than the two other models. More precisely, the Brier scores for this model range from approximately 0.05 for early predictions to 0.16 for late predictions, while the corresponding Brier scores for the other models range from approximately 0.02 to 0.14. In other terms, two other curves remain closely aligned, although the curve for the JM is slightly lower at the two year-follow-up, indicating a slightly better predictive performance at this time-point.
 
-This pattern holds for the models incorporating NfL (Appendix 8.6; Figure 14a). The curves remain consistently high, at around the same AUC range as the curves representing the models incorporating p-tau181. At the same time, the curve for the Cox PH model remain slightly higher than the curves representing the curves for the JM and the JLCMM, indicating a worse predictive performance.
+This pattern holds for the models incorporating NfL (Appendix 8.6; @fig-brier-nfl). The curves remain consistently high, at around the same AUC range as the curves representing the models incorporating p-tau181. At the same time, the curve for the Cox PH model remain slightly higher than the curves representing the curves for the JM and the JLCMM, indicating a worse predictive performance.
 
-The same can be said for the time-dependent Brier scores among the models incorporating both biomarkers simultaneously. Appendix 8.6; Figure 14b demonstrates that the values for the Cox PH model with both biomarkers are consistently higher than those for the multivariate JM, again indicating poorer overall predictive performance and higher prediction error.
+The same can be said for the time-dependent Brier scores among the models incorporating both biomarkers simultaneously. Appendix 8.6; @fig-brier-multi demonstrates that the values for the Cox PH model with both biomarkers are consistently higher than those for the multivariate JM, again indicating poorer overall predictive performance and higher prediction error.
 
-Table 11 presents the Brier scores for each modelling approach and at each horizon.
+@tbl-results-brier presents the Brier scores for each modelling approach and at each horizon.
 
 ```{r, echo=FALSE}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-results-brier
 #| tbl-cap: "Time-dependent Brier score by model and prediction time point"
 kable_standard(readRDS("tables/results_table_Brier_test.rds"))
 ```
@@ -661,39 +694,39 @@ For predictions at two years, the Cox PH incorporating p-tau181 achieves a Brier
 
 ## Biomarker Comparison
 
-The models' performances in predicting progression to AD dementia were also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. Figure 4 illustrates how the time-dependent AUC of the models changes with biomarker specification across prediction horizons, with the model being fixed as Cox PH.
+The models' performances in predicting progression to AD dementia were also examined in order to compare the different biomarker specifications, meaning modelling either using p-tau181, NfL or a combination of the two biomarkers. @fig-auc-cox illustrates how the time-dependent AUC of the models changes with biomarker specification across prediction horizons, with the model being fixed as Cox PH.
 
 ![Time-dependent AUC (Cox PH)](figures/q2_auc_cox.png){#fig-auc-cox}
 
 Among the Cox PH models, the model incorporating NfL shows slightly higher time-dependent AUC values overall than the model incorporating p-tau181 across the follow-up period. However, both single-marker models are consistently outperformed by the combined model, indicating superior discriminative ability in distinguishing between individuals who progress to AD dementia and those who do not over time.
 
-Within the JM framework, a similar overall pattern is observed. Appendix 8.7; Figure 15a demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
+Within the JM framework, a similar overall pattern is observed. Appendix 8.7; @fig-auc-jm demonstrates that the multivariate JM provides the strongest predictive performance across all horizons, with consistently higher AUC values than the univariate models. Nevertheless, the NfL-based model generally shows slightly higher values than the p-tau181-based model.
 
-Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except for predictions made at the three-year point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; Figure 15b).
+Comparing JLCMMs, NfL consistently shows slightly higher AUC values than the model including p-tau181, except for predictions made at the three-year point, where the p-tau181 model shows a slightly higher value (Appendix 8.7; @fig-auc-jlcmm).
 
-The time-dependent AUC values for each biomarker specification at each horizon are also presented in Table 10. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.966, compared to 0.947 for the NfL model and 0.905 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
+The time-dependent AUC values for each biomarker specification at each horizon are also presented in @tbl-results-AUC. For example, for predictions made two years from baseline, the multivariate JM achieved an AUC value of 0.966, compared to 0.947 for the NfL model and 0.905 for the p-tau181 model. This indicates that the multivariate model provides the highest predictive performance at this time point.
 
-When observing the time-dependent Brier score curves, such as Figure 5 presenting the curves for the Cox PH models, a similar pattern can be observed, although not as evident.
+When observing the time-dependent Brier score curves, such as @fig-brier-cox presenting the curves for the Cox PH models, a similar pattern can be observed, although not as evident.
 
 ![Time-Dependent Brier scores (Cox PH)](figures/q2_brier_cox.png){#fig-brier-cox}
 
 All three Cox PH models yield low and similar time-dependent Brier scores across all horizons, as reflected by the closely aligned curves. For predictions made at year six, the curve for the model incorporating both biomarkers simultaneously is slightly lower, indicating a lower Brier score and thus better overall predictive accuracy at this time point compared to the two single-marker models.
 
-In a similar manner, the multivariate JM demonstrates lower Brier scores compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; Figure 16a). These two models consistently show similar Brier values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; Figure 16b).
+In a similar manner, the multivariate JM demonstrates lower Brier scores compared to the corresponding models incorporating solely p-tau181 or NfL (Appendix 8.7; @fig-brier-jm). These two models consistently show similar Brier values, a pattern that is also observed for the JLCMMs incorporating p-tau181 or NfL, respectively (Appendix 8.7; @fig-brier-jlcmm).
 
-Table 11, containing the time-dependent Brier scores for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modelling baseline values for both biomarkers yields a value of 0.142 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
+@tbl-results-brier, containing the time-dependent Brier scores for each biomarker specification and at each horizon, also confirms this pattern. For instance, for all three Cox PH models, predictions made two years ahead yield values ranging from 0.052 to 0.054, indicating minimal differences in predictive performance at this time point. For predictions made six years ahead, the differences between models becomes slightly more pronounced: modelling baseline values for both biomarkers yields a value of 0.142 at this horizon, whilst the models with baseline p-tau181 and NfL as covariates yield values of 0.158 and 0.159, respectively.
 
 ## Sensitivity Analyses
 
 To examine the robustness of the results, several sensitivity analyses were performed.
 
-First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal (Appendix 8.8; Tables 21, 22, 23 & 24). This indicates that the results were robust to the handling of duplicated measurements.
+First, for individuals with two biomarker measurements reported for the same date and visit code, the analysis was run using the first or last recorded value instead of their average. The majority of the time-dependent AUC and Brier scores values were identical to those in the main analysis, with any differences being minimal (Appendix 8.8; @tbl-auc-first, @tbl-brier-first, @tbl-auc-last, @tbl-brier-last). This indicates that the results were robust to the handling of duplicated measurements.
 
-A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period (Appendix 8.8; Tables 25 & 26).
+A second sensitivity analysis related to the difference in time between the examinations of p-tau181 and NfL. Instead of defining the baseline date as the midpoint between the differing biomarker examination dates, it was defined as the earlier of the two biomarker examination dates. The Cox PH models still consistently yielded the lowest AUC values across modelling approaches, while the performance of the JMs and the JLCMMs varied across follow-up points and biomarker specifications. Additionally, the models incorporating both biomarkers still performed the best overall, yielding the highest AUC values and lowest Brier scores across the follow-up period (Appendix 8.8; @tbl-auc-first-date, @tbl-brier-first-date).
 
-In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis (Appendix 8.8; Tables 27 & 28).
+In response to the debate over whether individuals with sparse data should be included when modelling longitudinal trajectories, all models were also estimated on an extended cohort of individuals with one or more p-tau181 and NfL measurements. Compared with the analysis restricted to participants with at least three biomarker measurements, the relative performance of the JMs and JLCMMs decreased, particularly compared to Cox PH models, which remained stable and in some cases showed similar or higher AUC values. In contrast, Brier scores showed that Cox models generally had worse overall predictive performance than the JMs and JLCMMs. Both metrics indicate that models based on p-tau181 alone performed similarly to, or in some cases better than, models including both biomarkers. NfL consistently displayed the lowest values across this sensitivity analysis (Appendix 8.8; @tbl-auc-1-bm, @tbl-brier-1-bm).
 
-Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons (Appendix 8.8; Tables 29 & 30). These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
+Finally, to address the interval-censored nature of the data, event times were defined as the midpoint between diagnostic exams when a positive dementia diagnosis was given. For all models, both discrimination and overall predictive performance were poorer than in the main analysis, with the largest differences in time-dependent AUC observed for JMs and JLCMMs. The differences between Brier scores from the main analysis and this sensitivity analysis were relatively similar across models, with differences in both AUC and Brier scores levelling out over prediction horizons (Appendix 8.8; @tbl-auc-mid, @tbl-brier-mid). These results show that this method is a worse approximation than defining event times as the diagnostic exam dates for this cohort.
 
 # Discussion
 
@@ -715,7 +748,7 @@ Sensitivity analyses showed however that including participants with only one bi
 
 ## Limitations and Further Research
 
-A limitation of this study is that covariate inclusion differed between models, as it was adapted to the assumptions and requirements of each modelling framework. Although this ensures appropriate model specification and avoids unnecessary loss of predictive information, it also means that differences in predictive performance cannot be attributed only to the modelling approach, since they may also be due to differences in covariate adjustment. Given this model-specific setup, the choice of random effects structures also differed between the JM and JLCMM frameworks. Therefore, the results should be interpreted as a comparison of the models as developed in this study, rather than as a fully systematic comparison of modelling frameworks.
+A limitation of this study is that covariate inclusion differed between models, as it was adapted to the assumptions and requirements of each modelling framework. Although this ensures appropriate model specification and avoids unnecessary loss of predictive information, it also means that differences in predictive performance cannot be attributed only to the modelling approach, since they may also be due to differences in covariate adjustment. Given this model-specific setup, the choice of random effects structures also differed between the JM and JLCMM frameworks. The $JMBayes2$ package is not yet developed for a simple random effects structure with only random intercept, yet the JLCMMs with only a random intercept provided the best fit according to BIC values. Therefore, the results should be interpreted as a comparison of the models as developed in this study, rather than as a fully systematic comparison of modelling frameworks. The decision to exclude covariates in the JLCMM submodels could have been compared thoroughly against models including age at baseline, sex and genotype in order to better understand their role in latent class modelling, however the limited scope of this study meant that the focus remained on comparison of the chosen models. Therefore, it is suggested that further research is done to evaluate how predictive performance and latent class structure changes with covariate inclusion.
 
 Additionally, while multivariate models including both p-tau181 and NfL were fitted within both the Cox PH and JM frameworks, enabling comparison of biomarker strategies across multiple modelling frameworks, a corresponding multivariate model was not fitted within the JLCMM framework due to time constraints. The $lcmm$ package does not currently offer dynamic predictions for multivariate JLCMMs, meaning there would be a heavier time burden were this model to be included. As a result, the predictive performance for the different biomarker specifications were not compared in a complete manner within this modelling approach. Further research could therefore work to assess the benefit in class-specific modelling of these biomarkers simultaneously. From the results of this analysis, the JLCMMs appeared to offer better late predictions, and further work could be done to assess whether the performance of these models diverges further over longer horizons.
 
@@ -731,7 +764,13 @@ Alzheimer’s Association (n.d.). *Mild cognitive impairment (MCI)*. <https://ww
 
 Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.-a). *About ADNI*. <https://adni.loni.usc.edu/about/>
 
-- (n.d.-b). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-b) *ADNI Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-1_Protocol.pdf>
+
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-c) *ADNI 2 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-2_Protocol.pdf>
+
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-d) *ADNI 3 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/consentForms/ADNI3_ProtocolVersion3.1_20201204.pdf>
+
+- (n.d.-e). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
 
 Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https://www.alzheimers.org.uk/about-dementia/types-dementia/who-gets-alzheimers-disease>
 
@@ -834,6 +873,7 @@ Zou, K. H., Liu, A., Bandos, A. I., Ohno-Machado, L., & Rockette, H. E. (2012). 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-event-full
 #| tbl-cap: "Participants with at least one biomarker measurement: number of participants, event distribution, and event rates in in-sample and out-of-sample data"
 kable_standard(readRDS("tables/event_table_full.rds"))
 ```
@@ -841,6 +881,7 @@ kable_standard(readRDS("tables/event_table_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-cohort-full
 #| tbl-cap: "Participants with at least one biomarker measurement: characteristics and measurement distributions "
 kable_standard(readRDS("tables/cohort_summary_table_full.rds"))
 ```
@@ -866,6 +907,7 @@ Correlation plots of numerical variables
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-lrt-re
 #| tbl-cap: "Results of the likelihood ratio tests to determine the random effects structure for LME models"
 kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```
@@ -873,6 +915,7 @@ kable_standard(readRDS("tables/long_re_lrt_table.rds"))
 ```{r, echo=FALSE}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-pht
 #| tbl-cap: "p-values for the proportional hazards assumption tests for all covariates in the Cox PH models"
 kable_standard(readRDS("tables/table_ph.rds"))
 ```
@@ -880,6 +923,7 @@ kable_standard(readRDS("tables/table_ph.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-coxph-lrt-sex
 #| tbl-cap: "Results of the likelihood ratio test for the Cox PH models with and without sex as a covariate"
 kable_standard(readRDS("tables/surv_lrt_table.rds"))
 ```
@@ -902,6 +946,10 @@ LME model with longitudinal p-tau181 measurements
 LME model with longitudinal NfL measurements
 :::
 
+::: {layout-ncol="1"}
+![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width="70%"}
+:::
+
 ## Convergence
 
 ::: {#fig-alpha layout-ncol="3"}
@@ -914,15 +962,12 @@ LME model with longitudinal NfL measurements
 Trace plots of the $α$-parameters (convergence)
 :::
 
-::: {layout-ncol="1"}
-![Complementary log-log transformed KM survival estimates vs log time](figures/weibull_assumption.png){#fig-weibull-assumption width="70%"}
-:::
-
 ## Model Results
 
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-jlcmm-ptau
 #| tbl-cap: "Model parameters for the two class JLCMM with longitudinal measurements for p-tau181"
 kable_standard(readRDS("tables/jlcmm_m1_ptau_output.rds"))
 ```
@@ -930,16 +975,23 @@ kable_standard(readRDS("tables/jlcmm_m1_ptau_output.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-jlcmm-nfl
 #| tbl-cap: "Model parameters for the two class JLCMM with longitudinal measurements for NfL"
 kable_standard(readRDS("tables/jlcmm_m1_nfl_output.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-ptau-class
 #| tbl-cap: "Comparison between latent classes estimated from longitudinal p-tau181 measurements"
 kable_standard(readRDS("tables/class_summary_ptau.rds"))
 ```
 
 ```{r}
+#| pos: "H"
+#| tbl-pos: "H"
+#| label: tbl-nfl-class
 #| tbl-cap: "Comparison between latent classes estimated from longitudinal NfL measurements"
 kable_standard(readRDS("tables/class_summary_nfl.rds"))
 ```
@@ -993,6 +1045,7 @@ Time-dependent Brier score curves
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-first
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```
@@ -1000,6 +1053,7 @@ kable_standard(readRDS("tables/results_table_AUC_first_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-first
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the first measurement"
 kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```
@@ -1007,6 +1061,7 @@ kable_standard(readRDS("tables/results_table_Brier_first_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-last
 #| tbl-cap: "Time-dependent AUC when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```
@@ -1014,6 +1069,7 @@ kable_standard(readRDS("tables/results_table_AUC_last_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-last
 #| tbl-cap: "Time-dependent Brier scores when visits with duplicate measurements are replaced by visits with the last measurement"
 kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```
@@ -1021,6 +1077,7 @@ kable_standard(readRDS("tables/results_table_Brier_last_duplicate.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-first-date
 #| tbl-cap: "Time-dependent AUC when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```
@@ -1028,6 +1085,7 @@ kable_standard(readRDS("tables/results_table_AUC_first_biomarker_bl.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-first-date
 #| tbl-cap: "Time-dependent Brier scores when baseline date is defined as the first biomarker examination date"
 kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```
@@ -1035,6 +1093,7 @@ kable_standard(readRDS("tables/results_table_Brier_first_biomarker_bl.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-1-bm
 #| tbl-cap: "Time-dependent AUC when setting participants to those with at least one biomarker measurement "
 kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```
@@ -1049,6 +1108,7 @@ kable_standard(readRDS("tables/results_table_AUC_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-1-bm
 #| tbl-cap: "Time-dependent Brier scores when setting participants to those with at least one biomarker measurement"
 kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```
@@ -1063,6 +1123,7 @@ kable_standard(readRDS("tables/results_table_Brier_full.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-auc-mid
 #| tbl-cap: "Time-dependent AUC when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```
@@ -1070,6 +1131,7 @@ kable_standard(readRDS("tables/results_table_AUC_midpoint_test.rds"))
 ```{r}
 #| pos: "H"
 #| tbl-pos: "H"
+#| label: tbl-brier-mid
 #| tbl-cap: "Time-dependent Brier scores when time-to-event is defined as midpoint between diagnostic exams"
 kable_standard(readRDS("tables/results_table_Brier_midpoint_test.rds"))
 ```
