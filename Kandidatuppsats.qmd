@@ -474,13 +474,13 @@ Application of these criteria yielded a sample of 704 participants with at least
 
 The variable of primary interest represents three diagnostic states - cognitively normal (CN), MCI and dementia - and was retrieved from the DXSUM data set in ADNIMERGE2. Diagnostic status is assessed over several examination dates, with the number of diagnostic exams differing depending on the baseline diagnosis.
 
-Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
+Since the study focuses on time to incident dementia, participants are classified as either non-demented or demented for the survival analyses, without distinguishing between CN and MCI states. The ADNI 1 and ADNI 2 protocols only include AD participants that meet criteria for probable AD, whilst the ADNI 3 protocol excludes any individuals with any significant neurological disease other than AD (ADNI, n.d.-b, n.d.-c, n.d-d). Therefore, individuals with dementia diagnoses are assumed to have dementia due to AD. Diagnostic records occurring more than 50 days prior to the first biomarker measurement were excluded to maintain temporal alignment between clinical and biomarker data.
 
 The sample size of the in-sample data set was 528, among which 128 experienced the event of dementia, corresponding to 24.24%, while 400 individuals were censored. In the out-of-sample, there were 176 individuals, among whom 49 experienced the event of dementia, corresponding to 27.84%, while 127 individuals were censored. The corresponding sample sizes for the in-sample and out-of-sample data sets, as well as the numbers of events and censored participants when extending the study population to include individuals with at least one biomarker measurement, can be found in Appendix 8.1; @tbl-event-full. The corresponding distributions and summary statistics for the variables of interest are presented for this cohort in Appendix 8.1; @tbl-cohort-full and are described below for participants with at least three measurements.
 
 ### p-tau181 and NfL
 
-The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-b), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-b). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
+The p-tau181 measurements were retrieved from the UGOPTAU181 data set, which was processed by the University of Gothenburg (ADNI, n.d.-e), while the NfL measurements were retrieved from the BLENNOWPLASMANFLLONG data set, processed by the Blennow Lab (ADNI, n.d.-e). The unit of measurement is not specified in the data set documentation for either p-tau181 or NfL.
 
 P-tau181 values ranged from 0.4 to 238.3, with a median of 15.5. Similarly, NfL values ranged from 6.9 to 408.0, with a median of 36.5. The pronounced right-skewness for both biomarkers was the basis for log-transformation in order to better satisfy the assumption of normality (Appendix 8.1; @fig-hist-ptau, @fig-hist-nfl). Values exceeding three standard deviations from the mean were further examined and retained in the analysis, as they reflected consistent longitudinal patterns within individuals rather than implausible observations.
 
@@ -764,7 +764,13 @@ Alzheimer’s Association (n.d.). *Mild cognitive impairment (MCI)*. <https://ww
 
 Alzheimer’s Disease Neuroimaging Initiative (ADNI) (n.d.-a). *About ADNI*. <https://adni.loni.usc.edu/about/>
 
-- (n.d.-b). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-b) *ADNI Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-1_Protocol.pdf>
+
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-c) *ADNI 2 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/clinical/ADNI-2_Protocol.pdf>
+
+Alzheimer’s Disease Neuroimaging Initiative (ADNI). (n.d.-d) *ADNI 3 Protocol*. <https://adni.loni.usc.edu/wp-content/themes/freshnews-dev-v2/documents/consentForms/ADNI3_ProtocolVersion3.1_20201204.pdf>
+
+- (n.d.-e). *ADNI Data*. <https://adni.loni.usc.edu/data-samples/adni-data/>
 
 Alzheimer’s Society (n.d.). *Risk factors for Alzheimer’s disease*. <https://www.alzheimers.org.uk/about-dementia/types-dementia/who-gets-alzheimers-disease>
 
